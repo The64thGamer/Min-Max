@@ -1,5 +1,4 @@
 # Description
-
 Min-Max is a VR Team-Based shooter in current development.
 
 #Plugins
