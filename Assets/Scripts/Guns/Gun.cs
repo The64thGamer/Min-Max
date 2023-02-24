@@ -24,3 +24,11 @@ public enum ChangableWeaponStats
     maxAmmo,
     bulletSpeed,
 }
+
+[SerializeField]
+public enum Team
+{
+    neutral,
+    team1,
+    team2,
+}
