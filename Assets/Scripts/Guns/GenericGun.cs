@@ -39,7 +39,7 @@ public class GenericGun : Gun
         {
             fireCooldown = 1.0f / SearchStats(ChangableWeaponStats.shotsPerSecond);
             GameObject currentProjectile = GameObject.Instantiate(projectile, firePoint.position, firePoint.rotation);
-            currentProjectile.GetComponent<Projectile>().SetProjectile(firePoint.position, currentFireAngle, SearchStats(ChangableWeaponStats.bulletSpeed), currentPlayer.GetTeamLayer());
+            currentProjectile.GetComponent<Projectile>().SetProjectile(firePoint.position, currentFireAngle, SearchStats(ChangableWeaponStats.bulletSpeed), currentPlayer.GetTeamLayer(), crosshair.position);
         }
     }
     public override void AltFire() { }
