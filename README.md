@@ -11,3 +11,7 @@ A set of plugins are required for building properly, and are not included within
 -[Realtime CSG](https://assetstore.unity.com/packages/tools/modeling/realtime-csg-69542)
 
 -TextMesh Pro
+
+-UI Toolkit
+
+-Steamworks.net
