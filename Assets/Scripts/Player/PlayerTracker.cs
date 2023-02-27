@@ -43,9 +43,9 @@ public class PlayerTracker : MonoBehaviour
 
     void Update()
     {
-        if(forceValue)
+        if (forceValue)
         {
-            animController.SetFloat("HandX",forceX);
+            animController.SetFloat("HandX", forceX);
             animController.SetFloat("HandY", forceY);
             return;
         }
@@ -53,7 +53,7 @@ public class PlayerTracker : MonoBehaviour
         {
             forwardRoot.position = Hroot.position;
             transform.LookAt(forwardRoot);
-            transform.localEulerAngles = new Vector3(0,transform.localEulerAngles.y,0);
+            transform.localEulerAngles = new Vector3(0, transform.localEulerAngles.y, 0);
 
             headset.localPosition = forwardRoot.InverseTransformPoint(Hhead.transform.position);
             rightController.localPosition = forwardRoot.InverseTransformPoint(HrightCont.transform.position);
@@ -64,22 +64,23 @@ public class PlayerTracker : MonoBehaviour
             ScaleAround(leftController, leftController.transform.parent.InverseTransformPoint(transform.position), Vector3.one * forceHostScale);
         }
 
-        animController.SetFloat("HandX", CalcLerpVector3(centerPos.localPosition, rightPos.localPosition, rightController.localPosition,false) - CalcLerpVector3(centerPos.localPosition, leftPos.localPosition, rightController.localPosition, false));
+        animController.SetFloat("HandX", CalcLerpVector3(centerPos.localPosition, rightPos.localPosition, rightController.localPosition, false) - CalcLerpVector3(centerPos.localPosition, leftPos.localPosition, rightController.localPosition, false));
         animController.SetFloat("HandY", CalcLerpVector3(centerPos.localPosition, upPos.localPosition, rightController.localPosition, true) - CalcLerpVector3(centerPos.localPosition, downPos.localPosition, rightController.localPosition, true));
     }
 
     void LateUpdate()
     {
-        playerRHand.rotation = HrightCont.rotation;
-        playerRHand.eulerAngles = new Vector3(-playerRHand.eulerAngles.x, playerRHand.eulerAngles.y, -playerRHand.eulerAngles.z);
-        playerRHand.Rotate(forwardRoot.localEulerAngles);
-        playerRHand.Rotate(new Vector3(-90, 180,0));
-        playerRHand.Rotate(adjustRotation);
-
-
-        playerHead.rotation = Hhead.rotation;
-        playerHead.eulerAngles = new Vector3(-playerHead.eulerAngles.x, playerHead.eulerAngles.y, -playerHead.eulerAngles.z);
-        playerHead.Rotate(forwardRoot.localEulerAngles);
+        if (forceHostMirror)
+        {
+            playerRHand.rotation = HrightCont.rotation;
+            playerRHand.eulerAngles = new Vector3(-playerRHand.eulerAngles.x, playerRHand.eulerAngles.y, -playerRHand.eulerAngles.z);
+            playerRHand.Rotate(forwardRoot.localEulerAngles);
+            playerRHand.Rotate(new Vector3(-90, 180, 0));
+            playerRHand.Rotate(adjustRotation);
+            playerHead.rotation = Hhead.rotation;
+            playerHead.eulerAngles = new Vector3(-playerHead.eulerAngles.x, playerHead.eulerAngles.y, -playerHead.eulerAngles.z);
+            playerHead.Rotate(forwardRoot.localEulerAngles);
+        }
     }
 
     float CalcLerpVector3(Vector3 a, Vector3 b, Vector3 t, bool vertical)
