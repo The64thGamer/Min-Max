@@ -8,10 +8,15 @@ public class UI_Titlescreen : MonoBehaviour
 {
     VisualElement root;
 
+    [SerializeField] List<Texture2D> mapIcons;
+    [SerializeField] List<string> mapNames;
+    int currentSceneToLoad;
+
     private void OnEnable()
     {
         root = GetComponent<UIDocument>().rootVisualElement;
 
+        //Grab
         Button rc_play = root.Q<Button>("RCPlay");
         Button rc_exit = root.Q<Button>("RCExit");
         Button ps_startlocal = root.Q<Button>("PSStartLocal");
@@ -19,7 +24,9 @@ public class UI_Titlescreen : MonoBehaviour
         Button ps_joinserver = root.Q<Button>("PSJoinServer");
         Button ps_back = root.Q<Button>("PSBack");
         Button ms_startgame = root.Q<Button>("StartGame");
+        DropdownField selectMap = root.Q<DropdownField>("SelectMap");
 
+        //Functions
         rc_play.clicked += () => SwapColumn(RightColumnSwaps.none,LeftColumnSwaps.PlaySection);
         rc_exit.clicked += () => Application.Quit();
         ps_startlocal.clicked += () => StartLocalOrHost(false);
@@ -27,11 +34,15 @@ public class UI_Titlescreen : MonoBehaviour
         //ps_joinserver.clicked += () =>
         ps_back.clicked += () => SwapColumn(RightColumnSwaps.TBAPanel, LeftColumnSwaps.MainButtons);
         ms_startgame.clicked += () => StartCoroutine(LoadMap());
+        selectMap.RegisterValueChangedCallback(evt => SwapMap(selectMap));
+
+        //Ect
+        selectMap.choices = mapNames;
     }
 
     IEnumerator LoadMap()
     {
-        AsyncOperation asyncLoad = SceneManager.LoadSceneAsync(1);
+        AsyncOperation asyncLoad = SceneManager.LoadSceneAsync(mapNames[currentSceneToLoad]);
         while (!asyncLoad.isDone)
         {
             yield return null;
@@ -102,4 +113,9 @@ public class UI_Titlescreen : MonoBehaviour
         }
     }
 
+    void SwapMap(DropdownField evt)
+    {
+        root.Q<VisualElement>("MapIcon").Q<Image>().image = mapIcons[evt.index];
+        currentSceneToLoad = evt.index;
+    }
 }
