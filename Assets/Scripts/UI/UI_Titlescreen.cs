@@ -38,14 +38,18 @@ public class UI_Titlescreen : MonoBehaviour
 
         //Ect
         selectMap.choices = mapNames;
+        selectMap.index = 0;
     }
 
     IEnumerator LoadMap()
     {
-        AsyncOperation asyncLoad = SceneManager.LoadSceneAsync(mapNames[currentSceneToLoad]);
-        while (!asyncLoad.isDone)
+        if (currentSceneToLoad > 0)
         {
-            yield return null;
+            AsyncOperation asyncLoad = SceneManager.LoadSceneAsync(mapNames[currentSceneToLoad]);
+            while (!asyncLoad.isDone)
+            {
+                yield return null;
+            }
         }
     }
 
@@ -115,7 +119,7 @@ public class UI_Titlescreen : MonoBehaviour
 
     void SwapMap(DropdownField evt)
     {
-        root.Q<VisualElement>("MapIcon").Q<Image>().image = mapIcons[evt.index];
+        root.Q<VisualElement>("MapIcon").style.backgroundImage = new StyleBackground(mapIcons[evt.index]);
         currentSceneToLoad = evt.index;
     }
 }
