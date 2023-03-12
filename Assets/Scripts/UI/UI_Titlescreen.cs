@@ -43,7 +43,7 @@ public class UI_Titlescreen : MonoBehaviour
 
     IEnumerator LoadMap()
     {
-        if (currentSceneToLoad > 0)
+        if (currentSceneToLoad >= 0)
         {
             AsyncOperation asyncLoad = SceneManager.LoadSceneAsync(mapNames[currentSceneToLoad]);
             while (!asyncLoad.isDone)

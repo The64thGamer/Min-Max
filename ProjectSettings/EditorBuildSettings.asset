@@ -11,6 +11,9 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Game Assets/Scenes/Maps/plr_backlot/plr_backlot.unity
     guid: 80521d7e7a7ce034fa6d546bd2a22c18
+  - enabled: 1
+    path: Assets/Game Assets/Scenes/Maps/pl_artpass/pl_artpass.unity
+    guid: e342c76d9b4ae37408571a894f4c6852
   m_configObjects:
     Unity.XR.Oculus.Settings: {fileID: 11400000, guid: bfa1182bd221b4ca89619141f66f1260,
       type: 2}
