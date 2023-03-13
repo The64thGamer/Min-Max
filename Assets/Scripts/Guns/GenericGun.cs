@@ -16,14 +16,19 @@ public class GenericGun : Gun
     [SerializeField] GameObject projectile;
     [SerializeField] Transform crosshair;
     [SerializeField] Player currentPlayer;
+    [SerializeField] AudioClip fireSound;
+    [SerializeField] AudioClip hitWorldSound;
+
 
     int currentAmmo;
     float fireCooldown;
     Vector3 currentFireAngle;
+    AudioSource au;
 
     void Start()
     {
         currentAmmo = SearchStats(ChangableWeaponStats.maxAmmo);
+        au = this.GetComponent<AudioSource>();
     }
     void Update()
     {
@@ -37,9 +42,10 @@ public class GenericGun : Gun
     {
         if (fireCooldown <= 0)
         {
+            au.PlayOneShot(fireSound);
             fireCooldown = 1.0f / SearchStats(ChangableWeaponStats.shotsPerSecond);
             GameObject currentProjectile = GameObject.Instantiate(projectile, firePoint.position, firePoint.rotation);
-            currentProjectile.GetComponent<Projectile>().SetProjectile(firePoint.position, currentFireAngle, SearchStats(ChangableWeaponStats.bulletSpeed), currentPlayer.GetTeamLayer(), crosshair.position);
+            currentProjectile.GetComponent<Projectile>().SetProjectile(firePoint.position, currentFireAngle, SearchStats(ChangableWeaponStats.bulletSpeed), currentPlayer.GetTeamLayer(), crosshair.position,hitWorldSound);
         }
     }
     public override void AltFire() { }
