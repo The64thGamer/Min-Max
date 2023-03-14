@@ -33,6 +33,9 @@ public class GenericGun : Gun
     void Update()
     {
         currentFireAngle = gm.CalculateFireAngle(currentPlayer,crosshair);
+        crosshair.position = gm.CalculcateFirePosition(currentFireAngle, currentPlayer);
+        crosshair.transform.LookAt(Camera.main.transform.position);
+        crosshair.localScale = Vector3.one + (Vector3.one * (crosshair.position - Camera.main.transform.position).magnitude * 0.5f);
         if (fireCooldown > 0)
         {
             fireCooldown = Mathf.Max(0, fireCooldown - Time.deltaTime);
@@ -44,7 +47,7 @@ public class GenericGun : Gun
         {
             au.PlayOneShot(fireSound);
             fireCooldown = 1.0f / SearchStats(ChangableWeaponStats.shotsPerSecond);
-            gm.SpawnProjectile(gunNameKey, firePoint.rotation, firePoint.position, currentFireAngle, SearchStats(ChangableWeaponStats.bulletSpeed), currentPlayer.GetTeamLayer(), crosshair.position);
+            gm.SpawnProjectile(currentPlayer);
         }
     }
     public override void AltFire() { }
@@ -61,8 +64,7 @@ public class GenericGun : Gun
     {
         return gunNameKey;
     }
-
-    int SearchStats(ChangableWeaponStats stat)
+    public override int SearchStats(ChangableWeaponStats stat)
     {
         for (int i = 0; i < changableStats.Count; i++)
         {

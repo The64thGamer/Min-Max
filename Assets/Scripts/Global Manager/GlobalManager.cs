@@ -15,26 +15,30 @@ public class GlobalManager : MonoBehaviour
     [SerializeField] List<ClientPlayer> clients;
     [SerializeField] float serverTimeForgiveness;
 
+    const float MINANGLE = 0.8f;
+    const float SPHERESIZE = 0.4f;
+    const float MAXSPHERECASTDISTANCE = 20;
+    const float MAXRAYCASTDISTANCE = 1000;
+
     //Exploit: Hit needs to be parsed to ensure extreme angles aren't achievable.
-    public void SpawnProjectile(string gunNameKey, Quaternion rot, Vector3 pos, Vector3 forw, float setSpeed, int layer, Vector3 hit)
+    public void SpawnProjectile(Player player)
     {
-        GunProjectiles fp = al.SearchGuns(gunNameKey);
+        Transform rHand = player.GetRightHand();
+        Vector3 firePoint = rHand.position + rHand.TransformPoint(al.SearchGuns(player.GetCurrentGun().GetNameKey()).firepoint);
+        Quaternion fpRotation = rHand.rotation;
+
+        GunProjectiles fp = al.SearchGuns(player.GetCurrentGun().GetNameKey());
         if (fp.firePrefab != null)
         {
-            GameObject currentProjectile = GameObject.Instantiate(fp.firePrefab, pos, rot);
-            currentProjectile.GetComponent<Projectile>().SetProjectile(pos, forw, setSpeed, layer, hit);
+            GameObject currentProjectile = GameObject.Instantiate(fp.firePrefab, firePoint, fpRotation);
+            Vector3 fireAngle = CalculateFireAngle(player, null);
+            currentProjectile.GetComponent<Projectile>().SetProjectile(firePoint, fireAngle, player.GetCurrentGun().SearchStats(ChangableWeaponStats.bulletSpeed), player.GetTeamLayer(), CalculcateFirePosition(fireAngle,player));
         }
     }
 
     //Crosshair doesn't recalculate if it doesn't collide with a wall, fix it.
     public Vector3 CalculateFireAngle(Player player, Transform crosshair)
     {
-        const float MINANGLE = 0.8f;
-        const float SPHERESIZE = 0.4f;
-        const float MAXSPHERECASTDISTANCE = 20;
-        const float CROSSHAIRDISTANCESCALE = 0.5f;
-        const float MAXRAYCASTDISTANCE = 1000;
-
         RaycastHit hit;
         Vector3 startCast = Camera.main.transform.position + (Camera.main.transform.forward * SPHERESIZE);
         Vector3 finalAngle = Vector3.one;
@@ -58,21 +62,32 @@ public class GlobalManager : MonoBehaviour
         {
             float percentage = (dotAngle - MINANGLE) / (1 - MINANGLE);
             finalAngle = Vector3.Slerp(fpForward, finalAngle, percentage);
-            if (Physics.Raycast(firePoint, finalAngle, out hit, MAXRAYCASTDISTANCE, layermask))
-            {
-                crosshair.position = hit.point;
-                crosshair.transform.LookAt(Camera.main.transform.position);
-                crosshair.localScale = Vector3.one + (Vector3.one * (crosshair.position - Camera.main.transform.position).magnitude * CROSSHAIRDISTANCESCALE);
-            }
             return finalAngle;
+        }
+        return fpForward;
+    }
+
+    public Vector3 CalculcateFirePosition(Vector3 fireAngle, Player player)
+    {
+        RaycastHit hit;
+        Transform rHand = player.GetRightHand();
+        Vector3 firePoint = rHand.position + rHand.TransformPoint(al.SearchGuns(player.GetCurrentGun().GetNameKey()).firepoint);
+        Vector3 fpForward = rHand.forward;
+        LayerMask layermask = GetIgnoreTeamAndVRLayerMask(player);
+        float dotAngle = Vector3.Dot(fpForward, fireAngle.normalized);
+        if (dotAngle > MINANGLE)
+        {
+            if (Physics.Raycast(firePoint, fireAngle, out hit, MAXRAYCASTDISTANCE, layermask))
+            {
+                return hit.point;
+
+            }
         }
         if (Physics.Raycast(firePoint, fpForward, out hit, MAXRAYCASTDISTANCE, layermask))
         {
-            crosshair.position = hit.point;
-            crosshair.transform.LookAt(Camera.main.transform.position);
-            crosshair.localScale = Vector3.one + (Vector3.one * (crosshair.position - Camera.main.transform.position).magnitude * CROSSHAIRDISTANCESCALE);
+            return hit.point;
         }
-        return fpForward;
+        return firePoint + (100 * fpForward);
     }
 
     public LayerMask GetIgnoreTeamAndVRLayerMask(Player player)
