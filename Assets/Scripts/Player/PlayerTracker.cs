@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
+using static Player;
 
 public class PlayerTracker : MonoBehaviour
 {
@@ -41,6 +42,16 @@ public class PlayerTracker : MonoBehaviour
     [Range(-1.0f, 1.0f)]
     [SerializeField] float forceY;
 
+    ButtonState triggerR;
+    ButtonState triggerL;
+    public enum ButtonState
+    {
+        off,
+        started,
+        on,
+        cancelled,
+    }
+
     void Update()
     {
         if (forceValue)
@@ -70,6 +81,7 @@ public class PlayerTracker : MonoBehaviour
 
     void LateUpdate()
     {
+        UpdateTriggers();
         if (forceHostMirror)
         {
             playerRHand.rotation = HrightCont.rotation;
@@ -80,6 +92,67 @@ public class PlayerTracker : MonoBehaviour
             playerHead.rotation = Hhead.rotation;
             playerHead.eulerAngles = new Vector3(-playerHead.eulerAngles.x, playerHead.eulerAngles.y, -playerHead.eulerAngles.z);
             playerHead.Rotate(forwardRoot.localEulerAngles);
+        }
+    }
+
+    public void TriggerPressed(bool left)
+    {
+        if (!left)
+        {
+            if (triggerR == ButtonState.off)
+            {
+                triggerR = ButtonState.started;
+            }
+        }
+        else
+        {
+            if (triggerL == ButtonState.off)
+            {
+                triggerL = ButtonState.started;
+            }
+        }
+    }
+    public void TriggerReleased(bool left)
+    {
+        if (!left)
+        {
+            if (triggerR == ButtonState.on)
+            {
+                triggerR = ButtonState.cancelled;
+            }
+        }
+        else
+        {
+            if (triggerL == ButtonState.on)
+            {
+                triggerL = ButtonState.cancelled;
+            }
+        }
+    }
+
+    void UpdateTriggers()
+    {
+        switch (triggerR)
+        {
+            case ButtonState.started:
+                triggerR = ButtonState.on;
+                break;
+            case ButtonState.cancelled:
+                triggerR = ButtonState.off;
+                break;
+            default:
+                break;
+        }
+        switch (triggerL)
+        {
+            case ButtonState.started:
+                triggerL = ButtonState.on;
+                break;
+            case ButtonState.cancelled:
+                triggerL = ButtonState.off;
+                break;
+            default:
+                break;
         }
     }
 
@@ -96,7 +169,7 @@ public class PlayerTracker : MonoBehaviour
         }
     }
 
-    public void ScaleAround(Transform target, Vector3 pivot, Vector3 newScale)
+    void ScaleAround(Transform target, Vector3 pivot, Vector3 newScale)
     {
         Vector3 A = target.localPosition;
         Vector3 B = pivot;
@@ -109,5 +182,14 @@ public class PlayerTracker : MonoBehaviour
 
         //target.localScale = newScale;
         target.localPosition = FP;
+    }
+
+    public ButtonState GetTriggerR()
+    {
+        return triggerR;
+    }
+    public ButtonState GetTriggerL()
+    {
+        return triggerL;
     }
 }

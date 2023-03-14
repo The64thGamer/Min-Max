@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.ProBuilder;
+using static PlayerTracker;
 
 public class GlobalManager : MonoBehaviour
 {
@@ -11,14 +12,36 @@ public class GlobalManager : MonoBehaviour
         al = GetComponent<AllStats>();
     }
 
-    [SerializeField] Player host;
-    [SerializeField] List<ClientPlayer> clients;
+    [SerializeField] PlayerTracker host;
+    [SerializeField] List<PlayerTracker> clients;
     [SerializeField] float serverTimeForgiveness;
 
     const float MINANGLE = 0.8f;
     const float SPHERESIZE = 0.4f;
     const float MAXSPHERECASTDISTANCE = 20;
     const float MAXRAYCASTDISTANCE = 1000;
+
+    private void Update()
+    {
+        CheckAllPlayerInputs(host);
+        for (int i = 0; i < clients.Count; i++)
+        {
+            CheckAllPlayerInputs(clients[i]);
+        }
+    }
+
+    void CheckAllPlayerInputs(PlayerTracker player)
+    {
+        if (player.GetTriggerR() == ButtonState.started || player.GetTriggerR() == ButtonState.on)
+        {
+            //player.GetComponent<Player>().GetCurrentGun().Fire();
+            host.GetComponent<Player>().GetCurrentGun().Fire();
+            for (int i = 0; i < clients.Count; i++)
+            {
+                clients[i].GetComponent<Player>().GetCurrentGun().Fire();
+            }
+        }
+    }
 
     //Exploit: Hit needs to be parsed to ensure extreme angles aren't achievable.
     public void SpawnProjectile(Player player)
@@ -72,9 +95,8 @@ public class GlobalManager : MonoBehaviour
         RaycastHit hit;
         Transform rHand = player.GetRightHand();
         Vector3 firePoint = rHand.position + rHand.TransformPoint(al.SearchGuns(player.GetCurrentGun().GetNameKey()).firepoint);
-        Vector3 fpForward = rHand.forward;
         LayerMask layermask = GetIgnoreTeamAndVRLayerMask(player);
-        float dotAngle = Vector3.Dot(fpForward, fireAngle.normalized);
+        float dotAngle = Vector3.Dot(rHand.forward, fireAngle.normalized);
         if (dotAngle > MINANGLE)
         {
             if (Physics.Raycast(firePoint, fireAngle, out hit, MAXRAYCASTDISTANCE, layermask))
@@ -83,11 +105,11 @@ public class GlobalManager : MonoBehaviour
 
             }
         }
-        if (Physics.Raycast(firePoint, fpForward, out hit, MAXRAYCASTDISTANCE, layermask))
+        if (Physics.Raycast(firePoint, rHand.forward, out hit, MAXRAYCASTDISTANCE, layermask))
         {
             return hit.point;
         }
-        return firePoint + (100 * fpForward);
+        return firePoint + (10 * rHand.forward);
     }
 
     public LayerMask GetIgnoreTeamAndVRLayerMask(Player player)
