@@ -32,7 +32,7 @@ public class GenericGun : Gun
     }
     void Update()
     {
-        currentFireAngle = CalculateFireAngle();
+        currentFireAngle = gm.CalculateFireAngle(currentPlayer,crosshair);
         if (fireCooldown > 0)
         {
             fireCooldown = Mathf.Max(0, fireCooldown - Time.deltaTime);
@@ -57,6 +57,11 @@ public class GenericGun : Gun
         return 0;
     }
 
+    public override string GetNameKey()
+    {
+        return gunNameKey;
+    }
+
     int SearchStats(ChangableWeaponStats stat)
     {
         for (int i = 0; i < changableStats.Count; i++)
@@ -67,51 +72,5 @@ public class GenericGun : Gun
             }
         }
         return 0;
-    }
-
-    //Crosshair doesn't recalculate if it doesn't collide with a wall, fix it.
-    Vector3 CalculateFireAngle()
-    {
-        const float MINANGLE = 0.8f;
-        const float SPHERESIZE = 0.4f;
-        const float MAXSPHERECASTDISTANCE = 20;
-        const float CROSSHAIRDISTANCESCALE = 0.5f;
-        const float MAXRAYCASTDISTANCE = 1000;
-
-        RaycastHit hit;
-        Vector3 startCast = Camera.main.transform.position + (Camera.main.transform.forward * SPHERESIZE);
-        Vector3 finalAngle = Vector3.one;
-
-        LayerMask layermask = currentPlayer.GetIgnoreTeamAndVRLayerMask();
-
-
-        if (Physics.SphereCast(startCast, SPHERESIZE, Camera.main.transform.forward, out hit, MAXSPHERECASTDISTANCE, layermask))
-        {
-            finalAngle = ((startCast + (Camera.main.transform.forward * hit.distance)) - firePoint.position);
-        }
-        else
-        {
-            finalAngle = Camera.main.transform.forward;
-        }
-        float dotAngle = Vector3.Dot(firePoint.forward, finalAngle.normalized);
-        if (dotAngle > MINANGLE)
-        {
-            float percentage = (dotAngle - MINANGLE) / (1 - MINANGLE);
-            finalAngle = Vector3.Slerp(firePoint.forward, finalAngle, percentage);
-            if (Physics.Raycast(firePoint.transform.position, finalAngle, out hit, MAXRAYCASTDISTANCE, layermask))
-            {
-                crosshair.position = hit.point;
-                crosshair.transform.LookAt(Camera.main.transform.position);
-                crosshair.localScale = Vector3.one + (Vector3.one * (crosshair.position - Camera.main.transform.position).magnitude * CROSSHAIRDISTANCESCALE);
-            }
-            return finalAngle;
-        }
-        if (Physics.Raycast(firePoint.transform.position, firePoint.transform.forward, out hit, MAXRAYCASTDISTANCE, layermask))
-        {
-            crosshair.position = hit.point;
-            crosshair.transform.LookAt(Camera.main.transform.position);
-            crosshair.localScale = Vector3.one + (Vector3.one * (crosshair.position - Camera.main.transform.position).magnitude * CROSSHAIRDISTANCESCALE);
-        }
-        return firePoint.forward;
     }
 }

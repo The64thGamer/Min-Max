@@ -9,6 +9,9 @@ public class Player : MonoBehaviour
     ButtonState triggerR;
     ButtonState triggerL;
     [SerializeField] LayerMask vrLayers;
+    [SerializeField] Transform camera;
+    [SerializeField] Transform handR;
+    [SerializeField] Transform handL;
     public enum ButtonState
     {
         off,
@@ -89,9 +92,34 @@ public class Player : MonoBehaviour
         }
     }
 
+    public LayerMask GetVRLayers()
+    {
+        return vrLayers;
+    }
+
     public Team GetTeam()
     {
         return currentTeam;
+    }
+
+    public Gun GetCurrentGun()
+    {
+        return currentGun;
+    }
+
+    public Transform GetCamera()
+    {
+        return camera;
+    }
+
+    public Transform GetRightHand()
+    {
+        return handR;
+    }
+
+    public Transform GetLeftHand()
+    {
+        return handL;
     }
 
     public int GetTeamLayer()
@@ -105,25 +133,5 @@ public class Player : MonoBehaviour
             default:
                 return LayerMask.NameToLayer("Neutral");
         }
-    }
-
-    public LayerMask GetIgnoreTeamAndVRLayerMask()
-    {
-        LayerMask mask;
-        switch (currentTeam)
-        {
-            case Team.team1:
-                mask = 1 << LayerMask.NameToLayer("Team1");
-                break;
-            case Team.team2:
-                mask = 1 << LayerMask.NameToLayer("Team2");
-                break;
-            default:
-                mask = 1 << LayerMask.NameToLayer("Neutral");
-                break;
-        }
-        mask = mask | vrLayers;
-        mask = ~mask;
-        return mask;
     }
 }

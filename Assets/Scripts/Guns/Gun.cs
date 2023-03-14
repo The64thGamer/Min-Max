@@ -8,6 +8,7 @@ public abstract class Gun : MonoBehaviour
     public abstract void AltFire();
     public abstract List<WeaponStats> ChangableStats();
     public abstract int GetCurrentAmmo();
+    public abstract string GetNameKey();
 }
 [System.Serializable]
 public class WeaponStats

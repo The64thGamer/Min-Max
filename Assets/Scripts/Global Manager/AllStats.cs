@@ -79,6 +79,7 @@ public struct GunProjectiles
     public GameObject gunPrefab;
     public GameObject firePrefab;
     public GameObject altFirePrefab;
+    public Vector3 firepoint;
 }
 
 
