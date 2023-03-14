@@ -9,11 +9,10 @@ public class Projectile : MonoBehaviour
     float t;
     Vector3 originalPos;
     Vector3 hitPoint;
-    AudioClip hitSound;
+    [SerializeField] AudioClip hitSound;
 
-    public void SetProjectile(Vector3 pos, Vector3 forw, float setSpeed, int layer, Vector3 hit, AudioClip audC)
+    public void SetProjectile(Vector3 pos, Vector3 forw, float setSpeed, int layer, Vector3 hit)
     {
-        hitSound = audC;
         hitPoint = hit;
         originalPos = pos;
         transform.position = pos;

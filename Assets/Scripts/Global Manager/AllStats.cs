@@ -5,8 +5,7 @@ using UnityEngine;
 
 public class AllStats : MonoBehaviour
 {
-    [SerializeField]
-    ClassStats 
+    [SerializeField] ClassStats 
         labourer,
         woodworker,
         engineer,
@@ -17,9 +16,22 @@ public class AllStats : MonoBehaviour
         freelancer,
         craftsman,
         manager;
+    [Header("MM-Chips")]
+    [SerializeField] List<MMChip> mMChips;
+    [Header("Guns")]
+    [SerializeField] List<GunProjectiles> guns;
 
-    [SerializeField]
-    List<MMChip> mMChips;
+    public GunProjectiles SearchGuns(string gun)
+    {
+        for (int i = 0; i < guns.Count; i++)
+        {
+            if (guns[i].gunName == gun)
+            {
+                return guns[i];
+            }
+        }
+        return new GunProjectiles();
+    }
 }
 
 [SerializeField]
@@ -53,12 +65,22 @@ public struct MMChip
 [System.Serializable]
 public struct MMChipBuffNerfPair
 {
-    [SerializeField] ChangableWeaponStats buffNerf;
+public ChangableWeaponStats buffNerf;
     [SerializeField] MMChipApplier applier;
     [SerializeField] float statFloat;
     [SerializeField] int statInt;
     [SerializeField] bool statBool;
 }
+
+[System.Serializable]
+public struct GunProjectiles
+{
+    public string gunName;
+    public GameObject gunPrefab;
+    public GameObject firePrefab;
+    public GameObject altFirePrefab;
+}
+
 
 [SerializeField]
 enum MMChipApplier

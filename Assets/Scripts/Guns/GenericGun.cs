@@ -13,22 +13,22 @@ public class GenericGun : Gun
         new WeaponStats(){ statName = ChangableWeaponStats.bulletSpeed, stat = 3},
     };
     [SerializeField] Transform firePoint;
-    [SerializeField] GameObject projectile;
     [SerializeField] Transform crosshair;
     [SerializeField] Player currentPlayer;
     [SerializeField] AudioClip fireSound;
-    [SerializeField] AudioClip hitWorldSound;
-
+    [SerializeField] string gunNameKey;
 
     int currentAmmo;
     float fireCooldown;
     Vector3 currentFireAngle;
     AudioSource au;
+    GlobalManager gm;
 
     void Start()
     {
         currentAmmo = SearchStats(ChangableWeaponStats.maxAmmo);
         au = this.GetComponent<AudioSource>();
+        gm = GameObject.Find("Global Manager").GetComponent<GlobalManager>();
     }
     void Update()
     {
@@ -44,8 +44,7 @@ public class GenericGun : Gun
         {
             au.PlayOneShot(fireSound);
             fireCooldown = 1.0f / SearchStats(ChangableWeaponStats.shotsPerSecond);
-            GameObject currentProjectile = GameObject.Instantiate(projectile, firePoint.position, firePoint.rotation);
-            currentProjectile.GetComponent<Projectile>().SetProjectile(firePoint.position, currentFireAngle, SearchStats(ChangableWeaponStats.bulletSpeed), currentPlayer.GetTeamLayer(), crosshair.position,hitWorldSound);
+            gm.SpawnProjectile(gunNameKey, firePoint.rotation, firePoint.position, currentFireAngle, SearchStats(ChangableWeaponStats.bulletSpeed), currentPlayer.GetTeamLayer(), crosshair.position);
         }
     }
     public override void AltFire() { }
