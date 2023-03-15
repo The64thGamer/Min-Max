@@ -12,9 +12,11 @@ public class PlayerTracker : MonoBehaviour
     [SerializeField] Transform rightController;
     [SerializeField] Transform leftController;
     [SerializeField] Transform forwardRoot;
+    [SerializeField] Transform trackerScale;
 
     [Header("Animator")]
     [SerializeField] Animator animController;
+    [SerializeField] Transform modelRoot;
     [SerializeField] Transform playerRHand;
     [SerializeField] Transform playerHead;
 
@@ -39,8 +41,8 @@ public class PlayerTracker : MonoBehaviour
     {
         if (animController != null)
         {
-            animController.SetFloat("HandX", CalcLerpVector3(centerPos.localPosition, rightPos.localPosition, rightController.localPosition, false) - CalcLerpVector3(centerPos.localPosition, leftPos.localPosition, rightController.localPosition, false));
-            animController.SetFloat("HandY", CalcLerpVector3(centerPos.localPosition, upPos.localPosition, rightController.localPosition, true) - CalcLerpVector3(centerPos.localPosition, downPos.localPosition, rightController.localPosition, true));
+            animController.SetFloat("HandX", CalcLerpVector3(centerPos.position, rightPos.position, rightController.position, false) - CalcLerpVector3(centerPos.position, leftPos.position, rightController.position, false));
+            animController.SetFloat("HandY", CalcLerpVector3(centerPos.position, upPos.position, rightController.position, true) - CalcLerpVector3(centerPos.position, downPos.position, rightController.position, true));
         }
     }
 
@@ -50,23 +52,24 @@ public class PlayerTracker : MonoBehaviour
         if (animController != null)
         {
             playerRHand.rotation = rightController.rotation;
-            playerRHand.eulerAngles = new Vector3(-playerRHand.eulerAngles.x, playerRHand.eulerAngles.y, -playerRHand.eulerAngles.z);
-            playerRHand.Rotate(forwardRoot.localEulerAngles);
             playerRHand.Rotate(new Vector3(-90, 180, 0));
             playerRHand.Rotate(new Vector3(9.99f, 27.48f, 0));
             playerHead.rotation = headset.rotation;
-            playerHead.eulerAngles = new Vector3(-playerHead.eulerAngles.x, playerHead.eulerAngles.y, -playerHead.eulerAngles.z);
-            playerHead.Rotate(forwardRoot.localEulerAngles);
+            modelRoot.rotation = Quaternion.Lerp(modelRoot.rotation, playerHead.rotation, Time.deltaTime);
+            modelRoot.eulerAngles = new Vector3(0, modelRoot.eulerAngles.y, 0);
         }
     }
 
-    public void UpdatePlayerPositions(Transform head, Transform handR, Transform handL, Transform root)
+    public void UpdatePlayerPositions(Transform head, Transform handR, Transform handL, Transform root, float scale)
     {
         headset.localPosition = root.InverseTransformPoint(head.transform.position);
+        headset.rotation = head.rotation;
         rightController.localPosition = root.InverseTransformPoint(handR.transform.position);
+        rightController.rotation = handR.rotation;
         leftController.localPosition = root.InverseTransformPoint(handL.transform.position);
+        leftController.rotation = handL.rotation;
         forwardRoot.position = root.position;
-        forwardRoot.forward = root.forward;
+        trackerScale.localScale = Vector3.one * scale;
     }
 
     public void TriggerPressed(bool left)

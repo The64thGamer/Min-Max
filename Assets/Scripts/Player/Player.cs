@@ -24,6 +24,11 @@ public class Player : MonoBehaviour
         return currentGun;
     }
 
+    public ClassList GetCurrentClass()
+    {
+        return currentClass;
+    }
+
     public int GetTeamLayer()
     {
         switch (currentTeam)

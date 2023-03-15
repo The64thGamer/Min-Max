@@ -32,10 +32,39 @@ public class AllStats : MonoBehaviour
         }
         return new GunProjectiles();
     }
+
+    public ClassStats GetClassStats(ClassList currentClass)
+    {
+        switch (currentClass)
+        {
+            case ClassList.labourer:
+                return labourer;
+            case ClassList.woodworker:
+                return woodworker;
+            case ClassList.engineer:
+                return engineer;
+            case ClassList.programmer:
+                return programmer;
+            case ClassList.computer:
+                return computer;
+            case ClassList.fabricator:
+                return fabricator;
+            case ClassList.artist:
+                return artist;
+            case ClassList.freelancer:
+                return freelancer;
+            case ClassList.craftsman:
+                return craftsman;
+            case ClassList.manager:
+                return manager;
+            default:
+                return new ClassStats();
+         }
+    }
 }
 
 [SerializeField]
-enum ClassList
+public enum ClassList
 {
     labourer,
     woodworker,
@@ -52,8 +81,9 @@ enum ClassList
 [System.Serializable]
 public struct ClassStats
 {
-    [SerializeField] int baseHealth;
-    [SerializeField] int baseSpeed;
+    public int baseHealth;
+    public int baseSpeed;
+    public float trackingScale;
 }
 
 [System.Serializable]

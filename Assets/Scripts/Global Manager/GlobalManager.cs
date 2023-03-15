@@ -6,28 +6,29 @@ using static PlayerTracker;
 
 public class GlobalManager : MonoBehaviour
 {
-    AllStats al;
-    private void Start()
-    {
-        al = GetComponent<AllStats>();
-    }
-
     [SerializeField] Player host;
     [SerializeField] List<Player> clients;
     [SerializeField] float serverTimeForgiveness;
     [SerializeField] LayerMask vrLayers;
+
+    AllStats al;
 
     const float MINANGLE = 0.8f;
     const float SPHERESIZE = 0.4f;
     const float MAXSPHERECASTDISTANCE = 20;
     const float MAXRAYCASTDISTANCE = 1000;
 
+    private void Start()
+    {
+        al = GetComponent<AllStats>();
+    }
+
     private void Update()
     {
         for (int i = 0; i < clients.Count; i++)
         {
             CheckAllPlayerInputs(clients[i]);
-            clients[i].GetTracker().UpdatePlayerPositions(host.GetTracker().GetCamera(), host.GetTracker().GetRightHand(), host.GetTracker().GetLeftHand(), host.GetTracker().GetForwardRoot());
+            clients[i].GetTracker().UpdatePlayerPositions(host.GetTracker().GetCamera(), host.GetTracker().GetRightHand(), host.GetTracker().GetLeftHand(), host.GetTracker().GetForwardRoot(), al.GetClassStats(host.GetCurrentClass()).trackingScale);
         }
         CheckAllPlayerInputs(host);
     }
@@ -153,5 +154,10 @@ public class GlobalManager : MonoBehaviour
             return true;
         }
         return false;
+    }
+
+    public AllStats GetAllStats()
+    {
+        return al;
     }
 }
