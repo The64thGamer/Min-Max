@@ -15,13 +15,6 @@ public class PlayerTracker : MonoBehaviour
 
     [Header("Animator")]
     [SerializeField] Animator animController;
-    [SerializeField] bool forceValue;
-    [Range(-1.0f, 1.0f)]
-    [SerializeField] float forceX;
-    [Range(-1.0f, 1.0f)]
-    [SerializeField] float forceY;
-
-    [Header("Player Bones")]
     [SerializeField] Transform playerRHand;
     [SerializeField] Transform playerHead;
 
@@ -44,12 +37,6 @@ public class PlayerTracker : MonoBehaviour
 
     void Update()
     {
-        if (forceValue)
-        {
-            animController.SetFloat("HandX", forceX);
-            animController.SetFloat("HandY", forceY);
-            return;
-        }
         if (animController != null)
         {
             animController.SetFloat("HandX", CalcLerpVector3(centerPos.localPosition, rightPos.localPosition, rightController.localPosition, false) - CalcLerpVector3(centerPos.localPosition, leftPos.localPosition, rightController.localPosition, false));
@@ -60,16 +47,17 @@ public class PlayerTracker : MonoBehaviour
     void LateUpdate()
     {
         UpdateTriggers();
-        playerRHand.rotation = rightController.rotation;
-        playerRHand.eulerAngles = new Vector3(-playerRHand.eulerAngles.x, playerRHand.eulerAngles.y, -playerRHand.eulerAngles.z);
-        playerRHand.Rotate(forwardRoot.localEulerAngles);
-        playerRHand.Rotate(new Vector3(-90, 180, 0));
-        playerRHand.Rotate(new Vector3(9.99f, 27.48f, 0));
-        playerHead.rotation = headset.rotation;
-        playerHead.eulerAngles = new Vector3(-playerHead.eulerAngles.x, playerHead.eulerAngles.y, -playerHead.eulerAngles.z);
-        playerHead.Rotate(forwardRoot.localEulerAngles);
-        transform.LookAt(forwardRoot);
-        transform.localEulerAngles = new Vector3(0, transform.localEulerAngles.y, 0);
+        if (animController != null)
+        {
+            playerRHand.rotation = rightController.rotation;
+            playerRHand.eulerAngles = new Vector3(-playerRHand.eulerAngles.x, playerRHand.eulerAngles.y, -playerRHand.eulerAngles.z);
+            playerRHand.Rotate(forwardRoot.localEulerAngles);
+            playerRHand.Rotate(new Vector3(-90, 180, 0));
+            playerRHand.Rotate(new Vector3(9.99f, 27.48f, 0));
+            playerHead.rotation = headset.rotation;
+            playerHead.eulerAngles = new Vector3(-playerHead.eulerAngles.x, playerHead.eulerAngles.y, -playerHead.eulerAngles.z);
+            playerHead.Rotate(forwardRoot.localEulerAngles);
+        }
     }
 
     public void UpdatePlayerPositions(Transform head, Transform handR, Transform handL, Transform root)
