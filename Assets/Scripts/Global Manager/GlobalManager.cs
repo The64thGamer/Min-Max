@@ -47,16 +47,12 @@ public class GlobalManager : MonoBehaviour
     //Exploit: Hit needs to be parsed to ensure extreme angles aren't achievable.
     public void SpawnProjectile(Player player)
     {
-        Transform rHand = player.GetTracker().GetRightHand();
-        Vector3 firePoint = rHand.position; //+ rHand.TransformPoint(al.SearchGuns(player.GetCurrentGun().GetNameKey()).firepoint);
-        Quaternion fpRotation = rHand.rotation;
-
         GunProjectiles fp = al.SearchGuns(player.GetCurrentGun().GetNameKey());
         if (fp.firePrefab != null)
         {
             GameObject currentProjectile = GameObject.Instantiate(fp.firePrefab);
             Vector3 fireAngle = CalculateFireAngle(player);
-            currentProjectile.GetComponent<Projectile>().SetProjectile(firePoint, fireAngle, player.GetCurrentGun().SearchStats(ChangableWeaponStats.bulletSpeed), player.GetTeamLayer(), CalculcateFirePosition(fireAngle, player));
+            currentProjectile.GetComponent<Projectile>().SetProjectile(player.GetTracker().GetRightHand().position, fireAngle, player.GetCurrentGun().SearchStats(ChangableWeaponStats.bulletSpeed), player.GetTeamLayer(), CalculcateFirePosition(fireAngle, player));
         }
     }
 
@@ -114,7 +110,7 @@ public class GlobalManager : MonoBehaviour
         {
             return hit.point;
         }
-        return firePoint + (100 * fireAngle);
+        return firePoint + (100 * fireAngle.normalized);
     }
 
     Vector3 postest1;
