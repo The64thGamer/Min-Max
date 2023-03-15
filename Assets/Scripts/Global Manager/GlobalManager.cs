@@ -48,7 +48,7 @@ public class GlobalManager : MonoBehaviour
     public void SpawnProjectile(Player player)
     {
         Transform rHand = player.GetTracker().GetRightHand();
-        Vector3 firePoint = rHand.position + rHand.TransformPoint(al.SearchGuns(player.GetCurrentGun().GetNameKey()).firepoint);
+        Vector3 firePoint = rHand.position; //+ rHand.TransformPoint(al.SearchGuns(player.GetCurrentGun().GetNameKey()).firepoint);
         Quaternion fpRotation = rHand.rotation;
 
         GunProjectiles fp = al.SearchGuns(player.GetCurrentGun().GetNameKey());
@@ -107,29 +107,14 @@ public class GlobalManager : MonoBehaviour
         {
             if (Physics.Raycast(firePoint, fireAngle, out hit, MAXRAYCASTDISTANCE, layermask))
             {
-                if (player == host)
-                {
-                    ray1 = firePoint;
-                    ray2 = hit.point;
-                }
                 return hit.point;
             }
         }
         if (Physics.Raycast(firePoint, rHand.forward, out hit, MAXRAYCASTDISTANCE, layermask))
         {
-            if (player == host)
-            {
-                ray1 = firePoint;
-                ray2 = hit.point;
-            }
             return hit.point;
         }
-        if (player == host)
-        {
-            ray1 = firePoint;
-            ray2 = firePoint + (100 * rHand.forward);
-        }
-        return firePoint + (100 * rHand.forward);
+        return firePoint + (100 * fireAngle);
     }
 
     Vector3 postest1;
