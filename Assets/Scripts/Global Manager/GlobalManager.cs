@@ -12,9 +12,10 @@ public class GlobalManager : MonoBehaviour
         al = GetComponent<AllStats>();
     }
 
-    [SerializeField] PlayerTracker host;
-    [SerializeField] List<PlayerTracker> clients;
+    [SerializeField] Player host;
+    [SerializeField] List<Player> clients;
     [SerializeField] float serverTimeForgiveness;
+    [SerializeField] LayerMask vrLayers;
 
     const float MINANGLE = 0.8f;
     const float SPHERESIZE = 0.4f;
@@ -30,15 +31,15 @@ public class GlobalManager : MonoBehaviour
         }
     }
 
-    void CheckAllPlayerInputs(PlayerTracker player)
+    void CheckAllPlayerInputs(Player player)
     {
-        if (player.GetTriggerR() == ButtonState.started || player.GetTriggerR() == ButtonState.on)
+        if (player.GetTracker().GetTriggerR() == ButtonState.started || player.GetTracker().GetTriggerR() == ButtonState.on)
         {
-            //player.GetComponent<Player>().GetCurrentGun().Fire();
-            host.GetComponent<Player>().GetCurrentGun().Fire();
+            //player.GetCurrentGun().Fire();
+            host.GetCurrentGun().Fire();
             for (int i = 0; i < clients.Count; i++)
             {
-                clients[i].GetComponent<Player>().GetCurrentGun().Fire();
+                clients[i].GetCurrentGun().Fire();
             }
         }
     }
@@ -46,7 +47,7 @@ public class GlobalManager : MonoBehaviour
     //Exploit: Hit needs to be parsed to ensure extreme angles aren't achievable.
     public void SpawnProjectile(Player player)
     {
-        Transform rHand = player.GetRightHand();
+        Transform rHand = player.GetTracker().GetRightHand();
         Vector3 firePoint = rHand.position + rHand.TransformPoint(al.SearchGuns(player.GetCurrentGun().GetNameKey()).firepoint);
         Quaternion fpRotation = rHand.rotation;
 
@@ -68,7 +69,7 @@ public class GlobalManager : MonoBehaviour
 
         LayerMask layermask = GetIgnoreTeamAndVRLayerMask(player);
 
-        Transform rHand = player.GetRightHand();
+        Transform rHand = player.GetTracker().GetRightHand();
         Vector3 firePoint = rHand.position + rHand.TransformPoint(al.SearchGuns(player.GetCurrentGun().GetNameKey()).firepoint);
         Vector3 fpForward = rHand.forward;
 
@@ -93,7 +94,7 @@ public class GlobalManager : MonoBehaviour
     public Vector3 CalculcateFirePosition(Vector3 fireAngle, Player player)
     {
         RaycastHit hit;
-        Transform rHand = player.GetRightHand();
+        Transform rHand = player.GetTracker().GetRightHand();
         Vector3 firePoint = rHand.position + rHand.TransformPoint(al.SearchGuns(player.GetCurrentGun().GetNameKey()).firepoint);
         LayerMask layermask = GetIgnoreTeamAndVRLayerMask(player);
         float dotAngle = Vector3.Dot(rHand.forward, fireAngle.normalized);
@@ -127,7 +128,7 @@ public class GlobalManager : MonoBehaviour
                 mask = 1 << LayerMask.NameToLayer("Neutral");
                 break;
         }
-        mask = mask | player.GetVRLayers();
+        mask = mask | vrLayers;
         mask = ~mask;
         return mask;
     }

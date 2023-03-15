@@ -6,22 +6,10 @@ using static Player;
 
 public class PlayerTracker : MonoBehaviour
 {
-    [Header("Anim Points")]
-    [SerializeField] Transform upPos;
-    [SerializeField] Transform downPos;
-    [SerializeField] Transform rightPos;
-    [SerializeField] Transform leftPos;
-    [SerializeField] Transform centerPos;
-
     [Header("Raw Positions")]
     [SerializeField] Transform headset;
     [SerializeField] Transform rightController;
     [SerializeField] Transform leftController;
-
-    [Header("Player Bones")]
-    [SerializeField] Transform playerRHand;
-    [SerializeField] Transform playerHead;
-
 
     [Header("Force Mirror")]
     [SerializeField] bool forceHostMirror;
@@ -41,6 +29,17 @@ public class PlayerTracker : MonoBehaviour
     [SerializeField] float forceX;
     [Range(-1.0f, 1.0f)]
     [SerializeField] float forceY;
+
+    [Header("Player Bones")]
+    [SerializeField] Transform playerRHand;
+    [SerializeField] Transform playerHead;
+
+    [Header("Anim Points")]
+    [SerializeField] Transform upPos;
+    [SerializeField] Transform downPos;
+    [SerializeField] Transform rightPos;
+    [SerializeField] Transform leftPos;
+    [SerializeField] Transform centerPos;
 
     ButtonState triggerR;
     ButtonState triggerL;
@@ -74,9 +73,11 @@ public class PlayerTracker : MonoBehaviour
             ScaleAround(rightController, rightController.transform.parent.InverseTransformPoint(transform.position), Vector3.one * forceHostScale);
             ScaleAround(leftController, leftController.transform.parent.InverseTransformPoint(transform.position), Vector3.one * forceHostScale);
         }
-
-        animController.SetFloat("HandX", CalcLerpVector3(centerPos.localPosition, rightPos.localPosition, rightController.localPosition, false) - CalcLerpVector3(centerPos.localPosition, leftPos.localPosition, rightController.localPosition, false));
-        animController.SetFloat("HandY", CalcLerpVector3(centerPos.localPosition, upPos.localPosition, rightController.localPosition, true) - CalcLerpVector3(centerPos.localPosition, downPos.localPosition, rightController.localPosition, true));
+        if (animController != null)
+        {
+            animController.SetFloat("HandX", CalcLerpVector3(centerPos.localPosition, rightPos.localPosition, rightController.localPosition, false) - CalcLerpVector3(centerPos.localPosition, leftPos.localPosition, rightController.localPosition, false));
+            animController.SetFloat("HandY", CalcLerpVector3(centerPos.localPosition, upPos.localPosition, rightController.localPosition, true) - CalcLerpVector3(centerPos.localPosition, downPos.localPosition, rightController.localPosition, true));
+        }
     }
 
     void LateUpdate()
@@ -191,5 +192,20 @@ public class PlayerTracker : MonoBehaviour
     public ButtonState GetTriggerL()
     {
         return triggerL;
+    }
+
+    public Transform GetCamera()
+    {
+        return headset;
+    }
+
+    public Transform GetRightHand()
+    {
+        return rightController;
+    }
+
+    public Transform GetLeftHand()
+    {
+        return leftController;
     }
 }

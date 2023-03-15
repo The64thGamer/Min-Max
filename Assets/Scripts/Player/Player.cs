@@ -7,15 +7,11 @@ public class Player : MonoBehaviour
     [SerializeField] Gun currentGun;
     [SerializeField] Team currentTeam;
     [SerializeField] ClassList currentClass;
+    [SerializeField] PlayerTracker tracker;
 
-    [SerializeField] LayerMask vrLayers;
-    [SerializeField] Transform camera;
-    [SerializeField] Transform handR;
-    [SerializeField] Transform handL;
-
-    public LayerMask GetVRLayers()
+    public PlayerTracker GetTracker()
     {
-        return vrLayers;
+        return tracker;
     }
 
     public Team GetTeam()
@@ -26,21 +22,6 @@ public class Player : MonoBehaviour
     public Gun GetCurrentGun()
     {
         return currentGun;
-    }
-
-    public Transform GetCamera()
-    {
-        return camera;
-    }
-
-    public Transform GetRightHand()
-    {
-        return handR;
-    }
-
-    public Transform GetLeftHand()
-    {
-        return handL;
     }
 
     public int GetTeamLayer()
