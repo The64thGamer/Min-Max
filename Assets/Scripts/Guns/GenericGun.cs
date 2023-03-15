@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class GenericGun : Gun
 {
@@ -23,19 +24,31 @@ public class GenericGun : Gun
     Vector3 currentFireAngle;
     AudioSource au;
     GlobalManager gm;
+    bool showCrosshair;
 
     void Start()
     {
         currentAmmo = SearchStats(ChangableWeaponStats.maxAmmo);
         au = this.GetComponent<AudioSource>();
         gm = GameObject.Find("Global Manager").GetComponent<GlobalManager>();
+        if(gm.IsPlayerHost(currentPlayer))
+        {
+            showCrosshair = true;
+        }
+        else
+        {
+            Destroy(crosshair.gameObject.GetComponent<Image>());
+        }
     }
     void Update()
     {
         currentFireAngle = gm.CalculateFireAngle(currentPlayer);
-        crosshair.position = gm.CalculcateFirePosition(currentFireAngle, currentPlayer);
-        crosshair.transform.LookAt(Camera.main.transform.position);
-        crosshair.localScale = Vector3.one + (Vector3.one * (crosshair.position - currentPlayer.GetTracker().GetCamera().position).magnitude * 0.5f);
+        if (showCrosshair)
+        {
+            crosshair.position = gm.CalculcateFirePosition(currentFireAngle, currentPlayer);
+            crosshair.transform.LookAt(Camera.main.transform.position);
+            crosshair.localScale = Vector3.one + (Vector3.one * (crosshair.position - Camera.main.transform.position).magnitude * 1.5f);
+        }
         if (fireCooldown > 0)
         {
             fireCooldown = Mathf.Max(0, fireCooldown - Time.deltaTime);

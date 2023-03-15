@@ -54,9 +54,9 @@ public class GlobalManager : MonoBehaviour
         GunProjectiles fp = al.SearchGuns(player.GetCurrentGun().GetNameKey());
         if (fp.firePrefab != null)
         {
-            GameObject currentProjectile = GameObject.Instantiate(fp.firePrefab, firePoint, fpRotation);
+            GameObject currentProjectile = GameObject.Instantiate(fp.firePrefab);
             Vector3 fireAngle = CalculateFireAngle(player);
-            currentProjectile.GetComponent<Projectile>().SetProjectile(firePoint, fireAngle, player.GetCurrentGun().SearchStats(ChangableWeaponStats.bulletSpeed), player.GetTeamLayer(), CalculcateFirePosition(fireAngle,player));
+            currentProjectile.GetComponent<Projectile>().SetProjectile(firePoint, fireAngle, player.GetCurrentGun().SearchStats(ChangableWeaponStats.bulletSpeed), player.GetTeamLayer(), CalculcateFirePosition(fireAngle, player));
         }
     }
 
@@ -95,7 +95,7 @@ public class GlobalManager : MonoBehaviour
     {
         RaycastHit hit;
         Transform rHand = player.GetTracker().GetRightHand();
-        Vector3 firePoint = rHand.position + rHand.TransformPoint(al.SearchGuns(player.GetCurrentGun().GetNameKey()).firepoint);
+        Vector3 firePoint = rHand.position; // + rHand.TransformPoint(al.SearchGuns(player.GetCurrentGun().GetNameKey()).firepoint);
         if (player == host)
         {
             postest1 = rHand.position;
@@ -107,23 +107,41 @@ public class GlobalManager : MonoBehaviour
         {
             if (Physics.Raycast(firePoint, fireAngle, out hit, MAXRAYCASTDISTANCE, layermask))
             {
+                if (player == host)
+                {
+                    ray1 = firePoint;
+                    ray2 = hit.point;
+                }
                 return hit.point;
             }
         }
         if (Physics.Raycast(firePoint, rHand.forward, out hit, MAXRAYCASTDISTANCE, layermask))
         {
+            if (player == host)
+            {
+                ray1 = firePoint;
+                ray2 = hit.point;
+            }
             return hit.point;
         }
-        return firePoint + (10 * rHand.forward);
+        if (player == host)
+        {
+            ray1 = firePoint;
+            ray2 = firePoint + (100 * rHand.forward);
+        }
+        return firePoint + (100 * rHand.forward);
     }
 
     Vector3 postest1;
     Vector3 postest2;
+    Vector3 ray1;
+    Vector3 ray2;
 
     private void OnDrawGizmos()
     {
-        Gizmos.DrawCube(postest1, Vector3.one * 0.5f);
-        Gizmos.DrawCube(postest2, Vector3.one * 0.5f);
+        Gizmos.DrawCube(postest1, Vector3.one * 0.3f);
+        Gizmos.DrawCube(postest2, Vector3.one * 0.3f);
+        Gizmos.DrawLine(ray1, ray2);
     }
 
     public LayerMask GetIgnoreTeamAndVRLayerMask(Player player)
@@ -144,5 +162,14 @@ public class GlobalManager : MonoBehaviour
         mask = mask | vrLayers;
         mask = ~mask;
         return mask;
+    }
+
+    public bool IsPlayerHost(Player player)
+    {
+        if(player == host)
+        {
+            return true;
+        }
+        return false;
     }
 }
