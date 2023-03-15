@@ -68,7 +68,7 @@ public class GlobalManager : MonoBehaviour
         LayerMask layermask = GetIgnoreTeamAndVRLayerMask(player);
 
         Transform rHand = player.GetTracker().GetRightHand();
-        Vector3 firePoint = rHand.position + rHand.TransformPoint(al.SearchGuns(player.GetCurrentGun().GetNameKey()).firepoint);
+        Vector3 firePoint = rHand.position; //+ rHand.TransformPoint(al.SearchGuns(player.GetCurrentGun().GetNameKey()).firepoint);
         Vector3 fpForward = rHand.forward;
 
         if (Physics.SphereCast(startCast, SPHERESIZE, player.GetTracker().GetCamera().forward, out hit, MAXSPHERECASTDISTANCE, layermask))
@@ -107,10 +107,6 @@ public class GlobalManager : MonoBehaviour
             {
                 return hit.point;
             }
-        }
-        if (Physics.Raycast(firePoint, rHand.forward, out hit, MAXRAYCASTDISTANCE, layermask))
-        {
-            return hit.point;
         }
         return firePoint + (100 * fireAngle.normalized);
     }
