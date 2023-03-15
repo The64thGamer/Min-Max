@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading;
 using Unity.VisualScripting;
 using UnityEngine;
 using static Player;
@@ -10,17 +11,7 @@ public class PlayerTracker : MonoBehaviour
     [SerializeField] Transform headset;
     [SerializeField] Transform rightController;
     [SerializeField] Transform leftController;
-
-    [Header("Force Mirror")]
-    [SerializeField] bool forceHostMirror;
-    [Range(1.0f, 10.0f)]
-    [SerializeField] float forceHostScale = 10;
-    [SerializeField] Transform Hhead;
-    [SerializeField] Transform HrightCont;
-    [SerializeField] Transform HleftCont;
-    [SerializeField] Transform Hroot;
     [SerializeField] Transform forwardRoot;
-    [SerializeField] Vector3 adjustRotation;
 
     [Header("Animator")]
     [SerializeField] Animator animController;
@@ -59,20 +50,6 @@ public class PlayerTracker : MonoBehaviour
             animController.SetFloat("HandY", forceY);
             return;
         }
-        if (forceHostMirror)
-        {
-            forwardRoot.position = Hroot.position;
-            transform.LookAt(forwardRoot);
-            transform.localEulerAngles = new Vector3(0, transform.localEulerAngles.y, 0);
-
-            headset.localPosition = forwardRoot.InverseTransformPoint(Hhead.transform.position);
-            rightController.localPosition = forwardRoot.InverseTransformPoint(HrightCont.transform.position);
-            leftController.localPosition = forwardRoot.InverseTransformPoint(HleftCont.transform.position);
-
-            ScaleAround(headset, headset.transform.parent.InverseTransformPoint(transform.position), Vector3.one * forceHostScale);
-            ScaleAround(rightController, rightController.transform.parent.InverseTransformPoint(transform.position), Vector3.one * forceHostScale);
-            ScaleAround(leftController, leftController.transform.parent.InverseTransformPoint(transform.position), Vector3.one * forceHostScale);
-        }
         if (animController != null)
         {
             animController.SetFloat("HandX", CalcLerpVector3(centerPos.localPosition, rightPos.localPosition, rightController.localPosition, false) - CalcLerpVector3(centerPos.localPosition, leftPos.localPosition, rightController.localPosition, false));
@@ -83,17 +60,25 @@ public class PlayerTracker : MonoBehaviour
     void LateUpdate()
     {
         UpdateTriggers();
-        if (forceHostMirror)
-        {
-            playerRHand.rotation = HrightCont.rotation;
-            playerRHand.eulerAngles = new Vector3(-playerRHand.eulerAngles.x, playerRHand.eulerAngles.y, -playerRHand.eulerAngles.z);
-            playerRHand.Rotate(forwardRoot.localEulerAngles);
-            playerRHand.Rotate(new Vector3(-90, 180, 0));
-            playerRHand.Rotate(adjustRotation);
-            playerHead.rotation = Hhead.rotation;
-            playerHead.eulerAngles = new Vector3(-playerHead.eulerAngles.x, playerHead.eulerAngles.y, -playerHead.eulerAngles.z);
-            playerHead.Rotate(forwardRoot.localEulerAngles);
-        }
+        playerRHand.rotation = rightController.rotation;
+        playerRHand.eulerAngles = new Vector3(-playerRHand.eulerAngles.x, playerRHand.eulerAngles.y, -playerRHand.eulerAngles.z);
+        playerRHand.Rotate(forwardRoot.localEulerAngles);
+        playerRHand.Rotate(new Vector3(-90, 180, 0));
+        playerRHand.Rotate(new Vector3(9.99f, 27.48f, 0));
+        playerHead.rotation = headset.rotation;
+        playerHead.eulerAngles = new Vector3(-playerHead.eulerAngles.x, playerHead.eulerAngles.y, -playerHead.eulerAngles.z);
+        playerHead.Rotate(forwardRoot.localEulerAngles);
+        transform.LookAt(forwardRoot);
+        transform.localEulerAngles = new Vector3(0, transform.localEulerAngles.y, 0);
+    }
+
+    public void UpdatePlayerPositions(Transform head, Transform handR, Transform handL, Transform root)
+    {
+        headset.localPosition = root.InverseTransformPoint(head.transform.position);
+        rightController.localPosition = root.InverseTransformPoint(handR.transform.position);
+        leftController.localPosition = root.InverseTransformPoint(handL.transform.position);
+        forwardRoot.position = root.position;
+        forwardRoot.forward = root.forward;
     }
 
     public void TriggerPressed(bool left)
@@ -207,5 +192,10 @@ public class PlayerTracker : MonoBehaviour
     public Transform GetLeftHand()
     {
         return leftController;
+    }
+
+    public Transform GetForwardRoot()
+    {
+        return forwardRoot;
     }
 }

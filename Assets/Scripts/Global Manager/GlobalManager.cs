@@ -27,6 +27,7 @@ public class GlobalManager : MonoBehaviour
         for (int i = 0; i < clients.Count; i++)
         {
             CheckAllPlayerInputs(clients[i]);
+            clients[i].GetTracker().UpdatePlayerPositions(host.GetTracker().GetCamera(), host.GetTracker().GetRightHand(), host.GetTracker().GetLeftHand(), host.GetTracker().GetForwardRoot());
         }
         CheckAllPlayerInputs(host);
     }
