@@ -24,11 +24,11 @@ public class GlobalManager : MonoBehaviour
 
     private void Update()
     {
-        CheckAllPlayerInputs(host);
         for (int i = 0; i < clients.Count; i++)
         {
             CheckAllPlayerInputs(clients[i]);
         }
+        CheckAllPlayerInputs(host);
     }
 
     void CheckAllPlayerInputs(Player player)
@@ -55,16 +55,16 @@ public class GlobalManager : MonoBehaviour
         if (fp.firePrefab != null)
         {
             GameObject currentProjectile = GameObject.Instantiate(fp.firePrefab, firePoint, fpRotation);
-            Vector3 fireAngle = CalculateFireAngle(player, null);
+            Vector3 fireAngle = CalculateFireAngle(player);
             currentProjectile.GetComponent<Projectile>().SetProjectile(firePoint, fireAngle, player.GetCurrentGun().SearchStats(ChangableWeaponStats.bulletSpeed), player.GetTeamLayer(), CalculcateFirePosition(fireAngle,player));
         }
     }
 
     //Crosshair doesn't recalculate if it doesn't collide with a wall, fix it.
-    public Vector3 CalculateFireAngle(Player player, Transform crosshair)
+    public Vector3 CalculateFireAngle(Player player)
     {
         RaycastHit hit;
-        Vector3 startCast = Camera.main.transform.position + (Camera.main.transform.forward * SPHERESIZE);
+        Vector3 startCast = player.GetTracker().GetCamera().position + (player.GetTracker().GetCamera().forward * SPHERESIZE);
         Vector3 finalAngle = Vector3.one;
 
         LayerMask layermask = GetIgnoreTeamAndVRLayerMask(player);
@@ -73,13 +73,13 @@ public class GlobalManager : MonoBehaviour
         Vector3 firePoint = rHand.position + rHand.TransformPoint(al.SearchGuns(player.GetCurrentGun().GetNameKey()).firepoint);
         Vector3 fpForward = rHand.forward;
 
-        if (Physics.SphereCast(startCast, SPHERESIZE, Camera.main.transform.forward, out hit, MAXSPHERECASTDISTANCE, layermask))
+        if (Physics.SphereCast(startCast, SPHERESIZE, player.GetTracker().GetCamera().forward, out hit, MAXSPHERECASTDISTANCE, layermask))
         {
-            finalAngle = ((startCast + (Camera.main.transform.forward * hit.distance)) - firePoint);
+            finalAngle = ((startCast + (player.GetTracker().GetCamera().forward * hit.distance)) - firePoint);
         }
         else
         {
-            finalAngle = Camera.main.transform.forward;
+            finalAngle = player.GetTracker().GetCamera().forward;
         }
         float dotAngle = Vector3.Dot(fpForward, finalAngle.normalized);
         if (dotAngle > MINANGLE)
@@ -96,6 +96,11 @@ public class GlobalManager : MonoBehaviour
         RaycastHit hit;
         Transform rHand = player.GetTracker().GetRightHand();
         Vector3 firePoint = rHand.position + rHand.TransformPoint(al.SearchGuns(player.GetCurrentGun().GetNameKey()).firepoint);
+        if (player == host)
+        {
+            postest1 = rHand.position;
+            postest2 = firePoint;
+        }
         LayerMask layermask = GetIgnoreTeamAndVRLayerMask(player);
         float dotAngle = Vector3.Dot(rHand.forward, fireAngle.normalized);
         if (dotAngle > MINANGLE)
@@ -103,7 +108,6 @@ public class GlobalManager : MonoBehaviour
             if (Physics.Raycast(firePoint, fireAngle, out hit, MAXRAYCASTDISTANCE, layermask))
             {
                 return hit.point;
-
             }
         }
         if (Physics.Raycast(firePoint, rHand.forward, out hit, MAXRAYCASTDISTANCE, layermask))
@@ -111,6 +115,15 @@ public class GlobalManager : MonoBehaviour
             return hit.point;
         }
         return firePoint + (10 * rHand.forward);
+    }
+
+    Vector3 postest1;
+    Vector3 postest2;
+
+    private void OnDrawGizmos()
+    {
+        Gizmos.DrawCube(postest1, Vector3.one * 0.5f);
+        Gizmos.DrawCube(postest2, Vector3.one * 0.5f);
     }
 
     public LayerMask GetIgnoreTeamAndVRLayerMask(Player player)

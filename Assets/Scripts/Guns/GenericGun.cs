@@ -32,10 +32,10 @@ public class GenericGun : Gun
     }
     void Update()
     {
-        currentFireAngle = gm.CalculateFireAngle(currentPlayer,crosshair);
+        currentFireAngle = gm.CalculateFireAngle(currentPlayer);
         crosshair.position = gm.CalculcateFirePosition(currentFireAngle, currentPlayer);
         crosshair.transform.LookAt(Camera.main.transform.position);
-        crosshair.localScale = Vector3.one + (Vector3.one * (crosshair.position - Camera.main.transform.position).magnitude * 0.5f);
+        crosshair.localScale = Vector3.one + (Vector3.one * (crosshair.position - currentPlayer.GetTracker().GetCamera().position).magnitude * 0.5f);
         if (fireCooldown > 0)
         {
             fireCooldown = Mathf.Max(0, fireCooldown - Time.deltaTime);
