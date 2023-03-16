@@ -83,23 +83,25 @@ public struct ClassStats
 {
     public int baseHealth;
     public int baseSpeed;
+    public int baseAccel;
     public float trackingScale;
 }
 
 [System.Serializable]
 public struct MMChip
 {
-    [SerializeField] List<MMChipBuffNerfPair> buffsNerfs;
+    public List<MMChipBuffNerfPair> buffsNerfs;
+    public bool oneTimeUse;
 }
 
 [System.Serializable]
 public struct MMChipBuffNerfPair
 {
-public ChangableWeaponStats buffNerf;
-    [SerializeField] MMChipApplier applier;
-    [SerializeField] float statFloat;
-    [SerializeField] int statInt;
-    [SerializeField] bool statBool;
+    public ChangableWeaponStats buffNerf;
+    public MMChipApplier applier;
+    public float statFloat;
+    public int statInt;
+    public bool statBool;
 }
 
 [System.Serializable]
@@ -112,9 +114,7 @@ public struct GunProjectiles
     public Vector3 firepoint;
 }
 
-
-[SerializeField]
-enum MMChipApplier
+public enum MMChipApplier
 {
     add,
     multiply,

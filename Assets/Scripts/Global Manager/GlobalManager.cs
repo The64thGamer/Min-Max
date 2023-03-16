@@ -37,12 +37,16 @@ public class GlobalManager : MonoBehaviour
     {
         if (player.GetTracker().GetTriggerR() == ButtonState.started || player.GetTracker().GetTriggerR() == ButtonState.on)
         {
-            //player.GetCurrentGun().Fire();
             host.GetCurrentGun().Fire();
             for (int i = 0; i < clients.Count; i++)
             {
                 clients[i].GetCurrentGun().Fire();
             }
+        }
+        host.GetTracker().MovePlayer(host.GetTracker().GetMoveAxis());
+        for (int i = 0; i < clients.Count; i++)
+        {
+            clients[i].GetTracker().MovePlayer(host.GetTracker().GetMoveAxis());
         }
     }
 
@@ -94,11 +98,6 @@ public class GlobalManager : MonoBehaviour
         RaycastHit hit;
         Transform rHand = player.GetTracker().GetRightHand();
         Vector3 firePoint = rHand.position; // + rHand.TransformPoint(al.SearchGuns(player.GetCurrentGun().GetNameKey()).firepoint);
-        if (player == host)
-        {
-            postest1 = rHand.position;
-            postest2 = firePoint;
-        }
         LayerMask layermask = GetIgnoreTeamAndVRLayerMask(player);
         float dotAngle = Vector3.Dot(rHand.forward, fireAngle.normalized);
         if (dotAngle > MINANGLE)
@@ -109,18 +108,6 @@ public class GlobalManager : MonoBehaviour
             }
         }
         return firePoint + (100 * fireAngle.normalized);
-    }
-
-    Vector3 postest1;
-    Vector3 postest2;
-    Vector3 ray1;
-    Vector3 ray2;
-
-    private void OnDrawGizmos()
-    {
-        Gizmos.DrawCube(postest1, Vector3.one * 0.3f);
-        Gizmos.DrawCube(postest2, Vector3.one * 0.3f);
-        Gizmos.DrawLine(ray1, ray2);
     }
 
     public LayerMask GetIgnoreTeamAndVRLayerMask(Player player)

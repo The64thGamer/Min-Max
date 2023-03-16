@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Threading;
 using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.EventSystems;
+using UnityEngine.InputSystem;
 using static Player;
 
 public class PlayerTracker : MonoBehaviour
@@ -27,8 +29,16 @@ public class PlayerTracker : MonoBehaviour
     [SerializeField] Transform leftPos;
     [SerializeField] Transform centerPos;
 
+    [Header("Input")]
+    [SerializeField] InputActionProperty moveAxis;
+    [SerializeField] Rigidbody rigidBody;
+    [SerializeField] Player player;
+
     ButtonState triggerR;
     ButtonState triggerL;
+
+    Vector3 currentSpeed;
+
     public enum ButtonState
     {
         off,
@@ -37,27 +47,25 @@ public class PlayerTracker : MonoBehaviour
         cancelled,
     }
 
-    void Update()
-    {
-        if (animController != null)
-        {
-            animController.SetFloat("HandX", CalcLerpVector3(centerPos.position, rightPos.position, rightController.position, false) - CalcLerpVector3(centerPos.position, leftPos.position, rightController.position, false));
-            animController.SetFloat("HandY", CalcLerpVector3(centerPos.position, upPos.position, rightController.position, true) - CalcLerpVector3(centerPos.position, downPos.position, rightController.position, true));
-        }
-    }
-
     void LateUpdate()
     {
         UpdateTriggers();
         if (animController != null)
         {
+            animController.SetFloat("HandX", CalcLerpVector3(centerPos.position, rightPos.position, rightController.position, false) - CalcLerpVector3(centerPos.position, leftPos.position, rightController.position, false));
+            animController.SetFloat("HandY", CalcLerpVector3(centerPos.position, upPos.position, rightController.position, true) - CalcLerpVector3(centerPos.position, downPos.position, rightController.position, true));
             playerRHand.rotation = rightController.rotation;
             playerRHand.Rotate(new Vector3(-90, 180, 0));
             playerRHand.Rotate(new Vector3(9.99f, 27.48f, 0));
             playerHead.rotation = headset.rotation;
             modelRoot.rotation = Quaternion.Lerp(modelRoot.rotation, playerHead.rotation, Time.deltaTime);
             modelRoot.eulerAngles = new Vector3(0, modelRoot.eulerAngles.y, 0);
+            modelRoot.position = trackerScale.position;
         }
+    }
+    void OnEnable()
+    {
+        if (moveAxis.action != null) moveAxis.action.Enable();
     }
 
     public void UpdatePlayerPositions(Transform head, Transform handR, Transform handL, Transform root, float scale)
@@ -189,4 +197,26 @@ public class PlayerTracker : MonoBehaviour
     {
         return forwardRoot;
     }
+
+    public Vector2 GetMoveAxis()
+    {
+        return moveAxis.action.ReadValue<Vector2>();
+    }    
+
+    public void MovePlayer(Vector2 axis)
+    {
+        Vector3 newAxis = headset.TransformDirection(new Vector3(axis.x, 0, axis.y));
+        newAxis.y = 0;
+        newAxis.Normalize();
+        float speed = player.GetClassStats().baseSpeed;
+        float accel = player.GetClassStats().baseAccel;
+        currentSpeed = new Vector3(
+            Mathf.Abs(newAxis.x) * Mathf.Clamp(currentSpeed.x + (newAxis.x * accel), -speed, speed),
+            rigidBody.velocity.y,
+            Mathf.Abs(newAxis.z) * Mathf.Clamp(currentSpeed.y + (newAxis.z * accel), -speed, speed)
+            );
+        rigidBody.velocity = currentSpeed;
+        player.GetAutoHand().SyncBodyHead();
+    }
+
 }
