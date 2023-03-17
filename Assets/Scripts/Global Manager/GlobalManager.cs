@@ -1,8 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
-using UnityEditor.PackageManager;
 using UnityEngine;
-using UnityEngine.ProBuilder;
 using static PlayerTracker;
 
 public class GlobalManager : MonoBehaviour
@@ -44,7 +42,7 @@ public class GlobalManager : MonoBehaviour
         host.transform.position = team1Spawns.GetChild(team1SpawnIndex).position;
         team1SpawnIndex = (team1SpawnIndex + 1) % team1Spawns.childCount;
 
-        for (int i = 0; i < 1; i++)
+        for (int i = 0; i < PlayerPrefs.GetInt("ServerMaxPlayers") - 1; i++)
         {
             JoinNewClient();
         }
@@ -63,7 +61,7 @@ public class GlobalManager : MonoBehaviour
     void RandomizeTeams()
     {
         int teamInt1 = Random.Range(0, 7);
-        int teamInt2 = 0;
+        int teamInt2 = Random.Range(0, 7);
         while (teamInt2 != teamInt1 && teamInt2 != teamInt1 - 1 && teamInt2 != teamInt1 + 1 && (team2 == 0 && teamInt1 == 5) && (teamInt2 == 5 && teamInt1 == 0) && (teamInt1 == 1 && teamInt2 == 6))
         {
             teamInt2 = Random.Range(0, 7);
@@ -84,20 +82,17 @@ public class GlobalManager : MonoBehaviour
     {
         bool team = clientList.childCount % 2 != 0;
         Vector3 spawnPos;
-        Quaternion spawnRot;
         if (team)
         {
             spawnPos = team1Spawns.GetChild(team1SpawnIndex).position;
-            spawnRot = team1Spawns.GetChild(team1SpawnIndex).rotation;
             team1SpawnIndex = (team1SpawnIndex + 1) % team1Spawns.childCount;
         }
         else
         {
             spawnPos = team2Spawns.GetChild(team2SpawnIndex).position;
-            spawnRot = team2Spawns.GetChild(team2SpawnIndex).rotation;
             team2SpawnIndex = (team2SpawnIndex + 1) % team2Spawns.childCount;
         }
-        GameObject client = GameObject.Instantiate(clientPrefab, spawnPos, spawnRot);
+        GameObject client = GameObject.Instantiate(clientPrefab, spawnPos, Quaternion.identity);
         Player clientPlayer = client.GetComponent<Player>();
         clients.Add(clientPlayer);
         client.transform.parent = clientList;

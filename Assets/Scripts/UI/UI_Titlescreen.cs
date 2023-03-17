@@ -25,6 +25,7 @@ public class UI_Titlescreen : MonoBehaviour
         Button ps_back = root.Q<Button>("PSBack");
         Button ms_startgame = root.Q<Button>("StartGame");
         DropdownField selectMap = root.Q<DropdownField>("SelectMap");
+        SliderInt maxPlayers = root.Q<SliderInt>("MaxPlayers");
 
         //Functions
         rc_play.clicked += () => SwapColumn(RightColumnSwaps.none,LeftColumnSwaps.PlaySection);
@@ -35,10 +36,12 @@ public class UI_Titlescreen : MonoBehaviour
         ps_back.clicked += () => SwapColumn(RightColumnSwaps.TBAPanel, LeftColumnSwaps.MainButtons);
         ms_startgame.clicked += () => StartCoroutine(LoadMap());
         selectMap.RegisterValueChangedCallback(evt => SwapMap(selectMap));
+        maxPlayers.RegisterValueChangedCallback(evt => SetMaxPlayers(maxPlayers));
 
         //Ect
         selectMap.choices = mapNames;
         selectMap.index = 0;
+        maxPlayers.value = Mathf.Max(PlayerPrefs.GetInt("ServerMaxPlayers"),1);
     }
 
     IEnumerator LoadMap()
@@ -115,6 +118,11 @@ public class UI_Titlescreen : MonoBehaviour
             default:
                 break;
         }
+    }
+
+    void SetMaxPlayers(SliderInt playerCount)
+    {
+        PlayerPrefs.SetInt("ServerMaxPlayers",(int)playerCount.value);
     }
 
     void SwapMap(DropdownField evt)
