@@ -43,9 +43,6 @@
     "m_Keywords": [
         {
             "m_Id": "113e64f4929145b3aeb263a88efd9dba"
-        },
-        {
-            "m_Id": "bb7d242d93b440f590252ea31b2ea46a"
         }
     ],
     "m_Dropdowns": [],
@@ -2433,9 +2430,6 @@
         },
         {
             "m_Id": "59e493fb9c1347578dfb0d6d4c5042b5"
-        },
-        {
-            "m_Id": "bb7d242d93b440f590252ea31b2ea46a"
         }
     ]
 }
@@ -8398,47 +8392,6 @@
     "m_Value": 0.0,
     "m_DefaultValue": 0.0,
     "m_Labels": []
-}
-
-{
-    "m_SGVersion": 1,
-    "m_Type": "UnityEditor.ShaderGraph.ShaderKeyword",
-    "m_ObjectId": "bb7d242d93b440f590252ea31b2ea46a",
-    "m_Guid": {
-        "m_GuidSerialized": "35039bae-82a6-46c6-a419-9fa751f41975"
-    },
-    "m_Name": "Dynamicism (1)",
-    "m_DefaultRefNameVersion": 1,
-    "m_RefNameGeneratedByDisplayName": "Dynamicism (1)",
-    "m_DefaultReferenceName": "_DYNAMICISM_1",
-    "m_OverrideReferenceName": "",
-    "m_GeneratePropertyBlock": true,
-    "m_UseCustomSlotLabel": false,
-    "m_CustomSlotLabel": "",
-    "m_DismissedVersion": 0,
-    "m_KeywordType": 1,
-    "m_KeywordDefinition": 0,
-    "m_KeywordScope": 0,
-    "m_KeywordStages": 63,
-    "m_Entries": [
-        {
-            "id": 4,
-            "displayName": "X Axis",
-            "referenceName": "X_AXIS"
-        },
-        {
-            "id": 1,
-            "displayName": "Force Team 1",
-            "referenceName": "FORCE_TEAM_1"
-        },
-        {
-            "id": 2,
-            "displayName": "Force Team 2",
-            "referenceName": "FORCE_TEAM_2"
-        }
-    ],
-    "m_Value": 0,
-    "m_IsEditable": true
 }
 
 {

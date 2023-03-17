@@ -203,6 +203,11 @@ public class PlayerTracker : MonoBehaviour
         return moveAxis.action.ReadValue<Vector2>();
     }    
 
+    public Transform GetModelRoot()
+    {
+        return modelRoot;
+    }
+
     public void MovePlayer(Vector2 axis)
     {
         Vector3 newAxis = headset.TransformDirection(new Vector3(axis.x, 0, axis.y));

@@ -1,17 +1,33 @@
 using System.Collections;
 using System.Collections.Generic;
+using UnityEditor.PackageManager;
 using UnityEngine;
 using UnityEngine.ProBuilder;
 using static PlayerTracker;
 
 public class GlobalManager : MonoBehaviour
 {
-    [SerializeField] Player host;
-    [SerializeField] List<Player> clients;
+    [Header("Server Settings")]
+    [SerializeField] TeamList team1;
+    [SerializeField] TeamList team2;
     [SerializeField] float serverTimeForgiveness;
     [SerializeField] LayerMask vrLayers;
 
+    [Header("Global Prefabs")]
+    [SerializeField] GameObject clientPrefab;
+
+    [Header("Lists")]
+    [SerializeField] Player host;
+    [SerializeField] Transform clientList;
+    [SerializeField] List<Player> clients;
+    [SerializeField] Transform team1Spawns;
+    [SerializeField] Transform team2Spawns;
+    [SerializeField] Transform particleList;
+
     AllStats al;
+    int team1SpawnIndex = 0;
+    int team2SpawnIndex = 0;
+
 
     const float MINANGLE = 0.8f;
     const float SPHERESIZE = 0.4f;
@@ -21,6 +37,17 @@ public class GlobalManager : MonoBehaviour
     private void Start()
     {
         al = GetComponent<AllStats>();
+        RandomizeTeams();
+
+        //Join host
+        host.SetTeam(Team.team1);
+        host.transform.position = team1Spawns.GetChild(team1SpawnIndex).position;
+        team1SpawnIndex = (team1SpawnIndex + 1) % team1Spawns.childCount;
+
+        for (int i = 0; i < 1; i++)
+        {
+            JoinNewClient();
+        }
     }
 
     private void Update()
@@ -31,6 +58,57 @@ public class GlobalManager : MonoBehaviour
             clients[i].GetTracker().UpdatePlayerPositions(host.GetTracker().GetCamera(), host.GetTracker().GetRightHand(), host.GetTracker().GetLeftHand(), host.GetTracker().GetForwardRoot(), al.GetClassStats(host.GetCurrentClass()).trackingScale);
         }
         CheckAllPlayerInputs(host);
+    }
+
+    void RandomizeTeams()
+    {
+        int teamInt1 = Random.Range(0, 7);
+        int teamInt2 = 0;
+        while (teamInt2 != teamInt1 && teamInt2 != teamInt1 - 1 && teamInt2 != teamInt1 + 1 && (team2 == 0 && teamInt1 == 5) && (teamInt2 == 5 && teamInt1 == 0) && (teamInt1 == 1 && teamInt2 == 6))
+        {
+            teamInt2 = Random.Range(0, 7);
+            if (teamInt1 == 6 && teamInt2 == 7)
+            {
+                break;
+            }
+            if (teamInt1 == 7 && teamInt2 == 6)
+            {
+                break;
+            }
+        }
+        team1 = (TeamList)teamInt1;
+        team2 = (TeamList)teamInt2;
+    }
+
+    public void JoinNewClient()
+    {
+        bool team = clientList.childCount % 2 != 0;
+        Vector3 spawnPos;
+        Quaternion spawnRot;
+        if (team)
+        {
+            spawnPos = team1Spawns.GetChild(team1SpawnIndex).position;
+            spawnRot = team1Spawns.GetChild(team1SpawnIndex).rotation;
+            team1SpawnIndex = (team1SpawnIndex + 1) % team1Spawns.childCount;
+        }
+        else
+        {
+            spawnPos = team2Spawns.GetChild(team2SpawnIndex).position;
+            spawnRot = team2Spawns.GetChild(team2SpawnIndex).rotation;
+            team2SpawnIndex = (team2SpawnIndex + 1) % team2Spawns.childCount;
+        }
+        GameObject client = GameObject.Instantiate(clientPrefab, spawnPos, spawnRot);
+        Player clientPlayer = client.GetComponent<Player>();
+        clients.Add(clientPlayer);
+        client.transform.parent = clientList;
+        if (team)
+        {
+            clientPlayer.SetTeam(Team.team1);
+        }
+        else
+        {
+            clientPlayer.SetTeam(Team.team2);
+        }
     }
 
     void CheckAllPlayerInputs(Player player)
@@ -57,6 +135,7 @@ public class GlobalManager : MonoBehaviour
         if (fp.firePrefab != null)
         {
             GameObject currentProjectile = GameObject.Instantiate(fp.firePrefab);
+            currentProjectile.transform.parent = particleList;
             Vector3 fireAngle = CalculateFireAngle(player);
             currentProjectile.GetComponent<Projectile>().SetProjectile(player.GetTracker().GetRightHand().position, fireAngle, player.GetCurrentGun().SearchStats(ChangableWeaponStats.bulletSpeed), player.GetTeamLayer(), CalculcateFirePosition(fireAngle, player));
         }
@@ -132,11 +211,21 @@ public class GlobalManager : MonoBehaviour
 
     public bool IsPlayerHost(Player player)
     {
-        if(player == host)
+        if (player == host)
         {
             return true;
         }
         return false;
+    }
+
+    public TeamList GetTeam1()
+    {
+        return team1;
+    }
+
+    public TeamList GetTeam2()
+    {
+        return team2;
     }
 
     public AllStats GetAllStats()

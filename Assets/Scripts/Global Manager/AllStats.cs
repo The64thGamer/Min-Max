@@ -78,6 +78,20 @@ public enum ClassList
     manager
 }
 
+[SerializeField]
+public enum TeamList
+{
+    orange,
+    yellow,
+    green,
+    lightBlue,
+    blue,
+    purple,
+    beige,
+    brown,
+    gray,
+}
+
 [System.Serializable]
 public struct ClassStats
 {
