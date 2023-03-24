@@ -12,6 +12,7 @@ public class Player : MonoBehaviour
     [SerializeField] ClassStats currentStats;
     [SerializeField] PlayerTracker tracker;
     [SerializeField] AutoHandPlayer autoHand;
+    [SerializeField] ulong playerID;
 
     private void Start()
     {
@@ -84,6 +85,16 @@ public class Player : MonoBehaviour
     public ClassStats GetClassStats()
     {
         return currentStats;
+    }
+
+    public ulong GetPlayerID()
+    {
+        return playerID;
+    }
+
+    public void SetPlayerID(ulong id)
+    {
+        playerID = id;
     }
 
     public int GetTeamLayer()

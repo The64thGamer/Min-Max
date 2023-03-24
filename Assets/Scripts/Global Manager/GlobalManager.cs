@@ -4,7 +4,7 @@ using Unity.Netcode;
 using UnityEngine;
 using static PlayerTracker;
 
-public class GlobalManager : MonoBehaviour
+public class GlobalManager : NetworkBehaviour
 {
     [Header("Server Settings")]
     [SerializeField] TeamList team1;
@@ -23,11 +23,16 @@ public class GlobalManager : MonoBehaviour
     [SerializeField] Transform team2Spawns;
     [SerializeField] Transform particleList;
 
+    //Network
+    List<NetworkVariable<PlayerNetworkDataServer>> playerData;
+
+    //Ect
     AllStats al;
     int team1SpawnIndex = 0;
     int team2SpawnIndex = 0;
+    int totalClientsConnected = 0;
 
-
+    //Constants
     const float MINANGLE = 0.8f;
     const float SPHERESIZE = 0.4f;
     const float MAXSPHERECASTDISTANCE = 20;
@@ -42,11 +47,6 @@ public class GlobalManager : MonoBehaviour
         host.SetTeam(Team.team1);
         host.transform.position = team1Spawns.GetChild(team1SpawnIndex).position;
         team1SpawnIndex = (team1SpawnIndex + 1) % team1Spawns.childCount;
-
-        for (int i = 0; i < PlayerPrefs.GetInt("ServerMaxPlayers") - 1; i++)
-        {
-            JoinNewClient();
-        }
 
         switch (PlayerPrefs.GetInt("LoadMapMode"))
         {
@@ -91,8 +91,9 @@ public class GlobalManager : MonoBehaviour
         team2 = (TeamList)teamInt2;
     }
 
-    public void JoinNewClient()
+    public void JoinNewClient(ulong clientID)
     {
+        totalClientsConnected++;
         bool team = clientList.childCount % 2 != 0;
         Vector3 spawnPos;
         if (team)
@@ -109,6 +110,7 @@ public class GlobalManager : MonoBehaviour
         Player clientPlayer = client.GetComponent<Player>();
         clients.Add(clientPlayer);
         client.transform.parent = clientList;
+        clientPlayer.SetPlayerID(clientID);
         if (team)
         {
             clientPlayer.SetTeam(Team.team1);
@@ -241,11 +243,13 @@ public class GlobalManager : MonoBehaviour
         return al;
     }
 
-    public struct PlayerNetworkDataServer
+    public struct PlayerNetworkDataServer : INetworkSerializable
     {
+        public int playerNumber;
+
         //Player
         public Vector3 positionWorld;
-        public Vector3 veclocity;
+        public Vector3 velocity;
 
         //Headset
         public Vector3 headsetPosWorld;
@@ -258,9 +262,22 @@ public class GlobalManager : MonoBehaviour
         //Left Hand
         public Vector3 lHandPosWorld;
         public Quaternion lHandRotWorld;
+
+        public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
+        {
+            serializer.SerializeValue(ref playerNumber);
+            serializer.SerializeValue(ref positionWorld);
+            serializer.SerializeValue(ref velocity);
+            serializer.SerializeValue(ref headsetPosWorld);
+            serializer.SerializeValue(ref headsetRotWorld);
+            serializer.SerializeValue(ref rHandPosWorld);
+            serializer.SerializeValue(ref rHandRotWorld);
+            serializer.SerializeValue(ref lHandPosWorld);
+            serializer.SerializeValue(ref lHandRotWorld);
+        }
     }
 
-    public struct PlayerNetworkDataClient
+    public struct PlayerNetworkDataClient : INetworkSerializable
     {
         //Headset
         public Vector3 headsetPosLocal;
@@ -276,5 +293,16 @@ public class GlobalManager : MonoBehaviour
 
         //Controls
         public Vector2 rightJoystick;
+
+        public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
+        {
+            serializer.SerializeValue(ref headsetPosLocal);
+            serializer.SerializeValue(ref headsetRotLocal);
+            serializer.SerializeValue(ref rHandPosLocal);
+            serializer.SerializeValue(ref rHandRotLocal);
+            serializer.SerializeValue(ref lHandPosLocal);
+            serializer.SerializeValue(ref lHandRotLocal);
+            serializer.SerializeValue(ref rightJoystick);
+        }
     }
 }
