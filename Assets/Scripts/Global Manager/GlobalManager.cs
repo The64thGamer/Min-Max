@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.Netcode;
 using UnityEngine;
 using static PlayerTracker;
 
@@ -45,6 +46,18 @@ public class GlobalManager : MonoBehaviour
         for (int i = 0; i < PlayerPrefs.GetInt("ServerMaxPlayers") - 1; i++)
         {
             JoinNewClient();
+        }
+
+        switch (PlayerPrefs.GetInt("LoadMapMode"))
+        {
+            case 1:
+                NetworkManager.Singleton.StartHost();
+                break;
+            case 2:
+                NetworkManager.Singleton.StartClient();
+                break;
+            default:
+                break;
         }
     }
 
@@ -226,5 +239,42 @@ public class GlobalManager : MonoBehaviour
     public AllStats GetAllStats()
     {
         return al;
+    }
+
+    public struct PlayerNetworkDataServer
+    {
+        //Player
+        public Vector3 positionWorld;
+        public Vector3 veclocity;
+
+        //Headset
+        public Vector3 headsetPosWorld;
+        public Quaternion headsetRotWorld;
+
+        //Right Hand
+        public Vector3 rHandPosWorld;
+        public Quaternion rHandRotWorld;
+
+        //Left Hand
+        public Vector3 lHandPosWorld;
+        public Quaternion lHandRotWorld;
+    }
+
+    public struct PlayerNetworkDataClient
+    {
+        //Headset
+        public Vector3 headsetPosLocal;
+        public Quaternion headsetRotLocal;
+
+        //Right Hand
+        public Vector3 rHandPosLocal;
+        public Quaternion rHandRotLocal;
+
+        //Left Hand
+        public Vector3 lHandPosLocal;
+        public Quaternion lHandRotLocal;
+
+        //Controls
+        public Vector2 rightJoystick;
     }
 }

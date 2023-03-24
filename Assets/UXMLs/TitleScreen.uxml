@@ -16,11 +16,11 @@
                 </ui:VisualElement>
             </ui:VisualElement>
             <ui:VisualElement name="LeftColumn" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0); flex-direction: row;">
-                <ui:VisualElement name="MapSelection" class="downbackdrop backdrop" style="display: none; overflow: visible; visibility: visible; -unity-text-align: upper-left; white-space: normal; margin-left: 5px; margin-right: 5px; margin-top: 5px; margin-bottom: 5px;">
+                <ui:VisualElement name="MapSelection" class="downbackdrop backdrop" style="display: flex; overflow: visible; visibility: visible; -unity-text-align: upper-left; white-space: normal; margin-left: 5px; margin-right: 5px; margin-top: 5px; margin-bottom: 5px;">
                     <ui:Label tabindex="-1" text="Start Local Game" display-tooltip-when-elided="true" name="StartLocalGame" />
                     <ui:Label tabindex="-1" text="Start Locally Hosted Server" display-tooltip-when-elided="true" name="StartServerGame" style="display: none;" />
                     <ui:VisualElement name="MapIcon" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0); background-image: url(&apos;project://database/Assets/Game%20Assets/UI/Map%20Icons/plr_backlot.png?fileID=2800000&amp;guid=f30dc384d40ec054696995bfeae0ec6c&amp;type=3#plr_backlot&apos;); -unity-background-scale-mode: scale-and-crop; max-height: 150px; border-top-left-radius: 15px; border-bottom-left-radius: 15px; border-top-right-radius: 15px; border-bottom-right-radius: 15px; border-left-width: 10px; border-right-width: 10px; border-top-width: 10px; border-bottom-width: 10px; margin-left: 5px; margin-right: 5px; margin-top: 5px; margin-bottom: 5px;" />
-                    <ui:DropdownField label="Map" index="-1" choices="error" name="SelectMap" class="dropdown" />
+                    <ui:DropdownField label="Map" index="-1" choices="error" name="SelectMap" class="dropdown" style="min-height: 24px;" />
                     <ui:SliderInt picking-mode="Ignore" label="Max Players" value="24" high-value="24" low-value="1" show-input-field="true" name="MaxPlayers" class="dropdown" />
                     <ui:VisualElement name="BlankSpace" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0); justify-content: flex-end; flex-direction: row;">
                         <ui:Label tabindex="-1" text="Send players key (??????) to let them join." display-tooltip-when-elided="true" name="SendPlayerKey" style="justify-content: flex-end; align-self: flex-end; display: none;" />
@@ -28,7 +28,7 @@
                         <ui:Button text="Request Key" display-tooltip-when-elided="true" name="RequestKey" class="button" style="justify-content: flex-end; align-self: flex-end; -unity-text-align: middle-center; display: none;" />
                     </ui:VisualElement>
                 </ui:VisualElement>
-                <ui:VisualElement name="TBAPanel" class="downbackdrop backdrop" style="display: flex; overflow: visible; visibility: visible; -unity-text-align: upper-left; white-space: normal; margin-left: 5px; margin-right: 5px; margin-top: 5px; margin-bottom: 5px;">
+                <ui:VisualElement name="TBAPanel" class="downbackdrop backdrop" style="display: none; overflow: visible; visibility: visible; -unity-text-align: upper-left; white-space: normal; margin-left: 5px; margin-right: 5px; margin-top: 5px; margin-bottom: 5px;">
                     <ui:Label tabindex="-1" text="To be Added Panel" display-tooltip-when-elided="true" name="MapName" />
                 </ui:VisualElement>
             </ui:VisualElement>

@@ -27,11 +27,12 @@ public class UI_Titlescreen : MonoBehaviour
         DropdownField selectMap = root.Q<DropdownField>("SelectMap");
         SliderInt maxPlayers = root.Q<SliderInt>("MaxPlayers");
 
+
         //Functions
         rc_play.clicked += () => SwapColumn(RightColumnSwaps.none,LeftColumnSwaps.PlaySection);
         rc_exit.clicked += () => Application.Quit();
-        ps_startlocal.clicked += () => StartLocalOrHost(false);
-        ps_startserver.clicked += () => StartLocalOrHost(true);
+        ps_startlocal.clicked += () => StartLocalOrHost(2);
+        ps_startserver.clicked += () => StartLocalOrHost(1);
         //ps_joinserver.clicked += () =>
         ps_back.clicked += () => SwapColumn(RightColumnSwaps.TBAPanel, LeftColumnSwaps.MainButtons);
         ms_startgame.clicked += () => StartCoroutine(LoadMap());
@@ -69,10 +70,12 @@ public class UI_Titlescreen : MonoBehaviour
         MapSelection
     }
 
-    void StartLocalOrHost(bool host)
+    //"LoadMapMode" 0 == Local, 1 == Host, 2 == Client
+    void StartLocalOrHost(int loadmapmode)
     {
+        PlayerPrefs.SetInt("LoadMapMode", loadmapmode);
         SwapColumn(RightColumnSwaps.MapSelection, LeftColumnSwaps.none);
-        if (host)
+        if (loadmapmode == 1)
         {
             root.Q<Label>("StartLocalGame").style.display = DisplayStyle.None;
             root.Q<Label>("StartServerGame").style.display = DisplayStyle.Flex;
@@ -82,6 +85,7 @@ public class UI_Titlescreen : MonoBehaviour
         }
         else
         {
+
             root.Q<Label>("StartLocalGame").style.display = DisplayStyle.Flex;
             root.Q<Label>("StartServerGame").style.display = DisplayStyle.None;
             root.Q<Label>("SendPlayerKey").style.display = DisplayStyle.None;
@@ -124,6 +128,7 @@ public class UI_Titlescreen : MonoBehaviour
     {
         PlayerPrefs.SetInt("ServerMaxPlayers",(int)playerCount.value);
     }
+
 
     void SwapMap(DropdownField evt)
     {
