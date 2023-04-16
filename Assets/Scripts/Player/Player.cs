@@ -1,10 +1,11 @@
 using Autohand;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-public class Player : MonoBehaviour
+public class Player : NetworkBehaviour
 {
     [SerializeField] Gun currentGun;
     [SerializeField] Team currentTeam;

@@ -1,5 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Globalization;
+using System.Runtime.CompilerServices;
 using System.Threading;
 using Unity.VisualScripting;
 using UnityEngine;
@@ -7,7 +9,7 @@ using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
 using static Player;
 
-public class PlayerTracker : MonoBehaviour
+public class PlayerTracker : NetcodeManager
 {
     [Header("Raw Positions")]
     [SerializeField] Transform headset;
@@ -66,6 +68,16 @@ public class PlayerTracker : MonoBehaviour
     void OnEnable()
     {
         if (moveAxis.action != null) moveAxis.action.Enable();
+    }
+
+
+    public void SetNewClientPosition(Vector3 pos)
+    {
+        if (!IsOwner && !IsHost)
+        {
+            //Clientside prediction
+        }
+        transform.position = pos;
     }
 
     public void UpdatePlayerPositions(Transform head, Transform handR, Transform handL, Transform root, float scale)

@@ -4,7 +4,7 @@ using Unity.Netcode;
 using UnityEngine;
 using static PlayerTracker;
 
-public class GlobalManager : NetworkBehaviour
+public class GlobalManager : MonoBehaviour
 {
     [Header("Server Settings")]
     [SerializeField] TeamList team1;
