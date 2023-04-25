@@ -1,7 +1,10 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="False">
     <Style src="project://database/Assets/USSs/StandardUIStyle.uss?fileID=7433441132597879392&amp;guid=67066f1d9b7d7574b905dc33f01d1cf0&amp;type=3#StandardUIStyle" />
     <ui:VisualElement name="Window" class="backdrop" style="flex-grow: 1;">
-        <ui:Label tabindex="-1" text="Min-Max VR" display-tooltip-when-elided="true" name="Title" style="width: 345px;" />
+        <ui:VisualElement style="flex-grow: 1; background-color: rgba(0, 0, 0, 0); flex-direction: row; flex-shrink: 1; flex-wrap: nowrap; max-height: 30px;">
+            <ui:VisualElement style="flex-grow: 1; background-color: rgba(0, 0, 0, 0); background-image: url(&apos;project://database/Assets/Game%20Assets/UI/Logo/Logo%201k.png?fileID=2800000&amp;guid=5ccbcfe7d6adba94bac659de8bee444a&amp;type=3#Logo 1k&apos;); -unity-background-scale-mode: scale-to-fit; max-width: 30px; max-height: 30px; margin-left: 5px; margin-right: 5px; margin-top: 0; margin-bottom: 0;" />
+            <ui:Label tabindex="-1" text="Min-Max" display-tooltip-when-elided="true" name="Title" style="width: auto; justify-content: flex-start; align-self: flex-start; -unity-text-align: middle-left; font-size: 20px;" />
+        </ui:VisualElement>
         <ui:VisualElement name="Colums" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0); flex-direction: row; flex-wrap: nowrap; justify-content: center; align-self: auto; align-items: stretch;">
             <ui:VisualElement name="RightColumn" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0); flex-direction: row; display: flex; min-width: 181px;">
                 <ui:VisualElement name="MainButtons" class="downbackdrop backdrop" style="display: flex; overflow: visible; visibility: visible; -unity-text-align: upper-left; white-space: normal; margin-left: 5px; margin-right: 5px; margin-top: 5px; margin-bottom: 5px;">
@@ -33,6 +36,6 @@
                 </ui:VisualElement>
             </ui:VisualElement>
         </ui:VisualElement>
-        <ui:Label tabindex="-1" text="v0.2a" display-tooltip-when-elided="true" name="VersionNumber" style="align-items: flex-end; align-self: flex-end; justify-content: flex-end; -unity-text-align: lower-left;" />
+        <ui:Label tabindex="-1" text="v0.5a" display-tooltip-when-elided="true" name="VersionNumber" style="align-items: flex-end; align-self: flex-end; justify-content: flex-end; -unity-text-align: lower-left; font-size: 20px;" />
     </ui:VisualElement>
 </ui:UXML>
