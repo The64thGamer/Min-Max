@@ -1,15 +1,8 @@
-using System.Collections;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Runtime.CompilerServices;
-using System.Threading;
-using Unity.VisualScripting;
+using Unity.Netcode;
 using UnityEngine;
-using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
-using static Player;
 
-public class PlayerTracker : NetcodeManager
+public class PlayerTracker : NetworkBehaviour
 {
     [Header("Raw Positions")]
     [SerializeField] Transform headset;

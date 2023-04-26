@@ -31,9 +31,9 @@ public class UI_Titlescreen : MonoBehaviour
         //Functions
         rc_play.clicked += () => SwapColumn(RightColumnSwaps.none,LeftColumnSwaps.PlaySection);
         rc_exit.clicked += () => Application.Quit();
-        ps_startlocal.clicked += () => StartLocalOrHost(2);
+        ps_startlocal.clicked += () => StartLocalOrHost(1);
         ps_startserver.clicked += () => StartLocalOrHost(1);
-        //ps_joinserver.clicked += () =>
+        //ps_joinserver.clicked += () => StartLocalOrHost(2);
         ps_back.clicked += () => SwapColumn(RightColumnSwaps.TBAPanel, LeftColumnSwaps.MainButtons);
         ms_startgame.clicked += () => StartCoroutine(LoadMap());
         selectMap.RegisterValueChangedCallback(evt => SwapMap(selectMap));

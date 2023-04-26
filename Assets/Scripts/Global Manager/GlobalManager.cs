@@ -48,13 +48,20 @@ public class GlobalManager : MonoBehaviour
         host.transform.position = team1Spawns.GetChild(team1SpawnIndex).position;
         team1SpawnIndex = (team1SpawnIndex + 1) % team1Spawns.childCount;
 
+        for (int i = 0; i < PlayerPrefs.GetInt("ServerMaxPlayers"); i++)
+        {
+            JoinNewClient((ulong)totalClientsConnected);
+        }
+
         switch (PlayerPrefs.GetInt("LoadMapMode"))
         {
             case 1:
                 NetworkManager.Singleton.StartHost();
+                Debug.Log("Started Host");
                 break;
             case 2:
                 NetworkManager.Singleton.StartClient();
+                Debug.Log("Started Client");
                 break;
             default:
                 break;
