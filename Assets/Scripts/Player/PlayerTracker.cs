@@ -2,7 +2,7 @@ using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-public class PlayerTracker : NetworkBehaviour
+public class PlayerTracker : MonoBehaviour
 {
     [Header("Raw Positions")]
     [SerializeField] Transform headset;
@@ -66,10 +66,6 @@ public class PlayerTracker : NetworkBehaviour
 
     public void SetNewClientPosition(Vector3 pos)
     {
-        if (!IsOwner && !IsHost)
-        {
-            //Clientside prediction
-        }
         transform.position = pos;
     }
 

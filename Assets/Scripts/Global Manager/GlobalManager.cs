@@ -20,7 +20,6 @@ public class GlobalManager : NetworkBehaviour
 
     [Header("Global Prefabs")]
     [SerializeField] GameObject clientPrefab;
-    [SerializeField] GameObject hostPrefab;
 
     [Header("Lists")]
     [SerializeField] Player host;
@@ -75,6 +74,7 @@ public class GlobalManager : NetworkBehaviour
 
     private void Update()
     {
+        /*
         //new
         if (!IsHost && tickTimer > 1.0f / (float)ClientInputTickRate.Value)
         {
@@ -106,7 +106,8 @@ public class GlobalManager : NetworkBehaviour
             CheckAllPlayerInputs(clients[i]);
             clients[i].GetTracker().UpdatePlayerPositions(host.GetTracker().GetCamera(), host.GetTracker().GetRightHand(), host.GetTracker().GetLeftHand(), host.GetTracker().GetForwardRoot(), al.GetClassStats(host.GetCurrentClass()).trackingScale);
         }
-        //CheckAllPlayerInputs(host);
+        CheckAllPlayerInputs(host);
+        */
     }
 
     void RandomizeTeams()
@@ -317,13 +318,10 @@ public class GlobalManager : NetworkBehaviour
     public void SpawnNewPlayerHost(ulong id)
     {
         if (!IsHost) { return; }
-
-        //VR Setup Spawning
-        GameObject thePlayer = GameObject.Instantiate(hostPrefab);
-        host = thePlayer.GetComponent<Player>();
-
         GameObject client = GameObject.Instantiate(clientPrefab, Vector3.zero, Quaternion.identity, clientList);
+        client.GetComponent<NetworkObject>().SpawnWithOwnership(id);
         Player clientPlayer = client.GetComponent<Player>();
+        host = clientPlayer;
         clientPlayer.SetPlayerID(id);
     }
 

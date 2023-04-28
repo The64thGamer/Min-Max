@@ -15,9 +15,27 @@ public class Player : NetworkBehaviour
     [SerializeField] AutoHandPlayer autoHand;
     [SerializeField] ulong playerID;
 
+    [SerializeField] Transform vrSetup;
+    [SerializeField] Transform clientSetup;
+
     public override void OnNetworkSpawn()
     {
-        GameObject.Find("Game Manager").GetComponent<GlobalManager>().AssignNewPlayerClient(this);
+        if (IsOwner)
+        {
+            Destroy(clientSetup.gameObject);
+            vrSetup.gameObject.SetActive(true);
+        }
+        else
+        {
+            Destroy(vrSetup.gameObject);
+            clientSetup.gameObject.SetActive(true);
+        }
+        tracker = GetComponentInChildren<PlayerTracker>();
+        autoHand = GetComponentInChildren<AutoHandPlayer>();
+        currentGun = GetComponentInChildren<GenericGun>();
+        GameObject.Find("Global Manager").GetComponent<GlobalManager>().AssignNewPlayerClient(this);
+
+        //Debug Default
         SetClass(ClassList.programmer);
     }
 
