@@ -67,6 +67,10 @@ public class GlobalManager : NetworkBehaviour
                 NetworkManager.Singleton.StartClient();
                 Debug.Log("Started Client");
                 break;
+            case 3:
+                NetworkManager.Singleton.StartClient();
+                Debug.Log("Started Client");
+                break;
             default:
                 break;
         }

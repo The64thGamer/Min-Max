@@ -12,9 +12,10 @@
                     <ui:Button text="Exit" display-tooltip-when-elided="true" name="RCExit" class="button" />
                 </ui:VisualElement>
                 <ui:VisualElement name="PlaySection" class="downbackdrop backdrop" style="display: none; overflow: visible; visibility: visible; -unity-text-align: upper-left; white-space: normal; margin-left: 5px; margin-right: 5px; margin-top: 5px; margin-bottom: 5px;">
-                    <ui:Button text="Start Local" display-tooltip-when-elided="true" name="PSStartLocal" class="button" />
                     <ui:Button text="Start Server" display-tooltip-when-elided="true" name="PSStartServer" class="button" />
                     <ui:Button text="Join Server" display-tooltip-when-elided="true" name="PSJoinServer" class="button" />
+                    <ui:Button text="Start Local" display-tooltip-when-elided="true" name="PSStartLocal" class="button" />
+                    <ui:Button text="Join Local" display-tooltip-when-elided="true" name="PSJoinLocal" class="button" />
                     <ui:Button text="Back" display-tooltip-when-elided="true" name="PSBack" class="button" />
                 </ui:VisualElement>
             </ui:VisualElement>

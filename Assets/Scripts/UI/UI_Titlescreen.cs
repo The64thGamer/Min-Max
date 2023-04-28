@@ -20,6 +20,7 @@ public class UI_Titlescreen : MonoBehaviour
         Button rc_play = root.Q<Button>("RCPlay");
         Button rc_exit = root.Q<Button>("RCExit");
         Button ps_startlocal = root.Q<Button>("PSStartLocal");
+        Button ps_joinlocal = root.Q<Button>("PSJoinLocal");
         Button ps_startserver = root.Q<Button>("PSStartServer");
         Button ps_joinserver = root.Q<Button>("PSJoinServer");
         Button ps_back = root.Q<Button>("PSBack");
@@ -34,6 +35,7 @@ public class UI_Titlescreen : MonoBehaviour
         ps_startlocal.clicked += () => StartLocalOrHost(0);
         ps_startserver.clicked += () => StartLocalOrHost(1);
         //ps_joinserver.clicked += () => StartLocalOrHost(2);
+        ps_joinlocal.clicked += () => StartLocalOrHost(3);
         ps_back.clicked += () => SwapColumn(RightColumnSwaps.TBAPanel, LeftColumnSwaps.MainButtons);
         ms_startgame.clicked += () => StartCoroutine(LoadMap());
         selectMap.RegisterValueChangedCallback(evt => SwapMap(selectMap));
@@ -70,27 +72,43 @@ public class UI_Titlescreen : MonoBehaviour
         MapSelection
     }
 
-    //"LoadMapMode" 0 == Local, 1 == Host, 2 == Client
+    //"LoadMapMode" 0 == StartLocal, 1 == StartServer, 2 == Joinserver, 3 == JoinLocals
     void StartLocalOrHost(int loadmapmode)
     {
         PlayerPrefs.SetInt("LoadMapMode", loadmapmode);
         SwapColumn(RightColumnSwaps.MapSelection, LeftColumnSwaps.none);
-        if (loadmapmode == 1)
+        switch (loadmapmode)
         {
-            root.Q<Label>("StartLocalGame").style.display = DisplayStyle.None;
-            root.Q<Label>("StartServerGame").style.display = DisplayStyle.Flex;
-            root.Q<Label>("SendPlayerKey").style.display = DisplayStyle.Flex;
-            root.Q<Button>("RequestKey").style.display = DisplayStyle.Flex;
-            root.Q<Button>("StartGame").style.display = DisplayStyle.None;
-        }
-        else
-        {
-
-            root.Q<Label>("StartLocalGame").style.display = DisplayStyle.Flex;
-            root.Q<Label>("StartServerGame").style.display = DisplayStyle.None;
-            root.Q<Label>("SendPlayerKey").style.display = DisplayStyle.None;
-            root.Q<Button>("RequestKey").style.display = DisplayStyle.None;
-            root.Q<Button>("StartGame").style.display = DisplayStyle.Flex;
+            case 0:
+                root.Q<Label>("StartLocalGame").style.display = DisplayStyle.Flex;
+                root.Q<Label>("StartServerGame").style.display = DisplayStyle.None;
+                root.Q<Label>("SendPlayerKey").style.display = DisplayStyle.None;
+                root.Q<Button>("RequestKey").style.display = DisplayStyle.None;
+                root.Q<Button>("StartGame").style.display = DisplayStyle.Flex;
+                break;
+            case 1:
+                root.Q<Label>("StartLocalGame").style.display = DisplayStyle.None;
+                root.Q<Label>("StartServerGame").style.display = DisplayStyle.Flex;
+                root.Q<Label>("SendPlayerKey").style.display = DisplayStyle.Flex;
+                root.Q<Button>("RequestKey").style.display = DisplayStyle.Flex;
+                root.Q<Button>("StartGame").style.display = DisplayStyle.None;
+                break;
+            case 2:
+                root.Q<Label>("StartLocalGame").style.display = DisplayStyle.Flex;
+                root.Q<Label>("StartServerGame").style.display = DisplayStyle.None;
+                root.Q<Label>("SendPlayerKey").style.display = DisplayStyle.None;
+                root.Q<Button>("RequestKey").style.display = DisplayStyle.None;
+                root.Q<Button>("StartGame").style.display = DisplayStyle.Flex;
+                break;
+            case 3:
+                root.Q<Label>("StartLocalGame").style.display = DisplayStyle.Flex;
+                root.Q<Label>("StartServerGame").style.display = DisplayStyle.None;
+                root.Q<Label>("SendPlayerKey").style.display = DisplayStyle.None;
+                root.Q<Button>("RequestKey").style.display = DisplayStyle.None;
+                root.Q<Button>("StartGame").style.display = DisplayStyle.Flex;
+                break;
+            default:
+                break;
         }
     }
 
