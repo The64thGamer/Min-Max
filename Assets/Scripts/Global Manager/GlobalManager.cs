@@ -37,7 +37,6 @@ public class GlobalManager : NetworkBehaviour
     AllStats al;
     int team1SpawnIndex = 0;
     int team2SpawnIndex = 0;
-    int totalClientsConnected = 0;
     float tickTimer;
     bool serverStarted;
 
@@ -51,18 +50,12 @@ public class GlobalManager : NetworkBehaviour
     {
         NetworkManager.Singleton.OnServerStarted += ServerStarted;
         al = GetComponent<AllStats>();
-        RandomizeTeams();
-
-        //remove this
-        for (int i = 0; i < PlayerPrefs.GetInt("ServerMaxPlayers"); i++)
-        {
-            JoinNewClient((ulong)totalClientsConnected);
-        }
 
         switch (PlayerPrefs.GetInt("LoadMapMode"))
         {
             case 1:
                 NetworkManager.Singleton.StartHost();
+                RandomizeTeams();
                 Debug.Log("Started Host");
                 break;
             case 2:
@@ -128,37 +121,6 @@ public class GlobalManager : NetworkBehaviour
         }
         team1 = (TeamList)teamInt1;
         team2 = (TeamList)teamInt2;
-    }
-
-    public void JoinNewClient(ulong clientID)
-    {
-        totalClientsConnected++;
-        bool team = clientList.childCount % 2 != 0;
-        Vector3 spawnPos;
-        if (team)
-        {
-            spawnPos = team1Spawns.GetChild(team1SpawnIndex).position;
-            team1SpawnIndex = (team1SpawnIndex + 1) % team1Spawns.childCount;
-        }
-        else
-        {
-            spawnPos = team2Spawns.GetChild(team2SpawnIndex).position;
-            team2SpawnIndex = (team2SpawnIndex + 1) % team2Spawns.childCount;
-        }
-        GameObject client = GameObject.Instantiate(clientPrefab, spawnPos, Quaternion.identity);
-        client.GetComponent<NetworkObject>().SpawnWithOwnership(clientID);
-        Player clientPlayer = client.GetComponent<Player>();
-        clients.Add(clientPlayer);
-        client.transform.parent = clientList;
-        clientPlayer.SetPlayerID(clientID);
-        if (team)
-        {
-            clientPlayer.SetTeam(Team.team1);
-        }
-        else
-        {
-            clientPlayer.SetTeam(Team.team2);
-        }
     }
 
     void CheckAllPlayerInputs(Player player)
@@ -350,14 +312,42 @@ public class GlobalManager : NetworkBehaviour
     {
         if (!IsHost) { return; }
 
+        //VR Setup Spawning
         GameObject thePlayer = GameObject.Instantiate(hostPrefab);
-        thePlayer.GetComponent<NetworkObject>().SpawnWithOwnership(id);
         host = thePlayer.GetComponent<Player>();
-        host.SetTeam(Team.team1);
-        host.transform.position = team1Spawns.GetChild(team1SpawnIndex).position;
-        team1SpawnIndex = (team1SpawnIndex + 1) % team1Spawns.childCount;
+
+        //Client Object Spawning
+        bool team = clientList.childCount % 2 != 0;
+        Vector3 spawnPos;
+        if (team)
+        {
+            spawnPos = team1Spawns.GetChild(team1SpawnIndex).position;
+            team1SpawnIndex = (team1SpawnIndex + 1) % team1Spawns.childCount;
+        }
+        else
+        {
+            spawnPos = team2Spawns.GetChild(team2SpawnIndex).position;
+            team2SpawnIndex = (team2SpawnIndex + 1) % team2Spawns.childCount;
+        }
+        GameObject client = GameObject.Instantiate(clientPrefab, spawnPos, Quaternion.identity);
+        Player clientPlayer = client.GetComponent<Player>();
+        clients.Add(clientPlayer);
+        client.transform.parent = clientList;
+        clientPlayer.SetPlayerID(id);
+        if (team)
+        {
+            clientPlayer.SetTeam(Team.team1);
+        }
+        else
+        {
+            clientPlayer.SetTeam(Team.team2);
+        }
     }
 
+    /// <summary>
+    /// "Client" also refers to Host Client.
+    /// </summary>
+    /// <param name="player"></param>
     public void AssignNewPlayerClient(Player player)
     {
         //Player lists are always sorted by ID to prevent searching in RPC

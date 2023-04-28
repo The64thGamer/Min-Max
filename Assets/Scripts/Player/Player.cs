@@ -17,7 +17,7 @@ public class Player : NetworkBehaviour
 
     public override void OnNetworkSpawn()
     {
-        GameObject.Find("Game Manager").GetComponent<NetcodeManager>().AssignNewPlayerClient(this);
+        GameObject.Find("Game Manager").GetComponent<GlobalManager>().AssignNewPlayerClient(this);
         SetClass(ClassList.programmer);
     }
 
