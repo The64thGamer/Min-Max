@@ -20,6 +20,7 @@ public class GlobalManager : NetworkBehaviour
 
     [Header("Global Prefabs")]
     [SerializeField] GameObject clientPrefab;
+    [SerializeField] GameObject hostPrefab;
 
     [Header("Lists")]
     [SerializeField] Player host;
@@ -52,11 +53,7 @@ public class GlobalManager : NetworkBehaviour
         al = GetComponent<AllStats>();
         RandomizeTeams();
 
-        //Join host
-        host.SetTeam(Team.team1);
-        host.transform.position = team1Spawns.GetChild(team1SpawnIndex).position;
-        team1SpawnIndex = (team1SpawnIndex + 1) % team1Spawns.childCount;
-
+        //remove this
         for (int i = 0; i < PlayerPrefs.GetInt("ServerMaxPlayers"); i++)
         {
             JoinNewClient((ulong)totalClientsConnected);
@@ -353,15 +350,19 @@ public class GlobalManager : NetworkBehaviour
     {
         if (!IsHost) { return; }
 
-        GameObject thePlayer = GameObject.Instantiate(playerPrefab);
+        GameObject thePlayer = GameObject.Instantiate(hostPrefab);
         thePlayer.GetComponent<NetworkObject>().SpawnWithOwnership(id);
+        host = thePlayer.GetComponent<Player>();
+        host.SetTeam(Team.team1);
+        host.transform.position = team1Spawns.GetChild(team1SpawnIndex).position;
+        team1SpawnIndex = (team1SpawnIndex + 1) % team1Spawns.childCount;
     }
 
     public void AssignNewPlayerClient(Player player)
     {
         //Player lists are always sorted by ID to prevent searching in RPC
-        players.Add(player);
-        players.Sort((p1, p2) => p1.OwnerClientId.CompareTo(p2.OwnerClientId));
+        clients.Add(player);
+        clients.Sort((p1, p2) => p1.OwnerClientId.CompareTo(p2.OwnerClientId));
         playerPosRPCData.Add(
             new PlayerPosData()
             {
@@ -374,9 +375,9 @@ public class GlobalManager : NetworkBehaviour
     [ServerRpc(RequireOwnership = false)]
     private void SendJoystickServerRpc(Vector2 joystick, ulong id)
     {
-        for (int i = 0; i < players.Count; i++)
+        for (int i = 0; i < clients.Count; i++)
         {
-            if (players[i].OwnerClientId == id)
+            if (clients[i].OwnerClientId == id)
             {
                 //players[i].UpdateJoystick(joystick);
                 return;
@@ -391,13 +392,13 @@ public class GlobalManager : NetworkBehaviour
     [ClientRpc]
     private void SendPosClientRpc(PlayerPosData[] data)
     {
-        if (data.Length != players.Count) { return; }
-        for (int i = 0; i < players.Count; i++)
+        if (data.Length != clients.Count) { return; }
+        for (int i = 0; i < clients.Count; i++)
         {
             //Check run incase of player disconnect+reconnect inside same tick.
-            if (players[i].OwnerClientId == data[i].id)
+            if (clients[i].OwnerClientId == data[i].id)
             {
-                players[i].GetTracker().SetNewClientPosition(data[i].pos);
+                clients[i].GetTracker().SetNewClientPosition(data[i].pos);
             }
         }
     }
