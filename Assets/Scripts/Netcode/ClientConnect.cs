@@ -17,7 +17,7 @@ public class ClientConnect : NetworkBehaviour
 
     IEnumerator ServerStartCheck()
     {
-        GlobalManager netcodeManager = GameObject.Find("Game Manager").GetComponent<GlobalManager>();
+        GlobalManager netcodeManager = GameObject.Find("Global Manager").GetComponent<GlobalManager>();
         while (!netcodeManager.GetServerStatus())
         {
             yield return null;

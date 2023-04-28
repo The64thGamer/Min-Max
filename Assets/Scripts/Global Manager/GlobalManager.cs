@@ -322,32 +322,9 @@ public class GlobalManager : NetworkBehaviour
         GameObject thePlayer = GameObject.Instantiate(hostPrefab);
         host = thePlayer.GetComponent<Player>();
 
-        //Client Object Spawning
-        bool team = clientList.childCount % 2 != 0;
-        Vector3 spawnPos;
-        if (team)
-        {
-            spawnPos = team1Spawns.GetChild(team1SpawnIndex).position;
-            team1SpawnIndex = (team1SpawnIndex + 1) % team1Spawns.childCount;
-        }
-        else
-        {
-            spawnPos = team2Spawns.GetChild(team2SpawnIndex).position;
-            team2SpawnIndex = (team2SpawnIndex + 1) % team2Spawns.childCount;
-        }
-        GameObject client = GameObject.Instantiate(clientPrefab, spawnPos, Quaternion.identity);
+        GameObject client = GameObject.Instantiate(clientPrefab, Vector3.zero, Quaternion.identity, clientList);
         Player clientPlayer = client.GetComponent<Player>();
-        clients.Add(clientPlayer);
-        client.transform.parent = clientList;
         clientPlayer.SetPlayerID(id);
-        if (team)
-        {
-            clientPlayer.SetTeam(Team.team1);
-        }
-        else
-        {
-            clientPlayer.SetTeam(Team.team2);
-        }
     }
 
     /// <summary>
@@ -366,6 +343,33 @@ public class GlobalManager : NetworkBehaviour
                 pos = player.transform.position
             });
         playerPosRPCData.Sort((p1, p2) => p1.id.CompareTo(p2.id));
+
+        if (!IsHost) { return; }
+
+        //Client Object Spawning
+        bool team = clientList.childCount % 2 != 0;
+        Vector3 spawnPos;
+        if (team)
+        {
+            spawnPos = team1Spawns.GetChild(team1SpawnIndex).position;
+            team1SpawnIndex = (team1SpawnIndex + 1) % team1Spawns.childCount;
+        }
+        else
+        {
+            spawnPos = team2Spawns.GetChild(team2SpawnIndex).position;
+            team2SpawnIndex = (team2SpawnIndex + 1) % team2Spawns.childCount;
+        }
+
+        if (team)
+        {
+            player.SetTeam(Team.team1);
+        }
+        else
+        {
+            player.SetTeam(Team.team2);
+        }
+
+        player.transform.position = spawnPos;
     }
 
     [ServerRpc(RequireOwnership = false)]
