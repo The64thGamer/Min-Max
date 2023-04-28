@@ -1,11 +1,6 @@
-using System.Collections;
 using System.Collections.Generic;
-using System.Runtime.CompilerServices;
 using Unity.Netcode;
-using UnityEditor.PackageManager;
 using UnityEngine;
-using static PlayerTracker;
-using static UnityEditor.Experimental.GraphView.GraphView;
 
 public class GlobalManager : NetworkBehaviour
 {
@@ -136,7 +131,7 @@ public class GlobalManager : NetworkBehaviour
 
     void CheckAllPlayerInputs(Player player)
     {
-        if (player.GetTracker().GetTriggerR() == ButtonState.started || player.GetTracker().GetTriggerR() == ButtonState.on)
+        if (player.GetTracker().GetTriggerR() == PlayerTracker.ButtonState.started || player.GetTracker().GetTriggerR() == PlayerTracker.ButtonState.on)
         {
             host.GetCurrentGun().Fire();
             for (int i = 0; i < clients.Count; i++)
