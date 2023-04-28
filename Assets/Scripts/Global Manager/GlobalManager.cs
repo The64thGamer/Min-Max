@@ -51,8 +51,14 @@ public class GlobalManager : NetworkBehaviour
         NetworkManager.Singleton.OnServerStarted += ServerStarted;
         al = GetComponent<AllStats>();
 
+        //Local Host, Server Relay Host, Client Connect
         switch (PlayerPrefs.GetInt("LoadMapMode"))
         {
+            case 0:
+                NetworkManager.Singleton.StartHost();
+                RandomizeTeams();
+                Debug.Log("Started Host");
+                break;
             case 1:
                 NetworkManager.Singleton.StartHost();
                 RandomizeTeams();
@@ -100,7 +106,7 @@ public class GlobalManager : NetworkBehaviour
             CheckAllPlayerInputs(clients[i]);
             clients[i].GetTracker().UpdatePlayerPositions(host.GetTracker().GetCamera(), host.GetTracker().GetRightHand(), host.GetTracker().GetLeftHand(), host.GetTracker().GetForwardRoot(), al.GetClassStats(host.GetCurrentClass()).trackingScale);
         }
-        CheckAllPlayerInputs(host);
+        //CheckAllPlayerInputs(host);
     }
 
     void RandomizeTeams()
@@ -418,11 +424,17 @@ public class GlobalManager : NetworkBehaviour
 public struct PlayerPosData : INetworkSerializable
 {
     public ulong id;
+    public Vector3 headsetPos;
+    public Vector3 rHandPos;
+    public Vector3 lHandPos;
     public Vector3 pos;
 
     public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
     {
         serializer.SerializeValue(ref id);
+        serializer.SerializeValue(ref headsetPos);
+        serializer.SerializeValue(ref rHandPos);
+        serializer.SerializeValue(ref lHandPos);
         serializer.SerializeValue(ref pos);
     }
 }
