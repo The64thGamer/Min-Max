@@ -15,8 +15,9 @@ public class Player : NetworkBehaviour
     [SerializeField] AutoHandPlayer autoHand;
     [SerializeField] ulong playerID;
 
-    private void Start()
+    public override void OnNetworkSpawn()
     {
+        GameObject.Find("Game Manager").GetComponent<NetcodeManager>().AssignNewPlayerClient(this);
         SetClass(ClassList.programmer);
     }
 
