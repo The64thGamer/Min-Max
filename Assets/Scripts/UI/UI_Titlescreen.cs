@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UIElements;
+using UnityEngine.XR;
+using UnityEngine.XR.Management;
 
 public class UI_Titlescreen : MonoBehaviour
 {
@@ -63,7 +65,10 @@ public class UI_Titlescreen : MonoBehaviour
         maxPlayers.value = Mathf.Max(PlayerPrefs.GetInt("ServerMaxPlayers"),1);
         spectatorAsPlayer.value = Convert.ToBoolean(PlayerPrefs.GetInt("ServerSpectatorAsPlayer"));
         isHostSpectator.value = Convert.ToBoolean(PlayerPrefs.GetInt("ServerIsHostSpectator"));
-
+        if (PlayerPrefs.GetInt("IsVREnabled") == 1)
+        {
+            rc_startVR.style.display = DisplayStyle.None;
+        }
     }
 
     IEnumerator LoadMap()
@@ -158,6 +163,7 @@ public class UI_Titlescreen : MonoBehaviour
             case 0:
                 root.Q<VisualElement>("TitleMenu").style.display = DisplayStyle.Flex;
                 SetVEBorderColor(root.Q<VisualElement>("RCStartVR"), borderButtonSelected);
+                StartCoroutine(StartXR());
                 break;
             case 1:
                 root.Q<VisualElement>("PlayMenu").style.display = DisplayStyle.Flex;
@@ -182,5 +188,32 @@ public class UI_Titlescreen : MonoBehaviour
     {
         root.Q<VisualElement>("MapIcon").style.backgroundImage = new StyleBackground(mapIcons[evt.index]);
         currentSceneToLoad = evt.index;
+    }
+
+    IEnumerator StartXR()
+    {
+        IReadOnlyList<XRLoader> loaders = XRGeneralSettings.Instance.Manager.activeLoaders;
+        Debug.Log(loaders);
+        for (int i = 0; i < loaders.Count; i++)
+        {
+            Debug.Log(loaders[i]);
+        }
+        yield return XRGeneralSettings.Instance.Manager.InitializeLoader();
+        if (XRGeneralSettings.Instance.Manager.activeLoader == null)
+        {
+            Debug.LogError("Initializing XR Failed. Check Editor or Player log for details.");
+        }
+        else
+        {
+            Debug.Log("Starting XR...");
+            XRGeneralSettings.Instance.Manager.StartSubsystems();
+            PlayerPrefs.SetInt("IsVREnabled", 1);
+            yield return null;
+            AsyncOperation asyncLoad = SceneManager.LoadSceneAsync("VR Title Screen");
+            while (!asyncLoad.isDone)
+            {
+                yield return null;
+            }
+        }
     }
 }
