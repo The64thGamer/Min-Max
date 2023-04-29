@@ -57,7 +57,7 @@ public class UI_Titlescreen : MonoBehaviour
         maxPlayers.RegisterValueChangedCallback(evt => PlayerPrefs.SetInt("ServerMaxPlayers", (int)maxPlayers.value));
         spectatorAsPlayer.RegisterValueChangedCallback(evt => PlayerPrefs.SetInt("ServerSpectatorAsPlayer", spectatorAsPlayer.value ? 1 : 0));
         isHostSpectator.RegisterValueChangedCallback(evt => PlayerPrefs.SetInt("ServerIsHostSpectator", isHostSpectator.value ? 1 : 0));
-        selectPort.RegisterValueChangedCallback(evt => PlayerPrefs.SetInt("ServerPort", int.Parse(selectPort.text)));
+        selectPort.RegisterValueChangedCallback(evt => TryPortChange(selectPort));
 
         //Ect
         selectMap.choices = mapNames;
@@ -69,6 +69,11 @@ public class UI_Titlescreen : MonoBehaviour
         {
             rc_startVR.style.display = DisplayStyle.None;
         }
+        if(PlayerPrefs.GetInt("ServerPort") <= 0)
+        {
+            PlayerPrefs.SetInt("ServerPort", 7777);
+        }
+        selectPort.value = PlayerPrefs.GetInt("ServerPort").ToString();
     }
 
     IEnumerator LoadMap()
@@ -80,6 +85,19 @@ public class UI_Titlescreen : MonoBehaviour
             {
                 yield return null;
             }
+        }
+    }
+
+    void TryPortChange(TextField selectPort)
+    {
+        try
+        {
+            PlayerPrefs.SetInt("ServerPort", ushort.Parse(selectPort.text));
+        }
+        catch (Exception)
+        {
+            PlayerPrefs.SetInt("ServerPort", 7777);
+            selectPort.value = PlayerPrefs.GetInt("ServerPort").ToString();
         }
     }
 
