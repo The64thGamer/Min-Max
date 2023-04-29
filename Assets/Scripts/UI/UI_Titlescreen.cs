@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -37,6 +38,8 @@ public class UI_Titlescreen : MonoBehaviour
         Button ms_startgame = root.Q<Button>("StartGame");
         DropdownField selectMap = root.Q<DropdownField>("SelectMap");
         SliderInt maxPlayers = root.Q<SliderInt>("MaxPlayers");
+        Toggle spectatorAsPlayer = root.Q<Toggle>("SpectatorAsPlayer");
+        Toggle isHostSpectator = root.Q<Toggle>("HostisSpectator");
 
 
         //Functions
@@ -49,12 +52,18 @@ public class UI_Titlescreen : MonoBehaviour
         ps_joinlocal.clicked += () => StartLocalOrHost(3);
         ms_startgame.clicked += () => StartCoroutine(LoadMap());
         selectMap.RegisterValueChangedCallback(evt => SwapMap(selectMap));
-        maxPlayers.RegisterValueChangedCallback(evt => SetMaxPlayers(maxPlayers));
+        maxPlayers.RegisterValueChangedCallback(evt => PlayerPrefs.SetInt("ServerMaxPlayers", (int)maxPlayers.value));
+        spectatorAsPlayer.RegisterValueChangedCallback(evt => PlayerPrefs.SetInt("ServerSpectatorAsPlayer", spectatorAsPlayer.value ? 1 : 0));
+        isHostSpectator.RegisterValueChangedCallback(evt => PlayerPrefs.SetInt("ServerIsHostSpectator", isHostSpectator.value ? 1 : 0));
+
 
         //Ect
         selectMap.choices = mapNames;
         selectMap.index = 0;
         maxPlayers.value = Mathf.Max(PlayerPrefs.GetInt("ServerMaxPlayers"),1);
+        spectatorAsPlayer.value = Convert.ToBoolean(PlayerPrefs.GetInt("ServerSpectatorAsPlayer"));
+        isHostSpectator.value = Convert.ToBoolean(PlayerPrefs.GetInt("ServerIsHostSpectator"));
+
     }
 
     IEnumerator LoadMap()
@@ -71,32 +80,56 @@ public class UI_Titlescreen : MonoBehaviour
 
     void StartLocalOrHost(int loadmapmode)
     {
+        //Default
+        root.Q<VisualElement>("ServerSettings").style.display = DisplayStyle.None;
+        root.Q<VisualElement>("StartMapCol").style.display = DisplayStyle.None;
+        root.Q<VisualElement>("JoinLocalCol").style.display = DisplayStyle.None;
+        root.Q<VisualElement>("JoinServerCol").style.display = DisplayStyle.None;
+
+        root.Q<Label>("SendPlayerKey").style.display = DisplayStyle.None;
+        root.Q<Button>("RequestKey").style.display = DisplayStyle.None;
+        root.Q<Button>("StartGame").style.display = DisplayStyle.None;
+
+        VisualElement col1 = root.Q<VisualElement>("PlayMenuCol1");
+
+        Color noBorder = borderButtonSelected;
+        noBorder.a = 0;
+
+        for (int i = 0; i < col1.childCount; i++)
+        {
+            SetVEBorderColor(col1.ElementAt(i), noBorder);
+        }
+
         PlayerPrefs.SetInt("LoadMapMode", loadmapmode);
+
         switch (loadmapmode)
         {
             case 0:
                 root.Q<Label>("StartSetting").text = "Start Local Game";
-                root.Q<Label>("SendPlayerKey").style.display = DisplayStyle.None;
-                root.Q<Button>("RequestKey").style.display = DisplayStyle.None;
                 root.Q<Button>("StartGame").style.display = DisplayStyle.Flex;
+                root.Q<VisualElement>("ServerSettings").style.display = DisplayStyle.Flex;
+                root.Q<VisualElement>("StartMapCol").style.display = DisplayStyle.Flex;
+                SetVEBorderColor(root.Q<VisualElement>("PSStartLocal"), borderButtonSelected);
                 break;
             case 1:
                 root.Q<Label>("StartSetting").text = "Start Server";
                 root.Q<Label>("SendPlayerKey").style.display = DisplayStyle.Flex;
                 root.Q<Button>("RequestKey").style.display = DisplayStyle.Flex;
-                root.Q<Button>("StartGame").style.display = DisplayStyle.None;
+                root.Q<VisualElement>("ServerSettings").style.display = DisplayStyle.Flex;
+                root.Q<VisualElement>("StartMapCol").style.display = DisplayStyle.Flex;
+                SetVEBorderColor(root.Q<VisualElement>("PSStartServer"), borderButtonSelected);
                 break;
             case 2:
                 root.Q<Label>("StartSetting").text = "Join Server";
-                root.Q<Label>("SendPlayerKey").style.display = DisplayStyle.None;
-                root.Q<Button>("RequestKey").style.display = DisplayStyle.None;
                 root.Q<Button>("StartGame").style.display = DisplayStyle.Flex;
+                root.Q<VisualElement>("JoinServerCol").style.display = DisplayStyle.Flex;
+                SetVEBorderColor(root.Q<VisualElement>("PSJoinServer"), borderButtonSelected);
                 break;
             case 3:
                 root.Q<Label>("StartSetting").text = "Join Local Game";
-                root.Q<Label>("SendPlayerKey").style.display = DisplayStyle.None;
-                root.Q<Button>("RequestKey").style.display = DisplayStyle.None;
                 root.Q<Button>("StartGame").style.display = DisplayStyle.Flex;
+                root.Q<VisualElement>("JoinLocalCol").style.display = DisplayStyle.Flex;
+                SetVEBorderColor(root.Q<VisualElement>("PSJoinLocal"), borderButtonSelected);
                 break;
             default:
                 break;
@@ -129,6 +162,7 @@ public class UI_Titlescreen : MonoBehaviour
             case 1:
                 root.Q<VisualElement>("PlayMenu").style.display = DisplayStyle.Flex;
                 SetVEBorderColor(root.Q<VisualElement>("RCPlay"), borderButtonSelected);
+                StartLocalOrHost(0);
                 break;
             default:
                 break;
@@ -141,11 +175,6 @@ public class UI_Titlescreen : MonoBehaviour
         v.style.borderRightColor = new StyleColor(c);
         v.style.borderLeftColor = new StyleColor(c);
         v.style.borderBottomColor = new StyleColor(c);
-    }
-
-    void SetMaxPlayers(SliderInt playerCount)
-    {
-        PlayerPrefs.SetInt("ServerMaxPlayers",(int)playerCount.value);
     }
 
 
