@@ -6,37 +6,47 @@ using UnityEngine.UIElements;
 
 public class UI_Titlescreen : MonoBehaviour
 {
-    VisualElement root;
-
+    [SerializeField] UIDocument doc;
     [SerializeField] List<Texture2D> mapIcons;
     [SerializeField] List<string> mapNames;
+
+
+    //Colors
+    [SerializeField] Color borderButtonSelected;
+
+    //Ect
+    VisualElement root;
     int currentSceneToLoad;
 
     private void OnEnable()
     {
-        root = GetComponent<UIDocument>().rootVisualElement;
+        root = doc.rootVisualElement;
 
-        //Grab
+        //Bottom Bar
+        Button rc_startVR = root.Q<Button>("RCStartVR");
         Button rc_play = root.Q<Button>("RCPlay");
         Button rc_exit = root.Q<Button>("RCExit");
+
+        //Play Menu
+        Button ps_joinserver = root.Q<Button>("PSJoinServer");
+        Button ps_startserver = root.Q<Button>("PSStartServer");
         Button ps_startlocal = root.Q<Button>("PSStartLocal");
         Button ps_joinlocal = root.Q<Button>("PSJoinLocal");
-        Button ps_startserver = root.Q<Button>("PSStartServer");
-        Button ps_joinserver = root.Q<Button>("PSJoinServer");
-        Button ps_back = root.Q<Button>("PSBack");
+
+        //Server Settings
         Button ms_startgame = root.Q<Button>("StartGame");
         DropdownField selectMap = root.Q<DropdownField>("SelectMap");
         SliderInt maxPlayers = root.Q<SliderInt>("MaxPlayers");
 
 
         //Functions
-        rc_play.clicked += () => SwapColumn(RightColumnSwaps.none,LeftColumnSwaps.PlaySection);
+        rc_startVR.clicked += () => SwitchMainTab(0);
+        rc_play.clicked += () => SwitchMainTab(1);
         rc_exit.clicked += () => Application.Quit();
         ps_startlocal.clicked += () => StartLocalOrHost(0);
         ps_startserver.clicked += () => StartLocalOrHost(1);
-        //ps_joinserver.clicked += () => StartLocalOrHost(2);
+        ps_joinserver.clicked += () => StartLocalOrHost(2);
         ps_joinlocal.clicked += () => StartLocalOrHost(3);
-        ps_back.clicked += () => SwapColumn(RightColumnSwaps.TBAPanel, LeftColumnSwaps.MainButtons);
         ms_startgame.clicked += () => StartCoroutine(LoadMap());
         selectMap.RegisterValueChangedCallback(evt => SwapMap(selectMap));
         maxPlayers.RegisterValueChangedCallback(evt => SetMaxPlayers(maxPlayers));
@@ -59,50 +69,31 @@ public class UI_Titlescreen : MonoBehaviour
         }
     }
 
-    enum LeftColumnSwaps
-    {
-        none,
-        MainButtons,
-        PlaySection
-    }
-    enum RightColumnSwaps
-    {
-        none,
-        TBAPanel,
-        MapSelection
-    }
-
-    //"LoadMapMode" 0 == StartLocal, 1 == StartServer, 2 == Joinserver, 3 == JoinLocals
     void StartLocalOrHost(int loadmapmode)
     {
         PlayerPrefs.SetInt("LoadMapMode", loadmapmode);
-        SwapColumn(RightColumnSwaps.MapSelection, LeftColumnSwaps.none);
         switch (loadmapmode)
         {
             case 0:
-                root.Q<Label>("StartLocalGame").style.display = DisplayStyle.Flex;
-                root.Q<Label>("StartServerGame").style.display = DisplayStyle.None;
+                root.Q<Label>("StartSetting").text = "Start Local Game";
                 root.Q<Label>("SendPlayerKey").style.display = DisplayStyle.None;
                 root.Q<Button>("RequestKey").style.display = DisplayStyle.None;
                 root.Q<Button>("StartGame").style.display = DisplayStyle.Flex;
                 break;
             case 1:
-                root.Q<Label>("StartLocalGame").style.display = DisplayStyle.None;
-                root.Q<Label>("StartServerGame").style.display = DisplayStyle.Flex;
+                root.Q<Label>("StartSetting").text = "Start Server";
                 root.Q<Label>("SendPlayerKey").style.display = DisplayStyle.Flex;
                 root.Q<Button>("RequestKey").style.display = DisplayStyle.Flex;
                 root.Q<Button>("StartGame").style.display = DisplayStyle.None;
                 break;
             case 2:
-                root.Q<Label>("StartLocalGame").style.display = DisplayStyle.Flex;
-                root.Q<Label>("StartServerGame").style.display = DisplayStyle.None;
+                root.Q<Label>("StartSetting").text = "Join Server";
                 root.Q<Label>("SendPlayerKey").style.display = DisplayStyle.None;
                 root.Q<Button>("RequestKey").style.display = DisplayStyle.None;
                 root.Q<Button>("StartGame").style.display = DisplayStyle.Flex;
                 break;
             case 3:
-                root.Q<Label>("StartLocalGame").style.display = DisplayStyle.Flex;
-                root.Q<Label>("StartServerGame").style.display = DisplayStyle.None;
+                root.Q<Label>("StartSetting").text = "Join Local Game";
                 root.Q<Label>("SendPlayerKey").style.display = DisplayStyle.None;
                 root.Q<Button>("RequestKey").style.display = DisplayStyle.None;
                 root.Q<Button>("StartGame").style.display = DisplayStyle.Flex;
@@ -112,34 +103,44 @@ public class UI_Titlescreen : MonoBehaviour
         }
     }
 
-    void SwapColumn(RightColumnSwaps r, LeftColumnSwaps l)
+    void SwitchMainTab(int tab)
     {
-        switch (l)
+        VisualElement tabroot = root.Q<VisualElement>("MiddleBar");
+        VisualElement buttonRoot = root.Q<VisualElement>("BottomBar");
+
+        Color noBorder = borderButtonSelected;
+        noBorder.a = 0;
+
+        for (int i = 0; i < tabroot.childCount; i++)
         {
-            case LeftColumnSwaps.MainButtons:
-                root.Q<VisualElement>("MainButtons").style.display = DisplayStyle.Flex;
-                root.Q<VisualElement>("PlaySection").style.display = DisplayStyle.None;
+            tabroot.ElementAt(i).style.display = DisplayStyle.None;
+        }
+        for (int i = 0; i < buttonRoot.childCount; i++)
+        {
+            SetVEBorderColor(buttonRoot.ElementAt(i), noBorder);
+        }
+
+        switch (tab)
+        {
+            case 0:
+                root.Q<VisualElement>("TitleMenu").style.display = DisplayStyle.Flex;
+                SetVEBorderColor(root.Q<VisualElement>("RCStartVR"), borderButtonSelected);
                 break;
-            case LeftColumnSwaps.PlaySection:
-                root.Q<VisualElement>("MainButtons").style.display = DisplayStyle.None;
-                root.Q<VisualElement>("PlaySection").style.display = DisplayStyle.Flex;
+            case 1:
+                root.Q<VisualElement>("PlayMenu").style.display = DisplayStyle.Flex;
+                SetVEBorderColor(root.Q<VisualElement>("RCPlay"), borderButtonSelected);
                 break;
             default:
                 break;
         }
-        switch (r)
-        {
-            case RightColumnSwaps.TBAPanel:
-                root.Q<VisualElement>("MapSelection").style.display = DisplayStyle.None;
-                root.Q<VisualElement>("TBAPanel").style.display = DisplayStyle.Flex;
-                break;
-            case RightColumnSwaps.MapSelection:
-                root.Q<VisualElement>("MapSelection").style.display = DisplayStyle.Flex;
-                root.Q<VisualElement>("TBAPanel").style.display = DisplayStyle.None;
-                break;
-            default:
-                break;
-        }
+    }
+
+    void SetVEBorderColor(VisualElement v, Color c)
+    {
+        v.style.borderTopColor = new StyleColor(c);
+        v.style.borderRightColor = new StyleColor(c);
+        v.style.borderLeftColor = new StyleColor(c);
+        v.style.borderBottomColor = new StyleColor(c);
     }
 
     void SetMaxPlayers(SliderInt playerCount)

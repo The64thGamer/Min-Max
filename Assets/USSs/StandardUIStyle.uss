@@ -40,10 +40,10 @@
     border-right-width: 5px;
     border-top-width: 5px;
     border-bottom-width: 5px;
-    border-left-color: rgba(0, 0, 0, 0);
-    border-right-color: rgba(0, 0, 0, 0);
-    border-top-color: rgba(0, 0, 0, 0);
-    border-bottom-color: rgba(0, 0, 0, 0);
+    border-left-color: rgba(237, 218, 197, 0);
+    border-right-color: rgba(237, 218, 197, 0);
+    border-top-color: rgba(237, 218, 197, 0);
+    border-bottom-color: rgba(237, 218, 197, 0);
     padding-left: 10px;
     padding-right: 10px;
     padding-top: 5px;
