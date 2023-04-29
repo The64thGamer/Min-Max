@@ -151,7 +151,7 @@ public class UI_Titlescreen : MonoBehaviour
             case 3:
                 root.Q<Label>("StartSetting").text = "Join Local Game";
                 root.Q<Button>("StartGame").style.display = DisplayStyle.Flex;
-                root.Q<VisualElement>("JoinLocalCol").style.display = DisplayStyle.Flex;
+                root.Q<VisualElement>("StartMapCol").style.display = DisplayStyle.Flex;
                 SetVEBorderColor(root.Q<VisualElement>("PSJoinLocal"), borderButtonSelected);
                 break;
             default:
