@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using Unity.Netcode;
+using Unity.Netcode.Transports.UTP;
 using UnityEngine;
 
 public class GlobalManager : NetworkBehaviour
@@ -44,6 +45,9 @@ public class GlobalManager : NetworkBehaviour
     {
         NetworkManager.Singleton.OnServerStarted += ServerStarted;
         al = GetComponent<AllStats>();
+
+        //Settings
+        NetworkManager.GetComponent<UnityTransport>().ConnectionData.Port = (ushort)PlayerPrefs.GetInt("ServerPort");
 
         //Local Host, Server Relay Host, Client Connect
         switch (PlayerPrefs.GetInt("LoadMapMode"))

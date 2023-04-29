@@ -42,7 +42,7 @@ public class UI_Titlescreen : MonoBehaviour
         SliderInt maxPlayers = root.Q<SliderInt>("MaxPlayers");
         Toggle spectatorAsPlayer = root.Q<Toggle>("SpectatorAsPlayer");
         Toggle isHostSpectator = root.Q<Toggle>("HostisSpectator");
-
+        TextField selectPort = root.Q<TextField>("SelectPort");
 
         //Functions
         rc_startVR.clicked += () => SwitchMainTab(0);
@@ -57,7 +57,7 @@ public class UI_Titlescreen : MonoBehaviour
         maxPlayers.RegisterValueChangedCallback(evt => PlayerPrefs.SetInt("ServerMaxPlayers", (int)maxPlayers.value));
         spectatorAsPlayer.RegisterValueChangedCallback(evt => PlayerPrefs.SetInt("ServerSpectatorAsPlayer", spectatorAsPlayer.value ? 1 : 0));
         isHostSpectator.RegisterValueChangedCallback(evt => PlayerPrefs.SetInt("ServerIsHostSpectator", isHostSpectator.value ? 1 : 0));
-
+        selectPort.RegisterValueChangedCallback(evt => PlayerPrefs.SetInt("ServerPort", int.Parse(selectPort.text)));
 
         //Ect
         selectMap.choices = mapNames;
