@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using Unity.Netcode;
 using Unity.Netcode.Transports.UTP;
@@ -325,7 +326,7 @@ public class GlobalManager : NetworkBehaviour
     public void SpawnNewPlayerHost(ulong id)
     {
         if (!IsHost) { return; }
-        Debug.Log("Host Player Spaned");
+        Debug.Log("Host Player Spawned");
         GameObject client = GameObject.Instantiate(clientPrefab, Vector3.zero, Quaternion.identity);
         client.GetComponent<NetworkObject>().SpawnWithOwnership(id);
         Player clientPlayer = client.GetComponent<Player>();
@@ -339,6 +340,11 @@ public class GlobalManager : NetworkBehaviour
     /// <param name="player"></param>
     public void AssignNewPlayerClient(Player player)
     {
+        StartCoroutine(AssignNewClient(player));
+    }
+
+    IEnumerator AssignNewClient(Player player)
+    {
         //Player lists are always sorted by ID to prevent searching in RPC
         clients.Add(player);
         clients.Sort((p1, p2) => p1.OwnerClientId.CompareTo(p2.OwnerClientId));
@@ -350,46 +356,51 @@ public class GlobalManager : NetworkBehaviour
             });
         playerPosRPCData.Sort((p1, p2) => p1.id.CompareTo(p2.id));
 
-        if (!IsHost) { return; }
+        if (IsHost)
+        {
+            //Client Object Spawning
+            bool team = clients.Count % 2 != 0;
+            Vector3 spawnPos;
+            if (team)
+            {
+                spawnPos = team1Spawns.GetChild(team1SpawnIndex).position;
+                team1SpawnIndex = (team1SpawnIndex + 1) % team1Spawns.childCount;
+            }
+            else
+            {
+                spawnPos = team2Spawns.GetChild(team2SpawnIndex).position;
+                team2SpawnIndex = (team2SpawnIndex + 1) % team2Spawns.childCount;
+            }
 
-        //Client Object Spawning
-        bool team = clients.Count % 2 != 0;
-        Vector3 spawnPos;
-        if (team)
-        {
-            spawnPos = team1Spawns.GetChild(team1SpawnIndex).position;
-            team1SpawnIndex = (team1SpawnIndex + 1) % team1Spawns.childCount;
-        }
-        else
-        {
-            spawnPos = team2Spawns.GetChild(team2SpawnIndex).position;
-            team2SpawnIndex = (team2SpawnIndex + 1) % team2Spawns.childCount;
-        }
+            if (team)
+            {
+                player.SetTeam(Team.team1);
+            }
+            else
+            {
+                player.SetTeam(Team.team2);
+            }
 
-        if (team)
-        {
-            player.SetTeam(Team.team1);
-        }
-        else
-        {
-            player.SetTeam(Team.team2);
-        }
+            player.transform.position = spawnPos;
 
-        player.transform.position = spawnPos;
-
-        TeamList debugList = TeamList.gray;
-        switch (player.GetTeam())
-        {
-            case Team.team1:
-                debugList = GetTeam1();
-                break;
-            case Team.team2:
-                debugList = GetTeam2();
-                break;
-            default:
-                break;
+            if(team1 == TeamList.gray || team2 == TeamList.gray)
+            {
+                yield return null;
+            }
+            TeamList debugList = TeamList.gray;
+            switch (player.GetTeam())
+            {
+                case Team.team1:
+                    debugList = GetTeam1();
+                    break;
+                case Team.team2:
+                    debugList = GetTeam2();
+                    break;
+                default:
+                    break;
+            }
+            Debug.Log("New Player Joined (#" + clients.Count + "), Team " + debugList);
         }
-        Debug.Log("New Player Joined (#" + clients.Count + "), Team " + debugList);
     }
 
     [ServerRpc(RequireOwnership = false)]
