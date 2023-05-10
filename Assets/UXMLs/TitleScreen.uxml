@@ -57,6 +57,24 @@
                     </ui:VisualElement>
                 </ui:VisualElement>
             </ui:VisualElement>
+            <ui:VisualElement name="Loadouts" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0); flex-direction: column; min-width: auto; min-height: auto; display: none;">
+                <ui:VisualElement style="flex-grow: 1; background-color: rgba(0, 0, 0, 0); align-self: auto; justify-content: flex-start; align-items: stretch; flex-direction: row; flex-wrap: nowrap;">
+                    <ui:VisualElement name="PlayMenuCol1" class="downbackdrop backdrop" style="display: flex; overflow: visible; visibility: visible; -unity-text-align: upper-left; white-space: normal; margin-left: 0; margin-right: 5px; margin-top: 0; margin-bottom: 0; max-width: 200px; justify-content: flex-start;">
+                        <ui:Button text="Labourer" display-tooltip-when-elided="true" name="CSSelect1" class="button" style="-unity-text-align: middle-left;" />
+                        <ui:Button text="Woodworker" display-tooltip-when-elided="true" name="CSSelect1" class="button" style="-unity-text-align: middle-left;" />
+                        <ui:Button text="Developer" display-tooltip-when-elided="true" name="CSSelect1" class="button" style="-unity-text-align: middle-left;" />
+                        <ui:Button text="Programmer" display-tooltip-when-elided="true" name="CSSelect1" class="button" style="-unity-text-align: middle-left;" />
+                        <ui:Button text="Computer" display-tooltip-when-elided="true" name="CSSelect1" class="button" style="-unity-text-align: middle-left;" />
+                        <ui:Button text="Fabricator" display-tooltip-when-elided="true" name="CSSelect1" class="button" style="-unity-text-align: middle-left;" />
+                        <ui:Button text="Artist" display-tooltip-when-elided="true" name="CSSelect1" class="button" style="-unity-text-align: middle-left;" />
+                        <ui:Button text="Freelancer" display-tooltip-when-elided="true" name="CSSelect1" class="button" style="-unity-text-align: middle-left;" />
+                        <ui:Button text="Craftsman" display-tooltip-when-elided="true" name="CSSelect1" class="button" style="-unity-text-align: middle-left;" />
+                        <ui:Button text="Manager" display-tooltip-when-elided="true" name="CSSelect1" class="button" style="-unity-text-align: middle-left;" />
+                    </ui:VisualElement>
+                    <ui:VisualElement name="PlayMenuCol2" class="downbackdrop backdrop" style="display: flex; overflow: visible; visibility: visible; -unity-text-align: upper-left; white-space: normal; margin-left: 5px; margin-right: 0; margin-top: 0; margin-bottom: 0;" />
+                    <ui:VisualElement name="PlayMenuCol3" class="downbackdrop backdrop" style="display: flex; overflow: visible; visibility: visible; -unity-text-align: upper-left; white-space: normal; margin-left: 5px; margin-right: 0; margin-top: 0; margin-bottom: 0; max-width: 400px;" />
+                </ui:VisualElement>
+            </ui:VisualElement>
         </ui:VisualElement>
         <ui:VisualElement name="BottomBar" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0); flex-direction: row; flex-shrink: 1; flex-wrap: nowrap; max-height: 50px;">
             <ui:Button text="Start VR" display-tooltip-when-elided="true" name="RCStartVR" class="button" />

@@ -222,10 +222,7 @@ public class PlayerTracker : MonoBehaviour
             Mathf.Abs(newAxis.z) * Mathf.Clamp(currentSpeed.y + (newAxis.z * accel), -speed, speed)
             );
         rigidBody.velocity = currentSpeed;
-        if (player.GetAutoHand().enabled)
-        {
-            player.GetAutoHand().SyncBodyHead();
-        }
+        player.GetAutoHand().SyncBodyHead();
     }
 
 }

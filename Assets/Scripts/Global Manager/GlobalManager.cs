@@ -8,7 +8,6 @@ public class GlobalManager : NetworkBehaviour
     [Header("Server Settings")]
     [SerializeField] TeamList team1;
     [SerializeField] TeamList team2;
-    [SerializeField] float serverTimeForgiveness;
     [SerializeField] LayerMask vrLayers;
     [SerializeField] List<PlayerPosData> playerPosRPCData = new List<PlayerPosData>();
     [SerializeField] NetworkVariable<int> ServerTickRate = new NetworkVariable<int>(10);
@@ -373,7 +372,20 @@ public class GlobalManager : NetworkBehaviour
         }
 
         player.transform.position = spawnPos;
-        Debug.Log("New Player Joined (#" + clients.Count + "), Team " + player.GetTeam());
+
+        TeamList debugList = TeamList.gray;
+        switch (player.GetTeam())
+        {
+            case Team.team1:
+                debugList = GetTeam1();
+                break;
+            case Team.team2:
+                debugList = GetTeam2();
+                break;
+            default:
+                break;
+        }
+        Debug.Log("New Player Joined (#" + clients.Count + "), Team " + debugList);
     }
 
     [ServerRpc(RequireOwnership = false)]
