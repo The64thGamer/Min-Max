@@ -19,7 +19,6 @@ public class GlobalManager : NetworkBehaviour
 
     [Header("Lists")]
     [SerializeField] Player host;
-    [SerializeField] Transform clientList;
     [SerializeField] List<Player> clients;
     [SerializeField] Transform team1Spawns;
     [SerializeField] Transform team2Spawns;
@@ -77,7 +76,6 @@ public class GlobalManager : NetworkBehaviour
 
     private void Update()
     {
-        /*
         //new
         if (!IsHost && tickTimer > 1.0f / (float)ClientInputTickRate.Value)
         {
@@ -110,7 +108,6 @@ public class GlobalManager : NetworkBehaviour
             clients[i].GetTracker().UpdatePlayerPositions(host.GetTracker().GetCamera(), host.GetTracker().GetRightHand(), host.GetTracker().GetLeftHand(), host.GetTracker().GetForwardRoot(), al.GetClassStats(host.GetCurrentClass()).trackingScale);
         }
         CheckAllPlayerInputs(host);
-        */
     }
 
     void RandomizeTeams()
@@ -131,22 +128,26 @@ public class GlobalManager : NetworkBehaviour
         }
         team1 = (TeamList)teamInt1;
         team2 = (TeamList)teamInt2;
+        Debug.Log("Teams Selected: " + team1 + ", " + team2);
     }
 
     void CheckAllPlayerInputs(Player player)
     {
-        if (player.GetTracker().GetTriggerR() == PlayerTracker.ButtonState.started || player.GetTracker().GetTriggerR() == PlayerTracker.ButtonState.on)
+        if (player != null)
         {
-            host.GetCurrentGun().Fire();
+            if (player.GetTracker().GetTriggerR() == PlayerTracker.ButtonState.started || player.GetTracker().GetTriggerR() == PlayerTracker.ButtonState.on)
+            {
+                host.GetCurrentGun().Fire();
+                for (int i = 0; i < clients.Count; i++)
+                {
+                    clients[i].GetCurrentGun().Fire();
+                }
+            }
+            host.GetTracker().MovePlayer(host.GetTracker().GetMoveAxis());
             for (int i = 0; i < clients.Count; i++)
             {
-                clients[i].GetCurrentGun().Fire();
+                clients[i].GetTracker().MovePlayer(host.GetTracker().GetMoveAxis());
             }
-        }
-        host.GetTracker().MovePlayer(host.GetTracker().GetMoveAxis());
-        for (int i = 0; i < clients.Count; i++)
-        {
-            clients[i].GetTracker().MovePlayer(host.GetTracker().GetMoveAxis());
         }
     }
 
@@ -321,7 +322,8 @@ public class GlobalManager : NetworkBehaviour
     public void SpawnNewPlayerHost(ulong id)
     {
         if (!IsHost) { return; }
-        GameObject client = GameObject.Instantiate(clientPrefab, Vector3.zero, Quaternion.identity, clientList);
+        Debug.Log("Host Player Spaned");
+        GameObject client = GameObject.Instantiate(clientPrefab, Vector3.zero, Quaternion.identity);
         client.GetComponent<NetworkObject>().SpawnWithOwnership(id);
         Player clientPlayer = client.GetComponent<Player>();
         host = clientPlayer;
@@ -348,7 +350,7 @@ public class GlobalManager : NetworkBehaviour
         if (!IsHost) { return; }
 
         //Client Object Spawning
-        bool team = clientList.childCount % 2 != 0;
+        bool team = clients.Count % 2 != 0;
         Vector3 spawnPos;
         if (team)
         {
@@ -371,6 +373,7 @@ public class GlobalManager : NetworkBehaviour
         }
 
         player.transform.position = spawnPos;
+        Debug.Log("New Player Joined (#" + clients.Count + "), Team " + player.GetTeam());
     }
 
     [ServerRpc(RequireOwnership = false)]
@@ -407,6 +410,7 @@ public class GlobalManager : NetworkBehaviour
     Vector2 GetJoyStickInput()
     {
         return new Vector2(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical"));
+
     }
 
     public void UpdateTickrates(int server, int client)
