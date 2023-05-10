@@ -39,6 +39,11 @@ public class Player : NetworkBehaviour
         SetClass(ClassList.programmer);
     }
 
+    void OnDestroy()
+    {
+        GameObject.Find("Global Manager").GetComponent<GlobalManager>().DisconnectClient(this);
+    }
+
     public void SetClass(ClassList setClass)
     {
         currentClass = setClass;

@@ -391,6 +391,17 @@ public class GlobalManager : NetworkBehaviour
         }
     }
 
+    public void DisconnectClient(Player player)
+    {
+        for (int i = 0; i < clients.Count; i++)
+        {
+            if (clients[i] == player)
+            {
+                clients.RemoveAt(i);
+            }
+        }
+    }
+
     [ServerRpc(RequireOwnership = false)]
     private void SendJoystickServerRpc(Vector2 joystick, ulong id)
     {
