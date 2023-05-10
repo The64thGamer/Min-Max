@@ -31,7 +31,7 @@ public class GenericGun : Gun
         currentAmmo = SearchStats(ChangableWeaponStats.maxAmmo);
         au = this.GetComponent<AudioSource>();
         gm = GameObject.Find("Global Manager").GetComponent<GlobalManager>();
-        if(gm.IsPlayerHost(currentPlayer))
+        if(IsOwner)
         {
             showCrosshair = true;
         }

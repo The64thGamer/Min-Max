@@ -18,7 +18,7 @@ public class GlobalManager : NetworkBehaviour
     [SerializeField] GameObject clientPrefab;
 
     [Header("Lists")]
-    [SerializeField] Player host;
+
     [SerializeField] List<Player> clients;
     [SerializeField] Transform team1Spawns;
     [SerializeField] Transform team2Spawns;
@@ -102,15 +102,15 @@ public class GlobalManager : NetworkBehaviour
         tickTimer += Time.deltaTime;
 
 
+
+        */
+
         //old
         for (int i = 0; i < clients.Count; i++)
         {
             CheckAllPlayerInputs(clients[i]);
-            clients[i].GetTracker().UpdatePlayerPositions(host.GetTracker().GetCamera(), host.GetTracker().GetRightHand(), host.GetTracker().GetLeftHand(), host.GetTracker().GetForwardRoot(), al.GetClassStats(host.GetCurrentClass()).trackingScale);
+            //clients[i].GetTracker().UpdatePlayerPositions(host.GetTracker().GetCamera(), host.GetTracker().GetRightHand(), host.GetTracker().GetLeftHand(), host.GetTracker().GetForwardRoot(), al.GetClassStats(host.GetCurrentClass()).trackingScale);
         }
-        */
-        CheckAllPlayerInputs(host);
-        
     }
 
     void SelectTeams()
@@ -141,16 +141,14 @@ public class GlobalManager : NetworkBehaviour
         {
             if (player.GetTracker().GetTriggerR() == PlayerTracker.ButtonState.started || player.GetTracker().GetTriggerR() == PlayerTracker.ButtonState.on)
             {
-                host.GetCurrentGun().Fire();
                 for (int i = 0; i < clients.Count; i++)
                 {
                     clients[i].GetCurrentGun().Fire();
                 }
             }
-            host.GetTracker().MovePlayer(host.GetTracker().GetMoveAxis());
             for (int i = 0; i < clients.Count; i++)
             {
-                clients[i].GetTracker().MovePlayer(host.GetTracker().GetMoveAxis());
+                clients[i].GetTracker().MovePlayer(clients[i].GetTracker().GetMoveAxis());
             }
         }
     }
@@ -234,15 +232,6 @@ public class GlobalManager : NetworkBehaviour
         mask = mask | vrLayers;
         mask = ~mask;
         return mask;
-    }
-
-    public bool IsPlayerHost(Player player)
-    {
-        if (player == host)
-        {
-            return true;
-        }
-        return false;
     }
 
     public TeamList GetTeam1()
@@ -330,7 +319,6 @@ public class GlobalManager : NetworkBehaviour
         GameObject client = GameObject.Instantiate(clientPrefab, Vector3.zero, Quaternion.identity);
         client.GetComponent<NetworkObject>().SpawnWithOwnership(id);
         Player clientPlayer = client.GetComponent<Player>();
-        host = clientPlayer;
         clientPlayer.SetPlayerID(id);
     }
 
