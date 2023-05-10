@@ -6,8 +6,8 @@ using UnityEngine;
 public class GlobalManager : NetworkBehaviour
 {
     [Header("Server Settings")]
-    [SerializeField] TeamList team1;
-    [SerializeField] TeamList team2;
+    [SerializeField] TeamList team1 = TeamList.gray;
+    [SerializeField] TeamList team2 = TeamList.gray;
     [SerializeField] LayerMask vrLayers;
     [SerializeField] List<PlayerPosData> playerPosRPCData = new List<PlayerPosData>();
     [SerializeField] NetworkVariable<int> ServerTickRate = new NetworkVariable<int>(10);
@@ -52,12 +52,12 @@ public class GlobalManager : NetworkBehaviour
         {
             case 0:
                 NetworkManager.Singleton.StartHost();
-                RandomizeTeams();
+                SelectTeams();
                 Debug.Log("Started Host");
                 break;
             case 1:
                 NetworkManager.Singleton.StartHost();
-                RandomizeTeams();
+                SelectTeams();
                 Debug.Log("Started Host");
                 break;
             case 2:
@@ -75,6 +75,7 @@ public class GlobalManager : NetworkBehaviour
 
     private void Update()
     {
+        /*
         //new
         if (!IsHost && tickTimer > 1.0f / (float)ClientInputTickRate.Value)
         {
@@ -106,11 +107,14 @@ public class GlobalManager : NetworkBehaviour
             CheckAllPlayerInputs(clients[i]);
             clients[i].GetTracker().UpdatePlayerPositions(host.GetTracker().GetCamera(), host.GetTracker().GetRightHand(), host.GetTracker().GetLeftHand(), host.GetTracker().GetForwardRoot(), al.GetClassStats(host.GetCurrentClass()).trackingScale);
         }
+        */
         CheckAllPlayerInputs(host);
+        
     }
 
-    void RandomizeTeams()
+    void SelectTeams()
     {
+        //Random
         int teamInt1 = Random.Range(0, 7);
         int teamInt2 = Random.Range(0, 7);
         while (teamInt2 != teamInt1 && teamInt2 != teamInt1 - 1 && teamInt2 != teamInt1 + 1 && (team2 == 0 && teamInt1 == 5) && (teamInt2 == 5 && teamInt1 == 0) && (teamInt1 == 1 && teamInt2 == 6))

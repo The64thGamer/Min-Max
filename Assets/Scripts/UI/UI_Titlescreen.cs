@@ -21,6 +21,8 @@ public class UI_Titlescreen : MonoBehaviour
     VisualElement root;
     int currentSceneToLoad;
 
+    bool alreadyLoading;
+
     private void OnEnable()
     {
         root = doc.rootVisualElement;
@@ -69,6 +71,11 @@ public class UI_Titlescreen : MonoBehaviour
         {
             rc_startVR.style.display = DisplayStyle.None;
         }
+        else
+        {
+            UnityEngine.Cursor.lockState = CursorLockMode.None;
+            UnityEngine.Cursor.visible = true;
+        }
         if(PlayerPrefs.GetInt("ServerPort") <= 0)
         {
             PlayerPrefs.SetInt("ServerPort", 7777);
@@ -78,12 +85,16 @@ public class UI_Titlescreen : MonoBehaviour
 
     IEnumerator LoadMap()
     {
-        if (currentSceneToLoad >= 0)
+        if (!alreadyLoading)
         {
-            AsyncOperation asyncLoad = SceneManager.LoadSceneAsync(mapNames[currentSceneToLoad]);
-            while (!asyncLoad.isDone)
+            alreadyLoading = true;
+            if (currentSceneToLoad >= 0)
             {
-                yield return null;
+                AsyncOperation asyncLoad = SceneManager.LoadSceneAsync(mapNames[currentSceneToLoad]);
+                while (!asyncLoad.isDone)
+                {
+                    yield return null;
+                }
             }
         }
     }
@@ -103,93 +114,99 @@ public class UI_Titlescreen : MonoBehaviour
 
     void StartLocalOrHost(int loadmapmode)
     {
-        //Default
-        root.Q<VisualElement>("ServerSettings").style.display = DisplayStyle.None;
-        root.Q<VisualElement>("StartMapCol").style.display = DisplayStyle.None;
-        root.Q<VisualElement>("JoinLocalCol").style.display = DisplayStyle.None;
-        root.Q<VisualElement>("JoinServerCol").style.display = DisplayStyle.None;
-
-        root.Q<Label>("SendPlayerKey").style.display = DisplayStyle.None;
-        root.Q<Button>("RequestKey").style.display = DisplayStyle.None;
-        root.Q<Button>("StartGame").style.display = DisplayStyle.None;
-
-        VisualElement col1 = root.Q<VisualElement>("PlayMenuCol1");
-
-        Color noBorder = borderButtonSelected;
-        noBorder.a = 0;
-
-        for (int i = 0; i < col1.childCount; i++)
+        if (!alreadyLoading)
         {
-            SetVEBorderColor(col1.ElementAt(i), noBorder);
-        }
+            //Default
+            root.Q<VisualElement>("ServerSettings").style.display = DisplayStyle.None;
+            root.Q<VisualElement>("StartMapCol").style.display = DisplayStyle.None;
+            root.Q<VisualElement>("JoinLocalCol").style.display = DisplayStyle.None;
+            root.Q<VisualElement>("JoinServerCol").style.display = DisplayStyle.None;
 
-        PlayerPrefs.SetInt("LoadMapMode", loadmapmode);
+            root.Q<Label>("SendPlayerKey").style.display = DisplayStyle.None;
+            root.Q<Button>("RequestKey").style.display = DisplayStyle.None;
+            root.Q<Button>("StartGame").style.display = DisplayStyle.None;
 
-        switch (loadmapmode)
-        {
-            case 0:
-                root.Q<Label>("StartSetting").text = "Start Local Game";
-                root.Q<Button>("StartGame").style.display = DisplayStyle.Flex;
-                root.Q<VisualElement>("ServerSettings").style.display = DisplayStyle.Flex;
-                root.Q<VisualElement>("StartMapCol").style.display = DisplayStyle.Flex;
-                SetVEBorderColor(root.Q<VisualElement>("PSStartLocal"), borderButtonSelected);
-                break;
-            case 1:
-                root.Q<Label>("StartSetting").text = "Start Server";
-                root.Q<Label>("SendPlayerKey").style.display = DisplayStyle.Flex;
-                root.Q<Button>("RequestKey").style.display = DisplayStyle.Flex;
-                root.Q<VisualElement>("ServerSettings").style.display = DisplayStyle.Flex;
-                root.Q<VisualElement>("StartMapCol").style.display = DisplayStyle.Flex;
-                SetVEBorderColor(root.Q<VisualElement>("PSStartServer"), borderButtonSelected);
-                break;
-            case 2:
-                root.Q<Label>("StartSetting").text = "Join Server";
-                root.Q<Button>("StartGame").style.display = DisplayStyle.Flex;
-                root.Q<VisualElement>("JoinServerCol").style.display = DisplayStyle.Flex;
-                SetVEBorderColor(root.Q<VisualElement>("PSJoinServer"), borderButtonSelected);
-                break;
-            case 3:
-                root.Q<Label>("StartSetting").text = "Join Local Game";
-                root.Q<Button>("StartGame").style.display = DisplayStyle.Flex;
-                root.Q<VisualElement>("StartMapCol").style.display = DisplayStyle.Flex;
-                SetVEBorderColor(root.Q<VisualElement>("PSJoinLocal"), borderButtonSelected);
-                break;
-            default:
-                break;
+            VisualElement col1 = root.Q<VisualElement>("PlayMenuCol1");
+
+            Color noBorder = borderButtonSelected;
+            noBorder.a = 0;
+
+            for (int i = 0; i < col1.childCount; i++)
+            {
+                SetVEBorderColor(col1.ElementAt(i), noBorder);
+            }
+
+            PlayerPrefs.SetInt("LoadMapMode", loadmapmode);
+
+            switch (loadmapmode)
+            {
+                case 0:
+                    root.Q<Label>("StartSetting").text = "Start Local Game";
+                    root.Q<Button>("StartGame").style.display = DisplayStyle.Flex;
+                    root.Q<VisualElement>("ServerSettings").style.display = DisplayStyle.Flex;
+                    root.Q<VisualElement>("StartMapCol").style.display = DisplayStyle.Flex;
+                    SetVEBorderColor(root.Q<VisualElement>("PSStartLocal"), borderButtonSelected);
+                    break;
+                case 1:
+                    root.Q<Label>("StartSetting").text = "Start Server";
+                    root.Q<Label>("SendPlayerKey").style.display = DisplayStyle.Flex;
+                    root.Q<Button>("RequestKey").style.display = DisplayStyle.Flex;
+                    root.Q<VisualElement>("ServerSettings").style.display = DisplayStyle.Flex;
+                    root.Q<VisualElement>("StartMapCol").style.display = DisplayStyle.Flex;
+                    SetVEBorderColor(root.Q<VisualElement>("PSStartServer"), borderButtonSelected);
+                    break;
+                case 2:
+                    root.Q<Label>("StartSetting").text = "Join Server";
+                    root.Q<Button>("StartGame").style.display = DisplayStyle.Flex;
+                    root.Q<VisualElement>("JoinServerCol").style.display = DisplayStyle.Flex;
+                    SetVEBorderColor(root.Q<VisualElement>("PSJoinServer"), borderButtonSelected);
+                    break;
+                case 3:
+                    root.Q<Label>("StartSetting").text = "Join Local Game";
+                    root.Q<Button>("StartGame").style.display = DisplayStyle.Flex;
+                    root.Q<VisualElement>("StartMapCol").style.display = DisplayStyle.Flex;
+                    SetVEBorderColor(root.Q<VisualElement>("PSJoinLocal"), borderButtonSelected);
+                    break;
+                default:
+                    break;
+            }
         }
     }
 
     void SwitchMainTab(int tab)
     {
-        VisualElement tabroot = root.Q<VisualElement>("MiddleBar");
-        VisualElement buttonRoot = root.Q<VisualElement>("BottomBar");
-
-        Color noBorder = borderButtonSelected;
-        noBorder.a = 0;
-
-        for (int i = 0; i < tabroot.childCount; i++)
+        if (!alreadyLoading)
         {
-            tabroot.ElementAt(i).style.display = DisplayStyle.None;
-        }
-        for (int i = 0; i < buttonRoot.childCount; i++)
-        {
-            SetVEBorderColor(buttonRoot.ElementAt(i), noBorder);
-        }
+            VisualElement tabroot = root.Q<VisualElement>("MiddleBar");
+            VisualElement buttonRoot = root.Q<VisualElement>("BottomBar");
 
-        switch (tab)
-        {
-            case 0:
-                root.Q<VisualElement>("TitleMenu").style.display = DisplayStyle.Flex;
-                SetVEBorderColor(root.Q<VisualElement>("RCStartVR"), borderButtonSelected);
-                StartCoroutine(StartXR());
-                break;
-            case 1:
-                root.Q<VisualElement>("PlayMenu").style.display = DisplayStyle.Flex;
-                SetVEBorderColor(root.Q<VisualElement>("RCPlay"), borderButtonSelected);
-                StartLocalOrHost(0);
-                break;
-            default:
-                break;
+            Color noBorder = borderButtonSelected;
+            noBorder.a = 0;
+
+            for (int i = 0; i < tabroot.childCount; i++)
+            {
+                tabroot.ElementAt(i).style.display = DisplayStyle.None;
+            }
+            for (int i = 0; i < buttonRoot.childCount; i++)
+            {
+                SetVEBorderColor(buttonRoot.ElementAt(i), noBorder);
+            }
+
+            switch (tab)
+            {
+                case 0:
+                    root.Q<VisualElement>("TitleMenu").style.display = DisplayStyle.Flex;
+                    SetVEBorderColor(root.Q<VisualElement>("RCStartVR"), borderButtonSelected);
+                    StartCoroutine(StartXR());
+                    break;
+                case 1:
+                    root.Q<VisualElement>("PlayMenu").style.display = DisplayStyle.Flex;
+                    SetVEBorderColor(root.Q<VisualElement>("RCPlay"), borderButtonSelected);
+                    StartLocalOrHost(0);
+                    break;
+                default:
+                    break;
+            }
         }
     }
 
