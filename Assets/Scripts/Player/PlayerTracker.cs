@@ -9,7 +9,6 @@ public class PlayerTracker : MonoBehaviour
     [SerializeField] Transform rightController;
     [SerializeField] Transform leftController;
     [SerializeField] Transform forwardRoot;
-    [SerializeField] Transform trackerScale;
 
     [Header("Animator")]
     [SerializeField] Animator animController;
@@ -55,7 +54,7 @@ public class PlayerTracker : MonoBehaviour
             playerHead.rotation = headset.rotation;
             modelRoot.rotation = Quaternion.Lerp(modelRoot.rotation, playerHead.rotation, Time.deltaTime);
             modelRoot.eulerAngles = new Vector3(0, modelRoot.eulerAngles.y, 0);
-            modelRoot.position = trackerScale.position;
+            modelRoot.position = forwardRoot.position;
         }
     }
     void OnEnable()
@@ -78,7 +77,7 @@ public class PlayerTracker : MonoBehaviour
         leftController.localPosition = root.InverseTransformPoint(handL.transform.position);
         leftController.rotation = handL.rotation;
         forwardRoot.position = root.position;
-        trackerScale.localScale = Vector3.one * scale;
+        forwardRoot.localScale = Vector3.one * scale;
     }
 
     public void TriggerPressed(bool left)
@@ -221,8 +220,8 @@ public class PlayerTracker : MonoBehaviour
             rigidBody.velocity.y,
             Mathf.Abs(newAxis.z) * Mathf.Clamp(currentSpeed.y + (newAxis.z * accel), -speed, speed)
             );
-        rigidBody.velocity = currentSpeed;
-        player.GetAutoHand().SyncBodyHead();
+        //rigidBody.velocity = currentSpeed;
+        //velocity = currentSpeed * 100 * Time.deltaTime;
     }
 
 }

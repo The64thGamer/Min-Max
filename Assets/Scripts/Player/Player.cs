@@ -88,11 +88,6 @@ public class Player : NetworkBehaviour
         return tracker;
     }
 
-    public AutoHandPlayer GetAutoHand()
-    {
-        return autoHand;
-    }
-
     public Team GetTeam()
     {
         return currentTeam;
