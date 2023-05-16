@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEngine;
+using UnityEngine.InputSystem.XR;
 using UnityEngine.UIElements;
 
 public class Player : NetworkBehaviour
@@ -19,10 +20,15 @@ public class Player : NetworkBehaviour
 
     public override void OnNetworkSpawn()
     {
+
         tracker = GetComponentInChildren<PlayerTracker>();
         currentGun = GetComponentInChildren<GenericGun>();
         GameObject.Find("Global Manager").GetComponent<GlobalManager>().AssignNewPlayerClient(this);
-
+        if (IsOwner)
+        {
+            Destroy(GetComponentInChildren<TrackedPoseDriver>());
+            tracker.GetCamera().transform.position = Vector3.zero;
+        }
         //Debug Default
         SetClass(ClassList.programmer);
     }
