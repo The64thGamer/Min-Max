@@ -32,6 +32,7 @@ public class PlayerTracker : MonoBehaviour
     ButtonState triggerL;
 
     Vector3 currentSpeed;
+    float accelerationLerp;
 
     public enum ButtonState
     {
@@ -210,18 +211,24 @@ public class PlayerTracker : MonoBehaviour
 
     public void MovePlayer(Vector2 axis)
     {
+        if(axis == Vector2.zero)
+        {
+            accelerationLerp = Mathf.Clamp01(accelerationLerp - (Time.deltaTime * player.GetClassStats().baseAccel));
+        }
+        else
+        {
+            accelerationLerp = Mathf.Clamp01(accelerationLerp + (Time.deltaTime * player.GetClassStats().baseAccel));
+        }
         Vector3 newAxis = headset.TransformDirection(new Vector3(axis.x, 0, axis.y));
         newAxis.y = 0;
         newAxis.Normalize();
         float speed = player.GetClassStats().baseSpeed;
-        float accel = player.GetClassStats().baseAccel;
         currentSpeed = new Vector3(
-            Mathf.Abs(newAxis.x) * Mathf.Clamp(currentSpeed.x + (newAxis.x * accel), -speed, speed),
+            Mathf.Abs(newAxis.x) * Mathf.Clamp((currentSpeed.x * Time.deltaTime) + (newAxis.x * accelerationLerp), -speed, speed),
             rigidBody.velocity.y,
-            Mathf.Abs(newAxis.z) * Mathf.Clamp(currentSpeed.y + (newAxis.z * accel), -speed, speed)
+            Mathf.Abs(newAxis.z) * Mathf.Clamp((currentSpeed.y * Time.deltaTime) + (newAxis.z * accelerationLerp), -speed, speed)
             );
-        //rigidBody.velocity = currentSpeed;
-        //velocity = currentSpeed * 100 * Time.deltaTime;
+        rigidBody.velocity = currentSpeed;    
     }
 
 }
