@@ -226,11 +226,11 @@ public class PlayerTracker : MonoBehaviour
 
         float speed = player.GetClassStats().baseSpeed;
         currentSpeed = new Vector3(
-            Mathf.Clamp((currentSpeed.x * Time.deltaTime) + (newAxis.x * accelerationLerp), -speed, speed),
+            Mathf.Clamp(currentSpeed.x + (newAxis.x * accelerationLerp * Time.deltaTime), -speed, speed),
             rigidBody.velocity.y,
-            Mathf.Clamp((currentSpeed.y * Time.deltaTime) + (newAxis.z * accelerationLerp), -speed, speed)
+            Mathf.Clamp(currentSpeed.y + (newAxis.z * accelerationLerp * Time.deltaTime), -speed, speed)
             );
-        rigidBody.velocity = currentSpeed;    
+        rigidBody.velocity = currentSpeed * Time.deltaTime;    
     }
 
 }
