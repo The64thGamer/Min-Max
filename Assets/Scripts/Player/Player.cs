@@ -24,10 +24,10 @@ public class Player : NetworkBehaviour
         tracker = GetComponentInChildren<PlayerTracker>();
         currentGun = GetComponentInChildren<GenericGun>();
         GameObject.Find("Global Manager").GetComponent<GlobalManager>().AssignNewPlayerClient(this);
-        if (IsOwner)
+        if (PlayerPrefs.GetInt("IsVREnabled") == 0)
         {
             Destroy(GetComponentInChildren<TrackedPoseDriver>());
-            tracker.GetCamera().transform.position = Vector3.zero;
+            tracker.GetCamera().transform.localPosition = Vector3.zero;
         }
         //Debug Default
         SetClass(ClassList.programmer);

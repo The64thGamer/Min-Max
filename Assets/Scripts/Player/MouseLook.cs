@@ -1,5 +1,6 @@
 
 using UnityEngine;
+using UnityEngine.InputSystem.XR;
 
 public class MouseLook : MonoBehaviour
 {
@@ -22,6 +23,7 @@ public class MouseLook : MonoBehaviour
             UnityEngine.Cursor.lockState = CursorLockMode.Locked;
             UnityEngine.Cursor.visible = false;
             cam.transform.localPosition += new Vector3(0,1.5951f,0);
+            Destroy(cam.GetComponent<TrackedPoseDriver>());
         }
     }
     void Update()
@@ -32,6 +34,7 @@ public class MouseLook : MonoBehaviour
         currentRotation.y = Mathf.Clamp(currentRotation.y, -maxYAngle, maxYAngle);
         Quaternion rot = Quaternion.Euler(currentRotation.y, currentRotation.x, 0);
         cam.rotation = rot;
+        cam.transform.localPosition = Vector3.zero;
         handR.rotation = rot;
         handL.rotation = rot;
     }
