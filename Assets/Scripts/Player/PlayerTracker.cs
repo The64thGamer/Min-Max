@@ -211,7 +211,7 @@ public class PlayerTracker : MonoBehaviour
 
     public void MovePlayer(Vector2 axis)
     {
-        axis.Normalize();
+        
         if (axis == Vector2.zero)
         {
             accelerationLerp = Mathf.Clamp01(accelerationLerp - (Time.deltaTime * player.GetClassStats().baseAccel));
@@ -222,12 +222,13 @@ public class PlayerTracker : MonoBehaviour
         }
         Vector3 newAxis = headset.TransformDirection(new Vector3(axis.x, 0, axis.y));
         newAxis.y = 0;
+        newAxis.Normalize();
 
         float speed = player.GetClassStats().baseSpeed;
         currentSpeed = new Vector3(
-            Mathf.Abs(newAxis.x) * Mathf.Clamp((currentSpeed.x * Time.deltaTime) + (newAxis.x * accelerationLerp), -speed, speed),
+            Mathf.Clamp((currentSpeed.x * Time.deltaTime) + (newAxis.x * accelerationLerp), -speed, speed),
             rigidBody.velocity.y,
-            Mathf.Abs(newAxis.z) * Mathf.Clamp((currentSpeed.y * Time.deltaTime) + (newAxis.z * accelerationLerp), -speed, speed)
+            Mathf.Clamp((currentSpeed.y * Time.deltaTime) + (newAxis.z * accelerationLerp), -speed, speed)
             );
         rigidBody.velocity = currentSpeed;    
     }
