@@ -16,6 +16,7 @@ public class PlayerTracker : MonoBehaviour
     [SerializeField] Transform playerRHand;
     [SerializeField] Transform playerHead;
 
+
     [Header("Anim Points")]
     [SerializeField] Transform upPos;
     [SerializeField] Transform downPos;
@@ -202,7 +203,7 @@ public class PlayerTracker : MonoBehaviour
     public Vector2 GetMoveAxis()
     {
         return moveAxis.action.ReadValue<Vector2>();
-    }    
+    }
 
     public Transform GetModelRoot()
     {
@@ -211,26 +212,47 @@ public class PlayerTracker : MonoBehaviour
 
     public void MovePlayer(Vector2 axis)
     {
-        
+        Vector3 forward = headset.transform.forward;
+        Vector3 right = headset.transform.right;
+        forward.y = 0f;
+        right.y = 0f;
+        forward.Normalize();
+        right.Normalize();
+        Vector3 newAxis = forward * axis.y + right * axis.x;
+
+        float speed = player.GetClassStats().baseSpeed;
         if (axis == Vector2.zero)
         {
             accelerationLerp = Mathf.Clamp01(accelerationLerp - (Time.deltaTime * player.GetClassStats().baseAccel));
+
+            if(currentSpeed.x > 0)
+            {
+                currentSpeed.x = Mathf.Max(currentSpeed.x - accelerationLerp * Time.deltaTime, 0);
+            }
+            if (currentSpeed.x < 0)
+            {
+                currentSpeed.x = Mathf.Min(currentSpeed.x - accelerationLerp * Time.deltaTime, 0);
+            }
+            if (currentSpeed.y > 0)
+            {
+                currentSpeed.y = Mathf.Max(currentSpeed.y - accelerationLerp * Time.deltaTime, 0);
+            }
+            if (currentSpeed.y < 0)
+            {
+                currentSpeed.y = Mathf.Min(currentSpeed.y - accelerationLerp * Time.deltaTime, 0);
+            }
         }
         else
         {
             accelerationLerp = Mathf.Clamp01(accelerationLerp + (Time.deltaTime * player.GetClassStats().baseAccel));
+            currentSpeed = new Vector3(
+                Mathf.Clamp(currentSpeed.x + (newAxis.x * accelerationLerp * Time.deltaTime), -speed, speed),
+                rigidBody.velocity.y,
+                Mathf.Clamp(currentSpeed.y + (newAxis.z * accelerationLerp * Time.deltaTime), -speed, speed)
+                );
         }
-        Vector3 newAxis = headset.TransformDirection(new Vector3(axis.x, 0, axis.y));
-        newAxis.y = 0;
-        newAxis.Normalize();
 
-        float speed = player.GetClassStats().baseSpeed;
-        currentSpeed = new Vector3(
-            Mathf.Clamp(currentSpeed.x + (newAxis.x * accelerationLerp * Time.deltaTime), -speed, speed),
-            rigidBody.velocity.y,
-            Mathf.Clamp(currentSpeed.y + (newAxis.z * accelerationLerp * Time.deltaTime), -speed, speed)
-            );
-        rigidBody.velocity = currentSpeed * Time.deltaTime;    
+        rigidBody.velocity = currentSpeed * Time.deltaTime;
     }
 
 }
