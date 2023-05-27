@@ -2,6 +2,7 @@ using Autohand;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.Netcode;
+using Unity.XR.CoreUtils;
 using UnityEngine;
 using UnityEngine.InputSystem.XR;
 using UnityEngine.UIElements;
@@ -16,14 +17,24 @@ public class Player : NetworkBehaviour
     [SerializeField] ulong playerID;
     [SerializeField] Transform vrSetup;
     [SerializeField] Transform clientSetup;
-    [SerializeField] bool displayModel;
+    [SerializeField] GameObject[] playerModels;
+
 
     public override void OnNetworkSpawn()
     {
-
         tracker = GetComponentInChildren<PlayerTracker>();
         currentGun = GetComponentInChildren<GenericGun>();
         GameObject.Find("Global Manager").GetComponent<GlobalManager>().AssignNewPlayerClient(this);
+        if(IsOwner)
+        {
+            SetCharacterVisibility(false);
+        }
+        else
+        {
+            SetCharacterVisibility(true);
+
+        }
+
         //Debug Default
         SetClass(ClassList.programmer);
     }
@@ -116,6 +127,40 @@ public class Player : NetworkBehaviour
                 return LayerMask.NameToLayer("Team2");
             default:
                 return LayerMask.NameToLayer("Neutral");
+        }
+    }
+
+    public void SetCharacterVisibility(bool visible)
+    {
+        for (int i = 0; i < playerModels.Length; i++)
+        {
+            if (visible)
+            {
+                if (i == (int)currentClass)
+                {
+                    playerModels[i].SetActive(true);
+                }
+                else
+                {
+                    playerModels[i].SetActive(false);
+                }
+            }
+            else
+            {
+                playerModels[i].SetActive(false);
+            }
+        }
+
+        if(currentGun != null)
+        {
+            if(visible)
+            {
+                currentGun.SetGunTransformParent(playerModels[(int)currentClass].GetNamedChild("Gun R").transform);
+            }
+            else
+            {
+                currentGun.SetGunTransformParent(tracker.GetRightHand());
+            }
         }
     }
 }
