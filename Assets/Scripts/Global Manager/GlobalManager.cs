@@ -24,6 +24,8 @@ public class GlobalManager : NetworkBehaviour
 
     [Header("The Map")]
     [SerializeField] Transform mapProps;
+    [SerializeField] Transform mapGeometry;
+
 
 
     //Network
@@ -146,6 +148,16 @@ public class GlobalManager : NetworkBehaviour
         float team1Final = (float)GetTeam1() + 1;
         float team2Final = (float)GetTeam2() + 1;
         Renderer[] meshes = mapProps.GetComponentsInChildren<Renderer>();
+        for (int i = 0; i < meshes.Length; i++)
+        {
+            Material[] mats = meshes[i].sharedMaterials;
+            for (int r = 0; r < mats.Length; r++)
+            {
+                mats[r].SetFloat("_Team_1", team1Final);
+                mats[r].SetFloat("_Team_2", team2Final);
+            }
+        }
+        meshes = mapGeometry.GetComponentsInChildren<Renderer>();
         for (int i = 0; i < meshes.Length; i++)
         {
             Material[] mats = meshes[i].sharedMaterials;
