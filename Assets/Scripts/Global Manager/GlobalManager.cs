@@ -14,15 +14,17 @@ public class GlobalManager : NetworkBehaviour
     [SerializeField] NetworkVariable<int> ServerTickRate = new NetworkVariable<int>(10);
     [SerializeField] NetworkVariable<int> ClientInputTickRate = new NetworkVariable<int>(10);
 
-    [Header("Global Prefabs")]
-    [SerializeField] GameObject clientPrefab;
-
     [Header("Lists")]
-
+    [SerializeField] GameObject clientPrefab;
     [SerializeField] List<Player> clients;
     [SerializeField] Transform team1Spawns;
     [SerializeField] Transform team2Spawns;
     [SerializeField] Transform particleList;
+
+
+    [Header("The Map")]
+    [SerializeField] Transform mapProps;
+
 
     //Network
     List<NetworkVariable<PlayerNetworkDataServer>> playerData;
@@ -135,7 +137,24 @@ public class GlobalManager : NetworkBehaviour
         }
         team1 = (TeamList)teamInt1;
         team2 = (TeamList)teamInt2;
+        UpdatePropColors();
         Debug.Log("Teams Selected: " + team1 + ", " + team2);
+    }
+
+    void UpdatePropColors()
+    {
+        float team1Final = (float)GetTeam1() + 1;
+        float team2Final = (float)GetTeam2() + 1;
+        Renderer[] meshes = mapProps.GetComponentsInChildren<Renderer>();
+        for (int i = 0; i < meshes.Length; i++)
+        {
+            Material[] mats = meshes[i].sharedMaterials;
+            for (int r = 0; r < mats.Length; r++)
+            {
+                mats[r].SetFloat("_Team_1", team1Final);
+                mats[r].SetFloat("_Team_2", team2Final);
+            }
+        }
     }
 
     void CheckAllPlayerInputs(Player player)

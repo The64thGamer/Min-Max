@@ -81,7 +81,6 @@ public enum ClassList
 [SerializeField]
 public enum TeamList
 {
-    gray,
     orange,
     yellow,
     green,
@@ -90,6 +89,7 @@ public enum TeamList
     purple,
     beige,
     brown,
+    gray,
 }
 
 [System.Serializable]
