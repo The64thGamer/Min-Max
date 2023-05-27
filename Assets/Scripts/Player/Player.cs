@@ -14,7 +14,6 @@ public class Player : NetworkBehaviour
     [SerializeField] ClassStats currentStats;
     [SerializeField] PlayerTracker tracker;
     [SerializeField] ulong playerID;
-
     [SerializeField] Transform vrSetup;
     [SerializeField] Transform clientSetup;
 
@@ -24,11 +23,6 @@ public class Player : NetworkBehaviour
         tracker = GetComponentInChildren<PlayerTracker>();
         currentGun = GetComponentInChildren<GenericGun>();
         GameObject.Find("Global Manager").GetComponent<GlobalManager>().AssignNewPlayerClient(this);
-        if (PlayerPrefs.GetInt("IsVREnabled") == 0)
-        {
-            Destroy(GetComponentInChildren<TrackedPoseDriver>());
-            tracker.GetCamera().transform.localPosition = Vector3.zero;
-        }
         //Debug Default
         SetClass(ClassList.programmer);
     }
