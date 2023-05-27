@@ -25,6 +25,7 @@ public class GenericGun : Gun
     AudioSource au;
     GlobalManager gm;
     bool showCrosshair;
+    Transform currentParent;
 
     void Start()
     {
@@ -42,6 +43,10 @@ public class GenericGun : Gun
     }
     void Update()
     {
+        transform.position = currentParent.position;
+        transform.rotation = currentParent.rotation;
+        transform.localScale = currentParent.localScale;
+
         currentFireAngle = gm.CalculateFireAngle(currentPlayer);
         if (showCrosshair)
         {
@@ -88,4 +93,10 @@ public class GenericGun : Gun
         }
         return 0;
     }
+
+    public override void SetGunTransformParent(Transform parent)
+    {
+        currentParent = parent;
+    }
+
 }

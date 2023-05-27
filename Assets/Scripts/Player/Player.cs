@@ -16,6 +16,7 @@ public class Player : NetworkBehaviour
     [SerializeField] ulong playerID;
     [SerializeField] Transform vrSetup;
     [SerializeField] Transform clientSetup;
+    [SerializeField] bool displayModel;
 
     public override void OnNetworkSpawn()
     {

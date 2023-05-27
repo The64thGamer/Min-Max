@@ -11,7 +11,7 @@ public abstract class Gun : NetworkBehaviour
     public abstract int GetCurrentAmmo();
     public abstract string GetNameKey();
     public abstract int SearchStats(ChangableWeaponStats stat);
-
+    public abstract void SetGunTransformParent(Transform parent);
 }
 [System.Serializable]
 public class WeaponStats
