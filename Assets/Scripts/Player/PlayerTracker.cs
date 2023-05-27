@@ -213,7 +213,7 @@ public class PlayerTracker : MonoBehaviour
     public void MovePlayer(Vector2 axis)
     {
         const float globalAcceleration = 100;
-        const float globalSpeedScaler = 0.1f;
+        const float globalSpeedScaler = 0.2f;
 
         Vector3 forward = headset.transform.forward;
         Vector3 right = headset.transform.right;
