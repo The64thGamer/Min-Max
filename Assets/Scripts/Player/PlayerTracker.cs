@@ -26,11 +26,11 @@ public class PlayerTracker : MonoBehaviour
 
     [Header("Input")]
     [SerializeField] InputActionProperty moveAxis;
+    [SerializeField] InputActionProperty jump;
+    [SerializeField] InputActionProperty triggerRAction;
+    [SerializeField] InputActionProperty triggerLAction;
     [SerializeField] Rigidbody rigidBody;
     [SerializeField] Player player;
-
-    ButtonState triggerR;
-    ButtonState triggerL;
 
     public enum ButtonState
     {
@@ -42,7 +42,6 @@ public class PlayerTracker : MonoBehaviour
 
     void LateUpdate()
     {
-        UpdateTriggers();
         if (animController != null && animController.gameObject.activeSelf)
         {
             animController.SetFloat("HandX", CalcLerpVector3(centerPos.position, rightPos.position, rightController.position, false) - CalcLerpVector3(centerPos.position, leftPos.position, rightController.position, false));
@@ -59,6 +58,9 @@ public class PlayerTracker : MonoBehaviour
     void OnEnable()
     {
         if (moveAxis.action != null) moveAxis.action.Enable();
+        if (jump.action != null) jump.action.Enable();
+        if (triggerRAction.action != null) triggerRAction.action.Enable();
+        if (triggerLAction.action != null) triggerLAction.action.Enable();
     }
 
 
@@ -77,67 +79,6 @@ public class PlayerTracker : MonoBehaviour
         leftController.rotation = handL.rotation;
         forwardRoot.position = root.position;
         forwardRoot.localScale = Vector3.one * scale;
-    }
-
-    public void TriggerPressed(bool left)
-    {
-        if (!left)
-        {
-            if (triggerR == ButtonState.off)
-            {
-                triggerR = ButtonState.started;
-            }
-        }
-        else
-        {
-            if (triggerL == ButtonState.off)
-            {
-                triggerL = ButtonState.started;
-            }
-        }
-    }
-    public void TriggerReleased(bool left)
-    {
-        if (!left)
-        {
-            if (triggerR == ButtonState.on)
-            {
-                triggerR = ButtonState.cancelled;
-            }
-        }
-        else
-        {
-            if (triggerL == ButtonState.on)
-            {
-                triggerL = ButtonState.cancelled;
-            }
-        }
-    }
-
-    void UpdateTriggers()
-    {
-        switch (triggerR)
-        {
-            case ButtonState.started:
-                triggerR = ButtonState.on;
-                break;
-            case ButtonState.cancelled:
-                triggerR = ButtonState.off;
-                break;
-            default:
-                break;
-        }
-        switch (triggerL)
-        {
-            case ButtonState.started:
-                triggerL = ButtonState.on;
-                break;
-            case ButtonState.cancelled:
-                triggerL = ButtonState.off;
-                break;
-            default:
-                break;
-        }
     }
 
     float CalcLerpVector3(Vector3 a, Vector3 b, Vector3 t, bool vertical)
@@ -168,13 +109,13 @@ public class PlayerTracker : MonoBehaviour
         target.localPosition = FP;
     }
 
-    public ButtonState GetTriggerR()
+    public bool GetTriggerR()
     {
-        return triggerR;
+        return triggerLAction.action.IsPressed();
     }
-    public ButtonState GetTriggerL()
+    public bool GetTriggerL()
     {
-        return triggerL;
+        return triggerRAction.action.IsPressed();
     }
 
     public Transform GetCamera()
@@ -200,6 +141,11 @@ public class PlayerTracker : MonoBehaviour
     public Vector2 GetMoveAxis()
     {
         return moveAxis.action.ReadValue<Vector2>();
+    }
+
+    public bool GetRHandAButton()
+    {
+        return jump.action.IsPressed();
     }
 
     public Transform GetModelRoot()

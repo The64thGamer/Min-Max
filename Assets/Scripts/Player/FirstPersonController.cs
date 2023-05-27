@@ -83,6 +83,8 @@ namespace StarterAssets
 
 		public void Move(Vector2 _input, bool jump)
         {
+            JumpAndGravity(jump);
+            GroundedCheck();
             Vector3 forward = _mainCamera.transform.forward;
             Vector3 right = _mainCamera.transform.right;
             forward.y = 0f;
@@ -91,8 +93,6 @@ namespace StarterAssets
             right.Normalize();
             Vector3 newAxis = forward * _input.y + right * _input.x;
 
-            JumpAndGravity(jump);
-            GroundedCheck();
             // set target speed based on move speed, sprint speed and if sprint is pressed
             float targetSpeed = MoveSpeed;
 

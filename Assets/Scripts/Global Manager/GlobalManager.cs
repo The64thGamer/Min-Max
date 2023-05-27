@@ -113,7 +113,7 @@ public class GlobalManager : NetworkBehaviour
         for (int i = 0; i < clients.Count; i++)
         {
             CheckAllPlayerInputs(clients[i]);
-            clients[i].GetController().Move(clients[i].GetTracker().GetMoveAxis(), false);
+            clients[i].GetController().Move(clients[i].GetTracker().GetMoveAxis(), clients[i].GetTracker().GetRHandAButton());
 
             //This is for getting inputs from the server and updating the head and hands, gotta relpace host with those inputs
             //clients[i].GetTracker().UpdatePlayerPositions(host.GetTracker().GetCamera(), host.GetTracker().GetRightHand(), host.GetTracker().GetLeftHand(), host.GetTracker().GetForwardRoot(), al.GetClassStats(host.GetCurrentClass()).trackingScale);
@@ -173,7 +173,7 @@ public class GlobalManager : NetworkBehaviour
     {
         if (player != null)
         {
-            if (player.GetTracker().GetTriggerR() == PlayerTracker.ButtonState.started || player.GetTracker().GetTriggerR() == PlayerTracker.ButtonState.on)
+            if (player.GetTracker().GetTriggerR())
             {
                 for (int i = 0; i < clients.Count; i++)
                 {
