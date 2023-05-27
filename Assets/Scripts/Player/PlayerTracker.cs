@@ -32,9 +32,6 @@ public class PlayerTracker : MonoBehaviour
     ButtonState triggerR;
     ButtonState triggerL;
 
-    Vector3 currentSpeed;
-    float accelerationLerp;
-
     public enum ButtonState
     {
         off,
@@ -210,57 +207,5 @@ public class PlayerTracker : MonoBehaviour
         return modelRoot;
     }
 
-    public void MovePlayer(Vector2 axis)
-    {
-        const float globalAcceleration = 100;
-        const float globalSpeedScaler = 0.2f;
-
-        Vector3 forward = headset.transform.forward;
-        Vector3 right = headset.transform.right;
-        forward.y = 0f;
-        right.y = 0f;
-        forward.Normalize();
-        right.Normalize();
-        Vector3 newAxis = forward * axis.y + right * axis.x;
-        float speed = player.GetClassStats().baseSpeed;
-
-        if (axis == Vector2.zero)
-        {
-            accelerationLerp = Mathf.Clamp01(accelerationLerp - (Time.deltaTime * player.GetClassStats().baseAccel));
-
-            if(currentSpeed.x > 0)
-            {
-                currentSpeed.x = Mathf.Max(currentSpeed.x - Time.deltaTime * speed * globalAcceleration, 0);
-            }
-            if (currentSpeed.x < 0)
-            {
-                currentSpeed.x = Mathf.Min(currentSpeed.x + Time.deltaTime * speed * globalAcceleration, 0);
-            }
-            if (currentSpeed.z > 0)
-            {
-                currentSpeed.z = Mathf.Max(currentSpeed.z - Time.deltaTime * speed * globalAcceleration, 0);
-            }
-            if (currentSpeed.z < 0)
-            {
-                currentSpeed.z = Mathf.Min(currentSpeed.z + Time.deltaTime * speed * globalAcceleration, 0);
-            }
-        }
-        else
-        {
-            accelerationLerp = Mathf.Clamp01(accelerationLerp + (Time.deltaTime * player.GetClassStats().baseAccel));
-            currentSpeed = new Vector3(
-                currentSpeed.x + (newAxis.x * accelerationLerp * Time.deltaTime * speed * globalAcceleration),
-                0,
-                currentSpeed.z + (newAxis.z * accelerationLerp * Time.deltaTime * speed * globalAcceleration)
-                );
-        }
-        if(currentSpeed.magnitude > speed)
-        {
-            currentSpeed = currentSpeed.normalized * speed;
-        }
-        currentSpeed.y = rigidBody.velocity.y;
-
-        rigidBody.velocity = currentSpeed * globalSpeedScaler;
-    }
 
 }

@@ -1,3 +1,4 @@
+using StarterAssets;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.Netcode;
@@ -13,6 +14,7 @@ public class Player : NetworkBehaviour
     [SerializeField] ClassList currentClass;
     [SerializeField] ClassStats currentStats;
     [SerializeField] PlayerTracker tracker;
+    [SerializeField] FirstPersonController controller;
     [SerializeField] ulong playerID;
     [SerializeField] Transform vrSetup;
     [SerializeField] Transform clientSetup;
@@ -22,6 +24,7 @@ public class Player : NetworkBehaviour
     public override void OnNetworkSpawn()
     {
         tracker = GetComponentInChildren<PlayerTracker>();
+        controller = GetComponentInChildren<FirstPersonController>();
         currentGun = GetComponentInChildren<GenericGun>();
         GameObject.Find("Global Manager").GetComponent<GlobalManager>().AssignNewPlayerClient(this);
         if (IsOwner)
@@ -81,6 +84,11 @@ public class Player : NetworkBehaviour
     public PlayerTracker GetTracker()
     {
         return tracker;
+    }
+
+    public FirstPersonController GetController()
+    {
+        return controller;
     }
 
     public Team GetTeam()
