@@ -111,11 +111,11 @@ public class PlayerTracker : MonoBehaviour
 
     public bool GetTriggerR()
     {
-        return triggerLAction.action.IsPressed();
+        return triggerRAction.action.IsPressed();
     }
     public bool GetTriggerL()
     {
-        return triggerRAction.action.IsPressed();
+        return triggerLAction.action.IsPressed();
     }
 
     public Transform GetCamera()

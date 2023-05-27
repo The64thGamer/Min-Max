@@ -36,9 +36,6 @@ namespace StarterAssets
 		[Tooltip("What layers the character uses as ground")]
 		public LayerMask GroundLayers;
 
-		// cinemachine
-		private float _cinemachineTargetPitch;
-
 		// player
 		private float _speed;
 		private float _rotationVelocity;
@@ -183,13 +180,6 @@ namespace StarterAssets
 			{
 				_verticalVelocity += Gravity * Time.deltaTime;
 			}
-		}
-
-		private static float ClampAngle(float lfAngle, float lfMin, float lfMax)
-		{
-			if (lfAngle < -360f) lfAngle += 360f;
-			if (lfAngle > 360f) lfAngle -= 360f;
-			return Mathf.Clamp(lfAngle, lfMin, lfMax);
 		}
 
 		private void OnDrawGizmosSelected()
