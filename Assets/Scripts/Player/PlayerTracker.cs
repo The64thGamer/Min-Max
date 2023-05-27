@@ -219,27 +219,30 @@ public class PlayerTracker : MonoBehaviour
         forward.Normalize();
         right.Normalize();
         Vector3 newAxis = forward * axis.y + right * axis.x;
+        Debug.Log("NewAxis " + newAxis);
+        Debug.Log("Axis " + axis);
 
         float speed = player.GetClassStats().baseSpeed;
+
         if (axis == Vector2.zero)
         {
             accelerationLerp = Mathf.Clamp01(accelerationLerp - (Time.deltaTime * player.GetClassStats().baseAccel));
 
             if(currentSpeed.x > 0)
             {
-                currentSpeed.x = Mathf.Max(currentSpeed.x - accelerationLerp * Time.deltaTime, 0);
+                currentSpeed.x = Mathf.Max(currentSpeed.x - Time.deltaTime, 0);
             }
             if (currentSpeed.x < 0)
             {
-                currentSpeed.x = Mathf.Min(currentSpeed.x - accelerationLerp * Time.deltaTime, 0);
+                currentSpeed.x = Mathf.Min(currentSpeed.x - Time.deltaTime, 0);
             }
-            if (currentSpeed.y > 0)
+            if (currentSpeed.z > 0)
             {
-                currentSpeed.y = Mathf.Max(currentSpeed.y - accelerationLerp * Time.deltaTime, 0);
+                currentSpeed.z = Mathf.Max(currentSpeed.z + Time.deltaTime, 0);
             }
-            if (currentSpeed.y < 0)
+            if (currentSpeed.z < 0)
             {
-                currentSpeed.y = Mathf.Min(currentSpeed.y - accelerationLerp * Time.deltaTime, 0);
+                currentSpeed.z = Mathf.Min(currentSpeed.z + Time.deltaTime, 0);
             }
         }
         else
@@ -248,7 +251,7 @@ public class PlayerTracker : MonoBehaviour
             currentSpeed = new Vector3(
                 Mathf.Clamp(currentSpeed.x + (newAxis.x * accelerationLerp * Time.deltaTime), -speed, speed),
                 rigidBody.velocity.y,
-                Mathf.Clamp(currentSpeed.y + (newAxis.z * accelerationLerp * Time.deltaTime), -speed, speed)
+                Mathf.Clamp(currentSpeed.z + (newAxis.z * accelerationLerp * Time.deltaTime), -speed, speed)
                 );
         }
 
