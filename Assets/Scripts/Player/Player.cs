@@ -25,7 +25,7 @@ public class Player : NetworkBehaviour
         tracker = GetComponentInChildren<PlayerTracker>();
         currentGun = GetComponentInChildren<GenericGun>();
         GameObject.Find("Global Manager").GetComponent<GlobalManager>().AssignNewPlayerClient(this);
-        if(IsOwner)
+        if (IsOwner)
         {
             SetCharacterVisibility(false);
         }
@@ -65,21 +65,17 @@ public class Player : NetworkBehaviour
             default:
                 break;
         }
-        Transform modelRoot = tracker.GetModelRoot();
-        float teamFinal = (float)currentList + 1;
-        if (modelRoot != null)
-        {
-            Renderer[] meshes = modelRoot.GetComponentsInChildren<Renderer>();
-            for (int i = 0; i < meshes.Length; i++)
-            {
-                Material[] mats = meshes[i].materials;
-                for (int r = 0; r < mats.Length; r++)
-                {
-                    mats[r].SetFloat("_Team_1", teamFinal);
-                }
-                meshes[i].materials = mats;
-            }
 
+        float teamFinal = (float)currentList + 1;
+        Renderer[] meshes = this.GetComponentsInChildren<Renderer>();
+        for (int i = 0; i < meshes.Length; i++)
+        {
+            Material[] mats = meshes[i].materials;
+            for (int r = 0; r < mats.Length; r++)
+            {
+                mats[r].SetFloat("_Team_1", teamFinal);
+            }
+            meshes[i].materials = mats;
         }
     }
 
@@ -109,7 +105,7 @@ public class Player : NetworkBehaviour
 
     public ulong GetPlayerID()
     {
-        return playerID; 
+        return playerID;
     }
 
     public void SetPlayerID(ulong id)
@@ -151,9 +147,9 @@ public class Player : NetworkBehaviour
             }
         }
 
-        if(currentGun != null)
+        if (currentGun != null)
         {
-            if(visible)
+            if (visible)
             {
                 currentGun.SetGunTransformParent(playerModels[(int)currentClass].GetNamedChild("Gun R").transform);
             }
