@@ -52,7 +52,7 @@ public class PlayerTracker : NetworkBehaviour
 
     private void Update()
     {
-        if(IsOwner)
+        if (IsOwner)
         {
             movementAxis = moveAxis.action.ReadValue<Vector2>();
             rhandAButton = jump.action.IsPressed();
@@ -100,19 +100,31 @@ public class PlayerTracker : NetworkBehaviour
         charController.enabled = true;
     }
 
-    public void UpdatePlayerPositions(Vector3 head, Vector3 handR, Vector3 handL, float scale)
+    public void UpdatePlayerPositions(PlayerPosData data)
     {
-        //Completely redo this
-        /*
-        headset.localPosition = root.InverseTransformPoint(head.transform.position);
-        headset.rotation = head.rotation;
-        rightController.localPosition = root.InverseTransformPoint(handR.transform.position);
-        rightController.rotation = handR.rotation;
-        leftController.localPosition = root.InverseTransformPoint(handL.transform.position);
-        leftController.rotation = handL.rotation;
-        forwardRoot.position = root.position;
-        forwardRoot.localScale = Vector3.one * scale;
-        */
+        headset.localPosition = data.headsetPos;
+        headset.rotation = data.headsetRot;
+        rightController.localPosition = data.rHandPos;
+        rightController.rotation = data.rHandRot;
+        leftController.localPosition = data.lHandPos;
+        leftController.rotation = data.lHandRot;
+    }
+
+    public PlayerPosData GetPlayerPosData()
+    {
+        return new PlayerPosData()
+        {
+            id = player.GetPlayerID(),
+            pos = GetPosition(),
+            velocity = GetVelocity(),
+            predictionTime = NetworkManager.Singleton.LocalTime.TimeAsFloat,
+            headsetPos = headset.localPosition,
+            headsetRot = headset.rotation,
+            rHandPos = rightController.localPosition,
+            rHandRot = rightController.rotation,
+            lHandPos = leftController.localPosition,
+            lHandRot = leftController.rotation,
+        };
     }
 
     float CalcLerpVector3(Vector3 a, Vector3 b, Vector3 t, bool vertical)

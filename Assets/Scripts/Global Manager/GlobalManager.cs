@@ -98,13 +98,7 @@ public class GlobalManager : NetworkBehaviour
             {
                 for (int i = 0; i < playerPosRPCData.Count; i++)
                 {
-                    playerPosRPCData[i] = new PlayerPosData()
-                    {
-                        id = clients[i].GetPlayerID(),
-                        pos = clients[i].transform.position,
-                        velocity = clients[i].GetTracker().GetVelocity(),
-                        predictionTime = NetworkManager.Singleton.LocalTime.TimeAsFloat
-                    };
+                    playerPosRPCData[i] = clients[i].GetTracker().GetPlayerPosData();
                 }
                 SendPosClientRpc(playerPosRPCData.ToArray());
             }
@@ -450,7 +444,7 @@ public class GlobalManager : NetworkBehaviour
                 if (clients[e].GetPlayerID() == playerPosRPCData[i].id)
                 {
                     clients[e].GetTracker().SetNewClientPosition(playerPosRPCData[i].pos, playerPosRPCData[i].velocity, playerPosRPCData[i].predictionTime);
-                    clients[e].GetTracker().UpdatePlayerPositions(playerPosRPCData[i].headsetPos, playerPosRPCData[i].rHandPos, playerPosRPCData[i].lHandPos, al.GetClassStats(clients[e].GetCurrentClass()).trackingScale);
+                    clients[e].GetTracker().UpdatePlayerPositions(playerPosRPCData[i]);
                 }
             }
 
@@ -496,8 +490,11 @@ public struct PlayerPosData : INetworkSerializable
     public ulong id;
     public float predictionTime;
     public Vector3 headsetPos;
+    public Quaternion headsetRot;
     public Vector3 rHandPos;
+    public Quaternion rHandRot;
     public Vector3 lHandPos;
+    public Quaternion lHandRot;
     public Vector3 pos;
     public Vector3 velocity;
 
@@ -506,8 +503,11 @@ public struct PlayerPosData : INetworkSerializable
         serializer.SerializeValue(ref id);
         serializer.SerializeValue(ref predictionTime);
         serializer.SerializeValue(ref headsetPos);
+        serializer.SerializeValue(ref headsetRot);
         serializer.SerializeValue(ref rHandPos);
+        serializer.SerializeValue(ref rHandRot);
         serializer.SerializeValue(ref lHandPos);
+        serializer.SerializeValue(ref lHandRot);
         serializer.SerializeValue(ref pos);
         serializer.SerializeValue(ref velocity);
     }
