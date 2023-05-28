@@ -54,6 +54,7 @@ public class Player : NetworkBehaviour
     {
         currentClass = setClass;
         currentStats = gm.GetComponent<AllStats>().GetClassStats(ClassList.programmer);
+        UpdateTeamColor();
     }
 
     public void SetTeam(Team team)
@@ -74,6 +75,7 @@ public class Player : NetworkBehaviour
         gunObject.GetComponent<NetworkObject>().SpawnWithOwnership(playerID);
         gunObject.GetComponent<Gun>().SetPlayer(this);
         currentGun = gunObject.GetComponent<Gun>();
+        UpdateTeamColor();
     }
 
     public void UpdateTeamColor()
