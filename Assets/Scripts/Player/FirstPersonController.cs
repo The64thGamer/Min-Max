@@ -39,7 +39,6 @@ namespace StarterAssets
 
 		private CharacterController _controller;
 		[SerializeField] GameObject _mainCamera;
-        [SerializeField] PlayerTracker tracker;
 
 
         private const float _threshold = 0.01f;
@@ -134,10 +133,7 @@ namespace StarterAssets
 
 			// move the player
 			Vector3 finalVelocity = inputDirection.normalized * (_speed * Time.deltaTime) + new Vector3(0.0f, _verticalVelocity, 0.0f) * Time.deltaTime;
-			if(tracker.GetPredictionVelocityTime() != 0)
-			{
-				finalVelocity = Vector3.Lerp(finalVelocity, tracker.GetPredictionVelocity(), Mathf.Clamp01(NetworkManager.Singleton.LocalTime.TimeAsFloat - tracker.GetPredictionVelocityTime()));
-			}
+
             _controller.Move(finalVelocity);
 		}
 

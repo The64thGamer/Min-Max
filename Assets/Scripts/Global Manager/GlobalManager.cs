@@ -316,6 +316,7 @@ public class GlobalManager : NetworkBehaviour
         }
     }
 
+    [System.Serializable]
     public struct PlayerNetworkDataClient : INetworkSerializable
     {
         //Headset
@@ -490,6 +491,7 @@ public class GlobalManager : NetworkBehaviour
     }
 }
 
+[System.Serializable]
 public struct PlayerPosData : INetworkSerializable
 {
     public ulong id;

@@ -29,8 +29,8 @@ public class PlayerTracker : NetworkBehaviour
     [SerializeField] InputActionProperty jump;
     [SerializeField] InputActionProperty triggerRAction;
     [SerializeField] InputActionProperty triggerLAction;
-    [SerializeField] Rigidbody rigidBody;
     [SerializeField] Player player;
+    [SerializeField] CharacterController charController;
 
     //Modified by either the player or the server
     Vector2 movementAxis;
@@ -172,7 +172,7 @@ public class PlayerTracker : NetworkBehaviour
 
     public Vector3 GetVelocity()
     {
-        return rigidBody.velocity;
+        return charController.velocity;
     }
 
     public Vector3 GetPredictionVelocity()
