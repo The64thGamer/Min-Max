@@ -93,16 +93,32 @@ public class Player : NetworkBehaviour
                 break;
         }
 
+        //Player
         float teamFinal = (float)currentList + 1;
         Renderer[] meshes = this.GetComponentsInChildren<Renderer>();
         for (int i = 0; i < meshes.Length; i++)
         {
-            Material[] mats = meshes[i].materials;
+            Material[] mats = meshes[i].materials; 
             for (int r = 0; r < mats.Length; r++)
             {
                 mats[r].SetFloat("_Team_1", teamFinal);
             }
             meshes[i].materials = mats;
+        }
+
+        //Gun
+        if (currentGun != null)
+        {
+            meshes = currentGun.GetComponentsInChildren<Renderer>();
+            for (int i = 0; i < meshes.Length; i++)
+            {
+                Material[] mats = meshes[i].materials;
+                for (int r = 0; r < mats.Length; r++)
+                {
+                    mats[r].SetFloat("_Team_1", teamFinal);
+                }
+                meshes[i].materials = mats;
+            }
         }
     }
 
