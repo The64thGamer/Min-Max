@@ -13,7 +13,6 @@ public class GlobalManager : NetworkBehaviour
     [SerializeField] LayerMask vrLayers;
     [SerializeField] List<PlayerPosData> playerPosRPCData = new List<PlayerPosData>();
     [SerializeField] NetworkVariable<int> ServerTickRate = new NetworkVariable<int>(10);
-    [SerializeField] NetworkVariable<int> ClientInputTickRate = new NetworkVariable<int>(10);
 
     [Header("Lists")]
     [SerializeField] GameObject clientPrefab;
@@ -85,15 +84,17 @@ public class GlobalManager : NetworkBehaviour
         {
             CheckAllPlayerInputs(clients[i]);
             clients[i].GetController().MovePlayer(clients[i].GetTracker().GetMoveAxis(), clients[i].GetTracker().GetRHandAButton());
+            if (clients[i].IsOwner)
+            {
+                SendJoystickServerRpc(clients[i].GetTracker().GetMoveAxis(), NetworkManager.Singleton.LocalClientId);
+            }
         }
     }
     void LateUpdate()
     {
-        if (tickTimer > 1.0f / (float)ClientInputTickRate.Value)
+        if (tickTimer > 1.0f / (float)ServerTickRate.Value)
         {
             tickTimer = 0;
-            SendJoystickServerRpc(GetJoyStickInput(), NetworkManager.Singleton.LocalClientId);
-
             if (IsHost)
             {
                 for (int i = 0; i < playerPosRPCData.Count; i++)
@@ -445,7 +446,7 @@ public class GlobalManager : NetworkBehaviour
         {
             if (clients[i].OwnerClientId == id)
             {
-                //players[i].UpdateJoystick(joystick);
+                clients[i].GetTracker().SetPlayerMoveAxis(joystick);
                 return;
             }
         }
@@ -459,7 +460,7 @@ public class GlobalManager : NetworkBehaviour
     private void SendPosClientRpc(PlayerPosData[] data)
     {
         playerPosRPCData = data.ToList<PlayerPosData>();
-        if (playerPosRPCData.Count != clients.Count || IsHost) { return; }
+        if (IsHost) { return; }
         for (int e = 0; e < clients.Count; e++)
         {
             for (int i = 0; i < playerPosRPCData.Count; i++)
@@ -467,24 +468,17 @@ public class GlobalManager : NetworkBehaviour
                 //Check run incase of player disconnect+reconnect inside same tick.
                 if (clients[e].GetPlayerID() == playerPosRPCData[i].id)
                 {
-                    clients[e].GetTracker().SetNewClientPosition(data[i].pos, data[i].velocity, data[i].predictionTime);
-                    clients[e].GetTracker().UpdatePlayerPositions(data[i].headsetPos, data[i].rHandPos, data[i].lHandPos, al.GetClassStats(clients[e].GetCurrentClass()).trackingScale);
+                    clients[e].GetTracker().SetNewClientPosition(playerPosRPCData[i].pos, playerPosRPCData[i].velocity, playerPosRPCData[i].predictionTime);
+                    clients[e].GetTracker().UpdatePlayerPositions(playerPosRPCData[i].headsetPos, playerPosRPCData[i].rHandPos, playerPosRPCData[i].lHandPos, al.GetClassStats(clients[e].GetCurrentClass()).trackingScale);
                 }
             }
 
         }
     }
 
-    Vector2 GetJoyStickInput()
-    {
-        return new Vector2(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical"));
-
-    }
-
-    public void UpdateTickrates(int server, int client)
+    public void UpdateTickrates(int server)
     {
         ServerTickRate.Value = server;
-        ClientInputTickRate.Value = client;
     }
 
     void ServerStarted()

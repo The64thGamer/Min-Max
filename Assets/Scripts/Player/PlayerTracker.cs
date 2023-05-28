@@ -84,7 +84,6 @@ public class PlayerTracker : NetworkBehaviour
         if (triggerLAction.action != null) triggerLAction.action.Enable();
     }
 
-
     public void SetNewClientPosition(Vector3 pos, Vector3 velocity, float rpcPredicitonTime)
     {
         charController.enabled = false;
@@ -215,5 +214,11 @@ public class PlayerTracker : NetworkBehaviour
         return modelRoot;
     }
 
-
+    public void SetPlayerMoveAxis(Vector2 axis)
+    {
+        if (!IsOwner)
+        {
+            movementAxis = axis;
+        }
+    }
 }
