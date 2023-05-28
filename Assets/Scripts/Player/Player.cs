@@ -47,6 +47,11 @@ public class Player : NetworkBehaviour
             Destroy(this.GetComponentInChildren<UniversalAdditionalCameraData>());
             Destroy(this.GetComponentInChildren<Camera>());
             Destroy(this.GetComponentInChildren<AudioListener>());
+            TrackedPoseDriver[] pd = this.GetComponentsInChildren<TrackedPoseDriver>();
+            for (int i = 0; i < pd.Length; i++)
+            {
+                Destroy(pd[i]);
+            }
         }
     }
 

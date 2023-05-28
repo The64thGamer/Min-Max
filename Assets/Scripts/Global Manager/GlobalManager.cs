@@ -83,7 +83,7 @@ public class GlobalManager : NetworkBehaviour
             //Client Networking
             if (clients[i].IsOwner)
             {
-                SendJoystickServerRpc(clients[i].GetTracker().GetPlayerNetworkData(), NetworkManager.Singleton.LocalClientId);
+                SendJoystickServerRpc(clients[i].GetTracker().GetPlayerNetworkData(), clients[i].GetPlayerID());
             }
         }
     }
@@ -325,14 +325,14 @@ public class GlobalManager : NetworkBehaviour
     }
 
     [ServerRpc(RequireOwnership = false)]
-    void SendJoystickServerRpc(PlayerDataSentToServer joystick, ulong id)
+    void SendJoystickServerRpc(PlayerDataSentToServer serverData, ulong id)
     {
         for (int i = 0; i < clients.Count; i++)
         {
             if (clients[i].OwnerClientId == id && !clients[i].IsOwner)
             {
-                clients[i].GetTracker().UpdatePlayerPositions(joystick);
-                clients[i].GetTracker().SetPlayerMoveAxis(joystick.rightJoystick);
+                clients[i].GetTracker().UpdatePlayerPositions(serverData);
+                clients[i].GetTracker().SetPlayerMoveAxis(serverData.rightJoystick);
                 return;
             }
         }
