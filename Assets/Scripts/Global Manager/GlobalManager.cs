@@ -200,13 +200,14 @@ public class GlobalManager : NetworkBehaviour
     //Exploit: Hit needs to be parsed to ensure extreme angles aren't achievable.
     public void SpawnProjectile(Player player)
     {
-        GunProjectiles fp = al.SearchGuns(player.GetCurrentGun().GetNameKey());
+        GunProjectiles fp = al.SearchGuns(player.GetCurrentGun().GetNameKey());;
         if (fp.firePrefab != null)
         {
+            Vector3 firepos = player.GetTracker().GetRightHandFirePos(fp.firepoint);
             GameObject currentProjectile = GameObject.Instantiate(fp.firePrefab);
             currentProjectile.transform.parent = particleList;
-            Vector3 fireAngle = CalculateFireAngle(player, player.GetTracker().GetRightHandFirePos(fp.firepoint));
-            currentProjectile.GetComponent<Projectile>().SetProjectile(player.GetTracker().GetRightHand().localPosition, fireAngle, player.GetCurrentGun().SearchStats(ChangableWeaponStats.bulletSpeed), player.GetTeamLayer(), CalculcateFirePosition(fireAngle, player, player.GetTracker().GetRightHandFirePos(fp.firepoint)));
+            Vector3 fireAngle = CalculateFireAngle(player, firepos);
+            currentProjectile.GetComponent<Projectile>().SetProjectile(firepos, fireAngle, player.GetCurrentGun().SearchStats(ChangableWeaponStats.bulletSpeed), player.GetTeamLayer(), CalculcateFirePosition(fireAngle, player, firepos));
         }
     }
 
