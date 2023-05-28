@@ -80,34 +80,26 @@ public class GlobalManager : NetworkBehaviour
 
     private void Update()
     {
-        /*
-        //new
-        if (!IsHost && tickTimer > 1.0f / (float)ClientInputTickRate.Value)
+        if (tickTimer > 1.0f / (float)ClientInputTickRate.Value)
         {
             tickTimer = 0;
             SendJoystickServerRpc(GetJoyStickInput(), NetworkManager.Singleton.LocalClientId);
-            return;
-        }
-        else if (IsHost && tickTimer > 1.0f / (float)ServerTickRate.Value)
-        {
-            tickTimer = 0;
-            for (int i = 0; i < playerPosRPCData.Count; i++)
+
+            if (IsHost)
             {
-                playerPosRPCData[i] = new PlayerPosData()
+                for (int i = 0; i < playerPosRPCData.Count; i++)
                 {
-                    id = playerPosRPCData[i].id,
-                    pos = clients[i].transform.position
-                };
+                    playerPosRPCData[i] = new PlayerPosData()
+                    {
+                        id = clients[i].GetPlayerID(),
+                        pos = clients[i].transform.position
+                    };
+                }
+                SendPosClientRpc(playerPosRPCData.ToArray());
+                return;
             }
-            SendPosClientRpc(playerPosRPCData.ToArray());
-            SendJoystickServerRpc(GetJoyStickInput(), NetworkManager.Singleton.LocalClientId);
-            return;
         }
         tickTimer += Time.deltaTime;
-
-
-
-        */
 
         //old
         for (int i = 0; i < clients.Count; i++)
@@ -465,7 +457,7 @@ public class GlobalManager : NetworkBehaviour
     [ClientRpc]
     private void SendPosClientRpc(PlayerPosData[] data)
     {
-        if (data.Length != clients.Count) { return; }
+        if (data.Length != clients.Count || IsHost) { return; }
         for (int i = 0; i < clients.Count; i++)
         {
             //Check run incase of player disconnect+reconnect inside same tick.
