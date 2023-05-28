@@ -77,7 +77,6 @@ public class Player : NetworkBehaviour
     public void SetGun(GunProjectiles gun)
     {
         GameObject gunObject = GameObject.Instantiate(gun.gunPrefab, Vector3.zero, Quaternion.identity,this.transform);
-        gunObject.GetComponent<NetworkObject>().SpawnWithOwnership(playerID);
         gunObject.GetComponent<Gun>().SetPlayer(this);
         currentGun = gunObject.GetComponent<Gun>();
         UpdateTeamColor();
@@ -156,6 +155,10 @@ public class Player : NetworkBehaviour
         return currentStats;
     }
 
+    public bool IsPlayerOwner()
+    {
+        return IsOwner;
+    }
     public ulong GetPlayerID()
     {
         return playerID;

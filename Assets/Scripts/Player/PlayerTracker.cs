@@ -81,9 +81,10 @@ public class PlayerTracker : NetworkBehaviour
     }
 
 
-    public void SetNewClientPosition(Vector3 pos)
+    public void SetNewClientPosition(Vector3 pos, Vector3 velocity)
     {
         transform.position = pos;
+        rigidBody.velocity = velocity;
     }
 
     public void UpdatePlayerPositions(Transform head, Transform handR, Transform handL, Transform root, float scale)
@@ -159,6 +160,11 @@ public class PlayerTracker : NetworkBehaviour
         Vector3 newPos = rightController.position;
         rightController.localPosition = oldPos;
         return newPos;
+    }
+
+    public Vector3 GetVelocity()
+    {
+        return rigidBody.velocity;
     }
 
     public Transform GetForwardRoot()

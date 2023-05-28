@@ -28,13 +28,13 @@ public class GenericGun : Gun
     Transform currentParent;
     GunProjectiles defaultStats;
 
-    public override void OnNetworkSpawn()
+    public void Start()
     {
         currentAmmo = SearchStats(ChangableWeaponStats.maxAmmo);
         au = this.GetComponent<AudioSource>();
         gm = GameObject.Find("Global Manager").GetComponent<GlobalManager>();
         defaultStats = gm.GetComponent<AllStats>().SearchGuns(GetNameKey());
-        if (IsOwner)
+        if (currentPlayer.IsOwner)
         {
             showCrosshair = true;
         }

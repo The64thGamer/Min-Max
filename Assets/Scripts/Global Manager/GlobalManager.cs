@@ -92,7 +92,8 @@ public class GlobalManager : NetworkBehaviour
                     playerPosRPCData[i] = new PlayerPosData()
                     {
                         id = clients[i].GetPlayerID(),
-                        pos = clients[i].transform.position
+                        pos = clients[i].transform.position,
+                        velocity = clients[i].GetTracker().GetVelocity()
                     };
                 }
                 SendPosClientRpc(playerPosRPCData.ToArray());
@@ -462,7 +463,7 @@ public class GlobalManager : NetworkBehaviour
             //Check run incase of player disconnect+reconnect inside same tick.
             if (clients[i].OwnerClientId == data[i].id)
             {
-                clients[i].GetTracker().SetNewClientPosition(data[i].pos);
+                clients[i].GetTracker().SetNewClientPosition(data[i].pos, data[i].velocity);
             }
         }
     }
@@ -497,6 +498,7 @@ public struct PlayerPosData : INetworkSerializable
     public Vector3 rHandPos;
     public Vector3 lHandPos;
     public Vector3 pos;
+    public Vector3 velocity;
 
     public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
     {
@@ -505,6 +507,7 @@ public struct PlayerPosData : INetworkSerializable
         serializer.SerializeValue(ref rHandPos);
         serializer.SerializeValue(ref lHandPos);
         serializer.SerializeValue(ref pos);
+        serializer.SerializeValue(ref velocity);
     }
 }
 
