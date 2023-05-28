@@ -101,7 +101,7 @@ public class PlayerTracker : NetworkBehaviour
         charController.enabled = true;
     }
 
-    public void UpdatePlayerPositions(PlayerPosData data)
+    public void UpdatePlayerPositions(PlayerDataSentToClient data)
     {
         headset.localPosition = data.headsetPos;
         headset.rotation = data.headsetRot;
@@ -111,7 +111,7 @@ public class PlayerTracker : NetworkBehaviour
         leftController.rotation = data.lHandRot;
     }
 
-    public void UpdatePlayerPositions(PlayerNetworkDataClient data)
+    public void UpdatePlayerPositions(PlayerDataSentToServer data)
     {
         headset.localPosition = data.headsetPos;
         headset.rotation = data.headsetRot;
@@ -121,9 +121,9 @@ public class PlayerTracker : NetworkBehaviour
         leftController.rotation = data.lHandRot;
     }
 
-    public PlayerPosData GetPlayerPosData()
+    public PlayerDataSentToClient GetPlayerPosData()
     {
-        return new PlayerPosData()
+        return new PlayerDataSentToClient()
         {
             id = player.GetPlayerID(),
             pos = GetPosition(),
@@ -138,9 +138,9 @@ public class PlayerTracker : NetworkBehaviour
         };
     }
 
-    public PlayerNetworkDataClient GetPlayerNetworkData()
+    public PlayerDataSentToServer GetPlayerNetworkData()
     {
-        return new PlayerNetworkDataClient()
+        return new PlayerDataSentToServer()
         {
             rightJoystick = GetMoveAxis(),
             headsetPos = headset.localPosition,

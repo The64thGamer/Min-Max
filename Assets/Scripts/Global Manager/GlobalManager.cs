@@ -11,7 +11,7 @@ public class GlobalManager : NetworkBehaviour
     [SerializeField] TeamList team1 = TeamList.gray;
     [SerializeField] TeamList team2 = TeamList.gray;
     [SerializeField] LayerMask vrLayers;
-    [SerializeField] List<PlayerPosData> playerPosRPCData = new List<PlayerPosData>();
+    [SerializeField] List<PlayerDataSentToClient> playerPosRPCData = new List<PlayerDataSentToClient>();
     [SerializeField] NetworkVariable<int> ServerTickRate = new NetworkVariable<int>(10);
 
     [Header("Lists")]
@@ -282,31 +282,6 @@ public class GlobalManager : NetworkBehaviour
         return al;
     }
 
-    [System.Serializable]
-    public struct PlayerNetworkDataClient : INetworkSerializable
-    {
-        public Vector3 headsetPos;
-        public Quaternion headsetRot;
-        public Vector3 rHandPos;
-        public Quaternion rHandRot;
-        public Vector3 lHandPos;
-        public Quaternion lHandRot;
-
-        //Controls
-        public Vector2 rightJoystick;
-
-        public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
-        {
-            serializer.SerializeValue(ref headsetPos);
-            serializer.SerializeValue(ref headsetRot);
-            serializer.SerializeValue(ref rHandPos);
-            serializer.SerializeValue(ref rHandRot);
-            serializer.SerializeValue(ref lHandPos);
-            serializer.SerializeValue(ref lHandRot);
-            serializer.SerializeValue(ref rightJoystick);
-        }
-    }
-
     public void SpawnNewPlayerHost(ulong id)
     {
         if (!IsHost) { return; }
@@ -346,15 +321,15 @@ public class GlobalManager : NetworkBehaviour
     public void AddPlayerToClientList(Player player)
     {
         clients.Add(player);
-        playerPosRPCData.Add(new PlayerPosData());
+        playerPosRPCData.Add(new PlayerDataSentToClient());
     }
 
     [ServerRpc(RequireOwnership = false)]
-    void SendJoystickServerRpc(PlayerNetworkDataClient joystick, ulong id)
+    void SendJoystickServerRpc(PlayerDataSentToServer joystick, ulong id)
     {
         for (int i = 0; i < clients.Count; i++)
         {
-            if (clients[i].OwnerClientId == id)
+            if (clients[i].OwnerClientId == id && !clients[i].IsOwner)
             {
                 clients[i].GetTracker().UpdatePlayerPositions(joystick);
                 clients[i].GetTracker().SetPlayerMoveAxis(joystick.rightJoystick);
@@ -393,9 +368,9 @@ public class GlobalManager : NetworkBehaviour
     /// </summary>
     /// <param name="data"></param>
     [ClientRpc]
-    private void SendPosClientRpc(PlayerPosData[] data)
+    private void SendPosClientRpc(PlayerDataSentToClient[] data)
     {
-        playerPosRPCData = data.ToList<PlayerPosData>();
+        playerPosRPCData = data.ToList<PlayerDataSentToClient>();
         if (IsHost) { return; }
         for (int e = 0; e < clients.Count; e++)
         {
@@ -449,7 +424,7 @@ public class GlobalManager : NetworkBehaviour
 }
 
 [System.Serializable]
-public struct PlayerPosData : INetworkSerializable
+public struct PlayerDataSentToClient : INetworkSerializable
 {
     public ulong id;
     public float predictionTime;
@@ -477,3 +452,27 @@ public struct PlayerPosData : INetworkSerializable
     }
 }
 
+[System.Serializable]
+public struct PlayerDataSentToServer : INetworkSerializable
+{
+    public Vector3 headsetPos;
+    public Quaternion headsetRot;
+    public Vector3 rHandPos;
+    public Quaternion rHandRot;
+    public Vector3 lHandPos;
+    public Quaternion lHandRot;
+
+    //Controls
+    public Vector2 rightJoystick;
+
+    public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
+    {
+        serializer.SerializeValue(ref headsetPos);
+        serializer.SerializeValue(ref headsetRot);
+        serializer.SerializeValue(ref rHandPos);
+        serializer.SerializeValue(ref rHandRot);
+        serializer.SerializeValue(ref lHandPos);
+        serializer.SerializeValue(ref lHandRot);
+        serializer.SerializeValue(ref rightJoystick);
+    }
+}
