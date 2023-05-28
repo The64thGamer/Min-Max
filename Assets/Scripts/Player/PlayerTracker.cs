@@ -38,6 +38,10 @@ public class PlayerTracker : NetworkBehaviour
     bool triggerL;
     bool rhandAButton;
 
+    //Prediction Values
+    float predictionTime;
+    Vector3 predictedVelocity;
+
     public enum ButtonState
     {
         off,
@@ -81,14 +85,17 @@ public class PlayerTracker : NetworkBehaviour
     }
 
 
-    public void SetNewClientPosition(Vector3 pos, Vector3 velocity)
+    public void SetNewClientPosition(Vector3 pos, Vector3 velocity, float rpcPredicitonTime)
     {
         transform.position = pos;
         rigidBody.velocity = velocity;
+        predictionTime = rpcPredicitonTime;
     }
 
-    public void UpdatePlayerPositions(Transform head, Transform handR, Transform handL, Transform root, float scale)
+    public void UpdatePlayerPositions(Vector3 head, Vector3 handR, Vector3 handL, float scale)
     {
+        //Completely redo this
+        /*
         headset.localPosition = root.InverseTransformPoint(head.transform.position);
         headset.rotation = head.rotation;
         rightController.localPosition = root.InverseTransformPoint(handR.transform.position);
@@ -97,6 +104,7 @@ public class PlayerTracker : NetworkBehaviour
         leftController.rotation = handL.rotation;
         forwardRoot.position = root.position;
         forwardRoot.localScale = Vector3.one * scale;
+        */
     }
 
     float CalcLerpVector3(Vector3 a, Vector3 b, Vector3 t, bool vertical)
@@ -165,6 +173,16 @@ public class PlayerTracker : NetworkBehaviour
     public Vector3 GetVelocity()
     {
         return rigidBody.velocity;
+    }
+
+    public Vector3 GetPredictionVelocity()
+    {
+        return predictedVelocity;
+    }
+
+    public float GetPredictionVelocityTime()
+    {
+        return predictionTime;
     }
 
     public Transform GetForwardRoot()

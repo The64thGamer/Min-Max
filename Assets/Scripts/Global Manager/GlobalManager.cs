@@ -93,7 +93,8 @@ public class GlobalManager : NetworkBehaviour
                     {
                         id = clients[i].GetPlayerID(),
                         pos = clients[i].transform.position,
-                        velocity = clients[i].GetTracker().GetVelocity()
+                        velocity = clients[i].GetTracker().GetVelocity(),
+                        predictionTime = NetworkManager.Singleton.LocalTime.TimeAsFloat
                     };
                 }
                 SendPosClientRpc(playerPosRPCData.ToArray());
@@ -106,9 +107,6 @@ public class GlobalManager : NetworkBehaviour
         {
             CheckAllPlayerInputs(clients[i]);
             clients[i].GetController().MovePlayer(clients[i].GetTracker().GetMoveAxis(), clients[i].GetTracker().GetRHandAButton());
-
-            //This is for getting inputs from the server and updating the head and hands, gotta relpace host with those inputs
-            //clients[i].GetTracker().UpdatePlayerPositions(host.GetTracker().GetCamera(), host.GetTracker().GetRightHand(), host.GetTracker().GetLeftHand(), host.GetTracker().GetForwardRoot(), al.GetClassStats(host.GetCurrentClass()).trackingScale);
         }
     }
 
@@ -463,7 +461,8 @@ public class GlobalManager : NetworkBehaviour
             //Check run incase of player disconnect+reconnect inside same tick.
             if (clients[i].OwnerClientId == data[i].id)
             {
-                clients[i].GetTracker().SetNewClientPosition(data[i].pos, data[i].velocity);
+                clients[i].GetTracker().SetNewClientPosition(data[i].pos, data[i].velocity, data[i].predictionTime);
+                clients[i].GetTracker().UpdatePlayerPositions(data[i].headsetPos, data[i].rHandPos, data[i].lHandPos, al.GetClassStats(clients[i].GetCurrentClass()).trackingScale);
             }
         }
     }
@@ -494,6 +493,7 @@ public class GlobalManager : NetworkBehaviour
 public struct PlayerPosData : INetworkSerializable
 {
     public ulong id;
+    public float predictionTime;
     public Vector3 headsetPos;
     public Vector3 rHandPos;
     public Vector3 lHandPos;
@@ -503,6 +503,7 @@ public struct PlayerPosData : INetworkSerializable
     public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
     {
         serializer.SerializeValue(ref id);
+        serializer.SerializeValue(ref predictionTime);
         serializer.SerializeValue(ref headsetPos);
         serializer.SerializeValue(ref rHandPos);
         serializer.SerializeValue(ref lHandPos);

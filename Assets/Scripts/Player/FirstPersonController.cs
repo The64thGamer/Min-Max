@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using Unity.Netcode;
+using UnityEngine;
 #if ENABLE_INPUT_SYSTEM
 using UnityEngine.InputSystem;
 #endif
@@ -37,22 +38,14 @@ namespace StarterAssets
 		private float _fallTimeoutDelta;
 
 		private CharacterController _controller;
-		private GameObject _mainCamera;
+		[SerializeField] GameObject _mainCamera;
+        [SerializeField] PlayerTracker tracker;
 
-		private const float _threshold = 0.01f;
+
+        private const float _threshold = 0.01f;
 
 		Vector3 oldAxis;
 		bool hasBeenGrounded;
-
-
-		private void Awake()
-		{
-			// get a reference to our main camera
-			if (_mainCamera == null)
-			{
-				_mainCamera = GameObject.FindGameObjectWithTag("MainCamera");
-			}
-		}
 
 		private void Start()
 		{
@@ -140,7 +133,9 @@ namespace StarterAssets
 			}
 
 			// move the player
-			_controller.Move(inputDirection.normalized * (_speed * Time.deltaTime) + new Vector3(0.0f, _verticalVelocity, 0.0f) * Time.deltaTime);
+			Vector3 finalVelocity = inputDirection.normalized * (_speed * Time.deltaTime) + new Vector3(0.0f, _verticalVelocity, 0.0f) * Time.deltaTime;
+			
+            _controller.Move(Vector3.Lerp(finalVelocity, tracker.GetPredictionVelocity(), Mathf.Clamp01(NetworkManager.Singleton.LocalTime.TimeAsFloat - tracker.GetPredictionVelocityTime())));
 		}
 
 		private void JumpAndGravity(bool jump)
