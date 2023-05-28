@@ -1,8 +1,9 @@
 
+using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.InputSystem.XR;
 
-public class MouseLook : MonoBehaviour
+public class MouseLook : NetworkBehaviour
 {
     [SerializeField] Transform cam;
     [SerializeField] Transform handR;
@@ -14,7 +15,7 @@ public class MouseLook : MonoBehaviour
 
     private void Start()
     {
-        if (PlayerPrefs.GetInt("IsVREnabled") == 1)
+        if (PlayerPrefs.GetInt("IsVREnabled") == 1 || !IsOwner)
         {
             Destroy(this);
         }

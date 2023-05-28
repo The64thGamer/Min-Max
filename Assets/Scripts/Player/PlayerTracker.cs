@@ -2,7 +2,7 @@ using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-public class PlayerTracker : MonoBehaviour
+public class PlayerTracker : NetworkBehaviour
 {
     [Header("Raw Positions")]
     [SerializeField] Transform headset;
@@ -32,12 +32,29 @@ public class PlayerTracker : MonoBehaviour
     [SerializeField] Rigidbody rigidBody;
     [SerializeField] Player player;
 
+    //Modified by either the player or the server
+    Vector2 movementAxis;
+    bool triggerR;
+    bool triggerL;
+    bool rhandAButton;
+
     public enum ButtonState
     {
         off,
         started,
         on,
         cancelled,
+    }
+
+    private void Update()
+    {
+        if(IsOwner)
+        {
+            movementAxis = moveAxis.action.ReadValue<Vector2>();
+            rhandAButton = jump.action.IsPressed();
+            triggerR = triggerRAction.action.IsPressed();
+            triggerL = triggerLAction.action.IsPressed();
+        }
     }
 
     void LateUpdate()
@@ -111,11 +128,11 @@ public class PlayerTracker : MonoBehaviour
 
     public bool GetTriggerR()
     {
-        return triggerRAction.action.IsPressed();
+        return triggerR;
     }
     public bool GetTriggerL()
     {
-        return triggerLAction.action.IsPressed();
+        return triggerL;
     }
 
     public Transform GetCamera()
@@ -151,12 +168,12 @@ public class PlayerTracker : MonoBehaviour
 
     public Vector2 GetMoveAxis()
     {
-        return moveAxis.action.ReadValue<Vector2>();
+        return movementAxis;
     }
 
     public bool GetRHandAButton()
     {
-        return jump.action.IsPressed();
+        return rhandAButton;
     }
 
     public Transform GetModelRoot()
