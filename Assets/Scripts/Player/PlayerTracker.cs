@@ -93,6 +93,13 @@ public class PlayerTracker : NetworkBehaviour
         predictionTime = rpcPredicitonTime;
     }
 
+    public void ForceNewPosition(Vector3 pos)
+    {
+        charController.enabled = false;
+        transform.position = pos;
+        charController.enabled = true;
+    }
+
     public void UpdatePlayerPositions(Vector3 head, Vector3 handR, Vector3 handL, float scale)
     {
         //Completely redo this

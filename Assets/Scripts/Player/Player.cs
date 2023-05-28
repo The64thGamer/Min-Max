@@ -16,7 +16,6 @@ public class Player : NetworkBehaviour
     [SerializeField] ClassStats currentStats;
     [SerializeField] PlayerTracker tracker;
     [SerializeField] FirstPersonController controller;
-    [SerializeField] ulong playerID;
     [SerializeField] Transform vrSetup;
     [SerializeField] Transform clientSetup;
     [SerializeField] GameObject[] playerModels;
@@ -29,7 +28,8 @@ public class Player : NetworkBehaviour
         controller = GetComponentInChildren<FirstPersonController>();
         currentGun = GetComponentInChildren<GenericGun>();
         gm = GameObject.Find("Global Manager").GetComponent<GlobalManager>();
-        gm.AssignNewPlayerClient(this);
+        gm.AddPlayerToClientList(this);
+
 
         //Debug Default
         SetClass(ClassList.programmer);
@@ -38,6 +38,7 @@ public class Player : NetworkBehaviour
         //After
         if (IsOwner)
         {
+            gm.AssignNewClientServerRpc(OwnerClientId);
             SetCharacterVisibility(false);
         }
         else
@@ -160,12 +161,7 @@ public class Player : NetworkBehaviour
     }
     public ulong GetPlayerID()
     {
-        return playerID;
-    }
-
-    public void SetPlayerID(ulong id)
-    {
-        playerID = id;
+        return OwnerClientId;
     }
 
     public int GetTeamLayer()

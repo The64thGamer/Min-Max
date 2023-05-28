@@ -21,7 +21,6 @@ public class GlobalManager : NetworkBehaviour
     [SerializeField] Transform team2Spawns;
     [SerializeField] Transform particleList;
 
-
     [Header("The Map")]
     [SerializeField] Transform mapProps;
     [SerializeField] Transform mapGeometry;
@@ -144,6 +143,11 @@ public class GlobalManager : NetworkBehaviour
 
     void ModifyTeamsAcrossServer()
     {
+        if (IsHost)
+        {
+            UpdateClientTeamColorsClientRpc(team1, team2);
+        }
+
         float team1Final = (float)GetTeam1() + 1;
         float team2Final = (float)GetTeam2() + 1;
         Renderer[] meshes = mapProps.GetComponentsInChildren<Renderer>();
@@ -356,77 +360,8 @@ public class GlobalManager : NetworkBehaviour
         GameObject client = GameObject.Instantiate(clientPrefab, Vector3.zero, Quaternion.identity);
         client.GetComponent<NetworkObject>().SpawnWithOwnership(id);
         Player clientPlayer = client.GetComponent<Player>();
-        clientPlayer.SetPlayerID(id);
     }
 
-    /// <summary>
-    /// "Client" also refers to Host Client.
-    /// </summary>
-    /// <param name="player"></param>
-    public void AssignNewPlayerClient(Player player)
-    {
-        StartCoroutine(AssignNewClient(player));
-    }
-
-    IEnumerator AssignNewClient(Player player)
-    {
-        //Player lists are always sorted by ID to prevent searching in RPC
-        clients.Add(player);
-        clients.Sort((p1, p2) => p1.OwnerClientId.CompareTo(p2.OwnerClientId));
-        playerPosRPCData.Add(
-            new PlayerPosData()
-            {
-                id = player.OwnerClientId,
-                pos = player.transform.position
-            });
-        playerPosRPCData.Sort((p1, p2) => p1.id.CompareTo(p2.id));
-
-        if (IsHost)
-        {
-            //Client Object Spawning
-            bool team = clients.Count % 2 != 0;
-            Vector3 spawnPos;
-            if (team)
-            {
-                spawnPos = team1Spawns.GetChild(team1SpawnIndex).position;
-                team1SpawnIndex = (team1SpawnIndex + 1) % team1Spawns.childCount;
-            }
-            else
-            {
-                spawnPos = team2Spawns.GetChild(team2SpawnIndex).position;
-                team2SpawnIndex = (team2SpawnIndex + 1) % team2Spawns.childCount;
-            }
-
-            if (team)
-            {
-                player.SetTeam(Team.team1);
-            }
-            else
-            {
-                player.SetTeam(Team.team2);
-            }
-
-            player.transform.position = spawnPos;
-
-            if (team1 == TeamList.gray || team2 == TeamList.gray)
-            {
-                yield return null;
-            }
-            TeamList debugList = TeamList.gray;
-            switch (player.GetTeam())
-            {
-                case Team.team1:
-                    debugList = GetTeam1();
-                    break;
-                case Team.team2:
-                    debugList = GetTeam2();
-                    break;
-                default:
-                    break;
-            }
-            Debug.Log("New Player Joined (#" + clients.Count + "), Team " + debugList);
-        }
-    }
 
     public void DisconnectClient(Player player)
     {
@@ -439,8 +374,28 @@ public class GlobalManager : NetworkBehaviour
         }
     }
 
+    public void UpdateTickrates(int server)
+    {
+        ServerTickRate.Value = server;
+    }
+
+    void ServerStarted()
+    {
+        serverStarted = true;
+    }
+
+    public bool GetServerStatus()
+    {
+        return serverStarted;
+    }
+
+    public void AddPlayerToClientList(Player player)
+    {
+        clients.Add(player);
+    }
+
     [ServerRpc(RequireOwnership = false)]
-    private void SendJoystickServerRpc(Vector2 joystick, ulong id)
+    void SendJoystickServerRpc(Vector2 joystick, ulong id)
     {
         for (int i = 0; i < clients.Count; i++)
         {
@@ -450,6 +405,30 @@ public class GlobalManager : NetworkBehaviour
                 return;
             }
         }
+    }
+
+    [ServerRpc(RequireOwnership = false)]
+    public void AssignNewClientServerRpc(ulong id)
+    {
+        //Client Object Spawning
+        bool team = clients.Count % 2 != 0;
+        Vector3 spawnPos;
+        TeamList debugList = TeamList.gray;
+        if (team)
+        {
+            spawnPos = team1Spawns.GetChild(team1SpawnIndex).position;
+            team1SpawnIndex = (team1SpawnIndex + 1) % team1Spawns.childCount;
+            debugList = GetTeam1();
+        }
+        else
+        {
+            spawnPos = team2Spawns.GetChild(team2SpawnIndex).position;
+            team2SpawnIndex = (team2SpawnIndex + 1) % team2Spawns.childCount;
+            debugList = GetTeam2();
+        }
+
+        Debug.Log("New Player Joined (#" + clients.Count + "), Team " + debugList);
+        SendNewPlayerDataBackClientRpc(id, team, spawnPos);
     }
 
     /// <summary>
@@ -476,19 +455,36 @@ public class GlobalManager : NetworkBehaviour
         }
     }
 
-    public void UpdateTickrates(int server)
+    [ClientRpc]
+    void SendNewPlayerDataBackClientRpc(ulong id, bool team, Vector3 spawnPos)
     {
-        ServerTickRate.Value = server;
+        Player player = null;
+        for (int i = 0; i < clients.Count; i++)
+        {
+            if (clients[i].GetPlayerID() == id)
+            {
+                player = clients[i];
+            }
+        }
+        if (player != null)
+        {
+            if (team)
+            {
+                player.SetTeam(Team.team1);
+            }
+            else
+            {
+                player.SetTeam(Team.team2);
+            }
+            player.GetTracker().ForceNewPosition(spawnPos);
+        }
     }
 
-    void ServerStarted()
+    [ClientRpc]
+    private void UpdateClientTeamColorsClientRpc(TeamList a, TeamList b)
     {
-        serverStarted = true;
-    }
-
-    public bool GetServerStatus()
-    {
-        return serverStarted;
+        if (IsHost) { return; }
+        ChangeTeams(a, b);
     }
 }
 
