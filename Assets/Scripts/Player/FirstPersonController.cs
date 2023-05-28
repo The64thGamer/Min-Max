@@ -88,7 +88,7 @@ namespace StarterAssets
 					{
 						oldAxis = newAxis;
 					}
-                    oldAxis = newAxis;
+					newAxis = oldAxis;
                 }
             }
             else
