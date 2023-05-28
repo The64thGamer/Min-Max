@@ -1,6 +1,7 @@
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using static GlobalManager;
 
 public class PlayerTracker : NetworkBehaviour
 {
@@ -110,6 +111,16 @@ public class PlayerTracker : NetworkBehaviour
         leftController.rotation = data.lHandRot;
     }
 
+    public void UpdatePlayerPositions(PlayerNetworkDataClient data)
+    {
+        headset.localPosition = data.headsetPos;
+        headset.rotation = data.headsetRot;
+        rightController.localPosition = data.rHandPos;
+        rightController.rotation = data.rHandRot;
+        leftController.localPosition = data.lHandPos;
+        leftController.rotation = data.lHandRot;
+    }
+
     public PlayerPosData GetPlayerPosData()
     {
         return new PlayerPosData()
@@ -118,6 +129,20 @@ public class PlayerTracker : NetworkBehaviour
             pos = GetPosition(),
             velocity = GetVelocity(),
             predictionTime = NetworkManager.Singleton.LocalTime.TimeAsFloat,
+            headsetPos = headset.localPosition,
+            headsetRot = headset.rotation,
+            rHandPos = rightController.localPosition,
+            rHandRot = rightController.rotation,
+            lHandPos = leftController.localPosition,
+            lHandRot = leftController.rotation,
+        };
+    }
+
+    public PlayerNetworkDataClient GetPlayerNetworkData()
+    {
+        return new PlayerNetworkDataClient()
+        {
+            rightJoystick = GetMoveAxis(),
             headsetPos = headset.localPosition,
             headsetRot = headset.rotation,
             rHandPos = rightController.localPosition,

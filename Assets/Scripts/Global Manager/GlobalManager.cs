@@ -25,11 +25,6 @@ public class GlobalManager : NetworkBehaviour
     [SerializeField] Transform mapProps;
     [SerializeField] Transform mapGeometry;
 
-
-
-    //Network
-    List<NetworkVariable<PlayerNetworkDataServer>> playerData;
-
     //Ect
     AllStats al;
     int team1SpawnIndex = 0;
@@ -81,16 +76,20 @@ public class GlobalManager : NetworkBehaviour
     {
         for (int i = 0; i < clients.Count; i++)
         {
+            //Game Logic
             CheckAllPlayerInputs(clients[i]);
             clients[i].GetController().MovePlayer(clients[i].GetTracker().GetMoveAxis(), clients[i].GetTracker().GetRHandAButton());
+
+            //Client Networking
             if (clients[i].IsOwner)
             {
-                SendJoystickServerRpc(clients[i].GetTracker().GetMoveAxis(), NetworkManager.Singleton.LocalClientId);
+                SendJoystickServerRpc(clients[i].GetTracker().GetPlayerNetworkData(), NetworkManager.Singleton.LocalClientId);
             }
         }
     }
     void LateUpdate()
     {
+        //Server Networking
         if (tickTimer > 1.0f / (float)ServerTickRate.Value)
         {
             tickTimer = 0;
@@ -283,66 +282,27 @@ public class GlobalManager : NetworkBehaviour
         return al;
     }
 
-    public struct PlayerNetworkDataServer : INetworkSerializable
-    {
-        public int playerNumber;
-
-        //Player
-        public Vector3 positionWorld;
-        public Vector3 velocity;
-
-        //Headset
-        public Vector3 headsetPosWorld;
-        public Quaternion headsetRotWorld;
-
-        //Right Hand
-        public Vector3 rHandPosWorld;
-        public Quaternion rHandRotWorld;
-
-        //Left Hand
-        public Vector3 lHandPosWorld;
-        public Quaternion lHandRotWorld;
-
-        public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
-        {
-            serializer.SerializeValue(ref playerNumber);
-            serializer.SerializeValue(ref positionWorld);
-            serializer.SerializeValue(ref velocity);
-            serializer.SerializeValue(ref headsetPosWorld);
-            serializer.SerializeValue(ref headsetRotWorld);
-            serializer.SerializeValue(ref rHandPosWorld);
-            serializer.SerializeValue(ref rHandRotWorld);
-            serializer.SerializeValue(ref lHandPosWorld);
-            serializer.SerializeValue(ref lHandRotWorld);
-        }
-    }
-
     [System.Serializable]
     public struct PlayerNetworkDataClient : INetworkSerializable
     {
-        //Headset
-        public Vector3 headsetPosLocal;
-        public Quaternion headsetRotLocal;
-
-        //Right Hand
-        public Vector3 rHandPosLocal;
-        public Quaternion rHandRotLocal;
-
-        //Left Hand
-        public Vector3 lHandPosLocal;
-        public Quaternion lHandRotLocal;
+        public Vector3 headsetPos;
+        public Quaternion headsetRot;
+        public Vector3 rHandPos;
+        public Quaternion rHandRot;
+        public Vector3 lHandPos;
+        public Quaternion lHandRot;
 
         //Controls
         public Vector2 rightJoystick;
 
         public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
         {
-            serializer.SerializeValue(ref headsetPosLocal);
-            serializer.SerializeValue(ref headsetRotLocal);
-            serializer.SerializeValue(ref rHandPosLocal);
-            serializer.SerializeValue(ref rHandRotLocal);
-            serializer.SerializeValue(ref lHandPosLocal);
-            serializer.SerializeValue(ref lHandRotLocal);
+            serializer.SerializeValue(ref headsetPos);
+            serializer.SerializeValue(ref headsetRot);
+            serializer.SerializeValue(ref rHandPos);
+            serializer.SerializeValue(ref rHandRot);
+            serializer.SerializeValue(ref lHandPos);
+            serializer.SerializeValue(ref lHandRot);
             serializer.SerializeValue(ref rightJoystick);
         }
     }
@@ -390,13 +350,14 @@ public class GlobalManager : NetworkBehaviour
     }
 
     [ServerRpc(RequireOwnership = false)]
-    void SendJoystickServerRpc(Vector2 joystick, ulong id)
+    void SendJoystickServerRpc(PlayerNetworkDataClient joystick, ulong id)
     {
         for (int i = 0; i < clients.Count; i++)
         {
             if (clients[i].OwnerClientId == id)
             {
-                clients[i].GetTracker().SetPlayerMoveAxis(joystick);
+                clients[i].GetTracker().UpdatePlayerPositions(joystick);
+                clients[i].GetTracker().SetPlayerMoveAxis(joystick.rightJoystick);
                 return;
             }
         }
@@ -444,7 +405,10 @@ public class GlobalManager : NetworkBehaviour
                 if (clients[e].GetPlayerID() == playerPosRPCData[i].id)
                 {
                     clients[e].GetTracker().SetNewClientPosition(playerPosRPCData[i].pos, playerPosRPCData[i].velocity, playerPosRPCData[i].predictionTime);
-                    clients[e].GetTracker().UpdatePlayerPositions(playerPosRPCData[i]);
+                    if(!IsOwner)
+                    {
+                        clients[e].GetTracker().UpdatePlayerPositions(playerPosRPCData[i]);
+                    }
                 }
             }
 
