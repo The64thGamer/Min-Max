@@ -87,7 +87,9 @@ public class PlayerTracker : NetworkBehaviour
 
     public void SetNewClientPosition(Vector3 pos, Vector3 velocity, float rpcPredicitonTime)
     {
+        charController.enabled = false;
         transform.position = pos;
+        charController.enabled = true;
         predictedVelocity = velocity;
         predictionTime = rpcPredicitonTime;
     }

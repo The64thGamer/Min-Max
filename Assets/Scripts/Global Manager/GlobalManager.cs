@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using Unity.Netcode;
 using Unity.Netcode.Transports.UTP;
 using UnityEngine;
@@ -456,15 +457,20 @@ public class GlobalManager : NetworkBehaviour
     [ClientRpc]
     private void SendPosClientRpc(PlayerPosData[] data)
     {
-        if (data.Length != clients.Count || IsHost) { return; }
-        for (int i = 0; i < clients.Count; i++)
+        playerPosRPCData = data.ToList<PlayerPosData>();
+        if (playerPosRPCData.Count != clients.Count || IsHost) { return; }
+        for (int i = 0; i < playerPosRPCData.Count; i++)
         {
-            //Check run incase of player disconnect+reconnect inside same tick.
-            if (clients[i].OwnerClientId == data[i].id)
+            for (int e = 0; e < clients.Count; e++)
             {
-                clients[i].GetTracker().SetNewClientPosition(data[i].pos, data[i].velocity, data[i].predictionTime);
-                clients[i].GetTracker().UpdatePlayerPositions(data[i].headsetPos, data[i].rHandPos, data[i].lHandPos, al.GetClassStats(clients[i].GetCurrentClass()).trackingScale);
+                //Check run incase of player disconnect+reconnect inside same tick.
+                if (clients[e].GetPlayerID() == playerPosRPCData[i].id)
+                {
+                    clients[e].GetTracker().SetNewClientPosition(data[i].pos, data[i].velocity, data[i].predictionTime);
+                    clients[e].GetTracker().UpdatePlayerPositions(data[i].headsetPos, data[i].rHandPos, data[i].lHandPos, al.GetClassStats(clients[e].GetCurrentClass()).trackingScale);
+                }
             }
+            
         }
     }
 

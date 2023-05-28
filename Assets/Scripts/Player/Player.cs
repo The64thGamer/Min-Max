@@ -34,7 +34,6 @@ public class Player : NetworkBehaviour
         //Debug Default
         SetClass(ClassList.programmer);
         SetGun(gm.GetComponent<AllStats>().SearchGuns("Worker Ionizing Pistol"));
-        Debug.Log(IsOwner);
 
         //After
         if (IsOwner)
