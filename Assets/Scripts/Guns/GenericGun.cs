@@ -54,10 +54,11 @@ public class GenericGun : Gun
 
         if (gm != null)
         {
-            currentFireAngle = gm.CalculateFireAngle(currentPlayer, currentPlayer.GetTracker().GetRightHandFirePos(defaultStats.firepoint));
+            Vector3 firePos = currentPlayer.GetTracker().GetRightHandFirePos(defaultStats.firepoint);
+            currentFireAngle = gm.CalculateFireAngle(currentPlayer, firePos);
             if (showCrosshair)
             {
-                crosshair.position = gm.CalculcateFirePosition(currentFireAngle, currentPlayer, currentPlayer.GetTracker().GetRightHandFirePos(defaultStats.firepoint));
+                crosshair.position = gm.CalculcateFirePosition(currentFireAngle, currentPlayer, firePos);
                 crosshair.transform.LookAt(Camera.main.transform.position);
                 crosshair.localScale = Vector3.one + (Vector3.one * (crosshair.position - Camera.main.transform.position).magnitude * 1.5f);
             }
@@ -65,8 +66,18 @@ public class GenericGun : Gun
             {
                 fireCooldown = Mathf.Max(0, fireCooldown - Time.deltaTime);
             }
+            fireposss = firePos;
         }
     }
+
+
+    Vector3 fireposss;
+
+    private void OnDrawGizmos()
+    {
+        Gizmos.DrawWireCube(fireposss, Vector3.one * 0.1f);
+    }
+
     public override void Fire()
     {
         if (gm != null && au != null)
