@@ -392,6 +392,7 @@ public class GlobalManager : NetworkBehaviour
     public void AddPlayerToClientList(Player player)
     {
         clients.Add(player);
+        playerPosRPCData.Add(new PlayerPosData());
     }
 
     [ServerRpc(RequireOwnership = false)]
@@ -429,6 +430,7 @@ public class GlobalManager : NetworkBehaviour
 
         Debug.Log("New Player Joined (#" + clients.Count + "), Team " + debugList);
         SendNewPlayerDataBackClientRpc(id, team, spawnPos);
+        UpdateClientTeamColorsClientRpc(team1, team2);
     }
 
     /// <summary>
