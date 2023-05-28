@@ -96,7 +96,6 @@ public class GlobalManager : NetworkBehaviour
                     };
                 }
                 SendPosClientRpc(playerPosRPCData.ToArray());
-                return;
             }
         }
         tickTimer += Time.deltaTime;
