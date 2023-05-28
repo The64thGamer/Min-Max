@@ -161,6 +161,14 @@ public class PlayerTracker : NetworkBehaviour
         return leftController;
     }
 
+    public Vector3 GetPosition()
+    {
+        charController.enabled = false;
+        Vector3 pos = transform.position;
+        charController.enabled = true;
+        return pos;
+    }
+
     public Vector3 GetRightHandFirePos(Vector3 firePosition)
     {
         Vector3 oldPos = rightController.localPosition;

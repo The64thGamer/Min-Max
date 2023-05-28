@@ -81,6 +81,14 @@ public class GlobalManager : NetworkBehaviour
 
     private void Update()
     {
+        for (int i = 0; i < clients.Count; i++)
+        {
+            CheckAllPlayerInputs(clients[i]);
+            clients[i].GetController().MovePlayer(clients[i].GetTracker().GetMoveAxis(), clients[i].GetTracker().GetRHandAButton());
+        }
+    }
+    void LateUpdate()
+    {
         if (tickTimer > 1.0f / (float)ClientInputTickRate.Value)
         {
             tickTimer = 0;
@@ -102,13 +110,6 @@ public class GlobalManager : NetworkBehaviour
             }
         }
         tickTimer += Time.deltaTime;
-
-        //old
-        for (int i = 0; i < clients.Count; i++)
-        {
-            CheckAllPlayerInputs(clients[i]);
-            clients[i].GetController().MovePlayer(clients[i].GetTracker().GetMoveAxis(), clients[i].GetTracker().GetRHandAButton());
-        }
     }
 
     void SelectTeams()
@@ -191,7 +192,7 @@ public class GlobalManager : NetworkBehaviour
     //Exploit: Hit needs to be parsed to ensure extreme angles aren't achievable.
     public void SpawnProjectile(Player player)
     {
-        GunProjectiles fp = al.SearchGuns(player.GetCurrentGun().GetNameKey());;
+        GunProjectiles fp = al.SearchGuns(player.GetCurrentGun().GetNameKey()); ;
         if (fp.firePrefab != null)
         {
             Vector3 firepos = player.GetTracker().GetRightHandFirePos(fp.firepoint);
@@ -406,7 +407,7 @@ public class GlobalManager : NetworkBehaviour
 
             player.transform.position = spawnPos;
 
-            if(team1 == TeamList.gray || team2 == TeamList.gray)
+            if (team1 == TeamList.gray || team2 == TeamList.gray)
             {
                 yield return null;
             }
@@ -459,9 +460,9 @@ public class GlobalManager : NetworkBehaviour
     {
         playerPosRPCData = data.ToList<PlayerPosData>();
         if (playerPosRPCData.Count != clients.Count || IsHost) { return; }
-        for (int i = 0; i < playerPosRPCData.Count; i++)
+        for (int e = 0; e < clients.Count; e++)
         {
-            for (int e = 0; e < clients.Count; e++)
+            for (int i = 0; i < playerPosRPCData.Count; i++)
             {
                 //Check run incase of player disconnect+reconnect inside same tick.
                 if (clients[e].GetPlayerID() == playerPosRPCData[i].id)
@@ -470,7 +471,7 @@ public class GlobalManager : NetworkBehaviour
                     clients[e].GetTracker().UpdatePlayerPositions(data[i].headsetPos, data[i].rHandPos, data[i].lHandPos, al.GetClassStats(clients[e].GetCurrentClass()).trackingScale);
                 }
             }
-            
+
         }
     }
 
