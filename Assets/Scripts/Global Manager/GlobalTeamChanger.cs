@@ -10,7 +10,11 @@ public class GlobalTeamChanger : MonoBehaviour
 
     TeamList oldTeam1;
     TeamList oldTeam2;
-
+    private void Start()
+    {
+        oldTeam1 = team1;
+        oldTeam2 = team2;
+    }
     void Update()
     {
         if(oldTeam1 != team1 || oldTeam2 != team2)
