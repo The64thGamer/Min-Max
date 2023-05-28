@@ -12,6 +12,8 @@ public abstract class Gun : NetworkBehaviour
     public abstract string GetNameKey();
     public abstract int SearchStats(ChangableWeaponStats stat);
     public abstract void SetGunTransformParent(Transform parent);
+    public abstract void SetPlayer(Player player);
+
 }
 [System.Serializable]
 public class WeaponStats

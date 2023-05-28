@@ -19,14 +19,22 @@ public class Player : NetworkBehaviour
     [SerializeField] Transform vrSetup;
     [SerializeField] Transform clientSetup;
     [SerializeField] GameObject[] playerModels;
-
+    GlobalManager gm;
 
     public override void OnNetworkSpawn()
     {
+        //Before
         tracker = GetComponentInChildren<PlayerTracker>();
         controller = GetComponentInChildren<FirstPersonController>();
         currentGun = GetComponentInChildren<GenericGun>();
-        GameObject.Find("Global Manager").GetComponent<GlobalManager>().AssignNewPlayerClient(this);
+        gm = GameObject.Find("Global Manager").GetComponent<GlobalManager>();
+        gm.AssignNewPlayerClient(this);
+
+        //Debug Default
+        SetClass(ClassList.programmer);
+        SetGun(gm.GetComponent<AllStats>().SearchGuns("Worker Ionizing Pistol"));
+
+        //After
         if (IsOwner)
         {
             SetCharacterVisibility(false);
@@ -34,22 +42,18 @@ public class Player : NetworkBehaviour
         else
         {
             SetCharacterVisibility(true);
-
         }
-
-        //Debug Default
-        SetClass(ClassList.programmer);
     }
 
     void OnDestroy()
     {
-        GameObject.Find("Global Manager").GetComponent<GlobalManager>().DisconnectClient(this);
+        gm.DisconnectClient(this);
     }
 
     public void SetClass(ClassList setClass)
     {
         currentClass = setClass;
-        currentStats = GameObject.Find("Global Manager").GetComponent<AllStats>().GetClassStats(ClassList.programmer);
+        currentStats = gm.GetComponent<AllStats>().GetClassStats(ClassList.programmer);
     }
 
     public void SetTeam(Team team)
@@ -60,7 +64,10 @@ public class Player : NetworkBehaviour
 
     public void SetGun(GunProjectiles gun)
     {
-
+        GameObject gunObject = GameObject.Instantiate(gun.gunPrefab, Vector3.zero, Quaternion.identity,this.transform);
+        gunObject.GetComponent<NetworkObject>().SpawnWithOwnership(playerID);
+        gunObject.GetComponent<Gun>().SetPlayer(this);
+        currentGun = gunObject.GetComponent<Gun>();
     }
 
     public void UpdateTeamColor()
@@ -69,10 +76,10 @@ public class Player : NetworkBehaviour
         switch (currentTeam)
         {
             case Team.team1:
-                currentList = GameObject.Find("Global Manager").GetComponent<GlobalManager>().GetTeam1();
+                currentList = gm.GetTeam1();
                 break;
             case Team.team2:
-                currentList = GameObject.Find("Global Manager").GetComponent<GlobalManager>().GetTeam2();
+                currentList = gm.GetTeam2();
                 break;
             default:
                 break;

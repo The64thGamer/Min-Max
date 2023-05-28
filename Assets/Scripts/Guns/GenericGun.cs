@@ -33,7 +33,7 @@ public class GenericGun : Gun
         currentAmmo = SearchStats(ChangableWeaponStats.maxAmmo);
         au = this.GetComponent<AudioSource>();
         gm = GameObject.Find("Global Manager").GetComponent<GlobalManager>();
-        defaultStats = gm.GetComponent<AllStats>().SearchGuns(currentPlayer.GetCurrentGun().GetNameKey());
+        defaultStats = gm.GetComponent<AllStats>().SearchGuns(GetNameKey());
         if (IsOwner)
         {
             showCrosshair = true;
@@ -45,9 +45,12 @@ public class GenericGun : Gun
     }
     void Update()
     {
-        transform.position = currentParent.position;
-        transform.rotation = currentParent.rotation;
-        transform.localScale = currentParent.localScale;
+        if (currentParent != null)
+        {
+            transform.position = currentParent.position;
+            transform.rotation = currentParent.rotation;
+            transform.localScale = currentParent.localScale;
+        }
 
         if (gm != null)
         {
@@ -77,6 +80,12 @@ public class GenericGun : Gun
         }
     }
     public override void AltFire() { }
+
+    public override void SetPlayer(Player player)
+    {
+        currentPlayer = player;
+    }
+
     public override List<WeaponStats> ChangableStats()
     {
         return null;
