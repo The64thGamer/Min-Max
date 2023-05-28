@@ -139,11 +139,17 @@ public class GlobalManager : NetworkBehaviour
         }
         team1 = (TeamList)teamInt1;
         team2 = (TeamList)teamInt2;
-        UpdatePropColors();
-        Debug.Log("Teams Selected: " + team1 + ", " + team2);
+        ModifyTeamsAcrossServer();
     }
 
-    void UpdatePropColors()
+    public void ChangeTeams(TeamList teamOne, TeamList teamTwo)
+    {
+        team1 = teamOne;
+        team2 = teamTwo;
+        ModifyTeamsAcrossServer();
+    }
+
+    void ModifyTeamsAcrossServer()
     {
         float team1Final = (float)GetTeam1() + 1;
         float team2Final = (float)GetTeam2() + 1;
@@ -167,6 +173,11 @@ public class GlobalManager : NetworkBehaviour
                 mats[r].SetFloat("_Team_2", team2Final);
             }
         }
+        for (int i = 0; i < clients.Count; i++)
+        {
+            clients[i].UpdateTeamColor();
+        }
+        Debug.Log("Teams Selected: " + team1 + ", " + team2);
     }
 
     void CheckAllPlayerInputs(Player player)

@@ -55,6 +55,11 @@ public class Player : NetworkBehaviour
     public void SetTeam(Team team)
     {
         currentTeam = team;
+        UpdateTeamColor();
+    }
+
+    public void UpdateTeamColor()
+    {
         TeamList currentList = TeamList.gray;
         switch (currentTeam)
         {
