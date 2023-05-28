@@ -5,6 +5,7 @@ using Unity.Netcode;
 using Unity.XR.CoreUtils;
 using UnityEngine;
 using UnityEngine.InputSystem.XR;
+using UnityEngine.Rendering.Universal;
 using UnityEngine.UIElements;
 
 public class Player : NetworkBehaviour
@@ -33,6 +34,7 @@ public class Player : NetworkBehaviour
         //Debug Default
         SetClass(ClassList.programmer);
         SetGun(gm.GetComponent<AllStats>().SearchGuns("Worker Ionizing Pistol"));
+        Debug.Log(IsOwner);
 
         //After
         if (IsOwner)
@@ -42,6 +44,9 @@ public class Player : NetworkBehaviour
         else
         {
             SetCharacterVisibility(true);
+            Destroy(this.GetComponentInChildren<UniversalAdditionalCameraData>());
+            Destroy(this.GetComponentInChildren<Camera>());
+            Destroy(this.GetComponentInChildren<AudioListener>());
         }
     }
 
