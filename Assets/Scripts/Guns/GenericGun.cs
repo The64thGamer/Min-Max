@@ -26,13 +26,15 @@ public class GenericGun : Gun
     GlobalManager gm;
     bool showCrosshair;
     Transform currentParent;
+    GunProjectiles defaultStats;
 
-    void Start()
+    public override void OnNetworkSpawn()
     {
         currentAmmo = SearchStats(ChangableWeaponStats.maxAmmo);
         au = this.GetComponent<AudioSource>();
         gm = GameObject.Find("Global Manager").GetComponent<GlobalManager>();
-        if(IsOwner)
+        defaultStats = gm.GetComponent<AllStats>().SearchGuns(currentPlayer.GetCurrentGun().GetNameKey());
+        if (IsOwner)
         {
             showCrosshair = true;
         }
@@ -47,25 +49,31 @@ public class GenericGun : Gun
         transform.rotation = currentParent.rotation;
         transform.localScale = currentParent.localScale;
 
-        currentFireAngle = gm.CalculateFireAngle(currentPlayer);
-        if (showCrosshair)
+        if (gm != null)
         {
-            crosshair.position = gm.CalculcateFirePosition(currentFireAngle, currentPlayer);
-            crosshair.transform.LookAt(Camera.main.transform.position);
-            crosshair.localScale = Vector3.one + (Vector3.one * (crosshair.position - Camera.main.transform.position).magnitude * 1.5f);
-        }
-        if (fireCooldown > 0)
-        {
-            fireCooldown = Mathf.Max(0, fireCooldown - Time.deltaTime);
+            currentFireAngle = gm.CalculateFireAngle(currentPlayer, currentPlayer.GetTracker().GetRightHandFirePos(defaultStats.firepoint));
+            if (showCrosshair)
+            {
+                crosshair.position = gm.CalculcateFirePosition(currentFireAngle, currentPlayer, currentPlayer.GetTracker().GetRightHandFirePos(defaultStats.firepoint));
+                crosshair.transform.LookAt(Camera.main.transform.position);
+                crosshair.localScale = Vector3.one + (Vector3.one * (crosshair.position - Camera.main.transform.position).magnitude * 1.5f);
+            }
+            if (fireCooldown > 0)
+            {
+                fireCooldown = Mathf.Max(0, fireCooldown - Time.deltaTime);
+            }
         }
     }
     public override void Fire()
     {
-        if (fireCooldown <= 0)
+        if (gm != null && au != null)
         {
-            au.PlayOneShot(fireSound);
-            fireCooldown = 1.0f / SearchStats(ChangableWeaponStats.shotsPerSecond);
-            gm.SpawnProjectile(currentPlayer);
+            if (fireCooldown <= 0)
+            {
+                au.PlayOneShot(fireSound);
+                fireCooldown = 1.0f / SearchStats(ChangableWeaponStats.shotsPerSecond);
+                gm.SpawnProjectile(currentPlayer);
+            }
         }
     }
     public override void AltFire() { }

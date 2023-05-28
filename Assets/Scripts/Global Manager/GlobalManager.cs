@@ -188,7 +188,10 @@ public class GlobalManager : NetworkBehaviour
             {
                 for (int i = 0; i < clients.Count; i++)
                 {
-                    clients[i].GetCurrentGun().Fire();
+                    if (clients[i].GetCurrentGun())
+                    {
+                        clients[i].GetCurrentGun().Fire();
+                    }
                 }
             }
         }
@@ -202,13 +205,13 @@ public class GlobalManager : NetworkBehaviour
         {
             GameObject currentProjectile = GameObject.Instantiate(fp.firePrefab);
             currentProjectile.transform.parent = particleList;
-            Vector3 fireAngle = CalculateFireAngle(player);
-            currentProjectile.GetComponent<Projectile>().SetProjectile(player.GetTracker().GetRightHand().position, fireAngle, player.GetCurrentGun().SearchStats(ChangableWeaponStats.bulletSpeed), player.GetTeamLayer(), CalculcateFirePosition(fireAngle, player));
+            Vector3 fireAngle = CalculateFireAngle(player, player.GetTracker().GetRightHandFirePos(fp.firepoint));
+            currentProjectile.GetComponent<Projectile>().SetProjectile(player.GetTracker().GetRightHand().localPosition, fireAngle, player.GetCurrentGun().SearchStats(ChangableWeaponStats.bulletSpeed), player.GetTeamLayer(), CalculcateFirePosition(fireAngle, player, player.GetTracker().GetRightHandFirePos(fp.firepoint)));
         }
     }
 
     //Crosshair doesn't recalculate if it doesn't collide with a wall, fix it.
-    public Vector3 CalculateFireAngle(Player player)
+    public Vector3 CalculateFireAngle(Player player, Vector3 firePoint)
     {
         RaycastHit hit;
         Vector3 startCast = player.GetTracker().GetCamera().position + (player.GetTracker().GetCamera().forward * SPHERESIZE);
@@ -217,7 +220,6 @@ public class GlobalManager : NetworkBehaviour
         LayerMask layermask = GetIgnoreTeamAndVRLayerMask(player);
 
         Transform rHand = player.GetTracker().GetRightHand();
-        Vector3 firePoint = rHand.position; //+ rHand.TransformPoint(al.SearchGuns(player.GetCurrentGun().GetNameKey()).firepoint);
         Vector3 fpForward = rHand.forward;
 
         if (Physics.SphereCast(startCast, SPHERESIZE, player.GetTracker().GetCamera().forward, out hit, MAXSPHERECASTDISTANCE, layermask))
@@ -238,11 +240,10 @@ public class GlobalManager : NetworkBehaviour
         return fpForward;
     }
 
-    public Vector3 CalculcateFirePosition(Vector3 fireAngle, Player player)
+    public Vector3 CalculcateFirePosition(Vector3 fireAngle, Player player, Vector3 firePoint)
     {
         RaycastHit hit;
         Transform rHand = player.GetTracker().GetRightHand();
-        Vector3 firePoint = rHand.position; // + rHand.TransformPoint(al.SearchGuns(player.GetCurrentGun().GetNameKey()).firepoint);
         LayerMask layermask = GetIgnoreTeamAndVRLayerMask(player);
         float dotAngle = Vector3.Dot(rHand.forward, fireAngle.normalized);
         if (dotAngle > MINANGLE)

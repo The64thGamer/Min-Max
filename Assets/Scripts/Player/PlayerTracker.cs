@@ -133,6 +133,15 @@ public class PlayerTracker : MonoBehaviour
         return leftController;
     }
 
+    public Vector3 GetRightHandFirePos(Vector3 firePosition)
+    {
+        Vector3 oldPos = rightController.localPosition;
+        rightController.localPosition += firePosition;
+        Vector3 newPos = rightController.position;
+        rightController.localPosition = oldPos;
+        return newPos;
+    }
+
     public Transform GetForwardRoot()
     {
         return forwardRoot;

@@ -58,6 +58,11 @@ public class Player : NetworkBehaviour
         UpdateTeamColor();
     }
 
+    public void SetGun(GunProjectiles gun)
+    {
+
+    }
+
     public void UpdateTeamColor()
     {
         TeamList currentList = TeamList.gray;
