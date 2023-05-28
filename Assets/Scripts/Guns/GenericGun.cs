@@ -66,17 +66,9 @@ public class GenericGun : Gun
             {
                 fireCooldown = Mathf.Max(0, fireCooldown - Time.deltaTime);
             }
-            fireposss = firePos;
         }
     }
 
-
-    Vector3 fireposss;
-
-    private void OnDrawGizmos()
-    {
-        Gizmos.DrawWireCube(fireposss, Vector3.one * 0.1f);
-    }
 
     public override void Fire()
     {

@@ -26,7 +26,7 @@ public class Projectile : MonoBehaviour
         t += Time.deltaTime * speed / Vector3.Distance(originalPos,hitPoint);
         if (t > 1)
         {
-            GameObject dsp = GameObject.Instantiate(destroyParticle, hitPoint, transform.rotation);
+            GameObject dsp = GameObject.Instantiate(destroyParticle, hitPoint, transform.rotation,transform.parent);
             dsp.GetComponent<AudioSource>().PlayOneShot(hitSound);
             Destroy(this.gameObject);
         }
