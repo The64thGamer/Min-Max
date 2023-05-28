@@ -41,6 +41,9 @@ namespace StarterAssets
 
 		private const float _threshold = 0.01f;
 
+		Vector3 oldAxis;
+		bool hasBeenGrounded;
+
 
 		private void Awake()
 		{
@@ -63,8 +66,6 @@ namespace StarterAssets
 		public void MovePlayer(Vector2 _input, bool jump)
         {
 
-            JumpAndGravity(jump);
-
             Vector3 forward = _mainCamera.transform.forward;
             Vector3 right = _mainCamera.transform.right;
             forward.y = 0f;
@@ -72,6 +73,31 @@ namespace StarterAssets
             forward.Normalize();
             right.Normalize();
             Vector3 newAxis = forward * _input.y + right * _input.x;
+
+			//Movment rotation halted in midair
+            if (!_controller.isGrounded)
+            {
+                if (!hasBeenGrounded)
+                {
+                    oldAxis = newAxis;
+                    hasBeenGrounded = true;
+                }
+				else
+				{
+					if(oldAxis == Vector3.zero)
+					{
+						oldAxis = newAxis;
+					}
+                    oldAxis = newAxis;
+                }
+            }
+            else
+            {
+                hasBeenGrounded = false;
+            }
+
+			//Jump
+            JumpAndGravity(jump);
 
             // set target speed based on move speed, sprint speed and if sprint is pressed
             float targetSpeed = MoveSpeed;
@@ -164,5 +190,6 @@ namespace StarterAssets
 				_verticalVelocity += Gravity * Time.deltaTime;
 			}
 		}
-	}
+
+    } 
 }
