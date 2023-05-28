@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using static UnityEditor.Experimental.GraphView.GraphView;
 
 public class Projectile : MonoBehaviour
 {
@@ -27,6 +28,7 @@ public class Projectile : MonoBehaviour
         if (t > 1)
         {
             GameObject dsp = GameObject.Instantiate(destroyParticle, hitPoint, transform.rotation,transform.parent);
+            dsp.layer = this.gameObject.layer;
             dsp.GetComponent<AudioSource>().PlayOneShot(hitSound);
             Destroy(this.gameObject);
         }

@@ -59,6 +59,12 @@ public class Player : NetworkBehaviour
     public void SetTeam(Team team)
     {
         currentTeam = team;
+        Transform[] allBits = this.GetComponentsInChildren<Transform>();
+        for (int i = 0; i < allBits.Length; i++)
+        {
+            allBits[i].gameObject.layer = GetTeamLayer();
+        }
+        this.gameObject.layer = GetTeamLayer();
         UpdateTeamColor();
     }
 
