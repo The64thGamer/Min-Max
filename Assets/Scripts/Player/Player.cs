@@ -7,6 +7,7 @@ using UnityEngine;
 using UnityEngine.InputSystem.XR;
 using UnityEngine.Rendering.Universal;
 using UnityEngine.UIElements;
+using UnityEngine.XR.Interaction.Toolkit;
 
 public class Player : NetworkBehaviour
 {
@@ -51,6 +52,11 @@ public class Player : NetworkBehaviour
             for (int i = 0; i < pd.Length; i++)
             {
                 Destroy(pd[i]);
+            }
+            ActionBasedController[] xd = this.GetComponentsInChildren<ActionBasedController>();
+            for (int i = 0; i < xd.Length; i++)
+            {
+                Destroy(xd[i]);
             }
         }
     }
