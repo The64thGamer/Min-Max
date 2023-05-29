@@ -110,6 +110,8 @@
     white-space: normal;
     text-overflow: clip;
     flex-wrap: nowrap;
+    max-height: none;
+    min-height: 35px;
 }
 
 .dropdown {
@@ -129,4 +131,6 @@
     border-top-color: rgba(0, 0, 0, 0);
     border-bottom-color: rgba(0, 0, 0, 0);
     -unity-text-align: middle-left;
+    max-height: none;
+    min-height: 70px;
 }
