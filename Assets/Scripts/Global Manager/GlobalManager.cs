@@ -51,12 +51,16 @@ public class GlobalManager : NetworkBehaviour
         {
             case 0:
                 NetworkManager.Singleton.StartHost();
-                SelectTeams();
+                team1 = SelectTeams(team1, team2, PlayerPrefs.GetInt("Team1Setting"));
+                team2 = SelectTeams(team2, team1, PlayerPrefs.GetInt("Team2Setting"));
+                ModifyTeamsAcrossServer();
                 Debug.Log("Started Host");
                 break;
             case 1:
                 NetworkManager.Singleton.StartHost();
-                SelectTeams();
+                team1 = SelectTeams(team1, team2, PlayerPrefs.GetInt("Team1Setting"));
+                team2 = SelectTeams(team2, team1, PlayerPrefs.GetInt("Team2Setting"));
+                ModifyTeamsAcrossServer();
                 Debug.Log("Started Host");
                 break;
             case 2:
@@ -105,26 +109,74 @@ public class GlobalManager : NetworkBehaviour
         tickTimer += Time.deltaTime;
     }
 
-    void SelectTeams()
+    TeamList SelectTeams(TeamList teamSet, TeamList teamRef, int setting)
     {
-        //Random
-        int teamInt1 = Random.Range(0, 7);
-        int teamInt2 = Random.Range(0, 7);
-        while (teamInt2 != teamInt1 && teamInt2 != teamInt1 - 1 && teamInt2 != teamInt1 + 1 && (team2 == 0 && teamInt1 == 5) && (teamInt2 == 5 && teamInt1 == 0) && (teamInt1 == 1 && teamInt2 == 6))
+        TeamList[] otherOptions = new TeamList[0];
+        switch (setting)
         {
-            teamInt2 = Random.Range(0, 7);
-            if (teamInt1 == 6 && teamInt2 == 7)
-            {
+            case 0:
+                switch (teamRef)
+                {
+                    case TeamList.orange:
+                        otherOptions = new TeamList[]{TeamList.green,TeamList.lightBlue,TeamList.blue,TeamList.purple,TeamList.brown};
+                        break;
+                    case TeamList.yellow:
+                        otherOptions = new TeamList[] {TeamList.green, TeamList.lightBlue, TeamList.blue, TeamList.purple, TeamList.brown};
+                        break;
+                    case TeamList.green:
+                        otherOptions = new TeamList[] { TeamList.orange,TeamList.blue, TeamList.purple, TeamList.beige, TeamList.brown};
+                        break;
+                    case TeamList.lightBlue:
+                        otherOptions = new TeamList[] { TeamList.orange, TeamList.yellow,TeamList.purple, TeamList.beige, TeamList.brown};
+                        break;
+                    case TeamList.blue:
+                        otherOptions = new TeamList[] { TeamList.orange, TeamList.yellow, TeamList.green,TeamList.beige, TeamList.brown};
+                        break;
+                    case TeamList.purple:
+                        otherOptions = new TeamList[] {TeamList.yellow, TeamList.green, TeamList.lightBlue,TeamList.beige, TeamList.brown};
+                        break;
+                    case TeamList.beige:
+                        otherOptions = new TeamList[] {TeamList.green, TeamList.lightBlue, TeamList.blue, TeamList.purple, TeamList.brown};
+                        break;
+                    case TeamList.brown:
+                        otherOptions = new TeamList[] {TeamList.yellow, TeamList.green, TeamList.lightBlue, TeamList.blue, TeamList.purple, TeamList.beige};
+                        break;
+                    case TeamList.gray:
+                        break;
+                    default:
+                        break;
+                }
+                teamSet = otherOptions[Random.Range(0, otherOptions.Length)];
                 break;
-            }
-            if (teamInt1 == 7 && teamInt2 == 6)
-            {
+            case 1:
+                teamSet = TeamList.orange;
                 break;
-            }
+            case 2:
+                teamSet = TeamList.yellow;
+                break;
+            case 3:
+                teamSet = TeamList.green;
+                break;
+            case 4:
+                teamSet = TeamList.lightBlue;
+                break;
+            case 5:
+                teamSet = TeamList.blue;
+                break;
+            case 6:
+                teamSet = TeamList.purple;
+                break;
+            case 7:
+                teamSet = TeamList.beige;
+                break;
+            case 8:
+                teamSet = TeamList.brown;
+                break;
+            default:
+                teamSet = TeamList.gray;
+                break;
         }
-        team1 = (TeamList)teamInt1;
-        team2 = (TeamList)teamInt2;
-        ModifyTeamsAcrossServer();
+        return teamSet;
     }
 
     public void ChangeTeams(TeamList teamOne, TeamList teamTwo)
@@ -378,7 +430,7 @@ public class GlobalManager : NetworkBehaviour
                 if (clients[e].GetPlayerID() == playerPosRPCData[i].id)
                 {
                     clients[e].GetTracker().SetNewClientPosition(playerPosRPCData[i].pos, playerPosRPCData[i].velocity, playerPosRPCData[i].predictionTime);
-                    if(!IsOwner)
+                    if (!IsOwner)
                     {
                         clients[e].GetTracker().UpdatePlayerPositions(playerPosRPCData[i]);
                     }

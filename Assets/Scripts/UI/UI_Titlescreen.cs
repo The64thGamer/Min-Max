@@ -45,6 +45,8 @@ public class UI_Titlescreen : MonoBehaviour
         Toggle spectatorAsPlayer = root.Q<Toggle>("SpectatorAsPlayer");
         Toggle isHostSpectator = root.Q<Toggle>("HostisSpectator");
         TextField selectPort = root.Q<TextField>("SelectPort");
+        DropdownField team1 = root.Q<DropdownField>("SelectTeam1");
+        DropdownField team2 = root.Q<DropdownField>("SelectTeam2");
 
         //Functions
         rc_startVR.clicked += () => SwitchMainTab(0);
@@ -58,15 +60,19 @@ public class UI_Titlescreen : MonoBehaviour
         selectMap.RegisterValueChangedCallback(evt => SwapMap(selectMap));
         maxPlayers.RegisterValueChangedCallback(evt => PlayerPrefs.SetInt("ServerMaxPlayers", (int)maxPlayers.value));
         spectatorAsPlayer.RegisterValueChangedCallback(evt => PlayerPrefs.SetInt("ServerSpectatorAsPlayer", spectatorAsPlayer.value ? 1 : 0));
-        isHostSpectator.RegisterValueChangedCallback(evt => PlayerPrefs.SetInt("ServerIsHostSpectator", isHostSpectator.value ? 1 : 0));
         selectPort.RegisterValueChangedCallback(evt => TryPortChange(selectPort));
+        team1.RegisterValueChangedCallback(evt => PlayerPrefs.SetInt("Team1Setting", team1.index));
+        team2.RegisterValueChangedCallback(evt => PlayerPrefs.SetInt("Team2Setting", team2.index));
+
 
         //Ect
         selectMap.choices = mapNames;
         selectMap.index = 0;
         maxPlayers.value = Mathf.Max(PlayerPrefs.GetInt("ServerMaxPlayers"),1);
         spectatorAsPlayer.value = Convert.ToBoolean(PlayerPrefs.GetInt("ServerSpectatorAsPlayer"));
-        isHostSpectator.value = Convert.ToBoolean(PlayerPrefs.GetInt("ServerIsHostSpectator"));
+        team1.index = PlayerPrefs.GetInt("Team1Setting");
+        team2.index = PlayerPrefs.GetInt("Team2Setting");
+
         if (PlayerPrefs.GetInt("IsVREnabled") == 1)
         {
             rc_startVR.style.display = DisplayStyle.None;
