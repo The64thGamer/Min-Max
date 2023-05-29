@@ -258,26 +258,13 @@ public class GlobalManager : NetworkBehaviour
     {
         Transform cam = player.GetTracker().GetCamera();
         RaycastHit hit;
-        Vector3 finalAngle = Vector3.one;
-
-        LayerMask layermask = GetIgnoreTeamAndVRLayerMask(player);
-
         Vector3 fpForward = player.GetTracker().GetRightHandSafeForward();
 
-        if (Physics.Raycast(cam.position, cam.forward, out hit, MAXSPHERECASTDISTANCE, layermask))
-        {
-            finalAngle = ((cam.position + (cam.forward * hit.distance)) - firePoint);
-        }
-        else
-        {
-            finalAngle = cam.forward;
-        }
-        float dotAngle = Vector3.Dot(fpForward, finalAngle.normalized);
+        float dotAngle = Vector3.Dot(fpForward, cam.forward);
         if (dotAngle > MINANGLE)
         {
             float percentage = (dotAngle - MINANGLE) / (1 - MINANGLE);
-            finalAngle = Vector3.Slerp(fpForward, finalAngle, percentage);
-            return finalAngle;
+            return Vector3.Slerp(fpForward, cam.forward, percentage);
         }
         return fpForward;
     }
