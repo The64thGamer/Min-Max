@@ -282,16 +282,6 @@ public class GlobalManager : NetworkBehaviour
         return al;
     }
 
-    public void SpawnNewPlayerHost(ulong id)
-    {
-        if (!IsHost) { return; }
-        Debug.Log("Host Player Spawned");
-        GameObject client = GameObject.Instantiate(clientPrefab, Vector3.zero, Quaternion.identity);
-        client.GetComponent<NetworkObject>().SpawnWithOwnership(id);
-        Player clientPlayer = client.GetComponent<Player>();
-    }
-
-
     public void DisconnectClient(Player player)
     {
         for (int i = 0; i < clients.Count; i++)
@@ -361,6 +351,14 @@ public class GlobalManager : NetworkBehaviour
         Debug.Log("New Player Joined (#" + clients.Count + "), Team " + debugList);
         SendNewPlayerDataBackClientRpc(id, team, spawnPos);
         UpdateClientTeamColorsClientRpc(team1, team2);
+    }
+
+    [ServerRpc(RequireOwnership = false)]
+    public void SpawnNewPlayerHostServerRpc(ulong id)
+    {
+        Debug.Log("Player Spawned On Host");
+        GameObject client = GameObject.Instantiate(clientPrefab, Vector3.zero, Quaternion.identity);
+        client.GetComponent<NetworkObject>().SpawnWithOwnership(id);
     }
 
     /// <summary>

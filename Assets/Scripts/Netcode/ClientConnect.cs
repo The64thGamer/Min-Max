@@ -22,8 +22,10 @@ public class ClientConnect : NetworkBehaviour
         {
             yield return null;
         }
-        if (!IsHost) { Destroy(this.gameObject); }
-        netcodeManager.SpawnNewPlayerHost(OwnerClientId);
+        if (IsOwner)
+        {
+            netcodeManager.SpawnNewPlayerHostServerRpc(OwnerClientId);
+        }
         Destroy(this.gameObject);
     }
 }
