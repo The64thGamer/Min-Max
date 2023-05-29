@@ -27,6 +27,7 @@ public class GenericGun : Gun
     bool showCrosshair;
     Transform currentParent;
     GunProjectiles defaultStats;
+    bool dumbstupidjank;
 
     public void Start()
     {
@@ -50,6 +51,19 @@ public class GenericGun : Gun
             transform.position = currentParent.position;
             transform.rotation = currentParent.rotation;
             transform.localScale = currentParent.localScale;
+
+            //Dumb stupid jank, please remove this and do proper weapon animations
+            if(dumbstupidjank)
+            {
+                //playermodel version jank
+                transform.localEulerAngles += new Vector3(-82.163f, 180.119f, -27.053f);
+            }
+            else
+            {
+                //vr mode jank
+                transform.localPosition += transform.up * -.15f;
+                transform.localPosition += transform.forward * -.1f;
+            }
         }
 
         if (gm != null)
@@ -114,9 +128,10 @@ public class GenericGun : Gun
         return 0;
     }
 
-    public override void SetGunTransformParent(Transform parent)
+    public override void SetGunTransformParent(Transform parent, bool dumbStupidJank)
     {
         currentParent = parent;
+        dumbstupidjank = dumbStupidJank;
     }
 
 }

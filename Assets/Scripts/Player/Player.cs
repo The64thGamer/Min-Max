@@ -237,11 +237,11 @@ public class Player : NetworkBehaviour
         {
             if (visible)
             {
-                currentGun.SetGunTransformParent(playerModels[(int)currentClass].GetNamedChild("Gun R").transform);
+                currentGun.SetGunTransformParent(playerModels[(int)currentClass].GetNamedChild("Gun R").transform,true);
             }
             else
             {
-                currentGun.SetGunTransformParent(tracker.GetRightHand());
+                currentGun.SetGunTransformParent(tracker.GetRightHand(),false);
             }
         }
     }

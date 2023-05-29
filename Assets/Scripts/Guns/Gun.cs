@@ -11,7 +11,7 @@ public abstract class Gun : MonoBehaviour
     public abstract int GetCurrentAmmo();
     public abstract string GetNameKey();
     public abstract int SearchStats(ChangableWeaponStats stat);
-    public abstract void SetGunTransformParent(Transform parent);
+    public abstract void SetGunTransformParent(Transform parent, bool dumbStupidJank);
     public abstract void SetPlayer(Player player);
 
 }
