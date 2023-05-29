@@ -359,7 +359,6 @@ public class GlobalManager : NetworkBehaviour
             if (clients[i].OwnerClientId == id && !clients[i].IsOwner)
             {
                 clients[i].GetTracker().UpdatePlayerPositions(serverData);
-                clients[i].GetTracker().SetPlayerMoveAxis(serverData.rightJoystick);
                 return;
             }
         }
@@ -499,6 +498,9 @@ public struct PlayerDataSentToServer : INetworkSerializable
 
     //Controls
     public Vector2 rightJoystick;
+    public bool jump;
+    public bool shoot;
+
 
     public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
     {
@@ -509,5 +511,7 @@ public struct PlayerDataSentToServer : INetworkSerializable
         serializer.SerializeValue(ref lHandPos);
         serializer.SerializeValue(ref lHandRot);
         serializer.SerializeValue(ref rightJoystick);
+        serializer.SerializeValue(ref jump);
+        serializer.SerializeValue(ref shoot);
     }
 }

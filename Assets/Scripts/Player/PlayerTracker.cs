@@ -131,6 +131,9 @@ public class PlayerTracker : NetworkBehaviour
         rightController.rotation = data.rHandRot;
         leftController.localPosition = data.lHandPos;
         leftController.rotation = data.lHandRot;
+        movementAxis = data.rightJoystick;
+        rhandAButton = data.jump;
+        triggerR = data.shoot;
     }
 
     public PlayerDataSentToClient GetPlayerPosData()
@@ -155,6 +158,8 @@ public class PlayerTracker : NetworkBehaviour
         return new PlayerDataSentToServer()
         {
             rightJoystick = GetMoveAxis(),
+            jump = jump.action.IsPressed(),
+            shoot = triggerRAction.action.IsPressed(),
             headsetPos = headset.localPosition,
             headsetRot = headset.rotation,
             rHandPos = rightController.localPosition,
@@ -271,14 +276,6 @@ public class PlayerTracker : NetworkBehaviour
     public Transform GetModelRoot()
     {
         return modelRoot;
-    }
-
-    public void SetPlayerMoveAxis(Vector2 axis)
-    {
-        if (!IsOwner)
-        {
-            movementAxis = axis;
-        }
     }
 
     public void SetCharacter(Animator playerAnim, Transform rootModel, Transform rHandPlayer, Transform headPlayer)
