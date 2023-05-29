@@ -39,6 +39,13 @@ public class PlayerTracker : NetworkBehaviour
     bool triggerL;
     bool rhandAButton;
 
+    //Wackness
+    Vector3 prevRHandPos;
+    Vector3 prevRHandForward;
+    Vector3 prevRHandUp;
+    Vector3 prevRHandRight;
+
+
     //Prediction Values
     float predictionTime;
     Vector3 predictedVelocity;
@@ -64,6 +71,11 @@ public class PlayerTracker : NetworkBehaviour
 
     void LateUpdate()
     {
+        prevRHandPos = rightController.position;
+        prevRHandForward = rightController.forward;
+        prevRHandUp = rightController.up;
+        prevRHandRight = rightController.right;
+
         if (animController != null && animController.gameObject.activeSelf)
         {
             animController.SetFloat("HandX", CalcLerpVector3(centerPos.position, rightPos.position, rightController.position, false) - CalcLerpVector3(centerPos.position, leftPos.position, rightController.position, false));
@@ -214,10 +226,10 @@ public class PlayerTracker : NetworkBehaviour
 
     public Vector3 GetRightHandFirePos(Vector3 firePosition)
     {
-        Vector3 pos = rightController.localPosition;
-        pos += rightController.right * firePosition.x;
-        pos += rightController.up * firePosition.y;
-        pos += rightController.forward * firePosition.z;
+        Vector3 pos = prevRHandPos;
+        pos += prevRHandRight * firePosition.x;
+        pos += prevRHandUp * firePosition.y;
+        pos += prevRHandForward * firePosition.z;
         return pos;
     }
 
