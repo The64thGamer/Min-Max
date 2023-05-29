@@ -214,13 +214,11 @@ public class PlayerTracker : NetworkBehaviour
 
     public Vector3 GetRightHandFirePos(Vector3 firePosition)
     {
-        Vector3 oldPos = rightController.localPosition;
-        rightController.localPosition += rightController.right * firePosition.x;
-        rightController.localPosition += rightController.up * firePosition.y;
-        rightController.localPosition += rightController.forward * firePosition.z;
-        Vector3 newPos = rightController.position;
-        rightController.localPosition = oldPos;
-        return newPos;
+        Vector3 pos = rightController.localPosition;
+        pos += rightController.right * firePosition.x;
+        pos += rightController.up * firePosition.y;
+        pos += rightController.forward * firePosition.z;
+        return pos;
     }
 
     public Vector3 GetVelocity()
