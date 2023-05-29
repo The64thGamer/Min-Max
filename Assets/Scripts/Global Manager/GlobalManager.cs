@@ -228,13 +228,7 @@ public class GlobalManager : NetworkBehaviour
         {
             if (player.GetTracker().GetTriggerR())
             {
-                for (int i = 0; i < clients.Count; i++)
-                {
-                    if (clients[i].GetCurrentGun())
-                    {
-                        clients[i].GetCurrentGun().Fire();
-                    }
-                }
+                player.GetCurrentGun().Fire();
             }
         }
     }
