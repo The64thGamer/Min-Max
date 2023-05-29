@@ -266,4 +266,12 @@ public class PlayerTracker : NetworkBehaviour
             movementAxis = axis;
         }
     }
+
+    public void SetCharacter(Animator playerAnim, Transform rootModel, Transform rHandPlayer, Transform headPlayer)
+    {
+        animController = playerAnim;
+        modelRoot = rootModel;
+        playerRHand = rHandPlayer;
+        playerHead = headPlayer;
+    }
 }

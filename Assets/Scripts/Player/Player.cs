@@ -197,6 +197,22 @@ public class Player : NetworkBehaviour
                 if (i == (int)currentClass)
                 {
                     playerModels[i].SetActive(true);
+                    Transform handR = null;
+                    Transform head = null;
+
+                    foreach (Transform g in transform.GetComponentsInChildren<Transform>())
+                    {
+                        if(g.name == "Hand R")
+                        {
+                            handR = g;
+                        }
+                        if (g.name == "Head")
+                        {
+                            head = g;
+                        }
+                    }
+
+                    GetTracker().SetCharacter(playerModels[i].GetComponentInChildren<Animator>(), playerModels[i].transform, handR, head);
                 }
                 else
                 {
