@@ -38,5 +38,9 @@ public class MouseLook : NetworkBehaviour
         cam.transform.localPosition = Vector3.zero;
         handR.rotation = rot;
         handL.rotation = rot;
+        if(Input.GetKey(KeyCode.Escape))
+        {
+            Application.Quit();
+        }
     }
 }
