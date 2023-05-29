@@ -233,6 +233,11 @@ public class PlayerTracker : NetworkBehaviour
         return pos;
     }
 
+    public Vector3 GetRightHandSafeForward()
+    {
+        return prevRHandForward;
+    }
+
     public Vector3 GetVelocity()
     {
         return charController.velocity;

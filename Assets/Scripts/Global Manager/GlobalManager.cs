@@ -256,22 +256,22 @@ public class GlobalManager : NetworkBehaviour
     //Crosshair doesn't recalculate if it doesn't collide with a wall, fix it.
     public Vector3 CalculateFireAngle(Player player, Vector3 firePoint)
     {
+        Transform cam = player.GetTracker().GetCamera();
         RaycastHit hit;
-        Vector3 startCast = player.GetTracker().GetCamera().position + (player.GetTracker().GetCamera().forward * SPHERESIZE);
+        Vector3 startCast = cam.position + (cam.forward * SPHERESIZE);
         Vector3 finalAngle = Vector3.one;
 
         LayerMask layermask = GetIgnoreTeamAndVRLayerMask(player);
 
-        Transform rHand = player.GetTracker().GetRightHand();
-        Vector3 fpForward = rHand.forward;
+        Vector3 fpForward = player.GetTracker().GetRightHandSafeForward();
 
-        if (Physics.SphereCast(startCast, SPHERESIZE, player.GetTracker().GetCamera().forward, out hit, MAXSPHERECASTDISTANCE, layermask))
+        if (Physics.SphereCast(startCast, SPHERESIZE, cam.forward, out hit, MAXSPHERECASTDISTANCE, layermask))
         {
-            finalAngle = ((startCast + (player.GetTracker().GetCamera().forward * hit.distance)) - firePoint);
+            finalAngle = ((startCast + (cam.forward * hit.distance)) - firePoint);
         }
         else
         {
-            finalAngle = player.GetTracker().GetCamera().forward;
+            finalAngle = cam.forward;
         }
         float dotAngle = Vector3.Dot(fpForward, finalAngle.normalized);
         if (dotAngle > MINANGLE)
