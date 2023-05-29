@@ -258,16 +258,15 @@ public class GlobalManager : NetworkBehaviour
     {
         Transform cam = player.GetTracker().GetCamera();
         RaycastHit hit;
-        Vector3 startCast = cam.position + (cam.forward * SPHERESIZE);
         Vector3 finalAngle = Vector3.one;
 
         LayerMask layermask = GetIgnoreTeamAndVRLayerMask(player);
 
         Vector3 fpForward = player.GetTracker().GetRightHandSafeForward();
 
-        if (Physics.SphereCast(startCast, SPHERESIZE, cam.forward, out hit, MAXSPHERECASTDISTANCE, layermask))
+        if (Physics.Raycast(cam.position, cam.forward, out hit, MAXSPHERECASTDISTANCE, layermask))
         {
-            finalAngle = ((startCast + (cam.forward * hit.distance)) - firePoint);
+            finalAngle = ((cam.position + (cam.forward * hit.distance)) - firePoint);
         }
         else
         {
@@ -286,9 +285,8 @@ public class GlobalManager : NetworkBehaviour
     public Vector3 CalculcateFirePosition(Vector3 fireAngle, Player player, Vector3 firePoint)
     {
         RaycastHit hit;
-        Transform rHand = player.GetTracker().GetRightHand();
         LayerMask layermask = GetIgnoreTeamAndVRLayerMask(player);
-        float dotAngle = Vector3.Dot(rHand.forward, fireAngle.normalized);
+        float dotAngle = Vector3.Dot(player.GetTracker().GetRightHandSafeForward(), fireAngle.normalized);
         if (dotAngle > MINANGLE)
         {
             if (Physics.Raycast(firePoint, fireAngle, out hit, MAXRAYCASTDISTANCE, layermask))
