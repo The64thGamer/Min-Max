@@ -33,7 +33,15 @@ public class Player : NetworkBehaviour
 
 
         //Debug Default
-        SetClass(ClassList.programmer);
+        if(GetPlayerID() % 2 == 0)
+        {
+            SetClass(ClassList.programmer);
+
+        }
+        else
+        {
+            SetClass(ClassList.fabricator);
+        }
         SetGun(gm.GetComponent<AllStats>().SearchGuns("Worker Ionizing Pistol"));
 
         //After
