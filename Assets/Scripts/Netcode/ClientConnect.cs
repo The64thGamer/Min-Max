@@ -18,14 +18,18 @@ public class ClientConnect : NetworkBehaviour
     IEnumerator ServerStartCheck()
     {
         GlobalManager netcodeManager = GameObject.Find("Global Manager").GetComponent<GlobalManager>();
-        while (!netcodeManager.GetServerStatus())
+        if (IsHost)
         {
-            yield return null;
+            //Wait for server to boot up
+            while (!netcodeManager.GetServerStatus())
+            {
+                yield return null;
+            }
         }
         if (IsOwner)
         {
             netcodeManager.SpawnNewPlayerHostServerRpc(OwnerClientId);
         }
-        Destroy(this.gameObject);
+        //Destroy(this.gameObject);
     }
 }

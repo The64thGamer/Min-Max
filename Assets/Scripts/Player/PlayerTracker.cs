@@ -113,7 +113,6 @@ public class PlayerTracker : NetworkBehaviour
 
     public void UpdatePlayerPositions(PlayerDataSentToServer data)
     {
-        Debug.Log("well its running " + data.headsetRot + " id " + player.GetPlayerID());
         headset.localPosition = data.headsetPos;
         headset.rotation = data.headsetRot;
         rightController.localPosition = data.rHandPos;
