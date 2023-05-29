@@ -72,7 +72,7 @@ public class PlayerTracker : NetworkBehaviour
             playerRHand.Rotate(new Vector3(-90, 180, 0));
             playerRHand.Rotate(new Vector3(9.99f, 27.48f, 0));
             playerHead.rotation = headset.rotation;
-            modelRoot.rotation = Quaternion.Lerp(modelRoot.rotation, playerHead.rotation, Time.deltaTime);
+            modelRoot.rotation = Quaternion.Lerp(modelRoot.rotation, playerHead.rotation, Time.deltaTime*3);
             modelRoot.eulerAngles = new Vector3(0, modelRoot.eulerAngles.y, 0);
             modelRoot.position = forwardRoot.position;
         }
