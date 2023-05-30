@@ -81,7 +81,10 @@ public class GlobalManager : NetworkBehaviour
         for (int i = 0; i < clients.Count; i++)
         {
             //Game Logic
-            CheckAllPlayerInputs(clients[i]);
+            if (clients[i].GetTracker().GetTriggerR())
+            {
+                clients[i].GetCurrentGun().Fire();
+            }
             clients[i].GetController().MovePlayer(clients[i].GetTracker().GetMoveAxis(), clients[i].GetTracker().GetRHandAButton());
 
             //Client Networking
@@ -220,17 +223,6 @@ public class GlobalManager : NetworkBehaviour
             clients[i].UpdateTeamColor();
         }
         Debug.Log("Teams Selected: " + team1 + ", " + team2);
-    }
-
-    void CheckAllPlayerInputs(Player player)
-    {
-        if (player != null)
-        {
-            if (player.GetTracker().GetTriggerR())
-            {
-                player.GetCurrentGun().Fire();
-            }
-        }
     }
 
     //Exploit: Hit needs to be parsed to ensure extreme angles aren't achievable.

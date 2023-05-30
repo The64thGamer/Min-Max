@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -18,6 +19,7 @@ public class GenericGun : Gun
     [SerializeField] Player currentPlayer;
     [SerializeField] AudioClip fireSound;
     [SerializeField] string gunNameKey;
+    [SerializeField] Transform superJank;
 
     int currentAmmo;
     float fireCooldown;
@@ -56,7 +58,7 @@ public class GenericGun : Gun
             if(dumbstupidjank)
             {
                 //playermodel version jank
-                transform.localEulerAngles += new Vector3(-82.163f, 180.119f, -27.053f);
+                transform.rotation = superJank.rotation;
             }
             else
             {
