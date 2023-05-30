@@ -351,8 +351,12 @@ public class GlobalManager : NetworkBehaviour
     }
 
     [ServerRpc(RequireOwnership = false)]
-    public void AssignNewClientServerRpc(ulong id)
+    public void SpawnNewPlayerHostServerRpc(ulong id)
     {
+        Debug.Log("Player Spawned On Host");
+        GameObject client = GameObject.Instantiate(clientPrefab, Vector3.zero, Quaternion.identity);
+        client.GetComponent<NetworkObject>().SpawnWithOwnership(id);
+
         //Client Object Spawning
         bool team = clients.Count % 2 != 0;
         Vector3 spawnPos;
@@ -395,14 +399,6 @@ public class GlobalManager : NetworkBehaviour
         }
         SendAllPlayerDataToNewPlayerClientRpc(data, id);
         UpdateClientTeamColorsClientRpc(team1, team2);
-    }
-
-    [ServerRpc(RequireOwnership = false)]
-    public void SpawnNewPlayerHostServerRpc(ulong id)
-    {
-        Debug.Log("Player Spawned On Host");
-        GameObject client = GameObject.Instantiate(clientPrefab, Vector3.zero, Quaternion.identity);
-        client.GetComponent<NetworkObject>().SpawnWithOwnership(id);
     }
 
     /// <summary>

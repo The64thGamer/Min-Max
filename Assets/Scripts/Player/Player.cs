@@ -38,7 +38,6 @@ public class Player : NetworkBehaviour
         //After
         if (IsOwner)
         {
-            gm.AssignNewClientServerRpc(OwnerClientId);
             SetCharacterVisibility(false);
         }
         else
