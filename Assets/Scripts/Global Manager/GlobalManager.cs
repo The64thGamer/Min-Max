@@ -121,28 +121,28 @@ public class GlobalManager : NetworkBehaviour
                 switch (teamRef)
                 {
                     case TeamList.orange:
-                        otherOptions = new TeamList[]{TeamList.green,TeamList.lightBlue,TeamList.blue,TeamList.purple,TeamList.brown};
+                        otherOptions = new TeamList[] { TeamList.green, TeamList.lightBlue, TeamList.blue, TeamList.purple, TeamList.brown };
                         break;
                     case TeamList.yellow:
-                        otherOptions = new TeamList[] {TeamList.green, TeamList.lightBlue, TeamList.blue, TeamList.purple, TeamList.brown};
+                        otherOptions = new TeamList[] { TeamList.green, TeamList.lightBlue, TeamList.blue, TeamList.purple, TeamList.brown };
                         break;
                     case TeamList.green:
-                        otherOptions = new TeamList[] { TeamList.orange,TeamList.blue, TeamList.purple, TeamList.beige, TeamList.brown};
+                        otherOptions = new TeamList[] { TeamList.orange, TeamList.blue, TeamList.purple, TeamList.beige, TeamList.brown };
                         break;
                     case TeamList.lightBlue:
-                        otherOptions = new TeamList[] { TeamList.orange, TeamList.yellow,TeamList.purple, TeamList.beige, TeamList.brown};
+                        otherOptions = new TeamList[] { TeamList.orange, TeamList.yellow, TeamList.purple, TeamList.beige, TeamList.brown };
                         break;
                     case TeamList.blue:
-                        otherOptions = new TeamList[] { TeamList.orange, TeamList.yellow, TeamList.green,TeamList.beige, TeamList.brown};
+                        otherOptions = new TeamList[] { TeamList.orange, TeamList.yellow, TeamList.green, TeamList.beige, TeamList.brown };
                         break;
                     case TeamList.purple:
-                        otherOptions = new TeamList[] {TeamList.yellow, TeamList.green, TeamList.lightBlue,TeamList.beige, TeamList.brown};
+                        otherOptions = new TeamList[] { TeamList.yellow, TeamList.green, TeamList.lightBlue, TeamList.beige, TeamList.brown };
                         break;
                     case TeamList.beige:
-                        otherOptions = new TeamList[] {TeamList.green, TeamList.lightBlue, TeamList.blue, TeamList.purple, TeamList.brown};
+                        otherOptions = new TeamList[] { TeamList.green, TeamList.lightBlue, TeamList.blue, TeamList.purple, TeamList.brown };
                         break;
                     case TeamList.brown:
-                        otherOptions = new TeamList[] {TeamList.yellow, TeamList.green, TeamList.lightBlue, TeamList.blue, TeamList.purple, TeamList.beige};
+                        otherOptions = new TeamList[] { TeamList.yellow, TeamList.green, TeamList.lightBlue, TeamList.blue, TeamList.purple, TeamList.beige };
                         break;
                     case TeamList.gray:
                         break;
@@ -369,9 +369,31 @@ public class GlobalManager : NetworkBehaviour
             team2SpawnIndex = (team2SpawnIndex + 1) % team2Spawns.childCount;
             debugList = GetTeam2();
         }
+        //Auto Team
+        ClassList autoClass = ClassList.programmer;
+        if (id % 2 == 0)
+        {
+            autoClass = ClassList.programmer;
+
+        }
+        else
+        {
+            autoClass = ClassList.fabricator;
+        }
 
         Debug.Log("New Player Joined (#" + clients.Count + "), Team " + debugList);
-        SendNewPlayerDataBackClientRpc(id, team, spawnPos);
+        SendNewPlayerDataBackClientRpc(id, team, spawnPos, autoClass);
+        PlayerInfoSentToClient[] data = new PlayerInfoSentToClient[clients.Count];
+        for (int i = 0; i < clients.Count; i++)
+        {
+            data[i] = new PlayerInfoSentToClient
+            {
+                id = clients[i].GetPlayerID(),
+                currentTeam = clients[i].GetTeam(),
+                currentClass = clients[i].GetCurrentClass(),
+            };
+        }
+        SendAllPlayerDataToNewPlayerClientRpc(data, id);
         UpdateClientTeamColorsClientRpc(team1, team2);
     }
 
@@ -411,27 +433,46 @@ public class GlobalManager : NetworkBehaviour
     }
 
     [ClientRpc]
-    void SendNewPlayerDataBackClientRpc(ulong id, bool team, Vector3 spawnPos)
+    void SendNewPlayerDataBackClientRpc(ulong id, bool team, Vector3 spawnPos, ClassList autoClass)
     {
-        Player player = null;
         for (int i = 0; i < clients.Count; i++)
         {
             if (clients[i].GetPlayerID() == id)
             {
-                player = clients[i];
+                if (team)
+                {
+                    clients[i].SetTeam(Team.team1);
+                }
+                else
+                {
+                    clients[i].SetTeam(Team.team2);
+                }
+                clients[i].SetClass(autoClass);
+                clients[i].GetTracker().ForceNewPosition(spawnPos);
             }
         }
-        if (player != null)
+    }
+
+    [ClientRpc]
+    void SendAllPlayerDataToNewPlayerClientRpc(PlayerInfoSentToClient[] data, ulong id)
+    {
+        for (int i = 0; i < clients.Count; i++)
         {
-            if (team)
+            if (clients[i].GetPlayerID() == id)
             {
-                player.SetTeam(Team.team1);
+                for (int e = 0; e < clients.Count; e++)
+                {
+                    for (int j = 0; j < data.Length; j++)
+                    {
+                        if (clients[e].GetPlayerID() == data[j].id)
+                        {
+                            clients[e].SetClass(data[j].currentClass);
+                            clients[e].SetTeam(data[j].currentTeam);
+                        }
+                    }
+                }
+                return;
             }
-            else
-            {
-                player.SetTeam(Team.team2);
-            }
-            player.GetTracker().ForceNewPosition(spawnPos);
         }
     }
 
@@ -469,6 +510,21 @@ public struct PlayerDataSentToClient : INetworkSerializable
         serializer.SerializeValue(ref lHandRot);
         serializer.SerializeValue(ref pos);
         serializer.SerializeValue(ref velocity);
+    }
+}
+
+[System.Serializable]
+public struct PlayerInfoSentToClient : INetworkSerializable
+{
+    public ulong id;
+    public ClassList currentClass;
+    public Team currentTeam;
+
+    public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
+    {
+        serializer.SerializeValue(ref id);
+        serializer.SerializeValue(ref currentClass);
+        serializer.SerializeValue(ref currentTeam);
     }
 }
 
