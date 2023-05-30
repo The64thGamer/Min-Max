@@ -353,6 +353,14 @@ public class GlobalManager : NetworkBehaviour
     [ServerRpc(RequireOwnership = false)]
     public void SpawnNewPlayerHostServerRpc(ulong id)
     {
+        for (int i = 0; i < clients.Count; i++)
+        {
+            if (clients[i].GetPlayerID() == id)
+            {
+                Debug.Log("Player " + id + " attempted to request more that one player object.");
+                return;
+            }
+        }
         Debug.Log("Player Spawned On Host");
         GameObject client = GameObject.Instantiate(clientPrefab, Vector3.zero, Quaternion.identity);
         client.GetComponent<NetworkObject>().SpawnWithOwnership(id);
