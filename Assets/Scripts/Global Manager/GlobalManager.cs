@@ -357,7 +357,7 @@ public class GlobalManager : NetworkBehaviour
         {
             if (clients[i].GetPlayerID() == id)
             {
-                Debug.Log("Player " + id + " attempted to request more that one player object.");
+                Debug.Log("Player " + id + " attempted to request more than one player object.");
                 return;
             }
         }
