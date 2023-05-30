@@ -21,6 +21,7 @@ public class Player : NetworkBehaviour
     [SerializeField] Transform clientSetup;
     [SerializeField] GameObject[] playerModels;
     GlobalManager gm;
+    bool currentPlayerVisibility;
 
     public override void OnNetworkSpawn()
     {
@@ -31,17 +32,7 @@ public class Player : NetworkBehaviour
         gm = GameObject.Find("Global Manager").GetComponent<GlobalManager>();
         gm.AddPlayerToClientList(this);
 
-
         //Debug Default
-        if(GetPlayerID() % 2 == 0)
-        {
-            SetClass(ClassList.programmer);
-
-        }
-        else
-        {
-            SetClass(ClassList.fabricator);
-        }
         SetGun(gm.GetComponent<AllStats>().SearchGuns("Worker Ionizing Pistol"));
 
         //After
@@ -78,6 +69,7 @@ public class Player : NetworkBehaviour
     {
         currentClass = setClass;
         currentStats = gm.GetComponent<AllStats>().GetClassStats(ClassList.programmer);
+        SetCharacterVisibility(currentPlayerVisibility);
         UpdateTeamColor();
     }
 
@@ -198,6 +190,7 @@ public class Player : NetworkBehaviour
 
     public void SetCharacterVisibility(bool visible)
     {
+        currentPlayerVisibility = visible;
         for (int i = 0; i < playerModels.Length; i++)
         {
             if (visible)
