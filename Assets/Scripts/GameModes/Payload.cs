@@ -22,7 +22,7 @@ public class Payload : GenericGamemode
         {
             TeamInfo nextTeam = new TeamInfo();
             nextTeam.spawns = gm.GetTeamSpawns()[i + 1];
-            nextTeam.teamColor = SelectTeams(gm.GetTeamColors(), PlayerPrefs.GetInt("Team1Setting"));
+            nextTeam.teamColor = SelectTeams(gm.GetTeamColors(), PlayerPrefs.GetInt("Team" + (i + 1) + "Setting"));
         }
     }
 }

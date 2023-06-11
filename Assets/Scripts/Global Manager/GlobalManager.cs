@@ -29,6 +29,7 @@ public class GlobalManager : NetworkBehaviour
     int team2SpawnIndex = 0;
     float tickTimer;
     bool serverStarted;
+    GenericGamemode currentGamemode;
 
     //Constants
     const float MINANGLE = 0.8f;
@@ -40,6 +41,7 @@ public class GlobalManager : NetworkBehaviour
     {
         NetworkManager.Singleton.OnServerStarted += ServerStarted;
         al = GetComponent<AllStats>();
+        currentGamemode = GetComponent<GenericGamemode>();
 
         //Settings
         NetworkManager.GetComponent<UnityTransport>().ConnectionData.Port = (ushort)PlayerPrefs.GetInt("ServerPort");
@@ -49,15 +51,13 @@ public class GlobalManager : NetworkBehaviour
         {
             case 0:
                 NetworkManager.Singleton.StartHost();
-                team1 = SelectTeams(team1, team2, PlayerPrefs.GetInt("Team1Setting"));
-                team2 = SelectTeams(team2, team1, PlayerPrefs.GetInt("Team2Setting"));
+                currentGamemode.SetTeams();
                 ModifyTeamsAcrossServer();
                 Debug.Log("Started Host");
                 break;
             case 1:
                 NetworkManager.Singleton.StartHost();
-                team1 = SelectTeams(team1, team2, PlayerPrefs.GetInt("Team1Setting"));
-                team2 = SelectTeams(team2, team1, PlayerPrefs.GetInt("Team2Setting"));
+                currentGamemode.SetTeams();
                 ModifyTeamsAcrossServer();
                 Debug.Log("Started Host");
                 break;
