@@ -6,13 +6,14 @@ using Unity.XR.CoreUtils;
 using UnityEngine;
 using UnityEngine.InputSystem.XR;
 using UnityEngine.Rendering.Universal;
+using UnityEngine.UI;
 using UnityEngine.UIElements;
 using UnityEngine.XR.Interaction.Toolkit;
 
 public class Player : NetworkBehaviour
 {
     [SerializeField] Gun currentGun;
-    [SerializeField] Team currentTeam;
+    [SerializeField] TeamList currentTeam;
     [SerializeField] ClassList currentClass;
     [SerializeField] ClassStats currentStats;
     [SerializeField] PlayerTracker tracker;
@@ -72,7 +73,7 @@ public class Player : NetworkBehaviour
         UpdateTeamColor();
     }
 
-    public void SetTeam(Team team)
+    public void SetTeam(TeamList team)
     {
         currentTeam = team;
         Transform[] allBits = this.GetComponentsInChildren<Transform>();
@@ -86,7 +87,7 @@ public class Player : NetworkBehaviour
 
     public void SetGun(GunProjectiles gun)
     {
-        GameObject gunObject = GameObject.Instantiate(gun.gunPrefab, Vector3.zero, Quaternion.identity,this.transform);
+        GameObject gunObject = GameObject.Instantiate(gun.gunPrefab, Vector3.zero, Quaternion.identity, this.transform);
         gunObject.GetComponent<Gun>().SetPlayer(this);
         currentGun = gunObject.GetComponent<Gun>();
         UpdateTeamColor();
@@ -94,25 +95,13 @@ public class Player : NetworkBehaviour
 
     public void UpdateTeamColor()
     {
-        TeamList currentList = TeamList.gray;
-        switch (currentTeam)
-        {
-            case Team.team1:
-                currentList = gm.GetTeam1();
-                break;
-            case Team.team2:
-                currentList = gm.GetTeam2();
-                break;
-            default:
-                break;
-        }
 
         //Player
-        float teamFinal = (float)currentList + 1;
+        float teamFinal = (float)currentTeam + 1;
         Renderer[] meshes = this.GetComponentsInChildren<Renderer>();
         for (int i = 0; i < meshes.Length; i++)
         {
-            Material[] mats = meshes[i].materials; 
+            Material[] mats = meshes[i].materials;
             for (int r = 0; r < mats.Length; r++)
             {
                 mats[r].SetFloat("_Team_1", teamFinal);
@@ -178,12 +167,26 @@ public class Player : NetworkBehaviour
     {
         switch (currentTeam)
         {
-            case Team.team1:
-                return LayerMask.NameToLayer("Team1");
-            case Team.team2:
-                return LayerMask.NameToLayer("Team2");
+            case TeamList.orange:
+                return LayerMask.NameToLayer("OrangeTeam");
+            case TeamList.yellow:
+                return LayerMask.NameToLayer("YellowTeam");
+            case TeamList.green:
+                return LayerMask.NameToLayer("GreenTeam");
+            case TeamList.lightBlue:
+                return LayerMask.NameToLayer("LightBlueTeam");
+            case TeamList.blue:
+                return LayerMask.NameToLayer("BlueTeam");
+            case TeamList.purple:
+                return LayerMask.NameToLayer("PurpleTeam");
+            case TeamList.beige:
+                return LayerMask.NameToLayer("BeigeTeam");
+            case TeamList.brown:
+                return LayerMask.NameToLayer("BrownTeam");
+            case TeamList.gray:
+                return LayerMask.NameToLayer("GrayTeam");
             default:
-                return LayerMask.NameToLayer("Neutral");
+                return LayerMask.NameToLayer("GrayTeam");
         }
     }
 
@@ -202,7 +205,7 @@ public class Player : NetworkBehaviour
 
                     foreach (Transform g in transform.GetComponentsInChildren<Transform>())
                     {
-                        if(g.name == "Hand R")
+                        if (g.name == "Hand R")
                         {
                             handR = g;
                         }
@@ -229,11 +232,11 @@ public class Player : NetworkBehaviour
         {
             if (visible)
             {
-                currentGun.SetGunTransformParent(playerModels[(int)currentClass].GetNamedChild("Gun R").transform,true);
+                currentGun.SetGunTransformParent(playerModels[(int)currentClass].GetNamedChild("Gun R").transform, true);
             }
             else
             {
-                currentGun.SetGunTransformParent(tracker.GetRightHand(),false);
+                currentGun.SetGunTransformParent(tracker.GetRightHand(), false);
             }
         }
     }

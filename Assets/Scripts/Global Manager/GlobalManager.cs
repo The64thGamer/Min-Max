@@ -236,6 +236,7 @@ public class GlobalManager : NetworkBehaviour
                 mask = 1 << LayerMask.NameToLayer("GrayTeam");
                 break;
             default:
+                mask = 1 << LayerMask.NameToLayer("GrayTeam");
                 break;
         }
         mask = mask | vrLayers;
