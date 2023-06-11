@@ -1,5 +1,7 @@
+using NUnit.Framework;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 [ExecuteInEditMode]
@@ -15,7 +17,7 @@ public class GlobalTeamChanger : MonoBehaviour
     }
     void Update()
     {
-        if(oldTeam != teams)
+        if(!Enumerable.SequenceEqual(oldTeam, teams))
         {
             oldTeam = teams;
             RepaintTeams();

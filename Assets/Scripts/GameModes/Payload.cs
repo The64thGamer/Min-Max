@@ -15,6 +15,10 @@ public class Payload : GenericGamemode
 
     public override void SetTeams()
     {
+        if(gm == null)
+        {
+            gm = this.GetComponent<GlobalManager>();
+        }
         //Gray Team Always Team 0
         TeamInfo grayTeam = new TeamInfo() { spawns = 0, teamColor = TeamList.gray };
         gm.AddNewTeam(grayTeam);
