@@ -8,8 +8,7 @@ using UnityEngine;
 public class GlobalManager : NetworkBehaviour
 {
     [Header("Server Settings")]
-    [SerializeField] TeamList team1 = TeamList.gray;
-    [SerializeField] TeamList team2 = TeamList.gray;
+    [SerializeField] List<TeamInfo> teams = new List<TeamInfo>();
     [SerializeField] LayerMask vrLayers;
     [SerializeField] List<PlayerDataSentToClient> playerPosRPCData = new List<PlayerDataSentToClient>();
     [SerializeField] NetworkVariable<int> ServerTickRate = new NetworkVariable<int>(10);
@@ -110,76 +109,6 @@ public class GlobalManager : NetworkBehaviour
             }
         }
         tickTimer += Time.deltaTime;
-    }
-
-    TeamList SelectTeams(TeamList teamSet, TeamList teamRef, int setting)
-    {
-        TeamList[] otherOptions = new TeamList[0];
-        switch (setting)
-        {
-            case 0:
-                switch (teamRef)
-                {
-                    case TeamList.orange:
-                        otherOptions = new TeamList[] { TeamList.green, TeamList.lightBlue, TeamList.blue, TeamList.purple, TeamList.brown };
-                        break;
-                    case TeamList.yellow:
-                        otherOptions = new TeamList[] { TeamList.green, TeamList.lightBlue, TeamList.blue, TeamList.purple, TeamList.brown };
-                        break;
-                    case TeamList.green:
-                        otherOptions = new TeamList[] { TeamList.orange, TeamList.blue, TeamList.purple, TeamList.beige, TeamList.brown };
-                        break;
-                    case TeamList.lightBlue:
-                        otherOptions = new TeamList[] { TeamList.orange, TeamList.yellow, TeamList.purple, TeamList.beige, TeamList.brown };
-                        break;
-                    case TeamList.blue:
-                        otherOptions = new TeamList[] { TeamList.orange, TeamList.yellow, TeamList.green, TeamList.beige, TeamList.brown };
-                        break;
-                    case TeamList.purple:
-                        otherOptions = new TeamList[] { TeamList.yellow, TeamList.green, TeamList.lightBlue, TeamList.beige, TeamList.brown };
-                        break;
-                    case TeamList.beige:
-                        otherOptions = new TeamList[] { TeamList.green, TeamList.lightBlue, TeamList.blue, TeamList.purple, TeamList.brown };
-                        break;
-                    case TeamList.brown:
-                        otherOptions = new TeamList[] { TeamList.yellow, TeamList.green, TeamList.lightBlue, TeamList.blue, TeamList.purple, TeamList.beige };
-                        break;
-                    case TeamList.gray:
-                        break;
-                    default:
-                        break;
-                }
-                teamSet = otherOptions[Random.Range(0, otherOptions.Length)];
-                break;
-            case 1:
-                teamSet = TeamList.orange;
-                break;
-            case 2:
-                teamSet = TeamList.yellow;
-                break;
-            case 3:
-                teamSet = TeamList.green;
-                break;
-            case 4:
-                teamSet = TeamList.lightBlue;
-                break;
-            case 5:
-                teamSet = TeamList.blue;
-                break;
-            case 6:
-                teamSet = TeamList.purple;
-                break;
-            case 7:
-                teamSet = TeamList.beige;
-                break;
-            case 8:
-                teamSet = TeamList.brown;
-                break;
-            default:
-                teamSet = TeamList.gray;
-                break;
-        }
-        return teamSet;
     }
 
     public void ChangeTeams(TeamList teamOne, TeamList teamTwo)
@@ -487,6 +416,14 @@ public class GlobalManager : NetworkBehaviour
         ChangeTeams(a, b);
     }
 }
+
+[System.Serializable]
+public struct TeamInfo
+{
+    public TeamList teamColor;
+    public Transform spawns;
+}
+
 
 [System.Serializable]
 public struct PlayerDataSentToClient : INetworkSerializable
