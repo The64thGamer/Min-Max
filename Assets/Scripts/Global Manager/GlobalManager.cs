@@ -50,13 +50,11 @@ public class GlobalManager : NetworkBehaviour
             case 0:
                 NetworkManager.Singleton.StartHost();
                 currentGamemode.SetTeams();
-                ModifyTeamsAcrossServer();
                 Debug.Log("Started Host");
                 break;
             case 1:
                 NetworkManager.Singleton.StartHost();
                 currentGamemode.SetTeams();
-                ModifyTeamsAcrossServer();
                 Debug.Log("Started Host");
                 break;
             case 2:
@@ -109,7 +107,7 @@ public class GlobalManager : NetworkBehaviour
     }
 
 
-    void ModifyTeamsAcrossServer()
+    public void ModifyTeamsAcrossServer()
     {
         if (IsHost)
         {
@@ -255,13 +253,16 @@ public class GlobalManager : NetworkBehaviour
         return teams;
     }
 
-    public List<TeamList> GetTeamColors()
+    public List<TeamList> GetTeamColors(bool minusGrayTeam)
     {
         List<TeamList> colors = new List<TeamList>();
 
         for (int i = 0; i < teams.Count; i++)
         {
-            colors.Add(teams[i].teamColor);
+            if (!(minusGrayTeam && teams[i].teamColor == TeamList.gray))
+            {
+                colors.Add(teams[i].teamColor);
+            }
         }
 
         return colors;
