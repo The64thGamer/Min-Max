@@ -146,7 +146,7 @@ public class Player : NetworkBehaviour
         return controller;
     }
 
-    public Team GetTeam()
+    public TeamList GetTeam()
     {
         return currentTeam;
     }

@@ -208,14 +208,34 @@ public class GlobalManager : NetworkBehaviour
         LayerMask mask;
         switch (player.GetTeam())
         {
-            case Team.team1:
-                mask = 1 << LayerMask.NameToLayer("Team1");
+            case TeamList.orange:
+                mask = 1 << LayerMask.NameToLayer("OrangeTeam");
                 break;
-            case Team.team2:
-                mask = 1 << LayerMask.NameToLayer("Team2");
+            case TeamList.yellow:
+                mask = 1 << LayerMask.NameToLayer("YellowTeam");
+                break;
+            case TeamList.green:
+                mask = 1 << LayerMask.NameToLayer("GreenTeam");
+                break;
+            case TeamList.lightBlue:
+                mask = 1 << LayerMask.NameToLayer("LightBlueTeam");
+                break;
+            case TeamList.blue:
+                mask = 1 << LayerMask.NameToLayer("BlueTeam");
+                break;
+            case TeamList.purple:
+                mask = 1 << LayerMask.NameToLayer("PurpleTeam");
+                break;
+            case TeamList.beige:
+                mask = 1 << LayerMask.NameToLayer("BeigeTeam");
+                break;
+            case TeamList.brown:
+                mask = 1 << LayerMask.NameToLayer("BrownTeam");
+                break;
+            case TeamList.gray:
+                mask = 1 << LayerMask.NameToLayer("GrayTeam");
                 break;
             default:
-                mask = 1 << LayerMask.NameToLayer("Neutral");
                 break;
         }
         mask = mask | vrLayers;
@@ -444,7 +464,6 @@ public struct TeamInfo
     public TeamList teamColor;
     public Transform spawns;
 }
-
 
 [System.Serializable]
 public struct PlayerDataSentToClient : INetworkSerializable
