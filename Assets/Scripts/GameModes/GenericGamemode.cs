@@ -9,10 +9,9 @@ public abstract class GenericGamemode : MonoBehaviour
 
     public abstract void SetTeams();
 
-
-    TeamList SelectTeams(TeamList teamSet, List<TeamList> teamRef, int setting)
+    protected TeamList SelectTeams(List<TeamList> teamRef, int setting)
     {
-       
+        TeamList teamSet;
         switch (setting)
         {
             case 0:

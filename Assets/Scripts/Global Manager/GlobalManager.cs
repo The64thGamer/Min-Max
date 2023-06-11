@@ -16,8 +16,7 @@ public class GlobalManager : NetworkBehaviour
     [Header("Lists")]
     [SerializeField] GameObject clientPrefab;
     [SerializeField] List<Player> clients;
-    [SerializeField] Transform team1Spawns;
-    [SerializeField] Transform team2Spawns;
+    [SerializeField] List<Transform> teamSpawns;
     [SerializeField] Transform particleList;
 
     [Header("The Map")]
@@ -199,6 +198,11 @@ public class GlobalManager : NetworkBehaviour
         return firePoint + (100 * fireAngle.normalized);
     }
 
+    public List<Transform> GetTeamSpawns()
+    {
+        return teamSpawns;
+    }
+
     public LayerMask GetIgnoreTeamAndVRLayerMask(Player player)
     {
         LayerMask mask;
@@ -219,14 +223,31 @@ public class GlobalManager : NetworkBehaviour
         return mask;
     }
 
-    public TeamList GetTeam1()
+   public void AddNewTeam(TeamInfo newTeam)
     {
-        return team1;
+        teams.Add(newTeam);
     }
 
-    public TeamList GetTeam2()
+    public void ClearTeams()
     {
-        return team2;
+        teams = new List<TeamInfo>();
+    }
+
+    public List<TeamInfo> GetTeams()
+    {
+        return teams;
+    }
+
+    public List<TeamList> GetTeamColors()
+    {
+        List<TeamList> colors = new List<TeamList>();
+
+        for (int i = 0; i < teams.Count; i++)
+        {
+            colors.Add(teams[i].teamColor);
+        }
+
+        return colors;
     }
 
     public AllStats GetAllStats()
