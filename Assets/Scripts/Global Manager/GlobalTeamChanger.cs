@@ -5,28 +5,25 @@ using UnityEngine;
 [ExecuteInEditMode]
 public class GlobalTeamChanger : MonoBehaviour
 {
-    [SerializeField] TeamList team1;
-    [SerializeField] TeamList team2;
+    [SerializeField] List<TeamList> teams;
 
-    TeamList oldTeam1;
-    TeamList oldTeam2;
+    List<TeamList> oldTeam;
+
     private void Start()
     {
-        oldTeam1 = team1;
-        oldTeam2 = team2;
+        oldTeam = teams;
     }
     void Update()
     {
-        if(oldTeam1 != team1 || oldTeam2 != team2)
+        if(oldTeam != teams)
         {
-            oldTeam1 = team1;
-            oldTeam2 = team2;
+            oldTeam = teams;
             RepaintTeams();
         }
     }
 
     void RepaintTeams()
     {
-        this.GetComponent<GlobalManager>().ChangeTeams(team1, team2);
+        this.GetComponent<GenericGamemode>().SetTeams(teams);
     }
 }

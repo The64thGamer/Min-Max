@@ -6,8 +6,10 @@ using UnityEngine;
 
 public abstract class GenericGamemode : MonoBehaviour
 {
-
     public abstract void SetTeams();
+    public abstract void SetTeams(List<TeamList> setTeams);
+
+    public abstract TeamList DecideWhichPlayerTeam();
 
     protected TeamList SelectTeams(List<TeamList> teamRef, int setting)
     {

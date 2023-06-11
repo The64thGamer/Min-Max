@@ -25,8 +25,6 @@ public class GlobalManager : NetworkBehaviour
 
     //Ect
     AllStats al;
-    int team1SpawnIndex = 0;
-    int team2SpawnIndex = 0;
     float tickTimer;
     bool serverStarted;
     GenericGamemode currentGamemode;
@@ -110,48 +108,41 @@ public class GlobalManager : NetworkBehaviour
         tickTimer += Time.deltaTime;
     }
 
-    public void ChangeTeams(TeamList teamOne, TeamList teamTwo)
-    {
-        team1 = teamOne;
-        team2 = teamTwo;
-        ModifyTeamsAcrossServer();
-    }
 
     void ModifyTeamsAcrossServer()
     {
         if (IsHost)
         {
-            UpdateClientTeamColorsClientRpc(team1, team2);
+            UpdateClientTeamColorsClientRpc(teams.ToArray());
         }
-
-        float team1Final = (float)GetTeam1() + 1;
-        float team2Final = (float)GetTeam2() + 1;
-        Renderer[] meshes = mapProps.GetComponentsInChildren<Renderer>();
-        for (int i = 0; i < meshes.Length; i++)
+        for (int e = 0; e < teams.Count; e++)
         {
-            Material[] mats = meshes[i].sharedMaterials;
-            for (int r = 0; r < mats.Length; r++)
+            float team1Final = (float)teams[e].teamColor + 1;
+            Renderer[] meshes = mapProps.GetComponentsInChildren<Renderer>();
+            for (int i = 0; i < meshes.Length; i++)
             {
-                mats[r].SetFloat("_Team_1", team1Final);
-                mats[r].SetFloat("_Team_2", team2Final);
+                Material[] mats = meshes[i].sharedMaterials;
+                for (int r = 0; r < mats.Length; r++)
+                {
+                    mats[r].SetFloat("_Team_1", team1Final);
+                }
+            }
+            meshes = mapGeometry.GetComponentsInChildren<Renderer>();
+            for (int i = 0; i < meshes.Length; i++)
+            {
+                Material[] mats = meshes[i].sharedMaterials;
+                for (int r = 0; r < mats.Length; r++)
+                {
+                    mats[r].SetFloat("_Team_1", team1Final);
+                }
+            }
+            for (int i = 0; i < clients.Count; i++)
+            {
+                clients[i].UpdateTeamColor();
             }
         }
-        meshes = mapGeometry.GetComponentsInChildren<Renderer>();
-        for (int i = 0; i < meshes.Length; i++)
-        {
-            Material[] mats = meshes[i].sharedMaterials;
-            for (int r = 0; r < mats.Length; r++)
-            {
-                mats[r].SetFloat("_Team_1", team1Final);
-                mats[r].SetFloat("_Team_2", team2Final);
-            }
-        }
-        for (int i = 0; i < clients.Count; i++)
-        {
-            clients[i].UpdateTeamColor();
-        }
-        Debug.Log("Teams Selected: " + team1 + ", " + team2);
     }
+
 
     //Exploit: Hit needs to be parsed to ensure extreme angles aren't achievable.
     public void SpawnProjectile(Player player)
@@ -244,7 +235,12 @@ public class GlobalManager : NetworkBehaviour
         return mask;
     }
 
-   public void AddNewTeam(TeamInfo newTeam)
+    public List<Player> GetClients()
+    {
+        return clients;
+    }
+
+    public void AddNewTeam(TeamInfo newTeam)
     {
         teams.Add(newTeam);
     }
@@ -337,21 +333,20 @@ public class GlobalManager : NetworkBehaviour
         client.GetComponent<NetworkObject>().SpawnWithOwnership(id);
 
         //Client Object Spawning
-        bool team = clients.Count % 2 != 0;
         Vector3 spawnPos;
-        TeamList debugList = TeamList.gray;
-        if (team)
+        TeamList debugList = currentGamemode.DecideWhichPlayerTeam();
+        TeamInfo find = new TeamInfo();
+        for (int i = 0; i < teams.Count; i++)
         {
-            spawnPos = team1Spawns.GetChild(team1SpawnIndex).position;
-            team1SpawnIndex = (team1SpawnIndex + 1) % team1Spawns.childCount;
-            debugList = GetTeam1();
+            if (teams[i].teamColor == debugList)
+            {
+                find = teams[i];
+            }
         }
-        else
-        {
-            spawnPos = team2Spawns.GetChild(team2SpawnIndex).position;
-            team2SpawnIndex = (team2SpawnIndex + 1) % team2Spawns.childCount;
-            debugList = GetTeam2();
-        }
+
+        //Random spawn selector that doesn't account for duplicate players in spots, fix later
+        spawnPos = teamSpawns[find.spawns].GetChild(Random.Range(0,teamSpawns[find.spawns].childCount)).position;
+
         //Auto Team
         ClassList autoClass = ClassList.programmer;
         if (id % 2 == 0)
@@ -365,7 +360,7 @@ public class GlobalManager : NetworkBehaviour
         }
 
         Debug.Log("New Player Joined (#" + clients.Count + "), Team " + debugList);
-        SendNewPlayerDataBackClientRpc(id, team, spawnPos, autoClass);
+        SendNewPlayerDataBackClientRpc(id, debugList, spawnPos, autoClass);
         PlayerInfoSentToClient[] data = new PlayerInfoSentToClient[clients.Count];
         for (int i = 0; i < clients.Count; i++)
         {
@@ -377,7 +372,7 @@ public class GlobalManager : NetworkBehaviour
             };
         }
         SendAllPlayerDataToNewPlayerClientRpc(data, id);
-        UpdateClientTeamColorsClientRpc(team1, team2);
+        UpdateClientTeamColorsClientRpc(teams.ToArray());
     }
 
     /// <summary>
@@ -408,20 +403,13 @@ public class GlobalManager : NetworkBehaviour
     }
 
     [ClientRpc]
-    void SendNewPlayerDataBackClientRpc(ulong id, bool team, Vector3 spawnPos, ClassList autoClass)
+    void SendNewPlayerDataBackClientRpc(ulong id, TeamList team, Vector3 spawnPos, ClassList autoClass)
     {
         for (int i = 0; i < clients.Count; i++)
         {
             if (clients[i].GetPlayerID() == id)
             {
-                if (team)
-                {
-                    clients[i].SetTeam(Team.team1);
-                }
-                else
-                {
-                    clients[i].SetTeam(Team.team2);
-                }
+                clients[i].SetTeam(team);
                 clients[i].SetClass(autoClass);
                 clients[i].GetTracker().ForceNewPosition(spawnPos);
             }
@@ -452,18 +440,15 @@ public class GlobalManager : NetworkBehaviour
     }
 
     [ClientRpc]
-    private void UpdateClientTeamColorsClientRpc(TeamList a, TeamList b)
+    private void UpdateClientTeamColorsClientRpc(TeamInfo[] a)
     {
         if (IsHost) { return; }
-        ChangeTeams(a, b);
+        ClearTeams();
+        for (int i = 0; i < a.Length; i++)
+        {
+            AddNewTeam(a[i]);
+        }
     }
-}
-
-[System.Serializable]
-public struct TeamInfo
-{
-    public TeamList teamColor;
-    public Transform spawns;
 }
 
 [System.Serializable]
@@ -495,12 +480,26 @@ public struct PlayerDataSentToClient : INetworkSerializable
     }
 }
 
+
+[System.Serializable]
+public struct TeamInfo : INetworkSerializable
+{
+    public TeamList teamColor;
+    public int spawns;
+
+    public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
+    {
+        serializer.SerializeValue(ref teamColor);
+        serializer.SerializeValue(ref spawns);
+    }
+}
+
 [System.Serializable]
 public struct PlayerInfoSentToClient : INetworkSerializable
 {
     public ulong id;
     public ClassList currentClass;
-    public Team currentTeam;
+    public TeamList currentTeam;
 
     public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
     {

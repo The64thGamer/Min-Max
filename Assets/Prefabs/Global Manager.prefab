@@ -125,8 +125,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 706ae5cd5ebd39f4ba98acf44836e74e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  team1: 6
-  team2: 7
+  teams: []
   vrLayers:
     serializedVersion: 2
     m_Bits: 805306368
@@ -136,8 +135,7 @@ MonoBehaviour:
   clientPrefab: {fileID: 8093838907312818641, guid: 183b441558cd63c45bf2e7be831cfa21,
     type: 3}
   clients: []
-  team1Spawns: {fileID: 0}
-  team2Spawns: {fileID: 0}
+  teamSpawns: []
   particleList: {fileID: 0}
   mapProps: {fileID: 0}
   mapGeometry: {fileID: 0}
@@ -172,5 +170,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1e7062d2c77fa4245add06df337fa272, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  team1: 0
-  team2: 0
+  teams: 0000000005000000
