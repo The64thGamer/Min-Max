@@ -330,7 +330,7 @@ public class GlobalManager : NetworkBehaviour
 
         Debug.Log("New Player Joined (#" + clients.Count + "), Team " + debugList);
         SendNewPlayerDataBackClientRpc(id, debugList, autoClass);
-        RespawnPlayerClientRpc(id);
+        RespawnPlayerClientRpc(id,debugList);
         PlayerInfoSentToClient[] data = new PlayerInfoSentToClient[clients.Count];
         for (int i = 0; i < clients.Count; i++)
         {
@@ -386,7 +386,11 @@ public class GlobalManager : NetworkBehaviour
     }
 
     [ClientRpc]
-    public void RespawnPlayerClientRpc(ulong id)
+    /// <summary>
+    /// "Team" is required due to clients possibly being out of sync with player team.
+    /// </summary>
+    /// <param name="data"></param>
+    public void RespawnPlayerClientRpc(ulong id, TeamList team)
     {
         for (int i = 0; i < clients.Count; i++)
         {
@@ -398,15 +402,18 @@ public class GlobalManager : NetworkBehaviour
                 //Spawning
                 for (int e = 0; e < teams.Count; e++)
                 {
-                    if (teams[e].teamColor == clients[i].GetTeam())
+                    if (teams[e].teamColor == team)
                     {
                         Vector3 spawnPos = teamSpawns[teams[e].spawns].GetChild(Random.Range(0, teamSpawns[teams[e].spawns].childCount)).position;
                         clients[i].GetTracker().ForceNewPosition(spawnPos);
+                        Debug.Log("Player " + id + " respawned in " + team.ToString() + " spawn room");
+                        return;
                     }
                 }
             }
         }
     }
+
 
     [ClientRpc]
     void SendAllPlayerDataToNewPlayerClientRpc(PlayerInfoSentToClient[] data, ulong id)
@@ -445,7 +452,14 @@ public class GlobalManager : NetworkBehaviour
     [ClientRpc]
     public void PlayerTookDamageClientRpc(ulong id, int currentHealth, ulong idOfKiller)
     {
-        Debug.Log("Player " + id + " took damage (" + currentHealth + " HP) by Player" + idOfKiller);
+        if (currentHealth <= 0)
+        {
+            Debug.Log("Player " + id + " was killed (" + currentHealth + " HP) by Player" + idOfKiller);
+        }
+        else
+        {
+            Debug.Log("Player " + id + " took damage (" + currentHealth + " HP) by Player" + idOfKiller);
+        }
         for (int i = 0; i < clients.Count; i++)
         {
             if (clients[i].GetPlayerID() == id)

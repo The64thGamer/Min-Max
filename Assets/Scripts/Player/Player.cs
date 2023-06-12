@@ -259,7 +259,7 @@ public class Player : NetworkBehaviour
         {
             if (IsHost)
             {
-                gm.RespawnPlayerClientRpc(GetPlayerID());
+                gm.RespawnPlayerClientRpc(GetPlayerID(), GetTeam());
             }
         }
     }
