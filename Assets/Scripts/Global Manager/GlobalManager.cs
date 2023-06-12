@@ -455,6 +455,18 @@ public class GlobalManager : NetworkBehaviour
     }
 
     [ClientRpc]
+    public void SpawnProjectileClientRpc(ulong id)
+    {
+        for (int i = 0; i < clients.Count; i++)
+        {
+            if (clients[i].GetPlayerID() == id)
+            {
+                clients[i].GetCurrentGun().SpawnProjectile(clients[i]);
+            }
+        }
+    }
+
+    [ClientRpc]
     public void PlayerTookDamageClientRpc(ulong id, int currentHealth, ulong idOfKiller)
     {
         if (currentHealth <= 0)

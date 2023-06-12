@@ -37,7 +37,8 @@ public abstract class Gun : MonoBehaviour
     }
 
     //Exploit: Hit needs to be parsed to ensure extreme angles aren't achievable.
-    protected void SpawnProjectile(Player player)
+    //This function breaks if the currently held weapon switches before its called
+    public void SpawnProjectile(Player player)
     {
         if (defaultStats.firePrefab != null)
         {

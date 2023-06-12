@@ -84,11 +84,11 @@ public class GenericGun : Gun
             {
                 au.PlayOneShot(fireSound);
                 fireCooldown = 1.0f / FindStat(ChangableWeaponStats.shotsPerSecond);
-                SpawnProjectile(currentPlayer);
 
                 if(gm.IsHost)
                 {
                     HitScanHostDamageCalculation(currentPlayer);
+                    gm.SpawnProjectileClientRpc(currentPlayer.GetPlayerID());
                 }
             }
         }
