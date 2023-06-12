@@ -49,6 +49,7 @@ public class PlayerTracker : NetworkBehaviour
     //Prediction Values
     float predictionTime;
     Vector3 predictedVelocity;
+    Vector3 predictedPos;
 
     public enum ButtonState
     {
@@ -71,11 +72,13 @@ public class PlayerTracker : NetworkBehaviour
 
     void LateUpdate()
     {
+        //For proper syncing
         prevRHandPos = rightController.position;
         prevRHandForward = rightController.forward;
         prevRHandUp = rightController.up;
         prevRHandRight = rightController.right;
 
+        //Animations
         if (animController != null && animController.gameObject.activeSelf)
         {
             animController.SetFloat("HandX", CalcLerpVector3(centerPos.position, rightPos.position, rightController.position, false) - CalcLerpVector3(centerPos.position, leftPos.position, rightController.position, false));
@@ -88,6 +91,9 @@ public class PlayerTracker : NetworkBehaviour
             modelRoot.eulerAngles = new Vector3(0, modelRoot.eulerAngles.y, 0);
             modelRoot.position = forwardRoot.position;
         }
+
+        //Lerping client-side movement with server positions for a smoother experience
+        transform.position = Vector3.Lerp(transform.position, predictedPos, Mathf.Clamp01(Vector3.Distance(transform.position, predictedPos)));
     }
     void OnEnable()
     {
@@ -100,7 +106,7 @@ public class PlayerTracker : NetworkBehaviour
     public void SetNewClientPosition(Vector3 pos, Vector3 velocity, float rpcPredicitonTime)
     {
         charController.enabled = false;
-        transform.position = pos;
+        predictedPos = pos;
         charController.enabled = true;
         predictedVelocity = velocity;
         predictionTime = rpcPredicitonTime;
