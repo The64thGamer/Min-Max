@@ -285,4 +285,11 @@ public class PlayerTracker : NetworkBehaviour
         playerRHand = rHandPlayer;
         playerHead = headPlayer;
     }
+
+    private void OnDrawGizmos()
+    {
+        Gizmos.DrawLine(headset.position, headset.position + headset.forward);
+        Gizmos.DrawLine(leftController.position, leftController.position + leftController.forward);
+        Gizmos.DrawLine(rightController.position, rightController.position + rightController.forward);
+    }
 }
