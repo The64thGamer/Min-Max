@@ -8,8 +8,12 @@ using UnityEngine;
 public class GlobalTeamChanger : MonoBehaviour
 {
     [SerializeField] List<TeamList> teams;
-    [SerializeField] bool submitChange;
+    [SerializeField] bool submitChange = false;
 
+    private void Start()
+    {
+        submitChange = false;
+    }
     void Update()
     {
         if(submitChange)

@@ -4,7 +4,6 @@ using System.Linq;
 using Unity.Netcode;
 using Unity.Netcode.Transports.UTP;
 using UnityEngine;
-using static UnityEngine.InputManagerEntry;
 
 public class GlobalManager : NetworkBehaviour
 {
