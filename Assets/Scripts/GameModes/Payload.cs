@@ -16,32 +16,38 @@ public class Payload : GenericGamemode
 
     public override void SetTeams()
     {
-        if(gm == null)
-        {
-            gm = this.GetComponent<GlobalManager>();
-        }
-        gm.ClearTeams();
-
-        //Gray Team Always Team 0
-        TeamInfo grayTeam = new TeamInfo() { spawns = 0, teamColor = TeamList.gray };
-        gm.AddNewTeam(grayTeam);
-
-        for (int i = 0; i < noOfTeams; i++)
-        {
-            TeamInfo nextTeam = new TeamInfo();
-            nextTeam.spawns = i + 1;
-            nextTeam.teamColor = SelectTeams(gm.GetTeamColors(false), PlayerPrefs.GetInt("Team" + (i + 1) + "Setting"));
-            gm.AddNewTeam(nextTeam);
-        }
-        gm.ModifyTeamsAcrossServer();
+        TeamChanger(null);
     }
 
     public override void SetTeams(List<TeamList> setTeams)
+    {
+        TeamChanger(setTeams);
+    }
+
+    void TeamChanger(List<TeamList> setTeams)
     {
         if (gm == null)
         {
             gm = this.GetComponent<GlobalManager>();
         }
+
+        //Gather player original teams
+        List<Player> clients = gm.GetClients();
+        List<TeamList> teamColors = gm.GetTeamColors(false);
+        int[] clientTeams = new int[clients.Count];
+        for (int i = 0; i < clients.Count; i++)
+        {
+            TeamList color = clients[i].GetTeam();
+            for (int e = 0; e < teamColors.Count; e++)
+            {
+                if (color == teamColors[e])
+                {
+                    clientTeams[i] = e;
+                }
+            }
+        }
+
+        //Select new teams
         gm.ClearTeams();
 
         //Gray Team Always Team 0
@@ -52,9 +58,23 @@ public class Payload : GenericGamemode
         {
             TeamInfo nextTeam = new TeamInfo();
             nextTeam.spawns = i + 1;
-            nextTeam.teamColor = setTeams[i];
+            if (setTeams == null)
+            {
+                nextTeam.teamColor = SelectTeams(gm.GetTeamColors(false), PlayerPrefs.GetInt("Team" + (i + 1) + "Setting"));
+            }
+            else
+            {
+                nextTeam.teamColor = setTeams[i];
+            }
             gm.AddNewTeam(nextTeam);
         }
+
+        //Re-apply Player Teams
+        for (int i = 0; i < clients.Count; i++)
+        {
+            clients[i].SetTeam(gm.GetTeams()[clientTeams[i]].teamColor);
+        }
+
         gm.ModifyTeamsAcrossServer();
     }
 
