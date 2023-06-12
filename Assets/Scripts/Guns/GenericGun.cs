@@ -28,7 +28,6 @@ public class GenericGun : Gun
     GlobalManager gm;
     bool showCrosshair;
     Transform currentParent;
-    GunProjectiles defaultStats;
     bool dumbstupidjank;
 
     public void Start()
@@ -71,10 +70,10 @@ public class GenericGun : Gun
         if (gm != null)
         {
             Vector3 firePos = currentPlayer.GetTracker().GetRightHandFirePos(defaultStats.firepoint);
-            currentFireAngle = gm.CalculateFireAngle(currentPlayer, firePos);
+            currentFireAngle = CalculateFireAngle(currentPlayer, firePos);
             if (showCrosshair)
             {
-                crosshair.position = gm.CalculcateFirePosition(currentFireAngle, currentPlayer, firePos);
+                crosshair.position = CalculcateFirePosition(currentFireAngle, currentPlayer, firePos);
                 crosshair.transform.LookAt(Camera.main.transform.position);
                 crosshair.localScale = Vector3.one + (Vector3.one * (crosshair.position - Camera.main.transform.position).magnitude * 1.5f);
             }
@@ -94,7 +93,7 @@ public class GenericGun : Gun
             {
                 au.PlayOneShot(fireSound);
                 fireCooldown = 1.0f / SearchStats(ChangableWeaponStats.shotsPerSecond);
-                gm.SpawnProjectile(currentPlayer);
+                SpawnProjectile(currentPlayer);
             }
         }
     }

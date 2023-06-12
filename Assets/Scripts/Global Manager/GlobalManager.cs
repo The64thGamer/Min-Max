@@ -9,7 +9,6 @@ public class GlobalManager : NetworkBehaviour
 {
     [Header("Server Settings")]
     [SerializeField] List<TeamInfo> teams = new List<TeamInfo>();
-    [SerializeField] LayerMask vrLayers;
     [SerializeField] List<PlayerDataSentToClient> playerPosRPCData = new List<PlayerDataSentToClient>();
     [SerializeField] NetworkVariable<int> ServerTickRate = new NetworkVariable<int>(10);
 
@@ -17,7 +16,6 @@ public class GlobalManager : NetworkBehaviour
     [SerializeField] GameObject clientPrefab;
     [SerializeField] List<Player> clients;
     [SerializeField] List<Transform> teamSpawns;
-    [SerializeField] Transform particleList;
 
     [Header("The Map")]
     [SerializeField] Transform mapProps;
@@ -28,12 +26,6 @@ public class GlobalManager : NetworkBehaviour
     float tickTimer;
     bool serverStarted;
     GenericGamemode currentGamemode;
-
-    //Constants
-    const float MINANGLE = 0.8f;
-    const float SPHERESIZE = 0.4f;
-    const float MAXSPHERECASTDISTANCE = 20;
-    const float MAXRAYCASTDISTANCE = 1000;
 
     private void Start()
     {
@@ -141,52 +133,6 @@ public class GlobalManager : NetworkBehaviour
         }
     }
 
-
-    //Exploit: Hit needs to be parsed to ensure extreme angles aren't achievable.
-    public void SpawnProjectile(Player player)
-    {
-        GunProjectiles fp = al.SearchGuns(player.GetCurrentGun().GetNameKey()); ;
-        if (fp.firePrefab != null)
-        {
-            Vector3 firepos = player.GetTracker().GetRightHandFirePos(fp.firepoint);
-            GameObject currentProjectile = GameObject.Instantiate(fp.firePrefab);
-            currentProjectile.transform.parent = particleList;
-            Vector3 fireAngle = CalculateFireAngle(player, firepos);
-            currentProjectile.GetComponent<Projectile>().SetProjectile(firepos, fireAngle, player.GetCurrentGun().SearchStats(ChangableWeaponStats.bulletSpeed), player.GetTeamLayer(), CalculcateFirePosition(fireAngle, player, firepos));
-        }
-    }
-
-    //Crosshair doesn't recalculate if it doesn't collide with a wall, fix it.
-    public Vector3 CalculateFireAngle(Player player, Vector3 firePoint)
-    {
-        Transform cam = player.GetTracker().GetCamera();
-        RaycastHit hit;
-        Vector3 fpForward = player.GetTracker().GetRightHandSafeForward();
-
-        float dotAngle = Vector3.Dot(fpForward, cam.forward);
-        if (dotAngle > MINANGLE)
-        {
-            float percentage = (dotAngle - MINANGLE) / (1 - MINANGLE);
-            return Vector3.Slerp(fpForward, cam.forward, percentage);
-        }
-        return fpForward;
-    }
-
-    public Vector3 CalculcateFirePosition(Vector3 fireAngle, Player player, Vector3 firePoint)
-    {
-        RaycastHit hit;
-        LayerMask layermask = GetIgnoreTeamAndVRLayerMask(player);
-        float dotAngle = Vector3.Dot(player.GetTracker().GetRightHandSafeForward(), fireAngle.normalized);
-        if (dotAngle > MINANGLE)
-        {
-            if (Physics.Raycast(firePoint, fireAngle, out hit, MAXRAYCASTDISTANCE, layermask))
-            {
-                return hit.point;
-            }
-        }
-        return firePoint + (100 * fireAngle.normalized);
-    }
-
     public List<Transform> GetTeamSpawns()
     {
         return teamSpawns;
@@ -228,7 +174,7 @@ public class GlobalManager : NetworkBehaviour
                 mask = 1 << LayerMask.NameToLayer("GrayTeam");
                 break;
         }
-        mask = mask | vrLayers;
+        mask = mask | 805306368; //VR Layermask
         mask = ~mask;
         return mask;
     }
