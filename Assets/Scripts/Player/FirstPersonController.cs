@@ -66,27 +66,30 @@ namespace StarterAssets
             right.Normalize();
             Vector3 newAxis = forward * _input.y + right * _input.x;
 
-			//Movment rotation halted in midair
-            if (!_controller.isGrounded)
-            {
-                if (!hasBeenGrounded)
-                {
-                    oldAxis = newAxis;
-                    hasBeenGrounded = true;
-                }
-				else
+			//Movement rotation halted in midair
+			if (_controller != null)
+			{
+				if (!_controller.isGrounded)
 				{
-					if(oldAxis == Vector3.zero)
+					if (!hasBeenGrounded)
 					{
 						oldAxis = newAxis;
+						hasBeenGrounded = true;
 					}
-					newAxis = oldAxis;
-                }
-            }
-            else
-            {
-                hasBeenGrounded = false;
-            }
+					else
+					{
+						if (oldAxis == Vector3.zero)
+						{
+							oldAxis = newAxis;
+						}
+						newAxis = oldAxis;
+					}
+				}
+				else
+				{
+					hasBeenGrounded = false;
+				}
+			}
 
 			//Jump
             JumpAndGravity(jump);

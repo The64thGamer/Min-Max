@@ -67,10 +67,10 @@ public class GlobalManager : NetworkBehaviour
 
         if(PlayerPrefs.GetInt("SpawnBotsInEmpty") > 0)
         {
-            for (int i = 0; i < PlayerPrefs.GetInt("ServerMaxPlayers")-clients.Count; i++)
+            for (int i = 0; i < PlayerPrefs.GetInt("ServerMaxPlayers"); i++)
             {
                 //Probably a bad idea for 24/7 servers, though what's a player gonna gain out of controlling bots?
-                SpawnNewPlayerHostServerRpc(botID);
+                SpawnNewPlayerHostServerRpc(botID + (uint)i);
             }
         }
     }
@@ -101,7 +101,7 @@ public class GlobalManager : NetworkBehaviour
             tickTimer = 0;
             if (IsHost)
             {
-                for (int i = 0; i < playerPosRPCData.Count; i++)
+                for (int i = 0; i < clients.Count; i++)
                 {
                     playerPosRPCData[i] = clients[i].GetTracker().GetPlayerPosData();
                 }
@@ -282,9 +282,30 @@ public class GlobalManager : NetworkBehaviour
     {
         for (int i = 0; i < clients.Count; i++)
         {
-            if (clients[i].GetPlayerID() == id)
+            ulong finalId = clients[i].GetPlayerID();
+            if (finalId == id && finalId < botID)
             {
                 Debug.Log("Player " + id + " attempted to request more than one player object.");
+                return;
+            }
+        }
+        if(clients.Count >= PlayerPrefs.GetInt("ServerMaxPlayers"))
+        {
+            bool goodToGo = false;
+            for (int i = 0; i < clients.Count; i++)
+            {
+                if (clients[i].GetPlayerID() >= botID)
+                {
+                    Debug.Log("Bot " + id + " removed from playerlist to make room for new player.");
+                    Destroy(clients[i].gameObject);
+                    clients.RemoveAt(i);
+                    goodToGo = true;
+                    break;
+                }
+            }
+            if(!goodToGo)
+            {
+                Debug.Log("Player could not connect, server full.");
                 return;
             }
         }
