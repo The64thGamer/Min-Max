@@ -48,55 +48,55 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   labourer:
-    baseHealth: 0
-    baseSpeed: 0
-    baseAccel: 0
-    trackingScale: 0
+    baseHealth: 100
+    baseSpeed: 30
+    baseAccel: 10
+    trackingScale: 1.16
   woodworker:
-    baseHealth: 0
-    baseSpeed: 0
-    baseAccel: 0
-    trackingScale: 0
+    baseHealth: 100
+    baseSpeed: 30
+    baseAccel: 10
+    trackingScale: 1.16
   engineer:
-    baseHealth: 0
-    baseSpeed: 0
-    baseAccel: 0
-    trackingScale: 0
+    baseHealth: 100
+    baseSpeed: 30
+    baseAccel: 10
+    trackingScale: 1.16
   programmer:
     baseHealth: 100
     baseSpeed: 30
     baseAccel: 10
     trackingScale: 1.16
   computer:
-    baseHealth: 0
-    baseSpeed: 0
-    baseAccel: 0
-    trackingScale: 0
+    baseHealth: 100
+    baseSpeed: 30
+    baseAccel: 10
+    trackingScale: 1.16
   fabricator:
-    baseHealth: 0
-    baseSpeed: 0
-    baseAccel: 0
-    trackingScale: 0
+    baseHealth: 100
+    baseSpeed: 30
+    baseAccel: 10
+    trackingScale: 1.16
   artist:
-    baseHealth: 0
-    baseSpeed: 0
-    baseAccel: 0
-    trackingScale: 0
+    baseHealth: 100
+    baseSpeed: 30
+    baseAccel: 10
+    trackingScale: 1.16
   freelancer:
-    baseHealth: 0
-    baseSpeed: 0
-    baseAccel: 0
-    trackingScale: 0
+    baseHealth: 100
+    baseSpeed: 30
+    baseAccel: 10
+    trackingScale: 1.16
   craftsman:
-    baseHealth: 0
-    baseSpeed: 0
-    baseAccel: 0
-    trackingScale: 0
+    baseHealth: 100
+    baseSpeed: 30
+    baseAccel: 10
+    trackingScale: 1.16
   manager:
-    baseHealth: 0
-    baseSpeed: 0
-    baseAccel: 0
-    trackingScale: 0
+    baseHealth: 100
+    baseSpeed: 30
+    baseAccel: 10
+    trackingScale: 1.16
   mMChips:
   - buffsNerfs:
     - buffNerf: 1
@@ -126,9 +126,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   teams: []
-  vrLayers:
-    serializedVersion: 2
-    m_Bits: 805306368
   playerPosRPCData: []
   ServerTickRate:
     m_InternalValue: 60
@@ -136,7 +133,6 @@ MonoBehaviour:
     type: 3}
   clients: []
   teamSpawns: []
-  particleList: {fileID: 0}
   mapProps: {fileID: 0}
   mapGeometry: {fileID: 0}
 --- !u!114 &7623448802612895609
@@ -171,3 +167,4 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   teams: 0000000005000000
+  submitChange: 0

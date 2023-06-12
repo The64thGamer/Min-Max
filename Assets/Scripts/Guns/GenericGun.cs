@@ -90,7 +90,7 @@ public class GenericGun : Gun
 
                 if(gm.IsHost)
                 {
-
+                    HitScanHostDamageCalculation(currentPlayer);
                 }
             }
         }
