@@ -28,6 +28,9 @@ public class GlobalManager : NetworkBehaviour
     bool serverStarted;
     GenericGamemode currentGamemode;
 
+    //Const
+    const ulong botID = 64646464646464;
+
     private void Start()
     {
         NetworkManager.Singleton.OnServerStarted += ServerStarted;
@@ -60,6 +63,15 @@ public class GlobalManager : NetworkBehaviour
                 break;
             default:
                 break;
+        }
+
+        if(PlayerPrefs.GetInt("SpawnBotsInEmpty") > 0)
+        {
+            for (int i = 0; i < PlayerPrefs.GetInt("ServerMaxPlayers")-clients.Count; i++)
+            {
+                //Probably a bad idea for 24/7 servers, though what's a player gonna gain out of controlling bots?
+                SpawnNewPlayerHostServerRpc(botID);
+            }
         }
     }
 

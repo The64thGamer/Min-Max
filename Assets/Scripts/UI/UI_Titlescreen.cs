@@ -47,6 +47,8 @@ public class UI_Titlescreen : MonoBehaviour
         TextField selectPort = root.Q<TextField>("SelectPort");
         DropdownField team1 = root.Q<DropdownField>("SelectTeam1");
         DropdownField team2 = root.Q<DropdownField>("SelectTeam2");
+        Toggle spawnBots = root.Q<Toggle>("SpawnBots");
+
 
         //Functions
         rc_startVR.clicked += () => SwitchMainTab(0);
@@ -63,12 +65,14 @@ public class UI_Titlescreen : MonoBehaviour
         selectPort.RegisterValueChangedCallback(evt => TryPortChange(selectPort));
         team1.RegisterValueChangedCallback(evt => PlayerPrefs.SetInt("Team1Setting", team1.index));
         team2.RegisterValueChangedCallback(evt => PlayerPrefs.SetInt("Team2Setting", team2.index));
+        spawnBots.RegisterValueChangedCallback(evt => PlayerPrefs.SetInt("SpawnBotsInEmpty", spawnBots.value ? 1 : 0));
 
 
         //Ect
         selectMap.choices = mapNames;
         selectMap.index = 0;
         maxPlayers.value = Mathf.Max(PlayerPrefs.GetInt("ServerMaxPlayers"),1);
+        spawnBots.value = Convert.ToBoolean(PlayerPrefs.GetInt("SpawnBotsInEmpty"));
         spectatorAsPlayer.value = Convert.ToBoolean(PlayerPrefs.GetInt("ServerSpectatorAsPlayer"));
         team1.index = PlayerPrefs.GetInt("Team1Setting");
         team2.index = PlayerPrefs.GetInt("Team2Setting");
