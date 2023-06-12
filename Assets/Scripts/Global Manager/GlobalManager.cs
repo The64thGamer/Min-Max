@@ -359,6 +359,10 @@ public class GlobalManager : NetworkBehaviour
         {
             if (clients[i].GetPlayerID() == id)
             {
+                //Refresh Stats
+                clients[i].ResetClassStats();
+
+                //Spawning
                 for (int e = 0; e < teams.Count; e++)
                 {
                     if (teams[e].teamColor == clients[i].GetTeam())

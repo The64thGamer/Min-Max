@@ -22,6 +22,7 @@ public class Player : NetworkBehaviour
     [SerializeField] Transform clientSetup;
     [SerializeField] GameObject[] playerModels;
     GlobalManager gm;
+    AllStats al;
     bool currentPlayerVisibility;
 
     public override void OnNetworkSpawn()
@@ -31,6 +32,7 @@ public class Player : NetworkBehaviour
         controller = GetComponentInChildren<FirstPersonController>();
         currentGun = GetComponentInChildren<GenericGun>();
         gm = GameObject.Find("Global Manager").GetComponent<GlobalManager>();
+        al = gm.GetComponent<AllStats>();
         gm.AddPlayerToClientList(this);
 
         //Debug Default
@@ -260,5 +262,10 @@ public class Player : NetworkBehaviour
                 gm.RespawnPlayerClientRpc(GetPlayerID());
             }
         }
+    }
+
+    public void ResetClassStats()
+    {
+        currentStats = al.GetClassStats(currentClass);
     }
 }
