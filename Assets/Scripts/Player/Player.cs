@@ -240,4 +240,9 @@ public class Player : NetworkBehaviour
             }
         }
     }
+
+    public void TakeDamage(ulong id, int amount)
+    {
+
+    }
 }

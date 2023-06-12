@@ -10,6 +10,16 @@ public abstract class Gun : MonoBehaviour
     const float MAXSPHERECASTDISTANCE = 20;
     const float MAXRAYCASTDISTANCE = 1000;
 
+    [SerializeField]
+    protected List<WeaponStats> changableStats = new List<WeaponStats>()
+    {
+        new WeaponStats(){ statName = ChangableWeaponStats.maxAmmo, stat = 5},
+        new WeaponStats(){ statName = ChangableWeaponStats.bulletsPerShot, stat = 1},
+        new WeaponStats(){ statName = ChangableWeaponStats.shotsPerSecond, stat = 3},
+        new WeaponStats(){ statName = ChangableWeaponStats.bulletSpeed, stat = 3},
+        new WeaponStats(){ statName = ChangableWeaponStats.damage, stat = 30},
+    };
+
     protected GunProjectiles defaultStats;
 
     public abstract void Fire();
@@ -21,21 +31,21 @@ public abstract class Gun : MonoBehaviour
     public abstract void SetGunTransformParent(Transform parent, bool dumbStupidJank);
     public abstract void SetPlayer(Player player);
 
-    
+
     //Exploit: Hit needs to be parsed to ensure extreme angles aren't achievable.
-    public void SpawnProjectile(Player player)
+    protected void SpawnProjectile(Player player)
     {
         if (defaultStats.firePrefab != null)
         {
             Vector3 firepos = player.GetTracker().GetRightHandFirePos(defaultStats.firepoint);
             GameObject currentProjectile = GameObject.Instantiate(defaultStats.firePrefab);
-            Vector3 fireAngle = CalculateFireAngle(player, firepos);
-            currentProjectile.GetComponent<Projectile>().SetProjectile(firepos, fireAngle, player.GetCurrentGun().SearchStats(ChangableWeaponStats.bulletSpeed), player.GetTeamLayer(), CalculcateFirePosition(fireAngle, player, firepos));
+            Vector3 fireAngle = CalculateFireAngle(player);
+            currentProjectile.GetComponent<Projectile>().SetProjectile(firepos, fireAngle, player.GetCurrentGun().SearchStats(ChangableWeaponStats.bulletSpeed), player.GetTeamLayer(), CalculateHitPosition(fireAngle, player, firepos));
         }
     }
 
     //Crosshair doesn't recalculate if it doesn't collide with a wall, fix it.
-    public Vector3 CalculateFireAngle(Player player, Vector3 firePoint)
+    protected Vector3 CalculateFireAngle(Player player)
     {
         Transform cam = player.GetTracker().GetCamera();
         RaycastHit hit;
@@ -50,7 +60,7 @@ public abstract class Gun : MonoBehaviour
         return fpForward;
     }
 
-    public Vector3 CalculcateFirePosition(Vector3 fireAngle, Player player, Vector3 firePoint)
+    protected Vector3 CalculateHitPosition(Vector3 fireAngle, Player player, Vector3 firePoint)
     {
         RaycastHit hit;
         LayerMask layermask = GetIgnoreTeamAndVRLayerMask(player);
@@ -62,10 +72,10 @@ public abstract class Gun : MonoBehaviour
                 return hit.point;
             }
         }
-        return firePoint + (100 * fireAngle.normalized);
+        return firePoint + (MAXRAYCASTDISTANCE * fireAngle.normalized);
     }
 
-    public LayerMask GetIgnoreTeamAndVRLayerMask(Player player)
+    protected LayerMask GetIgnoreTeamAndVRLayerMask(Player player)
     {
         LayerMask mask;
         switch (player.GetTeam())
@@ -105,6 +115,39 @@ public abstract class Gun : MonoBehaviour
         mask = ~mask;
         return mask;
     }
+
+    protected void HitScanHostDamageCalculation(Player player)
+    {
+        Vector3 firepos = player.GetTracker().GetRightHandFirePos(defaultStats.firepoint);
+        Vector3 fireAngle = CalculateFireAngle(player);
+
+        RaycastHit hit;
+        LayerMask layermask = GetIgnoreTeamAndVRLayerMask(player);
+        float dotAngle = Vector3.Dot(player.GetTracker().GetRightHandSafeForward(), fireAngle.normalized);
+        if (dotAngle > MINANGLE)
+        {
+            if (Physics.Raycast(firepos, fireAngle, out hit, MAXRAYCASTDISTANCE, layermask))
+            {
+                Player hitPlayer = hit.collider.GetComponent<Player>();
+                if (hitPlayer != null)
+                {
+                    hitPlayer.TakeDamage(player.GetPlayerID(), FindStat(ChangableWeaponStats.damage));
+                }
+            }
+        }
+    }
+
+    int FindStat(ChangableWeaponStats statName)
+    {
+        for (int i = 0; i < changableStats.Count; i++)
+        {
+            if (changableStats[i].statName == statName)
+            {
+                return changableStats[i].stat;
+            }
+        }
+        return 0;
+    }
 }
 [System.Serializable]
 public class WeaponStats
@@ -120,4 +163,5 @@ public enum ChangableWeaponStats
     bulletsPerShot,
     maxAmmo,
     bulletSpeed,
+    damage,
 }

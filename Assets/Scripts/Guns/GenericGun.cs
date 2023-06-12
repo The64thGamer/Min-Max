@@ -1,19 +1,12 @@
 using System.Collections;
 using System.Collections.Generic;
 using Unity.Mathematics;
+using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class GenericGun : Gun
 {
-    [SerializeField]
-    List<WeaponStats> changableStats = new List<WeaponStats>()
-    {
-        new WeaponStats(){ statName = ChangableWeaponStats.maxAmmo, stat = 5},
-        new WeaponStats(){ statName = ChangableWeaponStats.bulletsPerShot, stat = 1},
-        new WeaponStats(){ statName = ChangableWeaponStats.shotsPerSecond, stat = 3},
-        new WeaponStats(){ statName = ChangableWeaponStats.bulletSpeed, stat = 3},
-    };
     [SerializeField] Transform firePoint;
     [SerializeField] Transform crosshair;
     [SerializeField] Player currentPlayer;
@@ -70,10 +63,10 @@ public class GenericGun : Gun
         if (gm != null)
         {
             Vector3 firePos = currentPlayer.GetTracker().GetRightHandFirePos(defaultStats.firepoint);
-            currentFireAngle = CalculateFireAngle(currentPlayer, firePos);
+            currentFireAngle = CalculateFireAngle(currentPlayer);
             if (showCrosshair)
             {
-                crosshair.position = CalculcateFirePosition(currentFireAngle, currentPlayer, firePos);
+                crosshair.position = CalculateHitPosition(currentFireAngle, currentPlayer, firePos);
                 crosshair.transform.LookAt(Camera.main.transform.position);
                 crosshair.localScale = Vector3.one + (Vector3.one * (crosshair.position - Camera.main.transform.position).magnitude * 1.5f);
             }
@@ -94,6 +87,11 @@ public class GenericGun : Gun
                 au.PlayOneShot(fireSound);
                 fireCooldown = 1.0f / SearchStats(ChangableWeaponStats.shotsPerSecond);
                 SpawnProjectile(currentPlayer);
+
+                if(gm.IsHost)
+                {
+
+                }
             }
         }
     }
