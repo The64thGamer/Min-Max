@@ -243,6 +243,15 @@ public class Player : NetworkBehaviour
 
     public void TakeDamage(ulong id, int amount)
     {
+        if (IsHost)
+        {
+            int currentHealth = currentStats.baseHealth -= amount;
+            gm.PlayerTookDamageClientRpc(GetPlayerID(), currentHealth, id);
+        }
+    }
 
+    public void SetHealth(int health)
+    {
+        currentStats.baseHealth = health;
     }
 }

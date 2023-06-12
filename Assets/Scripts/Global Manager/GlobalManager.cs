@@ -396,6 +396,19 @@ public class GlobalManager : NetworkBehaviour
             AddNewTeam(a[i]);
         }
     }
+
+    [ClientRpc]
+    public void PlayerTookDamageClientRpc(ulong id, int currentHealth, ulong idOfKiller)
+    {
+        for (int i = 0; i < clients.Count; i++)
+        {
+            if (clients[i].GetPlayerID() == id)
+            {
+                clients[i].SetHealth(currentHealth);
+            }
+        }
+    }
+
 }
 
 [System.Serializable]
