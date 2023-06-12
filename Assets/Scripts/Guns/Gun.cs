@@ -10,6 +10,7 @@ public abstract class Gun : MonoBehaviour
     const float MAXSPHERECASTDISTANCE = 20;
     const float MAXRAYCASTDISTANCE = 1000;
 
+
     [SerializeField]
     protected List<WeaponStats> changableStats = new List<WeaponStats>()
     {
@@ -19,7 +20,7 @@ public abstract class Gun : MonoBehaviour
         new WeaponStats(){ statName = ChangableWeaponStats.bulletSpeed, stat = 3},
         new WeaponStats(){ statName = ChangableWeaponStats.damage, stat = 30},
     };
-
+    protected int currentAmmo;
     protected GunProjectiles defaultStats;
 
     public abstract void Fire();
@@ -27,10 +28,13 @@ public abstract class Gun : MonoBehaviour
     public abstract List<WeaponStats> ChangableStats();
     public abstract int GetCurrentAmmo();
     public abstract string GetNameKey();
-    public abstract int SearchStats(ChangableWeaponStats stat);
     public abstract void SetGunTransformParent(Transform parent, bool dumbStupidJank);
     public abstract void SetPlayer(Player player);
 
+    private void Start()
+    {
+        currentAmmo = FindStat(ChangableWeaponStats.maxAmmo);
+    }
 
     //Exploit: Hit needs to be parsed to ensure extreme angles aren't achievable.
     protected void SpawnProjectile(Player player)
@@ -40,7 +44,7 @@ public abstract class Gun : MonoBehaviour
             Vector3 firepos = player.GetTracker().GetRightHandFirePos(defaultStats.firepoint);
             GameObject currentProjectile = GameObject.Instantiate(defaultStats.firePrefab);
             Vector3 fireAngle = CalculateFireAngle(player);
-            currentProjectile.GetComponent<Projectile>().SetProjectile(firepos, fireAngle, player.GetCurrentGun().SearchStats(ChangableWeaponStats.bulletSpeed), player.GetTeamLayer(), CalculateHitPosition(fireAngle, player, firepos));
+            currentProjectile.GetComponent<Projectile>().SetProjectile(firepos, fireAngle, player.GetCurrentGun().FindStat(ChangableWeaponStats.bulletSpeed), player.GetTeamLayer(), CalculateHitPosition(fireAngle, player, firepos));
         }
     }
 
@@ -137,7 +141,7 @@ public abstract class Gun : MonoBehaviour
         }
     }
 
-    int FindStat(ChangableWeaponStats statName)
+    protected int FindStat(ChangableWeaponStats statName)
     {
         for (int i = 0; i < changableStats.Count; i++)
         {

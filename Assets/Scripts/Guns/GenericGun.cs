@@ -14,7 +14,6 @@ public class GenericGun : Gun
     [SerializeField] string gunNameKey;
     [SerializeField] Transform superJank;
 
-    int currentAmmo;
     float fireCooldown;
     Vector3 currentFireAngle;
     AudioSource au;
@@ -25,7 +24,6 @@ public class GenericGun : Gun
 
     public void Start()
     {
-        currentAmmo = SearchStats(ChangableWeaponStats.maxAmmo);
         au = this.GetComponent<AudioSource>();
         gm = GameObject.Find("Global Manager").GetComponent<GlobalManager>();
         defaultStats = gm.GetComponent<AllStats>().SearchGuns(GetNameKey());
@@ -85,7 +83,7 @@ public class GenericGun : Gun
             if (fireCooldown <= 0)
             {
                 au.PlayOneShot(fireSound);
-                fireCooldown = 1.0f / SearchStats(ChangableWeaponStats.shotsPerSecond);
+                fireCooldown = 1.0f / FindStat(ChangableWeaponStats.shotsPerSecond);
                 SpawnProjectile(currentPlayer);
 
                 if(gm.IsHost)
@@ -114,17 +112,6 @@ public class GenericGun : Gun
     public override string GetNameKey()
     {
         return gunNameKey;
-    }
-    public override int SearchStats(ChangableWeaponStats stat)
-    {
-        for (int i = 0; i < changableStats.Count; i++)
-        {
-            if (changableStats[i].statName == stat)
-            {
-                return changableStats[i].stat;
-            }
-        }
-        return 0;
     }
 
     public override void SetGunTransformParent(Transform parent, bool dumbStupidJank)

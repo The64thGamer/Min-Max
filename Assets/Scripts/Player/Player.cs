@@ -247,7 +247,7 @@ public class Player : NetworkBehaviour
     {
         if (IsHost)
         {
-            int currentHealth = currentStats.baseHealth -= amount;
+            int currentHealth = currentStats.baseHealth - amount;
             gm.PlayerTookDamageClientRpc(GetPlayerID(), currentHealth, id);
         }
     }

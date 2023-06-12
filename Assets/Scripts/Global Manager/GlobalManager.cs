@@ -445,6 +445,7 @@ public class GlobalManager : NetworkBehaviour
     [ClientRpc]
     public void PlayerTookDamageClientRpc(ulong id, int currentHealth, ulong idOfKiller)
     {
+        Debug.Log("Player " + id + " took damage (" + currentHealth + " HP) by Player" + idOfKiller);
         for (int i = 0; i < clients.Count; i++)
         {
             if (clients[i].GetPlayerID() == id)
