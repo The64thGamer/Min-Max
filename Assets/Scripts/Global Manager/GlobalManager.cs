@@ -237,7 +237,14 @@ public class GlobalManager : NetworkBehaviour
         {
             if (clients[i] == player)
             {
+                Destroy(clients[i].gameObject);
                 clients.RemoveAt(i);
+                playerPosRPCData = new List<PlayerDataSentToClient>();
+                for (int e = 0; e < clients.Count; e++)
+                {
+                    playerPosRPCData.Add(new PlayerDataSentToClient());
+                }
+                return;
             }
         }
     }
@@ -296,8 +303,7 @@ public class GlobalManager : NetworkBehaviour
                 if (clients[i].GetPlayerID() >= botID)
                 {
                     Debug.Log("Bot " + id + " removed from playerlist to make room for new player.");
-                    Destroy(clients[i].gameObject);
-                    clients.RemoveAt(i);
+                    DisconnectClient(clients[i]);
                     goodToGo = true;
                     break;
                 }
