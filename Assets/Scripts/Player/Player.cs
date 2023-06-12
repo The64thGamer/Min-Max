@@ -253,5 +253,12 @@ public class Player : NetworkBehaviour
     public void SetHealth(int health)
     {
         currentStats.baseHealth = health;
+        if(health <= 0)
+        {
+            if (IsHost)
+            {
+                gm.RespawnPlayerClientRpc(GetPlayerID());
+            }
+        }
     }
 }

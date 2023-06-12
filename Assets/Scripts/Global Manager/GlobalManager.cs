@@ -4,6 +4,7 @@ using System.Linq;
 using Unity.Netcode;
 using Unity.Netcode.Transports.UTP;
 using UnityEngine;
+using static UnityEngine.InputManagerEntry;
 
 public class GlobalManager : NetworkBehaviour
 {
@@ -280,19 +281,7 @@ public class GlobalManager : NetworkBehaviour
         client.GetComponent<NetworkObject>().SpawnWithOwnership(id);
 
         //Client Object Spawning
-        Vector3 spawnPos;
         TeamList debugList = currentGamemode.DecideWhichPlayerTeam();
-        TeamInfo find = new TeamInfo();
-        for (int i = 0; i < teams.Count; i++)
-        {
-            if (teams[i].teamColor == debugList)
-            {
-                find = teams[i];
-            }
-        }
-
-        //Random spawn selector that doesn't account for duplicate players in spots, fix later
-        spawnPos = teamSpawns[find.spawns].GetChild(Random.Range(0,teamSpawns[find.spawns].childCount)).position;
 
         //Auto Team
         ClassList autoClass = ClassList.programmer;
@@ -307,7 +296,8 @@ public class GlobalManager : NetworkBehaviour
         }
 
         Debug.Log("New Player Joined (#" + clients.Count + "), Team " + debugList);
-        SendNewPlayerDataBackClientRpc(id, debugList, spawnPos, autoClass);
+        SendNewPlayerDataBackClientRpc(id, debugList, autoClass);
+        RespawnPlayerClientRpc(id);
         PlayerInfoSentToClient[] data = new PlayerInfoSentToClient[clients.Count];
         for (int i = 0; i < clients.Count; i++)
         {
@@ -350,7 +340,7 @@ public class GlobalManager : NetworkBehaviour
     }
 
     [ClientRpc]
-    void SendNewPlayerDataBackClientRpc(ulong id, TeamList team, Vector3 spawnPos, ClassList autoClass)
+    void SendNewPlayerDataBackClientRpc(ulong id, TeamList team, ClassList autoClass)
     {
         for (int i = 0; i < clients.Count; i++)
         {
@@ -358,7 +348,25 @@ public class GlobalManager : NetworkBehaviour
             {
                 clients[i].SetTeam(team);
                 clients[i].SetClass(autoClass);
-                clients[i].GetTracker().ForceNewPosition(spawnPos);
+            }
+        }
+    }
+
+    [ClientRpc]
+    public void RespawnPlayerClientRpc(ulong id)
+    {
+        for (int i = 0; i < clients.Count; i++)
+        {
+            if (clients[i].GetPlayerID() == id)
+            {
+                for (int e = 0; e < teams.Count; e++)
+                {
+                    if (teams[e].teamColor == clients[i].GetTeam())
+                    {
+                        Vector3 spawnPos = teamSpawns[teams[e].spawns].GetChild(Random.Range(0, teamSpawns[teams[e].spawns].childCount)).position;
+                        clients[i].GetTracker().ForceNewPosition(spawnPos);
+                    }
+                }
             }
         }
     }
@@ -408,7 +416,6 @@ public class GlobalManager : NetworkBehaviour
             }
         }
     }
-
 }
 
 [System.Serializable]
