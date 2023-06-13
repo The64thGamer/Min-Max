@@ -4,17 +4,18 @@ using System.Linq;
 using Unity.Netcode;
 using Unity.Netcode.Transports.UTP;
 using UnityEngine;
+using UnityEngine.Windows;
 
 public class GlobalManager : NetworkBehaviour
 {
     [Header("Server Settings")]
-    [SerializeField] List<TeamInfo> teams = new List<TeamInfo>();
-    [SerializeField] List<PlayerDataSentToClient> playerPosRPCData = new List<PlayerDataSentToClient>();
+    List<TeamInfo> teams = new List<TeamInfo>();
+    List<PlayerDataSentToClient> playerPosRPCData = new List<PlayerDataSentToClient>();
     [SerializeField] NetworkVariable<int> ServerTickRate = new NetworkVariable<int>(10);
 
     [Header("Lists")]
     [SerializeField] GameObject clientPrefab;
-    [SerializeField] List<Player> clients;
+    List<Player> clients = new List<Player>();
     [SerializeField] List<Transform> teamSpawns;
 
     [Header("The Map")]
@@ -77,19 +78,20 @@ public class GlobalManager : NetworkBehaviour
     private void Update()
     {
         for (int i = 0; i < clients.Count; i++)
-        {
-            //Game Logic
-            if (clients[i].GetTracker().GetTriggerR())
-            {
-                clients[i].GetCurrentGun().Fire();
-            }
-            clients[i].GetController().MovePlayer(clients[i].GetTracker().GetMoveAxis(), clients[i].GetTracker().GetRHandAButton());
-
+        {            
             //Client Networking
             if (clients[i].IsOwner)
             {
                 SendJoystickServerRpc(clients[i].GetTracker().GetPlayerNetworkData(), clients[i].GetPlayerID());
             }
+
+            //Game Logic
+            if (clients[i].GetTracker().GetTriggerR())
+            {
+                clients[i].GetCurrentGun().Fire();
+            }
+            Debug.Log("GetAxis " + clients[i].GetTracker().GetMoveAxis());
+            clients[i].GetController().MovePlayer(clients[i].GetTracker().GetMoveAxis(), clients[i].GetTracker().GetRHandAButton());
         }
     }
     void LateUpdate()
@@ -273,11 +275,13 @@ public class GlobalManager : NetworkBehaviour
     [ServerRpc(RequireOwnership = false)]
     void SendJoystickServerRpc(PlayerDataSentToServer serverData, ulong id)
     {
+        if (IsHost) { return; }
+
         for (int i = 0; i < clients.Count; i++)
         {
             if (clients[i].OwnerClientId == id && !clients[i].IsOwner)
             {
-                clients[i].GetTracker().UpdatePlayerPositions(serverData);
+                clients[i].GetTracker().ServerSyncPlayerInputs(serverData);
                 return;
             }
         }
@@ -357,8 +361,9 @@ public class GlobalManager : NetworkBehaviour
     [ClientRpc]
     private void SendPosClientRpc(PlayerDataSentToClient[] data)
     {
-        playerPosRPCData = data.ToList<PlayerDataSentToClient>();
         if (IsHost) { return; }
+
+        playerPosRPCData = data.ToList<PlayerDataSentToClient>();
         for (int e = 0; e < clients.Count; e++)
         {
             for (int i = 0; i < playerPosRPCData.Count; i++)
@@ -369,7 +374,7 @@ public class GlobalManager : NetworkBehaviour
                     clients[e].GetTracker().SetNewClientPosition(playerPosRPCData[i].pos, playerPosRPCData[i].velocity, playerPosRPCData[i].predictionTime);
                     if (!IsOwner)
                     {
-                        clients[e].GetTracker().UpdatePlayerPositions(playerPosRPCData[i]);
+                        clients[e].GetTracker().ClientSyncPlayerInputs(playerPosRPCData[i]);
                     }
                 }
             }

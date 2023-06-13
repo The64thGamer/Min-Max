@@ -67,6 +67,7 @@ public class PlayerTracker : NetworkBehaviour
             rhandAButton = jump.action.IsPressed();
             triggerR = triggerRAction.action.IsPressed();
             triggerL = triggerLAction.action.IsPressed();
+            Debug.Log("ReadValue " + moveAxis.action.ReadValue<Vector2>());
         }
     }
 
@@ -122,7 +123,7 @@ public class PlayerTracker : NetworkBehaviour
         charController.enabled = true;
     }
 
-    public void UpdatePlayerPositions(PlayerDataSentToClient data)
+    public void ClientSyncPlayerInputs(PlayerDataSentToClient data)
     {
         headset.localPosition = data.headsetPos;
         headset.rotation = data.headsetRot;
@@ -132,7 +133,7 @@ public class PlayerTracker : NetworkBehaviour
         leftController.rotation = data.lHandRot;
     }
 
-    public void UpdatePlayerPositions(PlayerDataSentToServer data)
+    public void ServerSyncPlayerInputs(PlayerDataSentToServer data)
     {
         headset.localPosition = data.headsetPos;
         headset.rotation = data.headsetRot;
@@ -166,7 +167,7 @@ public class PlayerTracker : NetworkBehaviour
     {
         return new PlayerDataSentToServer()
         {
-            rightJoystick = GetMoveAxis(),
+            rightJoystick = movementAxis,
             jump = jump.action.IsPressed(),
             shoot = triggerRAction.action.IsPressed(),
             headsetPos = headset.localPosition,

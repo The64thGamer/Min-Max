@@ -57,7 +57,7 @@ namespace StarterAssets
 
 		public void MovePlayer(Vector2 _input, bool jump)
         {
-
+			Debug.Log("MovePlayer " + _input);
             Vector3 forward = _mainCamera.transform.forward;
             Vector3 right = _mainCamera.transform.right;
             forward.y = 0f;
