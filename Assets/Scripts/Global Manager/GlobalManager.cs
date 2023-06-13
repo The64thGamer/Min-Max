@@ -17,10 +17,7 @@ public class GlobalManager : NetworkBehaviour
     [SerializeField] GameObject clientPrefab;
     List<Player> clients = new List<Player>();
     [SerializeField] List<Transform> teamSpawns;
-
-    [Header("The Map")]
-    [SerializeField] Transform mapProps;
-    [SerializeField] Transform mapGeometry;
+    [SerializeField] List<Transform> teamGeometry;
 
     //Ect
     AllStats al;
@@ -129,16 +126,7 @@ public class GlobalManager : NetworkBehaviour
         for (int e = 0; e < teams.Count; e++)
         {
             float team1Final = (float)teams[e].teamColor + 1;
-            Renderer[] meshes = mapProps.GetComponentsInChildren<Renderer>();
-            for (int i = 0; i < meshes.Length; i++)
-            {
-                Material[] mats = meshes[i].sharedMaterials;
-                for (int r = 0; r < mats.Length; r++)
-                {
-                    mats[r].SetFloat("_Team_1", team1Final);
-                }
-            }
-            meshes = mapGeometry.GetComponentsInChildren<Renderer>();
+            Renderer[] meshes = teamGeometry[teams[e].spawns].GetComponentsInChildren<Renderer>();
             for (int i = 0; i < meshes.Length; i++)
             {
                 Material[] mats = meshes[i].sharedMaterials;
@@ -208,6 +196,7 @@ public class GlobalManager : NetworkBehaviour
     public void AddNewTeam(TeamInfo newTeam)
     {
         teams.Add(newTeam);
+        ModifyTeamsAcrossServer();
     }
 
     public void ClearTeams()
