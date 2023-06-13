@@ -15,6 +15,7 @@ public class MouseLook : NetworkBehaviour
 
     private void Start()
     {
+
         if (PlayerPrefs.GetInt("IsVREnabled") == 1 || !IsOwner)
         {
             Destroy(this);

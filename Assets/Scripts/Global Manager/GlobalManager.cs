@@ -90,10 +90,17 @@ public class GlobalManager : NetworkBehaviour
             {
                 clients[i].GetCurrentGun().Fire();
             }
-            Debug.Log("GetAxis " + clients[i].GetTracker().GetMoveAxis());
+        }    
+    }
+
+    private void FixedUpdate()
+    {
+        for (int i = 0; i < clients.Count; i++)
+        {
             clients[i].GetController().MovePlayer(clients[i].GetTracker().GetMoveAxis(), clients[i].GetTracker().GetRHandAButton());
         }
     }
+
     void LateUpdate()
     {
         //Server Networking

@@ -67,7 +67,6 @@ public class PlayerTracker : NetworkBehaviour
             rhandAButton = jump.action.IsPressed();
             triggerR = triggerRAction.action.IsPressed();
             triggerL = triggerLAction.action.IsPressed();
-            Debug.Log("ReadValue " + moveAxis.action.ReadValue<Vector2>());
         }
     }
 

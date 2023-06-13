@@ -1,8 +1,4 @@
-﻿using Unity.Netcode;
-using UnityEngine;
-#if ENABLE_INPUT_SYSTEM
-using UnityEngine.InputSystem;
-#endif
+﻿using UnityEngine;
 
 namespace StarterAssets
 {
@@ -29,7 +25,6 @@ namespace StarterAssets
 
 		// player
 		private float _speed;
-		private float _rotationVelocity;
 		private float _verticalVelocity;
 		private float _terminalVelocity = 53.0f;
 
@@ -57,7 +52,6 @@ namespace StarterAssets
 
 		public void MovePlayer(Vector2 _input, bool jump)
         {
-			Debug.Log("MovePlayer " + _input);
             Vector3 forward = _mainCamera.transform.forward;
             Vector3 right = _mainCamera.transform.right;
             forward.y = 0f;
@@ -65,6 +59,7 @@ namespace StarterAssets
             forward.Normalize();
             right.Normalize();
             Vector3 newAxis = forward * _input.y + right * _input.x;
+
 
 			//Movement rotation halted in midair
 			if (_controller != null)
@@ -90,6 +85,7 @@ namespace StarterAssets
 					hasBeenGrounded = false;
 				}
 			}
+
 
 			//Jump
             JumpAndGravity(jump);
