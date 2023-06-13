@@ -65,7 +65,7 @@ public class GlobalManager : NetworkBehaviour
                 break;
         }
 
-        if(PlayerPrefs.GetInt("SpawnBotsInEmpty") > 0)
+        if (PlayerPrefs.GetInt("SpawnBotsInEmpty") > 0)
         {
             for (int i = 0; i < PlayerPrefs.GetInt("ServerMaxPlayers"); i++)
             {
@@ -78,7 +78,7 @@ public class GlobalManager : NetworkBehaviour
     private void Update()
     {
         for (int i = 0; i < clients.Count; i++)
-        {            
+        {
             //Client Networking
             if (clients[i].IsOwner)
             {
@@ -90,7 +90,7 @@ public class GlobalManager : NetworkBehaviour
             {
                 clients[i].GetCurrentGun().Fire();
             }
-        }    
+        }
     }
 
     private void FixedUpdate()
@@ -306,7 +306,7 @@ public class GlobalManager : NetworkBehaviour
                 return;
             }
         }
-        if(clients.Count >= PlayerPrefs.GetInt("ServerMaxPlayers"))
+        if (clients.Count >= PlayerPrefs.GetInt("ServerMaxPlayers"))
         {
             bool goodToGo = false;
             for (int i = 0; i < clients.Count; i++)
@@ -319,7 +319,7 @@ public class GlobalManager : NetworkBehaviour
                     break;
                 }
             }
-            if(!goodToGo)
+            if (!goodToGo)
             {
                 Debug.Log("Player could not connect, server full.");
                 return;
@@ -346,7 +346,7 @@ public class GlobalManager : NetworkBehaviour
 
         Debug.Log("New Player Joined (#" + clients.Count + "), Team " + debugList);
         SendNewPlayerDataBackClientRpc(id, debugList, autoClass);
-        RespawnPlayerClientRpc(id,debugList);
+        RespawnPlayerClientRpc(id, debugList);
         PlayerInfoSentToClient[] data = new PlayerInfoSentToClient[clients.Count];
         for (int i = 0; i < clients.Count; i++)
         {
