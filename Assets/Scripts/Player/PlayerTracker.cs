@@ -30,6 +30,7 @@ public class PlayerTracker : NetworkBehaviour
     [SerializeField] InputActionProperty jump;
     [SerializeField] InputActionProperty triggerRAction;
     [SerializeField] InputActionProperty triggerLAction;
+    [SerializeField] InputActionProperty pressRStickAction;
     [SerializeField] Player player;
     [SerializeField] CharacterController charController;
 
@@ -38,6 +39,7 @@ public class PlayerTracker : NetworkBehaviour
     bool triggerR;
     bool triggerL;
     bool rhandAButton;
+    bool pressRstick;
 
     //Wackness
     Vector3 prevRHandPos;
@@ -67,6 +69,7 @@ public class PlayerTracker : NetworkBehaviour
             rhandAButton = jump.action.IsPressed();
             triggerR = triggerRAction.action.IsPressed();
             triggerL = triggerLAction.action.IsPressed();
+            pressRstick = pressRStickAction.action.IsPressed();
         }
     }
 
@@ -104,6 +107,7 @@ public class PlayerTracker : NetworkBehaviour
         if (jump.action != null) jump.action.Enable();
         if (triggerRAction.action != null) triggerRAction.action.Enable();
         if (triggerLAction.action != null) triggerLAction.action.Enable();
+        if (pressRStickAction.action != null) pressRStickAction.action.Enable();
     }
 
     public void SetNewClientPosition(Vector3 pos, Vector3 velocity, float rpcPredicitonTime)
