@@ -1,0 +1,34 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class Wire : MonoBehaviour
+{
+    WirePoint startingWire;
+
+    public Vector3 CheckForClosestWire(Vector3 playerPos)
+    {
+        return RecursiveWireSearch(playerPos, startingWire, float.PositiveInfinity).point;
+    }
+
+    WirePoint RecursiveWireSearch(Vector3 playerPos, WirePoint parent, float distance)
+    {
+        for (int i = 0; i < parent.children.Count; i++)
+        {
+            if (Vector3.Distance(parent.children[i].point, playerPos) < distance)
+            {
+                distance = Vector3.Distance(parent.children[i].point, playerPos);
+            }
+            parent = RecursiveWireSearch(playerPos, parent.children[i],distance);
+        }
+        return parent;
+    }
+
+    class WirePoint
+    {
+        public bool isOn = true;
+        public Vector3 point;
+        public List<WirePoint> children;
+        public WirePoint parent;
+    }
+}
