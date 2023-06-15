@@ -44,24 +44,34 @@ public class AiPlayer : NetworkBehaviour
         Player currentFind = null;
         for (int i = 0; i < clients.Count; i++)
         {
+            //Check for players within view
             if (Physics.Raycast(headset.position, clients[i].GetTracker().GetCamera().position - headset.position, out hit))
             {
                 Player collidePlayer = hit.collider.GetComponent<Player>();
                 if (collidePlayer != null)
                 {
-                    if(currentFind == null)
+                    if (currentFind == null)
                     {
                         currentFind = collidePlayer;
                     }
-                    else if (Vector3.Distance(headset.position, collidePlayer.GetTracker().GetCamera().position) < Vector3.Distance(headset.position, currentFind.GetTracker().GetCamera().position))
+                    else
                     {
-                        currentFind = collidePlayer;
+                        //If an enemy is within seeable players, prioritize them
+                        if ((currentFind.GetTeam() != player.GetTeam() && collidePlayer.GetTeam() != player.GetTeam()) || currentFind.GetTeam() == player.GetTeam())
+                        {
+                            //Prioritize closest player
+                            if (Vector3.Distance(headset.position, collidePlayer.GetTracker().GetCamera().position) < Vector3.Distance(headset.position, currentFind.GetTracker().GetCamera().position))
+                            {
+                                currentFind = collidePlayer;
+                            }
+                        }
                     }
                 }
             }
         }
         if(currentFind == null)
         {
+            //When cant find a target, looks at random player in the map
             targetPoint = clients[Random.Range(0, gm.GetClients().Count)].GetTracker().GetCamera().position;
         }
         else
