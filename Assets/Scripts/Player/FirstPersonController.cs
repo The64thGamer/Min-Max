@@ -24,24 +24,28 @@ namespace StarterAssets
 		public float FallTimeout = 0.15f;
 
 		// player
-		private float _speed;
-		private float _verticalVelocity;
-		private float _terminalVelocity = 53.0f;
+		 float _speed;
+		 float _verticalVelocity;
+		 float _terminalVelocity = 53.0f;
 
 		// timeout deltatime
-		private float _jumpTimeoutDelta;
-		private float _fallTimeoutDelta;
+		 float _jumpTimeoutDelta;
+		 float _fallTimeoutDelta;
 
-		private CharacterController _controller;
+		 CharacterController _controller;
 		[SerializeField] GameObject _mainCamera;
 
 
-        private const float _threshold = 0.01f;
+         const float _threshold = 0.01f;
 
 		Vector3 oldAxis;
 		bool hasBeenGrounded;
 
-		private void Start()
+		//Crouch
+		float currentCrouchLerp;
+
+
+		 void Start()
 		{
 			_controller = GetComponent<CharacterController>();
 
@@ -50,7 +54,7 @@ namespace StarterAssets
 			_fallTimeoutDelta = FallTimeout;
 		}
 
-		public void MovePlayer(Vector2 _input, bool jump)
+		public void MovePlayer(Vector2 _input, bool jump, bool crouch)
         {
             Vector3 forward = _mainCamera.transform.forward;
             Vector3 right = _mainCamera.transform.right;
@@ -60,6 +64,15 @@ namespace StarterAssets
             right.Normalize();
             Vector3 newAxis = forward * _input.y + right * _input.x;
 
+			//Crouch
+			if(crouch)
+			{
+
+			}
+			else
+			{
+
+			}
 
 			//Movement rotation halted in midair
 			if (_controller != null)
@@ -73,12 +86,22 @@ namespace StarterAssets
 					}
 					else
 					{
+						//No Starting Input In Air
 						if (oldAxis == Vector3.zero)
 						{
 							oldAxis = newAxis;
 						}
-						newAxis = oldAxis;
-					}
+
+						//Stop Mid-air if holding opposite direction
+						if(Vector2.Dot(oldAxis,newAxis) < 0.5f)
+						{
+							newAxis = Vector3.zero;
+                        }
+						else
+						{
+                            newAxis = oldAxis;
+                        }
+                    }
 				}
 				else
 				{
@@ -136,7 +159,7 @@ namespace StarterAssets
             _controller.Move(finalVelocity);
 		}
 
-		private void JumpAndGravity(bool jump)
+		 void JumpAndGravity(bool jump)
 		{
 			if (_controller.isGrounded)
 			{
