@@ -10,6 +10,8 @@ public class PlayerTracker : NetworkBehaviour
     [SerializeField] Transform rightController;
     [SerializeField] Transform leftController;
     [SerializeField] Transform forwardRoot;
+    [SerializeField] Transform camOffset;
+
 
     [Header("Animator")]
     [SerializeField] Animator animController;
@@ -297,6 +299,13 @@ public class PlayerTracker : NetworkBehaviour
         modelRoot = rootModel;
         playerRHand = rHandPlayer;
         playerHead = headPlayer;
+    }
+
+    public void ModifyPlayerHeight()
+    {
+        float height = PlayerPrefs.GetFloat("PlayerHeight") - 0.127f; //Height offset by 5 inches (Height from eyes to top of head)
+        camOffset.localPosition = new Vector3(0, height , 0);
+        forwardRoot.localScale = Vector3.one * (player.GetClassStats().classEyeHeight / height);
     }
 
     private void OnDrawGizmos()

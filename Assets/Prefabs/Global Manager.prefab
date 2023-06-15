@@ -51,52 +51,52 @@ MonoBehaviour:
     baseHealth: 100
     baseSpeed: 30
     baseAccel: 10
-    trackingScale: 1.16
+    classEyeHeight: 0
   woodworker:
     baseHealth: 100
     baseSpeed: 30
     baseAccel: 10
-    trackingScale: 1.16
+    classEyeHeight: 0
   engineer:
     baseHealth: 100
     baseSpeed: 30
     baseAccel: 10
-    trackingScale: 1.16
+    classEyeHeight: 0
   programmer:
     baseHealth: 100
     baseSpeed: 30
     baseAccel: 10
-    trackingScale: 1.16
+    classEyeHeight: 1.584
   computer:
     baseHealth: 100
     baseSpeed: 30
     baseAccel: 10
-    trackingScale: 1.16
+    classEyeHeight: 0
   fabricator:
     baseHealth: 100
     baseSpeed: 30
     baseAccel: 10
-    trackingScale: 1.16
+    classEyeHeight: 1.4116
   artist:
     baseHealth: 100
     baseSpeed: 30
     baseAccel: 10
-    trackingScale: 1.16
+    classEyeHeight: 0
   freelancer:
     baseHealth: 100
     baseSpeed: 30
     baseAccel: 10
-    trackingScale: 1.16
+    classEyeHeight: 0
   craftsman:
     baseHealth: 100
     baseSpeed: 30
     baseAccel: 10
-    trackingScale: 1.16
+    classEyeHeight: 0
   manager:
     baseHealth: 100
     baseSpeed: 30
     baseAccel: 10
-    trackingScale: 1.16
+    classEyeHeight: 0
   mMChips:
   - buffsNerfs:
     - buffNerf: 1
@@ -125,16 +125,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 706ae5cd5ebd39f4ba98acf44836e74e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  teams: []
-  playerPosRPCData: []
   ServerTickRate:
     m_InternalValue: 60
   clientPrefab: {fileID: 8093838907312818641, guid: 183b441558cd63c45bf2e7be831cfa21,
     type: 3}
-  clients: []
   teamSpawns: []
-  mapProps: {fileID: 0}
-  mapGeometry: {fileID: 0}
+  teamGeometry: []
 --- !u!114 &7623448802612895609
 MonoBehaviour:
   m_ObjectHideFlags: 0

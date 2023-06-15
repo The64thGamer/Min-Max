@@ -98,7 +98,7 @@ public struct ClassStats
     public int baseHealth;
     public int baseSpeed;
     public int baseAccel;
-    public float trackingScale;
+    public float classEyeHeight;
 }
 
 [System.Serializable]

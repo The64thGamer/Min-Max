@@ -2089,7 +2089,7 @@ MonoBehaviour:
     baseHealth: 0
     baseSpeed: 0
     baseAccel: 0
-    trackingScale: 0
+    classEyeHeight: 0
   tracker: {fileID: 7861903822883519718}
   controller: {fileID: 7276100145206638254}
   vrSetup: {fileID: 4484057317053731980}
@@ -2121,6 +2121,7 @@ MonoBehaviour:
   rightController: {fileID: 4021970662802244310}
   leftController: {fileID: 8756789624271952682}
   forwardRoot: {fileID: 4484057317053731980}
+  camOffset: {fileID: 5950323513306811924}
   animController: {fileID: 0}
   modelRoot: {fileID: 0}
   playerRHand: {fileID: 0}
@@ -2272,6 +2273,18 @@ MonoBehaviour:
         m_Groups: 
         m_Action: Trigger L
         m_Flags: 0
+      m_Flags: 0
+    m_Reference: {fileID: 0}
+  pressRStickAction:
+    m_UseReference: 0
+    m_Action:
+      m_Name: Press R Stick
+      m_Type: 0
+      m_ExpectedControlType: 
+      m_Id: 82b3ef6b-e716-4942-93d9-9b80605d2628
+      m_Processors: 
+      m_Interactions: 
+      m_SingletonActionBindings: []
       m_Flags: 0
     m_Reference: {fileID: 0}
   player: {fileID: 4907099281776281469}

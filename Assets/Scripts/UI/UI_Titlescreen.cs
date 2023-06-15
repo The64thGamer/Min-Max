@@ -50,7 +50,7 @@ public class UI_Titlescreen : MonoBehaviour
         Toggle spawnBots = root.Q<Toggle>("SpawnBots");
 
 
-        //Functions
+        //Functions When Button is Clicked
         rc_startVR.clicked += () => SwitchMainTab(0);
         rc_play.clicked += () => SwitchMainTab(1);
         rc_exit.clicked += () => Application.Quit();
@@ -67,16 +67,7 @@ public class UI_Titlescreen : MonoBehaviour
         team2.RegisterValueChangedCallback(evt => PlayerPrefs.SetInt("Team2Setting", team2.index));
         spawnBots.RegisterValueChangedCallback(evt => PlayerPrefs.SetInt("SpawnBotsInEmpty", spawnBots.value ? 1 : 0));
 
-
-        //Ect
-        selectMap.choices = mapNames;
-        selectMap.index = 0;
-        maxPlayers.value = Mathf.Max(PlayerPrefs.GetInt("ServerMaxPlayers"),1);
-        spawnBots.value = Convert.ToBoolean(PlayerPrefs.GetInt("SpawnBotsInEmpty"));
-        spectatorAsPlayer.value = Convert.ToBoolean(PlayerPrefs.GetInt("ServerSpectatorAsPlayer"));
-        team1.index = PlayerPrefs.GetInt("Team1Setting");
-        team2.index = PlayerPrefs.GetInt("Team2Setting");
-
+        //Set Default Values when Out of Range (Or on First Boot)
         if (PlayerPrefs.GetInt("IsVREnabled") == 1)
         {
             rc_startVR.style.display = DisplayStyle.None;
@@ -86,11 +77,27 @@ public class UI_Titlescreen : MonoBehaviour
             UnityEngine.Cursor.lockState = CursorLockMode.None;
             UnityEngine.Cursor.visible = true;
         }
-        if(PlayerPrefs.GetInt("ServerPort") <= 0)
+        if (PlayerPrefs.GetInt("ServerPort") <= 0)
         {
             PlayerPrefs.SetInt("ServerPort", 7777);
         }
+        if (PlayerPrefs.GetFloat("PlayerHeight") < 0.9144f && PlayerPrefs.GetFloat("PlayerHeight") > 2.1336) //Value is 3 feet, 7 Feet
+        {
+            PlayerPrefs.SetFloat("PlayerHeight", 1.524f); //Value is 5 feet
+        }
+
+        //Set Values
+        selectMap.choices = mapNames;
+        selectMap.index = 0;
+        maxPlayers.value = Mathf.Max(PlayerPrefs.GetInt("ServerMaxPlayers"),1);
+        spawnBots.value = Convert.ToBoolean(PlayerPrefs.GetInt("SpawnBotsInEmpty"));
+        spectatorAsPlayer.value = Convert.ToBoolean(PlayerPrefs.GetInt("ServerSpectatorAsPlayer"));
+        team1.index = PlayerPrefs.GetInt("Team1Setting");
+        team2.index = PlayerPrefs.GetInt("Team2Setting");
         selectPort.value = PlayerPrefs.GetInt("ServerPort").ToString();
+
+
+
     }
 
     IEnumerator LoadMap()
