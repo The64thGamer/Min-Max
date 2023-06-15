@@ -4,9 +4,15 @@ using UnityEngine;
 
 public class Wire : MonoBehaviour
 {
-    [SerializeField] WirePoint startingWire;
+    [SerializeField] Transform startPoint;
+    WirePoint startingWire = new WirePoint();
     const float minWireGrabDistance = 0.1f;
     Vector3 raycastYOffset = new Vector3(0, 0.2f, 0) ;
+
+    private void Start()
+    {
+        startingWire.point = startPoint.position;
+    }
 
     public WirePoint RequestForWire(Vector3 playerPos)
     {
@@ -42,6 +48,7 @@ public class Wire : MonoBehaviour
         return bestChoice;
     }
 
+    [System.Serializable]
     public class WirePoint
     {
         public bool isOn = true;
