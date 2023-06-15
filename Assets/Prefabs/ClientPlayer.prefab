@@ -2045,6 +2045,7 @@ GameObject:
   - component: {fileID: 6723066605033233937}
   - component: {fileID: 5652349492828538713}
   - component: {fileID: 7276100145206638254}
+  - component: {fileID: 3553998420938263425}
   m_Layer: 10
   m_Name: ClientPlayer
   m_TagString: Untagged
@@ -2398,6 +2399,21 @@ MonoBehaviour:
   JumpTimeout: 0.1
   FallTimeout: 0.15
   _mainCamera: {fileID: 6447799786635912044}
+--- !u!114 &3553998420938263425
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8093838907312818641}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b3aca12fb7a39804193af315c810c62f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  player: {fileID: 0}
+  headset: {fileID: 0}
+  gm: {fileID: 0}
 --- !u!1001 &3018312229643902415
 PrefabInstance:
   m_ObjectHideFlags: 0
