@@ -118,10 +118,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5794986e9ccdfe841a6a745024157633, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  startingWire:
-    isOn: 1
-    point: {x: 0, y: 0, z: 0}
-    children: []
+  startPoint: {fileID: 1069363177007763308}
 --- !u!1 &6489486011466357420
 GameObject:
   m_ObjectHideFlags: 0

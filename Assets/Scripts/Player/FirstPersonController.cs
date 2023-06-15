@@ -23,23 +23,25 @@ namespace StarterAssets
 		[Tooltip("Time required to pass before entering the fall state. Useful for walking down stairs")]
 		public float FallTimeout = 0.15f;
 
-		// player
-		 float _speed;
-		 float _verticalVelocity;
-		 float _terminalVelocity = 53.0f;
-
-		// timeout deltatime
-		 float _jumpTimeoutDelta;
-		 float _fallTimeoutDelta;
-
-		 CharacterController _controller;
+        //Objects
+        CharacterController _controller;
 		[SerializeField] GameObject _mainCamera;
 
+		//Consts
+        const float _threshold = 0.01f;
 
-         const float _threshold = 0.01f;
+        // player
+        float _speed;
+        float _verticalVelocity;
+        float _terminalVelocity = 53.0f;
+        float _jumpTimeoutDelta;
+        float _fallTimeoutDelta;
 
-		Vector3 oldAxis;
+        //Midair Movement
+        Vector3 oldAxis;
+		Vector2 oldInput;
 		bool hasBeenGrounded;
+		bool hasBeenStopped;
 
 		//Crouch
 		float currentCrouchLerp;
@@ -82,31 +84,42 @@ namespace StarterAssets
 					if (!hasBeenGrounded)
 					{
 						oldAxis = newAxis;
+						oldInput = _input;
 						hasBeenGrounded = true;
 					}
 					else
 					{
-						//No Starting Input In Air
-						if (oldAxis == Vector3.zero)
+						if (!hasBeenStopped)
 						{
-							oldAxis = newAxis;
+							//No Starting Input In Air
+							if (oldAxis == Vector3.zero)
+							{
+								oldAxis = newAxis;
+                                oldInput = _input;
+                            }
+                            else if (Vector2.Dot(oldInput, _input) < -0.5f)
+                            {
+								//Stop Mid-air if holding opposite direction
+                                newAxis = Vector3.zero;
+								hasBeenStopped = true;
+							}
+							else
+							{
+								newAxis = oldAxis;
+							}
 						}
-
-						//Stop Mid-air if holding opposite direction
-						if(Vector2.Dot(oldAxis,newAxis) < 0.5f)
-						{
-							newAxis = Vector3.zero;
-                        }
 						else
 						{
-                            newAxis = oldAxis;
-                        }
+							newAxis = Vector3.zero;
+						}
                     }
 				}
 				else
 				{
 					hasBeenGrounded = false;
-				}
+					hasBeenStopped = false;
+
+                }
 			}
 
 
