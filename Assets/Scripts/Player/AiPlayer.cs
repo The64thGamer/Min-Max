@@ -11,7 +11,10 @@ public class AiPlayer : NetworkBehaviour
     GlobalManager gm;
     const ulong botID = 64646464646464;
 
-    Vector3 targetPoint;
+    //Target
+    Player target;
+    Transform targetHeadset;
+    bool isTargetEnemy;
 
     private void Start()
     {
@@ -34,7 +37,7 @@ public class AiPlayer : NetworkBehaviour
         }
         timeToSwap -= Time.deltaTime;
 
-        headset.rotation = Quaternion.Lerp(headset.rotation, Quaternion.LookRotation(targetPoint - headset.position, headset.up), Time.deltaTime * 10);
+        headset.rotation = Quaternion.Lerp(headset.rotation, Quaternion.LookRotation(targetHeadset.position - headset.position, headset.up), Time.deltaTime * 10);
     }
 
     void ChangeFocus()
@@ -57,13 +60,19 @@ public class AiPlayer : NetworkBehaviour
                     else
                     {
                         //If an enemy is within seeable players, prioritize them
-                        if ((currentFind.GetTeam() != player.GetTeam() && collidePlayer.GetTeam() != player.GetTeam()) || currentFind.GetTeam() == player.GetTeam())
+                        bool currentlyOnlyFriendlies = currentFind.GetTeam() == player.GetTeam();
+                        bool isEnemy = collidePlayer.GetTeam() != player.GetTeam();
+                        if ((currentlyOnlyFriendlies && !isEnemy) || (!currentlyOnlyFriendlies && isEnemy))
                         {
                             //Prioritize closest player
                             if (Vector3.Distance(headset.position, collidePlayer.GetTracker().GetCamera().position) < Vector3.Distance(headset.position, currentFind.GetTracker().GetCamera().position))
                             {
                                 currentFind = collidePlayer;
                             }
+                        }
+                        else if(currentlyOnlyFriendlies && isEnemy)
+                        {
+                            currentFind = collidePlayer;
                         }
                     }
                 }
@@ -72,11 +81,15 @@ public class AiPlayer : NetworkBehaviour
         if(currentFind == null)
         {
             //When cant find a target, looks at random player in the map
-            targetPoint = clients[Random.Range(0, gm.GetClients().Count)].GetTracker().GetCamera().position;
+            target = clients[Random.Range(0, gm.GetClients().Count)];
+            targetHeadset = target.GetTracker().GetCamera();
+            isTargetEnemy = false;
         }
         else
         {
-            targetPoint = currentFind.GetTracker().GetCamera().position;
+            target = currentFind;
+            targetHeadset = target.GetTracker().GetCamera();
+            isTargetEnemy = currentFind.GetTeam() != player.GetTeam();
         }
     }
 }
