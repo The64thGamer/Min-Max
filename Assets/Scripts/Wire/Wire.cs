@@ -4,11 +4,20 @@ using UnityEngine;
 
 public class Wire : MonoBehaviour
 {
-    WirePoint startingWire;
+    [SerializeField] WirePoint startingWire;
+    const float minWireGrabDistance = 0.1f;
 
-    public Vector3 CheckForClosestWire(Vector3 playerPos)
+    public WirePoint RequestForWire(Vector3 playerPos)
     {
-        return RecursiveWireSearch(playerPos, startingWire, float.PositiveInfinity).point;
+        WirePoint closest = RecursiveWireSearch(playerPos, startingWire, float.PositiveInfinity);
+        if(Vector3.Distance(playerPos,closest.point) <= minWireGrabDistance)
+        {
+            return new WirePoint() { parent = closest, isOn = true, point = playerPos };
+        }
+        else
+        {
+            return null;
+        }
     }
 
     WirePoint RecursiveWireSearch(Vector3 playerPos, WirePoint parent, float distance)
@@ -29,7 +38,7 @@ public class Wire : MonoBehaviour
         return bestChoice;
     }
 
-    class WirePoint
+    public class WirePoint
     {
         public bool isOn = true;
         public Vector3 point;
