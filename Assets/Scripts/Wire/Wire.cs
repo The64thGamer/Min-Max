@@ -13,15 +13,20 @@ public class Wire : MonoBehaviour
 
     WirePoint RecursiveWireSearch(Vector3 playerPos, WirePoint parent, float distance)
     {
+        WirePoint bestChoice = parent;
         for (int i = 0; i < parent.children.Count; i++)
         {
             if (Vector3.Distance(parent.children[i].point, playerPos) < distance)
             {
                 distance = Vector3.Distance(parent.children[i].point, playerPos);
+                bestChoice = parent.children[i];
             }
-            parent = RecursiveWireSearch(playerPos, parent.children[i],distance);
+            if (parent.children[i].children.Count > 0)
+            {
+                bestChoice = RecursiveWireSearch(playerPos, parent.children[i], distance);
+            }
         }
-        return parent;
+        return bestChoice;
     }
 
     class WirePoint
