@@ -306,6 +306,7 @@ public class PlayerTracker : NetworkBehaviour
         float height = PlayerPrefs.GetFloat("PlayerHeight") - 0.127f; //Height offset by 5 inches (Height from eyes to top of head)
         camOffset.localPosition = new Vector3(0, height , 0);
         forwardRoot.localScale = Vector3.one * (player.GetClassStats().classEyeHeight / height);
+        Debug.Log(height + " a " + player.GetClassStats().classEyeHeight);
     }
 
     private void OnDrawGizmos()

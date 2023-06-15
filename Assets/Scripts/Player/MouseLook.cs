@@ -24,7 +24,6 @@ public class MouseLook : NetworkBehaviour
         {
             UnityEngine.Cursor.lockState = CursorLockMode.Locked;
             UnityEngine.Cursor.visible = false;
-            cam.transform.localPosition += new Vector3(0,1.5951f,0);
             Destroy(cam.GetComponent<TrackedPoseDriver>());
         }
     }

@@ -81,7 +81,7 @@ public class UI_Titlescreen : MonoBehaviour
         {
             PlayerPrefs.SetInt("ServerPort", 7777);
         }
-        if (PlayerPrefs.GetFloat("PlayerHeight") < 0.9144f && PlayerPrefs.GetFloat("PlayerHeight") > 2.1336) //Value is 3 feet, 7 Feet
+        if (PlayerPrefs.GetFloat("PlayerHeight") < 0.9144f || PlayerPrefs.GetFloat("PlayerHeight") > 2.1336) //Value is 3 feet, 7 Feet
         {
             PlayerPrefs.SetFloat("PlayerHeight", 1.524f); //Value is 5 feet
         }
