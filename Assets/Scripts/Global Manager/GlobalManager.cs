@@ -323,10 +323,10 @@ public class GlobalManager : NetworkBehaviour
 
         //Auto Team
         ClassList autoClass = ClassList.programmer;
-        if (id % 2 == 0)
+        int random = Random.Range(0, 2);
+        if (random == 0)
         {
             autoClass = ClassList.programmer;
-
         }
         else
         {
