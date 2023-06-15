@@ -94,7 +94,8 @@ public class GlobalManager : NetworkBehaviour
     {
         for (int i = 0; i < clients.Count; i++)
         {
-            clients[i].GetController().MovePlayer(clients[i].GetTracker().GetMoveAxis(), clients[i].GetTracker().GetRHandAButton());
+            PlayerDataSentToServer inputs = clients[i].GetTracker().GetPlayerNetworkData();
+            clients[i].GetController().MovePlayer(inputs.rightJoystick, inputs.jump,inputs.crouch);
         }
     }
 
