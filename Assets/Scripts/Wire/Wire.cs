@@ -14,7 +14,9 @@ public class Wire : MonoBehaviour
         if(Vector3.Distance(playerPos,closest.point) <= minWireGrabDistance 
             && !Physics.Raycast(playerPos + raycastYOffset, (closest.point + raycastYOffset) - (playerPos + raycastYOffset)))
         {
-            return new WirePoint() { parent = closest, isOn = true, point = playerPos };
+            WirePoint final = new WirePoint() { parent = closest, isOn = true, point = playerPos };
+            closest.children.Add(final);
+            return final;
         }
         else
         {
