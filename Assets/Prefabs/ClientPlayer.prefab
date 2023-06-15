@@ -2411,9 +2411,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b3aca12fb7a39804193af315c810c62f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  player: {fileID: 0}
-  headset: {fileID: 0}
-  gm: {fileID: 0}
 --- !u!1001 &3018312229643902415
 PrefabInstance:
   m_ObjectHideFlags: 0

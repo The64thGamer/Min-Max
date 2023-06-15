@@ -197,21 +197,6 @@ public class PlayerTracker : NetworkBehaviour
         }
     }
 
-    void ScaleAround(Transform target, Vector3 pivot, Vector3 newScale)
-    {
-        Vector3 A = target.localPosition;
-        Vector3 B = pivot;
-
-        Vector3 C = A - B;
-
-        float RS = newScale.x / target.localScale.x;
-
-        Vector3 FP = B + C * RS;
-
-        //target.localScale = newScale;
-        target.localPosition = FP;
-    }
-
     public bool GetTriggerR()
     {
         return triggerR;
