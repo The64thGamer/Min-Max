@@ -8,8 +8,10 @@ public class AiPlayer : NetworkBehaviour
 {
     Player player;
     Transform headset;
+    Transform rhand;
     GlobalManager gm;
     const ulong botID = 64646464646464;
+    PlayerTracker tracker;
 
     //Target
     Player target;
@@ -25,6 +27,8 @@ public class AiPlayer : NetworkBehaviour
         }
         gm = GameObject.Find("Global Manager").GetComponent<GlobalManager>();
         headset = player.GetTracker().GetCamera();
+        rhand = player.GetTracker().GetRightHand();
+        tracker = player.GetTracker();
     }
 
     float timeToSwap;
@@ -37,7 +41,13 @@ public class AiPlayer : NetworkBehaviour
         }
         timeToSwap -= Time.deltaTime;
 
-        headset.rotation = Quaternion.Lerp(headset.rotation, Quaternion.LookRotation(targetHeadset.position - headset.position, headset.up), Time.deltaTime * 10);
+        if (target != null)
+        {
+            PlayerDataSentToClient data = tracker.GetPlayerPosData();
+            data.rHandRot = Quaternion.Lerp(rhand.rotation, Quaternion.LookRotation(targetHeadset.position - rhand.position, Vector3.up), Time.deltaTime * 20);
+            data.headsetRot = Quaternion.Lerp(headset.rotation, Quaternion.LookRotation(targetHeadset.position - headset.position, Vector3.up), Time.deltaTime * 10);
+            tracker.ClientSyncPlayerInputs(data);
+        }
     }
 
     void ChangeFocus()
