@@ -6,11 +6,13 @@ public class Wire : MonoBehaviour
 {
     [SerializeField] WirePoint startingWire;
     const float minWireGrabDistance = 0.1f;
+    Vector3 raycastYOffset = new Vector3(0, 0.2f, 0) ;
 
     public WirePoint RequestForWire(Vector3 playerPos)
     {
         WirePoint closest = RecursiveWireSearch(playerPos, startingWire, float.PositiveInfinity);
-        if(Vector3.Distance(playerPos,closest.point) <= minWireGrabDistance)
+        if(Vector3.Distance(playerPos,closest.point) <= minWireGrabDistance 
+            && !Physics.Raycast(playerPos + raycastYOffset, (closest.point + raycastYOffset) - (playerPos + raycastYOffset)))
         {
             return new WirePoint() { parent = closest, isOn = true, point = playerPos };
         }
