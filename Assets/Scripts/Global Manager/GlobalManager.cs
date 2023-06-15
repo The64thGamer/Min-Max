@@ -560,6 +560,7 @@ public struct PlayerDataSentToServer : INetworkSerializable
     public Vector2 rightJoystick;
     public bool jump;
     public bool shoot;
+    public bool crouch;
 
 
     public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
@@ -573,5 +574,6 @@ public struct PlayerDataSentToServer : INetworkSerializable
         serializer.SerializeValue(ref rightJoystick);
         serializer.SerializeValue(ref jump);
         serializer.SerializeValue(ref shoot);
+        serializer.SerializeValue(ref crouch);
     }
 }
