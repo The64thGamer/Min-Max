@@ -70,7 +70,7 @@ public class Player : NetworkBehaviour
     public void SetClass(ClassList setClass)
     {
         currentClass = setClass;
-        currentStats = gm.GetComponent<AllStats>().GetClassStats(ClassList.programmer);
+        currentStats = gm.GetComponent<AllStats>().GetClassStats(setClass);
         SetCharacterVisibility(currentPlayerVisibility);
         UpdateTeamColor();
         tracker.ModifyPlayerHeight();
