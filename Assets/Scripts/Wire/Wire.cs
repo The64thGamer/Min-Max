@@ -6,6 +6,8 @@ using UnityEngine;
 public class Wire : MonoBehaviour
 {
     TeamList currentTeam;
+    [SerializeField] Texture2D palette;
+    [SerializeField] Material wireMat;
     [SerializeField] Transform startPoint;
     WirePoint startingWire = new WirePoint();
     const float minWireGrabDistance = 0.5f;
@@ -44,7 +46,6 @@ public class Wire : MonoBehaviour
                 return final;
             }
         }
-        Debug.Log("awwwwwww only " + Vector3.Distance(playerPos, closest.point));
         return null;
     }
 
@@ -81,16 +82,19 @@ public class Wire : MonoBehaviour
         GameObject bruh = new GameObject();
         bruh.transform.parent = transform;
         LineRenderer lr = bruh.AddComponent<LineRenderer>();
-        lr.SetColors(Color.black, Color.black);
-        lr.material = new Material(Shader.Find("Legacy Shaders/Particles/Alpha Blended Premultiply"));
-        lr.SetWidth(0.1f, 0.1f);
+        lr.material = wireMat;
+        lr.material.color = palette.GetPixel((int)currentTeam, 7);
+        lr.startColor = palette.GetPixel((int)currentTeam, 7);
+        lr.endColor = lr.startColor;
+        lr.startWidth = 0.1f;
+        lr.endWidth = lr.startWidth;
         meshes.Add(lr);
     }
 
     int RecursiveDraw(WirePoint parent, int index)
     {
-        meshes[index].SetPosition(0, parent.point + raycastYOffset);
-        meshes[index].SetPosition(1, parent.parent.point + raycastYOffset);
+        meshes[index].SetPosition(0, parent.point);
+        meshes[index].SetPosition(1, parent.parent.point);
         index++;
         for (int i = 0; i < parent.children.Count; i++)
         {
@@ -119,6 +123,11 @@ public class Wire : MonoBehaviour
             }
         }
         return bestChoice;
+    }
+
+    public void SetTeam(TeamList team)
+    {
+        currentTeam = team;
     }
 
 

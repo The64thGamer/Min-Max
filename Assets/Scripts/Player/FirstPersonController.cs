@@ -103,10 +103,10 @@ namespace StarterAssets
                     hasBeenCrouched = true;
                     if(IsHost)
                     {
-                        heldWire = gm.GetWire().RequestForWire(transform.position);
+                        heldWire = gm.GetWire(player.GetTeam()).RequestForWire(transform.position);
                         if (heldWire != null)
                         {
-                            gm.GiveClientWireClientRpc(player.GetPlayerID(), heldWire.wireID, heldWire.parent.wireID);
+                            gm.GiveClientWireClientRpc(player.GetPlayerID(), heldWire.wireID, heldWire.parent.wireID, player.GetTeam());
                         }
                     }
                 }

@@ -18,8 +18,7 @@ public class GlobalManager : NetworkBehaviour
     List<Player> clients = new List<Player>();
     [SerializeField] List<Transform> teamSpawns;
     [SerializeField] List<Transform> teamGeometry;
-    [SerializeField] Wire wire;
-
+    [SerializeField] List<Wire> teamWires;
 
     //Ect
     AllStats al;
@@ -142,6 +141,10 @@ public class GlobalManager : NetworkBehaviour
             {
                 clients[i].UpdateTeamColor();
             }
+            if (teamWires[teams[e].spawns] != null)
+            {
+                teamWires[teams[e].spawns].SetTeam(teams[e].teamColor);
+            }
         }
     }
 
@@ -232,9 +235,16 @@ public class GlobalManager : NetworkBehaviour
         return al;
     }
 
-    public Wire GetWire()
+    public Wire GetWire(TeamList team)
     {
-        return wire;
+        for (int e = 0; e < teams.Count; e++)
+        {
+            if(teams[e].teamColor == team)
+            {
+                return teamWires[teams[e].spawns];
+            }
+        }
+        return null;
     }
 
     public void DisconnectClient(Player player)
@@ -408,14 +418,22 @@ public class GlobalManager : NetworkBehaviour
     }
 
     [ClientRpc]
-    public void GiveClientWireClientRpc(ulong id, uint wireID, uint parentID)
+    public void GiveClientWireClientRpc(ulong id, uint wireID, uint parentID, TeamList teamWireNeeded)
     {
         if (IsHost) { return; }
+        Wire neededWire = null;
+        for (int e = 0; e < teams.Count; e++)
+        {
+            if (teams[e].teamColor == teamWireNeeded)
+            {
+                neededWire = teamWires[teams[e].spawns];
+            }
+        }
         for (int i = 0; i < clients.Count; i++)
         {
             if (clients[i].GetPlayerID() == id)
             {
-                clients[i].GetController().SetHeldWire(wire.CreateNewClientWire(wireID, parentID));
+                clients[i].GetController().SetHeldWire(neededWire.CreateNewClientWire(wireID, parentID));
                 return;
             }
         }
