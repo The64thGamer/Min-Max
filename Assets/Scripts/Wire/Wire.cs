@@ -85,9 +85,9 @@ public class Wire : MonoBehaviour
 
     void RecursiveDraw(WirePoint parent)
     {
+        Gizmos.DrawWireSphere(parent.point, 0.1f);
         for (int i = 0; i < parent.children.Count; i++)
         {
-            Gizmos.DrawWireSphere(parent.children[i].point, 0.1f);
             Gizmos.DrawLine(parent.point, parent.children[i].point);
             RecursiveDraw(parent.children[i]);
         }
