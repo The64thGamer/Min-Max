@@ -395,22 +395,37 @@ public class GlobalManager : NetworkBehaviour
             {
                 clients[i].SetTeam(team);
                 clients[i].SetClass(autoClass);
+                return;
             }
         }
     }
 
     [ClientRpc]
-    public void GiveClientWireClientRpc(ulong id, uint wireID)
+    public void GiveClientWireClientRpc(ulong id, uint wireID, uint parentID)
     {
         if (IsHost) { return; }
-
+        for (int i = 0; i < clients.Count; i++)
+        {
+            if (clients[i].GetPlayerID() == id)
+            {
+                clients[i].GetController().SetHeldWire(wire.CreateNewClientWire(wireID, parentID));
+                return;
+            }
+        }
     }
 
     [ClientRpc]
     public void RemoveClientWireClientRpc(uint id, Vector3 finalPos)
     {
         if (IsHost) { return; }
-
+        for (int i = 0; i < clients.Count; i++)
+        {
+            if (clients[i].GetPlayerID() == id)
+            {
+                clients[i].GetController().RemoveHeldWire(finalPos);
+                return;
+            }
+        }
     }
 
     [ClientRpc]

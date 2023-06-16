@@ -66,6 +66,17 @@ namespace StarterAssets
             _fallTimeoutDelta = FallTimeout;
         }
 
+        public void SetHeldWire(Wire.WirePoint wire)
+        {
+            heldWire = wire;
+        }
+
+        public void RemoveHeldWire(Vector3 finalPos)
+        {
+            heldWire.point = finalPos;
+            heldWire = null;
+        }
+
         public void MovePlayer(Vector2 _input, bool jump, bool crouch)
         {
             if (_controller == null) { return; }
@@ -88,7 +99,7 @@ namespace StarterAssets
                     if(IsHost)
                     {
                         heldWire = gm.GetWire().RequestForWire(transform.position);
-                        gm.GiveClientWireClientRpc(player.GetPlayerID(),heldWire.wireID);
+                        gm.GiveClientWireClientRpc(player.GetPlayerID(),heldWire.wireID, heldWire.parent.wireID);
                     }
                 }
                 currentCrouchLerp = Mathf.Clamp01(currentCrouchLerp + (Time.deltaTime * crouchSpeed));

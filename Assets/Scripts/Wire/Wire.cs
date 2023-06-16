@@ -56,12 +56,12 @@ public class Wire : MonoBehaviour
         return bestChoice;
     }
 
-    public WirePoint FindWireFromID(int id)
+    public WirePoint FindWireFromID(uint id)
     {
         return RecursiveIDSearch(id, startingWire);
     }
 
-    WirePoint RecursiveIDSearch(int id, WirePoint parent)
+    WirePoint RecursiveIDSearch(uint id, WirePoint parent)
     {
         WirePoint bestChoice = null;
         for (int i = 0; i < parent.children.Count; i++)
@@ -93,6 +93,13 @@ public class Wire : MonoBehaviour
         }
     }
 
+    public WirePoint CreateNewClientWire(uint id, uint parentId)
+    {
+        WirePoint parent = FindWireFromID(parentId);
+        WirePoint final = new WirePoint() { parent = parent, isOn = true, wireID = id };
+        parent.children.Add(final);
+        return final;
+    }
 
     [System.Serializable]
     public class WirePoint
