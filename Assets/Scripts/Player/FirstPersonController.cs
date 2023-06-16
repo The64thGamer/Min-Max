@@ -77,6 +77,11 @@ namespace StarterAssets
             heldWire = null;
         }
 
+        public Wire.WirePoint GetWire()
+        {
+            return heldWire;
+        }
+
         public void MovePlayer(Vector2 _input, bool jump, bool crouch)
         {
             if (_controller == null) { return; }

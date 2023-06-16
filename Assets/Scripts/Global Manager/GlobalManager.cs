@@ -250,6 +250,13 @@ public class GlobalManager : NetworkBehaviour
                 {
                     playerPosRPCData.Add(new PlayerDataSentToClient());
                 }
+
+                Wire.WirePoint wireHeld = clients[i].GetController().GetWire();
+                if (wireHeld != null)
+                {
+                    RemoveClientWireClientRpc(wireHeld.wireID, wireHeld.point);
+                    clients[i].GetController().RemoveHeldWire(wireHeld.point);
+                }
                 return;
             }
         }
