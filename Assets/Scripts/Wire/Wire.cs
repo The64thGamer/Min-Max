@@ -22,9 +22,10 @@ public class Wire : MonoBehaviour
 
     private void Update()
     {
+        int index = 0;
         for (int i = 0; i < startingWire.children.Count; i++)
         {
-            RecursiveDraw(startingWire.children[i],0);
+            index = RecursiveDraw(startingWire.children[i], index);
         }
     }
 
@@ -106,6 +107,10 @@ public class Wire : MonoBehaviour
     WirePoint RecursiveIDSearch(uint id, WirePoint parent)
     {
         WirePoint bestChoice = null;
+        if (parent.wireID == id)
+        {
+            return parent;
+        }
         for (int i = 0; i < parent.children.Count; i++)
         {
             if (parent.children[i].wireID == id)
@@ -134,6 +139,10 @@ public class Wire : MonoBehaviour
     public WirePoint CreateNewClientWire(uint id, uint parentId)
     {
         WirePoint parent = FindWireFromID(parentId);
+        if(parent == null)
+        {
+            Debug.LogError("Could not find with with ID " + parentId);
+        }
         WirePoint final = new WirePoint() { parent = parent, isOn = true, wireID = id };
         parent.children.Add(final);
         AddNewLineRenderer(final);

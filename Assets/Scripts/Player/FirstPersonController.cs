@@ -73,6 +73,7 @@ namespace StarterAssets
 
         public void RemoveHeldWire(Vector3 finalPos)
         {
+            if(heldWire == null) { return; }
             heldWire.point = finalPos;
             heldWire = null;
         }
