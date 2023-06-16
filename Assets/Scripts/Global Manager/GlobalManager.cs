@@ -264,7 +264,7 @@ public class GlobalManager : NetworkBehaviour
                 Wire.WirePoint wireHeld = clients[i].GetController().GetWire();
                 if (wireHeld != null)
                 {
-                    RemoveClientWireClientRpc(wireHeld.wireID, wireHeld.point);
+                    RemoveClientWireClientRpc(clients[i].GetPlayerID(), wireHeld.point);
                     clients[i].GetController().RemoveHeldWire(wireHeld.point);
                 }
                 return;
@@ -438,7 +438,7 @@ public class GlobalManager : NetworkBehaviour
     }
 
     [ClientRpc]
-    public void RemoveClientWireClientRpc(uint id, Vector3 finalPos)
+    public void RemoveClientWireClientRpc(ulong id, Vector3 finalPos)
     {
         if (IsHost) { return; }
         for (int i = 0; i < clients.Count; i++)

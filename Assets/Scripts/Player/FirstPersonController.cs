@@ -68,12 +68,12 @@ namespace StarterAssets
 
         public void SetHeldWire(Wire.WirePoint wire)
         {
+            Debug.Log("it worked " + player.GetPlayerID() + wire);
             heldWire = wire;
         }
 
         public void RemoveHeldWire(Vector3 finalPos)
         {
-            if(heldWire == null) { return; }
             heldWire.point = finalPos;
             heldWire = null;
         }
