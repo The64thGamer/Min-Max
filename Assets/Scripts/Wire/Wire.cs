@@ -15,6 +15,11 @@ public class Wire : MonoBehaviour
         startingWire.point = startPoint.position;
     }
 
+    private void OnDrawGizmos()
+    {
+        RecursiveDraw(startingWire);
+    }
+
     public WirePoint RequestForWire(Vector3 playerPos)
     {
         //This should only be called by the host
@@ -77,6 +82,17 @@ public class Wire : MonoBehaviour
         }
         return bestChoice;
     }
+
+    void RecursiveDraw(WirePoint parent)
+    {
+        for (int i = 0; i < parent.children.Count; i++)
+        {
+            Gizmos.DrawWireSphere(parent.children[i].point, 0.1f);
+            Gizmos.DrawLine(parent.point, parent.children[i].point);
+            RecursiveDraw(parent.children[i]);
+        }
+    }
+
 
     [System.Serializable]
     public class WirePoint

@@ -88,7 +88,7 @@ namespace StarterAssets
                     if(IsHost)
                     {
                         heldWire = gm.GetWire().RequestForWire(transform.position);
-                        gm.GiveClientWire(player.GetPlayerID(),heldWire.wireID);
+                        gm.GiveClientWireClientRpc(player.GetPlayerID(),heldWire.wireID);
                     }
                 }
                 currentCrouchLerp = Mathf.Clamp01(currentCrouchLerp + (Time.deltaTime * crouchSpeed));
@@ -99,7 +99,7 @@ namespace StarterAssets
                 {
                     if (IsHost)
                     {
-                        gm.RemoveClientWire(heldWire.wireID,heldWire.point);
+                        gm.RemoveClientWireClientRpc(heldWire.wireID,heldWire.point);
                         heldWire = null;
                     }
                     hasBeenCrouched = false;

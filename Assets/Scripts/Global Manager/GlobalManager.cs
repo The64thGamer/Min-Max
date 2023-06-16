@@ -400,14 +400,14 @@ public class GlobalManager : NetworkBehaviour
     }
 
     [ClientRpc]
-    public void GiveClientWire(ulong id, uint wireID)
+    public void GiveClientWireClientRpc(ulong id, uint wireID)
     {
         if (IsHost) { return; }
 
     }
 
     [ClientRpc]
-    public void RemoveClientWire(uint id, Vector3 finalPos)
+    public void RemoveClientWireClientRpc(uint id, Vector3 finalPos)
     {
         if (IsHost) { return; }
 
