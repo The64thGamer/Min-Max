@@ -68,7 +68,6 @@ namespace StarterAssets
 
         public void SetHeldWire(Wire.WirePoint wire)
         {
-            Debug.Log("it worked " + player.GetPlayerID() + wire);
             heldWire = wire;
         }
 
@@ -119,7 +118,7 @@ namespace StarterAssets
                 {
                     if (IsHost && heldWire != null)
                     {
-                        gm.RemoveClientWireClientRpc(heldWire.wireID,heldWire.point);
+                        gm.RemoveClientWireClientRpc(player.GetPlayerID(),heldWire.point);
                         heldWire = null;
                     }
                     hasBeenCrouched = false;
