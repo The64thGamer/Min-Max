@@ -296,11 +296,9 @@ public class GlobalManager : NetworkBehaviour
     [ServerRpc(RequireOwnership = false)]
     void SendJoystickServerRpc(PlayerDataSentToServer serverData, ulong id)
     {
-        if (IsHost) { return; }
-
         for (int i = 0; i < clients.Count; i++)
         {
-            if (clients[i].OwnerClientId == id && !clients[i].IsOwner)
+            if (clients[i].GetPlayerID() == id && !clients[i].IsOwner)
             {
                 clients[i].GetTracker().ServerSyncPlayerInputs(serverData);
                 return;
@@ -488,6 +486,7 @@ public class GlobalManager : NetworkBehaviour
     {
         for (int i = 0; i < clients.Count; i++)
         {
+            //This looks dumb but its to make sure redundant data isn't sent to all clients
             if (clients[i].GetPlayerID() == id)
             {
                 for (int e = 0; e < clients.Count; e++)
