@@ -73,7 +73,6 @@ public class Player : NetworkBehaviour
         currentStats = gm.GetComponent<AllStats>().GetClassStats(setClass);
         SetCharacterVisibility(currentPlayerVisibility);
         UpdateTeamColor();
-        tracker.ModifyPlayerHeight();
     }
 
     public void SetTeam(TeamList team)

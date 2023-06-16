@@ -55,6 +55,9 @@ public class PlayerTracker : NetworkBehaviour
     Vector3 predictedVelocity;
     Vector3 predictedPos;
 
+    //Const
+    const float crouchMinHeight = 0.7f;
+
     public enum ButtonState
     {
         off,
@@ -293,10 +296,10 @@ public class PlayerTracker : NetworkBehaviour
         playerHead = headPlayer;
     }
 
-    public void ModifyPlayerHeight()
+    public void ModifyPlayerHeight(float crouchHeight)
     {
         float height = PlayerPrefs.GetFloat("PlayerHeight") - 0.127f; //Height offset by 5 inches (Height from eyes to top of head)
-        camOffset.localPosition = new Vector3(0, height - 0.127f, 0);
+        camOffset.localPosition = new Vector3(0, (height - 0.127f) * (((1 - crouchHeight) * (1 - crouchMinHeight)) + crouchMinHeight), 0);
         forwardRoot.localScale = Vector3.one * (player.GetClassStats().classEyeHeight / height);
     }
 
