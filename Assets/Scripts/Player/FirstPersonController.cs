@@ -1,9 +1,10 @@
-﻿using UnityEngine;
+﻿using Unity.Netcode;
+using UnityEngine;
 
 namespace StarterAssets
 {
     [RequireComponent(typeof(CharacterController))]
-    public class FirstPersonController : MonoBehaviour
+    public class FirstPersonController : NetworkBehaviour
     {
         [Header("Player")]
         [Tooltip("Move speed of the character in m/s")]
@@ -27,6 +28,9 @@ namespace StarterAssets
         CharacterController _controller;
         [SerializeField] GameObject _mainCamera;
         PlayerTracker tracker;
+        GlobalManager gm;
+        Wire.WirePoint heldWire;
+        Player player;
 
         //Consts
         const float _threshold = 0.01f;
@@ -47,12 +51,15 @@ namespace StarterAssets
 
         //Crouch
         float currentCrouchLerp;
+        bool hasBeenCrouched;
 
 
-        void Start()
+        void OnNetworkSpawn()
         {
+            gm = GameObject.Find("Global Manager").GetComponent<GlobalManager>();
             tracker = this.GetComponent<PlayerTracker>();
             _controller = GetComponent<CharacterController>();
+            player = GetComponent<Player>();
 
             // reset our timeouts on start
             _jumpTimeoutDelta = JumpTimeout;
@@ -75,10 +82,28 @@ namespace StarterAssets
             //Crouch
             if (crouch && _controller.isGrounded)
             {
+                if(!hasBeenCrouched)
+                {
+                    hasBeenCrouched = true;
+                    if(IsHost)
+                    {
+                        heldWire = gm.GetWire().RequestForWire(transform.position);
+                        gm.GiveClientWire(player.GetPlayerID(),heldWire.wireID);
+                    }
+                }
                 currentCrouchLerp = Mathf.Clamp01(currentCrouchLerp + (Time.deltaTime * crouchSpeed));
             }
             else
             {
+                if (hasBeenCrouched)
+                {
+                    if (IsHost)
+                    {
+                        gm.RemoveClientWire(heldWire.wireID,heldWire.point);
+                        heldWire = null;
+                    }
+                    hasBeenCrouched = false;
+                }
                 currentCrouchLerp = Mathf.Clamp01(currentCrouchLerp - (Time.deltaTime * crouchSpeed));
             }
             targetSpeed *= ((1 - currentCrouchLerp) / 2.0f) + 0.5f;
@@ -171,6 +196,12 @@ namespace StarterAssets
             Vector3 finalVelocity = inputDirection.normalized * (_speed * Time.deltaTime) + new Vector3(0.0f, _verticalVelocity, 0.0f) * Time.deltaTime;
 
             _controller.Move(finalVelocity);
+
+            //Wire
+            if (heldWire != null)
+            {
+                heldWire.point = transform.position;
+            }
         }
 
         void JumpAndGravity(bool jump)

@@ -18,6 +18,8 @@ public class GlobalManager : NetworkBehaviour
     List<Player> clients = new List<Player>();
     [SerializeField] List<Transform> teamSpawns;
     [SerializeField] List<Transform> teamGeometry;
+    [SerializeField] Wire wire;
+
 
     //Ect
     AllStats al;
@@ -230,6 +232,11 @@ public class GlobalManager : NetworkBehaviour
         return al;
     }
 
+    public Wire GetWire()
+    {
+        return wire;
+    }
+
     public void DisconnectClient(Player player)
     {
         for (int i = 0; i < clients.Count; i++)
@@ -390,6 +397,20 @@ public class GlobalManager : NetworkBehaviour
                 clients[i].SetClass(autoClass);
             }
         }
+    }
+
+    [ClientRpc]
+    public void GiveClientWire(ulong id, uint wireID)
+    {
+        if (IsHost) { return; }
+
+    }
+
+    [ClientRpc]
+    public void RemoveClientWire(uint id, Vector3 finalPos)
+    {
+        if (IsHost) { return; }
+
     }
 
     [ClientRpc]

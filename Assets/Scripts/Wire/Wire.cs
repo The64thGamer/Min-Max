@@ -7,7 +7,8 @@ public class Wire : MonoBehaviour
     [SerializeField] Transform startPoint;
     WirePoint startingWire = new WirePoint();
     const float minWireGrabDistance = 0.1f;
-    Vector3 raycastYOffset = new Vector3(0, 0.2f, 0) ;
+    Vector3 raycastYOffset = new Vector3(0, 0.2f, 0);
+    uint lastID = 0;
 
     private void Start()
     {
@@ -16,11 +17,13 @@ public class Wire : MonoBehaviour
 
     public WirePoint RequestForWire(Vector3 playerPos)
     {
+        //This should only be called by the host
         WirePoint closest = RecursiveWireSearch(playerPos, startingWire, float.PositiveInfinity);
         if(Vector3.Distance(playerPos,closest.point) <= minWireGrabDistance 
             && !Physics.Raycast(playerPos + raycastYOffset, (closest.point + raycastYOffset) - (playerPos + raycastYOffset)))
         {
-            WirePoint final = new WirePoint() { parent = closest, isOn = true, point = playerPos };
+            WirePoint final = new WirePoint() { parent = closest, isOn = true, point = playerPos, wireID = lastID + 1};
+            lastID++;
             closest.children.Add(final);
             return final;
         }
@@ -48,6 +51,33 @@ public class Wire : MonoBehaviour
         return bestChoice;
     }
 
+    public WirePoint FindWireFromID(int id)
+    {
+        return RecursiveIDSearch(id, startingWire);
+    }
+
+    WirePoint RecursiveIDSearch(int id, WirePoint parent)
+    {
+        WirePoint bestChoice = null;
+        for (int i = 0; i < parent.children.Count; i++)
+        {
+            if (parent.children[i].wireID == id)
+            {
+                bestChoice = parent.children[i];
+                break;
+            }
+            else
+            {
+                bestChoice = RecursiveIDSearch(id, parent.children[i]);
+                if(bestChoice != null)
+                {
+                    break;
+                }
+            }
+        }
+        return bestChoice;
+    }
+
     [System.Serializable]
     public class WirePoint
     {
@@ -55,5 +85,6 @@ public class Wire : MonoBehaviour
         public Vector3 point;
         public List<WirePoint> children;
         public WirePoint parent;
+        public uint wireID;
     }
 }
