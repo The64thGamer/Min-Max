@@ -5,6 +5,7 @@ using UnityEngine;
 
 public class Wire : MonoBehaviour
 {
+    TeamList currentTeam;
     [SerializeField] Transform startPoint;
     WirePoint startingWire = new WirePoint();
     const float minWireGrabDistance = 0.5f;
@@ -29,38 +30,42 @@ public class Wire : MonoBehaviour
     {
         //This should only be called by the host
         WirePoint closest = RecursiveWireSearch(playerPos, startingWire, float.PositiveInfinity);
-        Debug.Log("Wire Attempt: " + closest);
-        if(Vector3.Distance(playerPos,closest.point) <= minWireGrabDistance 
-            //&& !Physics.Raycast(playerPos + raycastYOffset, (closest.point + raycastYOffset) - (playerPos + raycastYOffset))
-            )
+        if (closest != null)
         {
-            Debug.Log("YEAAAAAAAAAAAA");
-            WirePoint final = new WirePoint() { parent = closest, isOn = true, point = playerPos, wireID = lastID + 1};
-            lastID++;
-            closest.children.Add(final);
-            AddNewLineRenderer(final);
-            return final;
+            if (Vector3.Distance(playerPos, closest.point) <= minWireGrabDistance
+                //&& !Physics.Raycast(playerPos + raycastYOffset, (closest.point + raycastYOffset) - (playerPos + raycastYOffset))
+                )
+            {
+                WirePoint final = new WirePoint() { parent = closest, isOn = true, point = playerPos, wireID = lastID + 1 };
+                lastID++;
+                closest.children.Add(final);
+                Debug.Log(closest.children.Count);
+                AddNewLineRenderer(final);
+                return final;
+            }
         }
-        else
-        {
-            Debug.Log("awwwwwww only " + Vector3.Distance(playerPos, closest.point));
-            return null;
-        }
+        Debug.Log("awwwwwww only " + Vector3.Distance(playerPos, closest.point));
+        return null;
     }
 
     WirePoint RecursiveWireSearch(Vector3 playerPos, WirePoint parent, float distance)
     {
-        WirePoint bestChoice = parent;
+        WirePoint bestChoice = null;
+        if (Vector3.Distance(parent.point, playerPos) < distance)
+        {
+            distance = Vector3.Distance(parent.point, playerPos);
+            bestChoice = parent;
+        }
         for (int i = 0; i < parent.children.Count; i++)
         {
-            if (Vector3.Distance(parent.children[i].point, playerPos) < distance)
+            WirePoint child = RecursiveWireSearch(playerPos, parent.children[i], distance);
+            if (child != null)
             {
-                distance = Vector3.Distance(parent.children[i].point, playerPos);
-                bestChoice = parent.children[i];
-            }
-            if (parent.children[i].children.Count > 0)
-            {
-                bestChoice = RecursiveWireSearch(playerPos, parent.children[i], distance);
+                if (Vector3.Distance(child.point, playerPos) < distance)
+                {
+                    distance = Vector3.Distance(child.point, playerPos);
+                    bestChoice = child;
+                }
             }
         }
         return bestChoice;
@@ -82,15 +87,16 @@ public class Wire : MonoBehaviour
         meshes.Add(lr);
     }
 
-    void RecursiveDraw(WirePoint parent, int index)
+    int RecursiveDraw(WirePoint parent, int index)
     {
-        meshes[index].SetPosition(0, parent.point);
-        meshes[index].SetPosition(1, parent.parent.point);
+        meshes[index].SetPosition(0, parent.point + raycastYOffset);
+        meshes[index].SetPosition(1, parent.parent.point + raycastYOffset);
         index++;
         for (int i = 0; i < parent.children.Count; i++)
         {
-            RecursiveDraw(parent.children[i],index);
+            index = RecursiveDraw(parent.children[i],index);
         }
+        return index;
     }
 
     WirePoint RecursiveIDSearch(uint id, WirePoint parent)
