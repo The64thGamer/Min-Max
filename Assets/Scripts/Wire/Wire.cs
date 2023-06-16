@@ -1,39 +1,49 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class Wire : MonoBehaviour
 {
     [SerializeField] Transform startPoint;
     WirePoint startingWire = new WirePoint();
-    const float minWireGrabDistance = 0.1f;
+    const float minWireGrabDistance = 0.5f;
     Vector3 raycastYOffset = new Vector3(0, 0.2f, 0);
     uint lastID = 0;
+    List<LineRenderer> meshes = new List<LineRenderer>();
 
     private void Start()
     {
         startingWire.point = startPoint.position;
     }
 
-    private void OnDrawGizmos()
+    private void Update()
     {
-        RecursiveDraw(startingWire);
+        for (int i = 0; i < startingWire.children.Count; i++)
+        {
+            RecursiveDraw(startingWire.children[i],0);
+        }
     }
 
     public WirePoint RequestForWire(Vector3 playerPos)
     {
         //This should only be called by the host
         WirePoint closest = RecursiveWireSearch(playerPos, startingWire, float.PositiveInfinity);
+        Debug.Log("Wire Attempt: " + closest);
         if(Vector3.Distance(playerPos,closest.point) <= minWireGrabDistance 
-            && !Physics.Raycast(playerPos + raycastYOffset, (closest.point + raycastYOffset) - (playerPos + raycastYOffset)))
+            //&& !Physics.Raycast(playerPos + raycastYOffset, (closest.point + raycastYOffset) - (playerPos + raycastYOffset))
+            )
         {
+            Debug.Log("YEAAAAAAAAAAAA");
             WirePoint final = new WirePoint() { parent = closest, isOn = true, point = playerPos, wireID = lastID + 1};
             lastID++;
             closest.children.Add(final);
+            AddNewLineRenderer(final);
             return final;
         }
         else
         {
+            Debug.Log("awwwwwww only " + Vector3.Distance(playerPos, closest.point));
             return null;
         }
     }
@@ -61,6 +71,28 @@ public class Wire : MonoBehaviour
         return RecursiveIDSearch(id, startingWire);
     }
 
+    void AddNewLineRenderer(WirePoint point)
+    {
+        GameObject bruh = new GameObject();
+        bruh.transform.parent = transform;
+        LineRenderer lr = bruh.AddComponent<LineRenderer>();
+        lr.SetColors(Color.black, Color.black);
+        lr.material = new Material(Shader.Find("Legacy Shaders/Particles/Alpha Blended Premultiply"));
+        lr.SetWidth(0.1f, 0.1f);
+        meshes.Add(lr);
+    }
+
+    void RecursiveDraw(WirePoint parent, int index)
+    {
+        meshes[index].SetPosition(0, parent.point);
+        meshes[index].SetPosition(1, parent.parent.point);
+        index++;
+        for (int i = 0; i < parent.children.Count; i++)
+        {
+            RecursiveDraw(parent.children[i],index);
+        }
+    }
+
     WirePoint RecursiveIDSearch(uint id, WirePoint parent)
     {
         WirePoint bestChoice = null;
@@ -83,21 +115,13 @@ public class Wire : MonoBehaviour
         return bestChoice;
     }
 
-    void RecursiveDraw(WirePoint parent)
-    {
-        Gizmos.DrawWireSphere(parent.point, 0.1f);
-        for (int i = 0; i < parent.children.Count; i++)
-        {
-            Gizmos.DrawLine(parent.point, parent.children[i].point);
-            RecursiveDraw(parent.children[i]);
-        }
-    }
 
     public WirePoint CreateNewClientWire(uint id, uint parentId)
     {
         WirePoint parent = FindWireFromID(parentId);
         WirePoint final = new WirePoint() { parent = parent, isOn = true, wireID = id };
         parent.children.Add(final);
+        AddNewLineRenderer(final);
         return final;
     }
 
