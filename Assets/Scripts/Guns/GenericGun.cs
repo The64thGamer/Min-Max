@@ -36,7 +36,7 @@ public class GenericGun : Gun
             Destroy(crosshair.gameObject.GetComponent<Image>());
         }
     }
-    void Update()
+    void FixedUpdate()
     {
         if (currentParent != null)
         {
