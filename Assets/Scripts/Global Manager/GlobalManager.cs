@@ -123,7 +123,7 @@ public class GlobalManager : NetworkBehaviour
     {
         if (IsHost)
         {
-            UpdateClientTeamColorsClientRpc(teams.ToArray());
+            UpdateClientMapDataClientRpc(teams.ToArray(),null);
         }
         for (int e = 0; e < teams.Count; e++)
         {
@@ -370,7 +370,18 @@ public class GlobalManager : NetworkBehaviour
             };
         }
         SendAllPlayerDataToNewPlayerClientRpc(data, id);
-        UpdateClientTeamColorsClientRpc(teams.ToArray());
+
+        List<Wire.WirePointData> wireData = new List<Wire.WirePointData>();
+        for (int i = 0; i < teamWires.Count; i++)
+        {
+            List<Wire.WirePointData> teamWData = teamWires[i].ConvertWiresToDataArray(i);
+            for (int e = 0; e < teamWData.Count; e++)
+            {
+                wireData.Add(teamWData[e]);
+            }
+        }
+
+        UpdateClientMapDataClientRpc(teams.ToArray(),wireData.ToArray());
     }
 
     /// <summary>
@@ -506,13 +517,20 @@ public class GlobalManager : NetworkBehaviour
     }
 
     [ClientRpc]
-    private void UpdateClientTeamColorsClientRpc(TeamInfo[] a)
+    private void UpdateClientMapDataClientRpc(TeamInfo[] a, Wire.WirePointData[] b)
     {
         if (IsHost) { return; }
         ClearTeams();
         for (int i = 0; i < a.Length; i++)
         {
             AddNewTeam(a[i]);
+        }
+        if (b != null)
+        {
+            for (int i = 0; i < b.Length; i++)
+            {
+                teamWires[b[i].teamNum].CreateNewClientWire(b[i]);
+            }
         }
     }
 

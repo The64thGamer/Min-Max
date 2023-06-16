@@ -1,5 +1,7 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.Netcode;
 using Unity.VisualScripting;
 using UnityEngine;
 
@@ -139,14 +141,43 @@ public class Wire : MonoBehaviour
     public WirePoint CreateNewClientWire(uint id, uint parentId)
     {
         WirePoint parent = FindWireFromID(parentId);
-        if(parent == null)
-        {
-            Debug.LogError("Could not find with with ID " + parentId);
-        }
         WirePoint final = new WirePoint() { parent = parent, isOn = true, wireID = id };
         parent.children.Add(final);
         AddNewLineRenderer(final);
         return final;
+    }
+
+    public void CreateNewClientWire(WirePointData data)
+    {
+        WirePoint parent = null;
+        if(data.parent != -1)
+        {
+            parent = FindWireFromID((uint)data.parent);
+        }
+        WirePoint final = new WirePoint() { parent = parent, isOn = true, wireID = data.wireID,point = data.point};
+        parent.children.Add(final);
+        AddNewLineRenderer(final);
+    }
+
+    public List<WirePointData> ConvertWiresToDataArray(int teamNumber)
+    {
+        List<WirePointData> data = new List<WirePointData>();
+        RecursiveConvertWires(data,startingWire, teamNumber);
+        return data;
+    }
+
+    void RecursiveConvertWires(List<WirePointData> data, WirePoint parent, int teamNumber)
+    {
+        int parentID = -1;
+        if(parent.parent != null)
+        {
+            parentID = (int)parent.parent.wireID;
+        }
+        data.Add(new WirePointData() { isOn = parent.isOn, parent = parentID, wireID = parent.wireID, point = parent.point, teamNum = teamNumber });
+        for (int i = 0; i < parent.children.Count; i++)
+        {
+            RecursiveConvertWires(data, parent.children[i], teamNumber);
+        }
     }
 
     public class WirePoint
@@ -156,5 +187,24 @@ public class Wire : MonoBehaviour
         public List<WirePoint> children = new List<WirePoint>();
         public WirePoint parent;
         public uint wireID;
+    }
+
+    [System.Serializable]
+    public struct WirePointData : INetworkSerializable
+    {
+        public bool isOn;
+        public Vector3 point;
+        public int parent;
+        public uint wireID;
+        public int teamNum;
+
+        public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
+        {
+            serializer.SerializeValue(ref isOn);
+            serializer.SerializeValue(ref point);
+            serializer.SerializeValue(ref parent);
+            serializer.SerializeValue(ref wireID);
+            serializer.SerializeValue(ref teamNum);
+        }
     }
 }
