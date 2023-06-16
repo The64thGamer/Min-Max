@@ -101,12 +101,11 @@ public class Wire : MonoBehaviour
         return final;
     }
 
-    [System.Serializable]
     public class WirePoint
     {
         public bool isOn = true;
         public Vector3 point;
-        public List<WirePoint> children;
+        public List<WirePoint> children = new List<WirePoint>();
         public WirePoint parent;
         public uint wireID;
     }

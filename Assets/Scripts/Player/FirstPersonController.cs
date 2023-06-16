@@ -54,7 +54,7 @@ namespace StarterAssets
         bool hasBeenCrouched;
 
 
-        void OnNetworkSpawn()
+        public override void OnNetworkSpawn()
         {
             gm = GameObject.Find("Global Manager").GetComponent<GlobalManager>();
             tracker = this.GetComponent<PlayerTracker>();
@@ -104,7 +104,10 @@ namespace StarterAssets
                     if(IsHost)
                     {
                         heldWire = gm.GetWire().RequestForWire(transform.position);
-                        gm.GiveClientWireClientRpc(player.GetPlayerID(),heldWire.wireID, heldWire.parent.wireID);
+                        if (heldWire != null)
+                        {
+                            gm.GiveClientWireClientRpc(player.GetPlayerID(), heldWire.wireID, heldWire.parent.wireID);
+                        }
                     }
                 }
                 currentCrouchLerp = Mathf.Clamp01(currentCrouchLerp + (Time.deltaTime * crouchSpeed));
@@ -113,7 +116,7 @@ namespace StarterAssets
             {
                 if (hasBeenCrouched)
                 {
-                    if (IsHost)
+                    if (IsHost && heldWire != null)
                     {
                         gm.RemoveClientWireClientRpc(heldWire.wireID,heldWire.point);
                         heldWire = null;
