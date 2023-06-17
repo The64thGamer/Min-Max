@@ -384,7 +384,6 @@ public class GlobalManager : NetworkBehaviour
                 }
             }
         }
-        Debug.Log("What the fuck????????");
         UpdateClientMapDataClientRpc(teams.ToArray(),wireData.ToArray());
     }
 
@@ -523,21 +522,16 @@ public class GlobalManager : NetworkBehaviour
     [ClientRpc]
     private void UpdateClientMapDataClientRpc(TeamInfo[] a, Wire.WirePointData[] b)
     {
-        Debug.Log("?????");
-
         if (IsHost) { return; }
         ClearTeams();
         for (int i = 0; i < a.Length; i++)
         {
             AddNewTeam(a[i]);
         }
-        Debug.Log("Wires Attempt Send");
         if (b != null)
         {
-            Debug.Log("Wires Sent");
             for (int i = 0; i < b.Length; i++)
             {
-                Debug.Log("Wires Create " + i);
                 teamWires[b[i].teamNum].CreateNewClientWire(b[i]);
             }
         }
