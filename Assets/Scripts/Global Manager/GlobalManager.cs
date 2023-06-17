@@ -439,12 +439,15 @@ public class GlobalManager : NetworkBehaviour
             if (teams[e].teamColor == teamWireNeeded)
             {
                 neededWire = teamWires[teams[e].spawns];
+                break;
             }
         }
+        Debug.Log(neededWire);
         for (int i = 0; i < clients.Count; i++)
         {
             if (clients[i].GetPlayerID() == id)
             {
+                Debug.Log("??????");
                 clients[i].SetWirePoint(neededWire.CreateNewClientWire(wireID, parentID));
                 return;
             }

@@ -88,6 +88,7 @@ namespace StarterAssets
                     if(IsHost)
                     {
                         player.SetWirePoint(gm.GetWire(player.GetTeam()).RequestForWire(transform.position));
+                        heldWire = player.GetWirePoint();
                         if (heldWire != null)
                         {
                             gm.GiveClientWireClientRpc(player.GetPlayerID(), heldWire.wireID, heldWire.parent.wireID, player.GetTeam());
