@@ -3,6 +3,8 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Unity.Netcode;
+using Unity.Netcode.Transports.UTP;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UIElements;
@@ -25,6 +27,7 @@ public class UI_Titlescreen : MonoBehaviour
     int currentSceneToLoad;
 
     bool alreadyLoading;
+    bool foundLocalServer;
 
     private void OnEnable()
     {
@@ -155,6 +158,8 @@ public class UI_Titlescreen : MonoBehaviour
             root.Q<VisualElement>("StartMapCol").style.display = DisplayStyle.None;
             root.Q<VisualElement>("JoinLocalCol").style.display = DisplayStyle.None;
             root.Q<VisualElement>("JoinServerCol").style.display = DisplayStyle.None;
+            root.Q<VisualElement>("NewLocalDeleteGame").style.display = DisplayStyle.None;
+            root.Q<VisualElement>("NewLocalStartGame").style.display = DisplayStyle.None;
 
             root.Q<Button>("StartGame").style.display = DisplayStyle.None;
 
@@ -194,6 +199,9 @@ public class UI_Titlescreen : MonoBehaviour
                     root.Q<Button>("StartGame").style.display = DisplayStyle.Flex;
                     root.Q<VisualElement>("JoinLocalCol").style.display = DisplayStyle.Flex;
                     root.Q<VisualElement>("LocalServers").style.display = DisplayStyle.Flex;
+                    root.Q<Label>("NewLocalServerName").text = "Select A Server";
+                    root.Q<Label>("NewLocalMapName").text = "";
+                    root.Q<Label>("NewLocalPlayerCount").text = "";
 
                     SetVEBorderColor(root.Q<VisualElement>("PSJoinLocal"), borderButtonSelected);
 
@@ -216,7 +224,7 @@ public class UI_Titlescreen : MonoBehaviour
                         for (int i = 0; i < PlayerPrefs.GetInt("LocalServersAdded") + 1; i++)
                         {
                             TemplateContainer myUI = vta.Instantiate();
-                            myUI.Q<Label>("ServerName").text = "(" + PlayerPrefs.GetInt("LocalServer" + i).ToString() + ") " + PlayerPrefs.GetString("LocalServerName" + i);
+                            myUI.Q<Label>("ServerName").text = "(" + PlayerPrefs.GetInt("LocalServer" + i).ToString("00000") + ") " + PlayerPrefs.GetString("LocalServerName" + i);
                             myUI.Q<Button>("Button").clicked += () => SetCurrentLocalServer(i);
 
                             visList.Add(myUI);
@@ -231,7 +239,21 @@ public class UI_Titlescreen : MonoBehaviour
 
     void SetCurrentLocalServer(int index)
     {
+        foundLocalServer = false;
+        m_NetworkManager.GetComponent<UnityTransport>().ConnectionData.Port = (ushort)PlayerPrefs.GetInt("LocalServer" + index);
+        m_NetworkManager.StartClient();
+        StartCoroutine(LocalServerCheck());
+    }
 
+    IEnumerator LocalServerCheck()
+    {
+        root.Q<Label>("NewLocalServerName").text = "Connecting To Server. . .";
+        yield return new WaitForSeconds(1.0f);
+        if(!foundLocalServer)
+        {
+            m_NetworkManager.Shutdown();
+            root.Q<Label>("NewLocalServerName").text = "Could Not Connect To Server.";
+        }
     }
 
     void AddNewLocalServer(string port)
@@ -338,6 +360,7 @@ public class UI_Titlescreen : MonoBehaviour
     {
         if (!m_NetworkManager.IsServer && m_NetworkManager.DisconnectReason != string.Empty)
         {
+            foundLocalServer = true;
             Debug.Log($"Approval Declined Reason: {m_NetworkManager.DisconnectReason}");
         }
     }

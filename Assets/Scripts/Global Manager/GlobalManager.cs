@@ -31,7 +31,8 @@ public class GlobalManager : NetworkBehaviour
     const ulong botID = 64646464646464;
 
     private void Start()
-    {        //Pinging
+    {        
+        //Pinging
         if (m_NetworkManager != null)
         {
             m_NetworkManager.ConnectionApprovalCallback = ApprovalCheck;
@@ -41,7 +42,7 @@ public class GlobalManager : NetworkBehaviour
         currentGamemode = GetComponent<GenericGamemode>();
 
         //Settings
-        NetworkManager.GetComponent<UnityTransport>().ConnectionData.Port = (ushort)PlayerPrefs.GetInt("ServerPort");
+        m_NetworkManager.GetComponent<UnityTransport>().ConnectionData.Port = (ushort)PlayerPrefs.GetInt("ServerPort");
 
         //Local Host, Server Relay Host, Client Connect
         switch (PlayerPrefs.GetInt("LoadMapMode"))
