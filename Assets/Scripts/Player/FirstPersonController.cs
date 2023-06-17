@@ -87,7 +87,7 @@ namespace StarterAssets
                     hasBeenCrouched = true;
                     if(IsHost)
                     {
-                        heldWire = gm.GetWire(player.GetTeam()).RequestForWire(transform.position);
+                        player.SetWirePoint(gm.GetWire(player.GetTeam()).RequestForWire(transform.position));
                         if (heldWire != null)
                         {
                             gm.GiveClientWireClientRpc(player.GetPlayerID(), heldWire.wireID, heldWire.parent.wireID, player.GetTeam());
@@ -103,7 +103,7 @@ namespace StarterAssets
                     if (IsHost && heldWire != null)
                     {
                         gm.RemoveClientWireClientRpc(player.GetPlayerID(),heldWire.point);
-                        heldWire = null;
+                        player.RemoveHeldWire(heldWire.point);
                     }
                     hasBeenCrouched = false;
                 }
