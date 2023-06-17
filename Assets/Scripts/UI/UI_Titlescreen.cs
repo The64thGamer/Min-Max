@@ -30,6 +30,7 @@ public class UI_Titlescreen : MonoBehaviour
     bool alreadyLoading;
     bool foundLocalServer;
     int joinLocalIndex;
+    bool serverCheckRunning;
 
     private void OnEnable()
     {
@@ -228,8 +229,13 @@ public class UI_Titlescreen : MonoBehaviour
                         {
                             TemplateContainer myUI = vta.Instantiate();
                             myUI.Q<Label>("ServerName").text = "(" + PlayerPrefs.GetInt("LocalServer" + i).ToString("00000") + ") " + PlayerPrefs.GetString("LocalServerName" + i);
-                            myUI.Q<Button>("Button").clicked += () => SetCurrentLocalServer(i);
 
+                            //THIS IS THE STUPIDEST COMPILER BLACK MAGIC EVER
+                            //"i" is actually a reference, meaning the ctx
+                            //gets changed every section of the loop. You
+                            //have to store "i" as a local variable. WHAT THE FUCK.
+                            int e = i;
+                            myUI.Q<Button>("Button").clicked += () => SetCurrentLocalServer(e);
                             visList.Add(myUI);
                         }
                     }
@@ -242,13 +248,16 @@ public class UI_Titlescreen : MonoBehaviour
 
     void SetCurrentLocalServer(int index)
     {
-        root.Q<VisualElement>("NewLocalDeleteGame").style.display = DisplayStyle.None;
-        joinLocalIndex = index;
-
-        foundLocalServer = false;
-        m_NetworkManager.GetComponent<UnityTransport>().ConnectionData.Port = (ushort)PlayerPrefs.GetInt("LocalServer" + index);
-        m_NetworkManager.StartClient();
-        StartCoroutine(LocalServerCheck());
+        if (!serverCheckRunning)
+        {
+            serverCheckRunning = true;
+            root.Q<VisualElement>("NewLocalDeleteGame").style.display = DisplayStyle.None;
+            joinLocalIndex = index;
+            foundLocalServer = false;
+            m_NetworkManager.GetComponent<UnityTransport>().ConnectionData.Port = (ushort)PlayerPrefs.GetInt("LocalServer" + index);
+            m_NetworkManager.StartClient();
+            StartCoroutine(LocalServerCheck());
+        }
     }
 
     //This entire loop sucks, but it gets the job done idgaf
@@ -277,6 +286,7 @@ public class UI_Titlescreen : MonoBehaviour
             secondCount++;
             yield return new WaitForSeconds(1.0f);
         }
+        serverCheckRunning = false;
     }
 
     void AddNewLocalServer(string port)
@@ -300,7 +310,6 @@ public class UI_Titlescreen : MonoBehaviour
         {
             PlayerPrefs.SetInt("LocalServer" + i, PlayerPrefs.GetInt("LocalServer" + (i + 1)));
         }
-        Debug.Log("Removed " + index + " " + PlayerPrefs.GetInt("LocalServersAdded"));
         StartLocalOrHost(3);
     }
 
