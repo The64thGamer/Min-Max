@@ -254,19 +254,19 @@ public class GlobalManager : NetworkBehaviour
         {
             if (clients[i] == player)
             {
+                Wire.WirePoint wireHeld = clients[i].GetWirePoint();
+                if (wireHeld != null)
+                {
+                    RemoveClientWireClientRpc(player.GetPlayerID(), wireHeld.point);
+                    player.RemoveHeldWire(wireHeld.point);
+                }
+
                 Destroy(clients[i].gameObject);
                 clients.RemoveAt(i);
                 playerPosRPCData = new List<PlayerDataSentToClient>();
                 for (int e = 0; e < clients.Count; e++)
                 {
                     playerPosRPCData.Add(new PlayerDataSentToClient());
-                }
-
-                Wire.WirePoint wireHeld = clients[i].GetWirePoint();
-                if (wireHeld != null)
-                {
-                    RemoveClientWireClientRpc(clients[i].GetPlayerID(), wireHeld.point);
-                    clients[i].RemoveHeldWire(wireHeld.point);
                 }
                 return;
             }
