@@ -33,7 +33,6 @@ namespace StarterAssets
         Player player;
 
         //Consts
-        const float _threshold = 0.01f;
         const float crouchSpeed = 7;
 
         // player
