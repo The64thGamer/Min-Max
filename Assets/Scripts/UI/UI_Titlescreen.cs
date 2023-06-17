@@ -5,6 +5,7 @@ using System.Linq;
 using Unity.Netcode;
 using Unity.Netcode.Transports.UTP;
 using Unity.VisualScripting;
+using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UIElements;
@@ -28,6 +29,7 @@ public class UI_Titlescreen : MonoBehaviour
 
     bool alreadyLoading;
     bool foundLocalServer;
+    int joinLocalIndex;
 
     private void OnEnable()
     {
@@ -66,6 +68,8 @@ public class UI_Titlescreen : MonoBehaviour
         //Join Local
         Button addnewLocalServer = root.Q<Button>("AddNewLocalServer");
         TextField newLocalPort = root.Q<TextField>("NewLocalServerPort");
+        Button newLocalDelete = root.Q<Button>("NewLocalDeleteGame");
+
 
         //Functions When Button is Clicked
         rc_startVR.clicked += () => SwitchMainTab(0);
@@ -84,6 +88,7 @@ public class UI_Titlescreen : MonoBehaviour
         team2.RegisterValueChangedCallback(evt => PlayerPrefs.SetInt("Team2Setting", team2.index));
         spawnBots.RegisterValueChangedCallback(evt => PlayerPrefs.SetInt("SpawnBotsInEmpty", spawnBots.value ? 1 : 0));
         addnewLocalServer.clicked += () => AddNewLocalServer(newLocalPort.text);
+        newLocalDelete.clicked += () => RemoveLocalServer(joinLocalIndex);
 
         //Set Default Values when Out of Range (Or on First Boot)
         if (PlayerPrefs.GetInt("IsVREnabled") == 1)
@@ -219,7 +224,7 @@ public class UI_Titlescreen : MonoBehaviour
                     //Recreate List
                     if (PlayerPrefs.GetInt("LocalServersAdded") > 0)
                     {
-                        for (int i = 0; i < PlayerPrefs.GetInt("LocalServersAdded") + 1; i++)
+                        for (int i = 0; i < PlayerPrefs.GetInt("LocalServersAdded"); i++)
                         {
                             TemplateContainer myUI = vta.Instantiate();
                             myUI.Q<Label>("ServerName").text = "(" + PlayerPrefs.GetInt("LocalServer" + i).ToString("00000") + ") " + PlayerPrefs.GetString("LocalServerName" + i);
@@ -237,6 +242,9 @@ public class UI_Titlescreen : MonoBehaviour
 
     void SetCurrentLocalServer(int index)
     {
+        root.Q<VisualElement>("NewLocalDeleteGame").style.display = DisplayStyle.None;
+        joinLocalIndex = index;
+
         foundLocalServer = false;
         m_NetworkManager.GetComponent<UnityTransport>().ConnectionData.Port = (ushort)PlayerPrefs.GetInt("LocalServer" + index);
         m_NetworkManager.StartClient();
@@ -262,6 +270,7 @@ public class UI_Titlescreen : MonoBehaviour
                 {
                     m_NetworkManager.Shutdown();
                     name.text = "Could Not Connect To Server.";
+                    root.Q<VisualElement>("NewLocalDeleteGame").style.display = DisplayStyle.Flex;
                 }
                 break;
             }
@@ -275,20 +284,24 @@ public class UI_Titlescreen : MonoBehaviour
         PlayerPrefs.SetInt("LocalServersAdded", PlayerPrefs.GetInt("LocalServersAdded") + 1);
         try
         {
-            PlayerPrefs.SetInt("LocalServer" + PlayerPrefs.GetInt("LocalServersAdded"), (int)ushort.Parse(port));
-            Debug.Log("not error " + PlayerPrefs.GetInt("LocalServersAdded"));
+            PlayerPrefs.SetInt("LocalServer" + (PlayerPrefs.GetInt("LocalServersAdded") - 1), (int)ushort.Parse(port));
         }
         catch (Exception)
         {
             PlayerPrefs.SetInt("LocalServersAdded", PlayerPrefs.GetInt("LocalServersAdded") - 1);
-            Debug.Log("error " + PlayerPrefs.GetInt("LocalServersAdded"));
         }
         StartLocalOrHost(3);
     }
 
     void RemoveLocalServer(int index)
     {
-
+        PlayerPrefs.SetInt("LocalServersAdded", PlayerPrefs.GetInt("LocalServersAdded") - 1);
+        for (int i = index; i < PlayerPrefs.GetInt("LocalServersAdded"); i++)
+        {
+            PlayerPrefs.SetInt("LocalServer" + i, PlayerPrefs.GetInt("LocalServer" + (i + 1)));
+        }
+        Debug.Log("Removed " + index + " " + PlayerPrefs.GetInt("LocalServersAdded"));
+        StartLocalOrHost(3);
     }
 
     void SwitchMainTab(int tab)
@@ -376,6 +389,8 @@ public class UI_Titlescreen : MonoBehaviour
         {
             foundLocalServer = true;
             Debug.Log($"Approval Declined Reason: {m_NetworkManager.DisconnectReason}");
+            root.Q<VisualElement>("NewLocalDeleteGame").style.display = DisplayStyle.Flex;
+            root.Q<VisualElement>("NewLocalStartGame").style.display = DisplayStyle.Flex;
         }
     }
 }
