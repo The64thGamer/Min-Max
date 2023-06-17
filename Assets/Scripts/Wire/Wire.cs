@@ -155,14 +155,20 @@ public class Wire : MonoBehaviour
             parent = FindWireFromID((uint)data.parent);
         }
         WirePoint final = new WirePoint() { parent = parent, isOn = true, wireID = data.wireID,point = data.point};
-        parent.children.Add(final);
+        if(parent != null)
+        {
+            parent.children.Add(final);
+        }
         AddNewLineRenderer(final);
     }
 
     public List<WirePointData> ConvertWiresToDataArray(int teamNumber)
     {
         List<WirePointData> data = new List<WirePointData>();
-        RecursiveConvertWires(data,startingWire, teamNumber);
+        for (int i = 0; i < startingWire.children.Count; i++)
+        {
+            RecursiveConvertWires(data, startingWire.children[i], teamNumber);
+        }
         return data;
     }
 
