@@ -24,6 +24,7 @@ public class Player : NetworkBehaviour
     GlobalManager gm;
     AllStats al;
     bool currentPlayerVisibility;
+    Wire.WirePoint heldWire;
 
     public override void OnNetworkSpawn()
     {
@@ -267,5 +268,21 @@ public class Player : NetworkBehaviour
     public void ResetClassStats()
     {
         currentStats = al.GetClassStats(currentClass);
+    }
+
+    public void RemoveHeldWire(Vector3 finalPos)
+    {
+        heldWire.point = finalPos;
+        heldWire = null;
+    }
+
+    public void SetWirePoint(Wire.WirePoint wire)
+    {
+        heldWire = wire;
+    }
+
+    public Wire.WirePoint GetWirePoint()
+    {
+        return heldWire;
     }
 }

@@ -66,17 +66,6 @@ namespace StarterAssets
             _fallTimeoutDelta = FallTimeout;
         }
 
-        public void SetHeldWire(Wire.WirePoint wire)
-        {
-            heldWire = wire;
-        }
-
-        public void RemoveHeldWire(Vector3 finalPos)
-        {
-            heldWire.point = finalPos;
-            heldWire = null;
-        }
-
         public Wire.WirePoint GetWire()
         {
             return heldWire;

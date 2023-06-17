@@ -123,6 +123,7 @@ public class GlobalManager : NetworkBehaviour
     {
         if (IsHost)
         {
+            Debug.Log("hhhhhhhhhhhhhhhh????????");
             UpdateClientMapDataClientRpc(teams.ToArray(),null);
         }
         for (int e = 0; e < teams.Count; e++)
@@ -265,7 +266,7 @@ public class GlobalManager : NetworkBehaviour
                 if (wireHeld != null)
                 {
                     RemoveClientWireClientRpc(clients[i].GetPlayerID(), wireHeld.point);
-                    clients[i].GetController().RemoveHeldWire(wireHeld.point);
+                    clients[i].RemoveHeldWire(wireHeld.point);
                 }
                 return;
             }
@@ -374,13 +375,16 @@ public class GlobalManager : NetworkBehaviour
         List<Wire.WirePointData> wireData = new List<Wire.WirePointData>();
         for (int i = 0; i < teamWires.Count; i++)
         {
-            List<Wire.WirePointData> teamWData = teamWires[i].ConvertWiresToDataArray(i);
-            for (int e = 0; e < teamWData.Count; e++)
+            if (teamWires[i] != null)
             {
-                wireData.Add(teamWData[e]);
+                List<Wire.WirePointData> teamWData = teamWires[i].ConvertWiresToDataArray(i);
+                for (int e = 0; e < teamWData.Count; e++)
+                {
+                    wireData.Add(teamWData[e]);
+                }
             }
         }
-
+        Debug.Log("What the fuck????????");
         UpdateClientMapDataClientRpc(teams.ToArray(),wireData.ToArray());
     }
 
@@ -442,7 +446,7 @@ public class GlobalManager : NetworkBehaviour
         {
             if (clients[i].GetPlayerID() == id)
             {
-                clients[i].GetController().SetHeldWire(neededWire.CreateNewClientWire(wireID, parentID));
+                clients[i].SetWirePoint(neededWire.CreateNewClientWire(wireID, parentID));
                 return;
             }
         }
@@ -456,7 +460,7 @@ public class GlobalManager : NetworkBehaviour
         {
             if (clients[i].GetPlayerID() == id)
             {
-                clients[i].GetController().RemoveHeldWire(finalPos);
+                clients[i].RemoveHeldWire(finalPos);
                 return;
             }
         }
@@ -519,6 +523,8 @@ public class GlobalManager : NetworkBehaviour
     [ClientRpc]
     private void UpdateClientMapDataClientRpc(TeamInfo[] a, Wire.WirePointData[] b)
     {
+        Debug.Log("?????");
+
         if (IsHost) { return; }
         ClearTeams();
         for (int i = 0; i < a.Length; i++)
