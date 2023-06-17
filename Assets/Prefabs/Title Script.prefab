@@ -24,13 +24,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2200363305993462611}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -12.052681, y: -0.24061055, z: 5.8536863}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &8891087978652463447
 MonoBehaviour:
@@ -51,4 +51,6 @@ MonoBehaviour:
   mapNames:
   - pl_artpass
   - pl_frequency
+  m_NetworkManager: {fileID: 0}
+  vta: {fileID: 9197481963319205126, guid: 52a12b2ec113cb44f9ff3f04f5cfdfcc, type: 3}
   borderButtonSelected: {r: 0.92941177, g: 0.85490197, b: 0.77254903, a: 1}

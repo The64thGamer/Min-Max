@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -14,7 +15,7 @@ public class UI_Titlescreen : MonoBehaviour
     [SerializeField] List<Texture2D> mapIcons;
     [SerializeField] List<string> mapNames;
     [SerializeField] NetworkManager m_NetworkManager;
-
+    [SerializeField] VisualTreeAsset vta;
 
     //Colors
     [SerializeField] Color borderButtonSelected;
@@ -31,8 +32,8 @@ public class UI_Titlescreen : MonoBehaviour
         if (m_NetworkManager != null)
         {
             m_NetworkManager.OnClientDisconnectCallback += OnClientDisconnectCallback;
+            m_NetworkManager.NetworkConfig.ConnectionData = System.Text.Encoding.ASCII.GetBytes("P");
         }
-        NetworkManager.Singleton.NetworkConfig.ConnectionData = System.Text.Encoding.ASCII.GetBytes("P");
 
         //Root
         root = doc.rootVisualElement;
@@ -48,7 +49,7 @@ public class UI_Titlescreen : MonoBehaviour
         Button ps_startlocal = root.Q<Button>("PSStartLocal");
         Button ps_joinlocal = root.Q<Button>("PSJoinLocal");
 
-        //Server Settings
+        //Create Local
         Button ms_startgame = root.Q<Button>("StartGame");
         DropdownField selectMap = root.Q<DropdownField>("SelectMap");
         SliderInt maxPlayers = root.Q<SliderInt>("MaxPlayers");
@@ -59,6 +60,9 @@ public class UI_Titlescreen : MonoBehaviour
         DropdownField team2 = root.Q<DropdownField>("SelectTeam2");
         Toggle spawnBots = root.Q<Toggle>("SpawnBots");
 
+        //Join Local
+        Button addnewLocalServer = root.Q<Button>("AddNewLocalServer");
+        TextField newLocalPort = root.Q<TextField>("NewLocalServerPort");
 
         //Functions When Button is Clicked
         rc_startVR.clicked += () => SwitchMainTab(0);
@@ -76,6 +80,7 @@ public class UI_Titlescreen : MonoBehaviour
         team1.RegisterValueChangedCallback(evt => PlayerPrefs.SetInt("Team1Setting", team1.index));
         team2.RegisterValueChangedCallback(evt => PlayerPrefs.SetInt("Team2Setting", team2.index));
         spawnBots.RegisterValueChangedCallback(evt => PlayerPrefs.SetInt("SpawnBotsInEmpty", spawnBots.value ? 1 : 0));
+        addnewLocalServer.clicked += () => AddNewLocalServer(newLocalPort.text);
 
         //Set Default Values when Out of Range (Or on First Boot)
         if (PlayerPrefs.GetInt("IsVREnabled") == 1)
@@ -99,7 +104,7 @@ public class UI_Titlescreen : MonoBehaviour
         //Set Values
         selectMap.choices = mapNames;
         selectMap.index = 0;
-        maxPlayers.value = Mathf.Max(PlayerPrefs.GetInt("ServerMaxPlayers"),1);
+        maxPlayers.value = Mathf.Max(PlayerPrefs.GetInt("ServerMaxPlayers"), 1);
         spawnBots.value = Convert.ToBoolean(PlayerPrefs.GetInt("SpawnBotsInEmpty"));
         spectatorAsPlayer.value = Convert.ToBoolean(PlayerPrefs.GetInt("ServerSpectatorAsPlayer"));
         team1.index = PlayerPrefs.GetInt("Team1Setting");
@@ -107,7 +112,7 @@ public class UI_Titlescreen : MonoBehaviour
         selectPort.value = PlayerPrefs.GetInt("ServerPort").ToString();
 
 
-
+        SwitchMainTab(0);
     }
 
     IEnumerator LoadMap()
@@ -145,13 +150,12 @@ public class UI_Titlescreen : MonoBehaviour
         if (!alreadyLoading)
         {
             //Default
+            root.Q<VisualElement>("LocalServers").style.display = DisplayStyle.None;
             root.Q<VisualElement>("ServerSettings").style.display = DisplayStyle.None;
             root.Q<VisualElement>("StartMapCol").style.display = DisplayStyle.None;
             root.Q<VisualElement>("JoinLocalCol").style.display = DisplayStyle.None;
             root.Q<VisualElement>("JoinServerCol").style.display = DisplayStyle.None;
 
-            root.Q<Label>("SendPlayerKey").style.display = DisplayStyle.None;
-            root.Q<Button>("RequestKey").style.display = DisplayStyle.None;
             root.Q<Button>("StartGame").style.display = DisplayStyle.None;
 
             VisualElement col1 = root.Q<VisualElement>("PlayMenuCol1");
@@ -169,14 +173,12 @@ public class UI_Titlescreen : MonoBehaviour
             switch (loadmapmode)
             {
                 case 0:
-                    root.Q<Label>("StartSetting").text = "Start Local Game";
                     root.Q<Button>("StartGame").style.display = DisplayStyle.Flex;
                     root.Q<VisualElement>("ServerSettings").style.display = DisplayStyle.Flex;
                     root.Q<VisualElement>("StartMapCol").style.display = DisplayStyle.Flex;
                     SetVEBorderColor(root.Q<VisualElement>("PSStartLocal"), borderButtonSelected);
                     break;
                 case 1:
-                    root.Q<Label>("StartSetting").text = "Start Server";
                     root.Q<Label>("SendPlayerKey").style.display = DisplayStyle.Flex;
                     root.Q<Button>("RequestKey").style.display = DisplayStyle.Flex;
                     root.Q<VisualElement>("ServerSettings").style.display = DisplayStyle.Flex;
@@ -184,21 +186,73 @@ public class UI_Titlescreen : MonoBehaviour
                     SetVEBorderColor(root.Q<VisualElement>("PSStartServer"), borderButtonSelected);
                     break;
                 case 2:
-                    root.Q<Label>("StartSetting").text = "Join Server";
                     root.Q<Button>("StartGame").style.display = DisplayStyle.Flex;
                     root.Q<VisualElement>("JoinServerCol").style.display = DisplayStyle.Flex;
                     SetVEBorderColor(root.Q<VisualElement>("PSJoinServer"), borderButtonSelected);
                     break;
                 case 3:
-                    root.Q<Label>("StartSetting").text = "Join Local Game";
                     root.Q<Button>("StartGame").style.display = DisplayStyle.Flex;
-                    root.Q<VisualElement>("StartMapCol").style.display = DisplayStyle.Flex;
+                    root.Q<VisualElement>("JoinLocalCol").style.display = DisplayStyle.Flex;
+                    root.Q<VisualElement>("LocalServers").style.display = DisplayStyle.Flex;
+
                     SetVEBorderColor(root.Q<VisualElement>("PSJoinLocal"), borderButtonSelected);
+
+                    //Clear Old List
+                    VisualElement visList = root.Q<VisualElement>("LocalServerList");
+                    List<VisualElement> children = new List<VisualElement>();
+                    foreach (var child in visList.Children())
+                    {
+                        //This stupid setup is because you can't delete children in foreach statement.
+                        children.Add(child);
+                    }
+                    for (int i = 0; i < children.Count; i++)
+                    {
+                        visList.Remove(children[i]);
+                    }
+
+                    //Recreate List
+                    if (PlayerPrefs.GetInt("LocalServersAdded") > 0)
+                    {
+                        for (int i = 0; i < PlayerPrefs.GetInt("LocalServersAdded") + 1; i++)
+                        {
+                            TemplateContainer myUI = vta.Instantiate();
+                            myUI.Q<Label>("ServerName").text = PlayerPrefs.GetInt("LocalServer" + i).ToString();
+                            myUI.Q<Button>("Button").clicked += () => SetCurrentLocalServer(i);
+
+                            visList.Add(myUI);
+                        }
+                    }
                     break;
                 default:
                     break;
             }
         }
+    }
+
+    void SetCurrentLocalServer(int index)
+    {
+
+    }
+
+    void AddNewLocalServer(string port)
+    {
+        PlayerPrefs.SetInt("LocalServersAdded", PlayerPrefs.GetInt("LocalServersAdded") + 1);
+        try
+        {
+            PlayerPrefs.SetInt("LocalServer" + PlayerPrefs.GetInt("LocalServersAdded"), (int)ushort.Parse(port));
+            Debug.Log("not error " + PlayerPrefs.GetInt("LocalServersAdded"));
+        }
+        catch (Exception)
+        {
+            PlayerPrefs.SetInt("LocalServersAdded", PlayerPrefs.GetInt("LocalServersAdded") - 1);
+            Debug.Log("error " + PlayerPrefs.GetInt("LocalServersAdded"));
+        }
+        StartLocalOrHost(3);
+    }
+
+    void RemoveLocalServer(int index)
+    {
+
     }
 
     void SwitchMainTab(int tab)
