@@ -29,7 +29,6 @@ namespace StarterAssets
         [SerializeField] GameObject _mainCamera;
         PlayerTracker tracker;
         GlobalManager gm;
-        Wire.WirePoint heldWire;
         Player player;
 
         //Consts
@@ -65,11 +64,6 @@ namespace StarterAssets
             _fallTimeoutDelta = FallTimeout;
         }
 
-        public Wire.WirePoint GetWire()
-        {
-            return heldWire;
-        }
-
         public void MovePlayer(Vector2 _input, bool jump, bool crouch)
         {
             if (_controller == null) { return; }
@@ -82,6 +76,8 @@ namespace StarterAssets
             forward.Normalize();
             right.Normalize();
             Vector3 newAxis = forward * _input.y + right * _input.x;
+
+            Wire.WirePoint heldWire = player.GetWirePoint();
 
             //Crouch
             if (crouch && _controller.isGrounded)
