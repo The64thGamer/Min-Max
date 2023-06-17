@@ -31,12 +31,10 @@ public class GlobalManager : NetworkBehaviour
     const ulong botID = 64646464646464;
 
     private void Start()
-    {        
+    {
         //Pinging
-        if (m_NetworkManager != null)
-        {
-            m_NetworkManager.ConnectionApprovalCallback = ApprovalCheck;
-        }
+        m_NetworkManager = GameObject.Find("Transport").GetComponent<NetworkManager>();
+        m_NetworkManager.ConnectionApprovalCallback = ApprovalCheck;
         NetworkManager.Singleton.OnServerStarted += ServerStarted;
         al = GetComponent<AllStats>();
         currentGamemode = GetComponent<GenericGamemode>();
@@ -104,7 +102,7 @@ public class GlobalManager : NetworkBehaviour
         for (int i = 0; i < clients.Count; i++)
         {
             PlayerDataSentToServer inputs = clients[i].GetTracker().GetPlayerNetworkData();
-            clients[i].GetController().MovePlayer(inputs.rightJoystick, inputs.jump,inputs.crouch);
+            clients[i].GetController().MovePlayer(inputs.rightJoystick, inputs.jump, inputs.crouch);
         }
     }
 
@@ -131,7 +129,7 @@ public class GlobalManager : NetworkBehaviour
     {
         if (IsHost)
         {
-            UpdateClientMapDataClientRpc(teams.ToArray(),null);
+            UpdateClientMapDataClientRpc(teams.ToArray(), null);
         }
         for (int e = 0; e < teams.Count; e++)
         {
@@ -247,7 +245,7 @@ public class GlobalManager : NetworkBehaviour
     {
         for (int e = 0; e < teams.Count; e++)
         {
-            if(teams[e].teamColor == team)
+            if (teams[e].teamColor == team)
             {
                 return teamWires[teams[e].spawns];
             }
@@ -412,7 +410,7 @@ public class GlobalManager : NetworkBehaviour
                 }
             }
         }
-        UpdateClientMapDataClientRpc(teams.ToArray(),wireData.ToArray());
+        UpdateClientMapDataClientRpc(teams.ToArray(), wireData.ToArray());
     }
 
     /// <summary>
