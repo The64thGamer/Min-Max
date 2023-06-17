@@ -157,7 +157,6 @@ public class UI_Titlescreen : MonoBehaviour
             root.Q<VisualElement>("ServerSettings").style.display = DisplayStyle.None;
             root.Q<VisualElement>("StartMapCol").style.display = DisplayStyle.None;
             root.Q<VisualElement>("JoinLocalCol").style.display = DisplayStyle.None;
-            root.Q<VisualElement>("JoinServerCol").style.display = DisplayStyle.None;
             root.Q<VisualElement>("NewLocalDeleteGame").style.display = DisplayStyle.None;
             root.Q<VisualElement>("NewLocalStartGame").style.display = DisplayStyle.None;
 
@@ -192,7 +191,6 @@ public class UI_Titlescreen : MonoBehaviour
                     break;
                 case 2:
                     root.Q<Button>("StartGame").style.display = DisplayStyle.Flex;
-                    root.Q<VisualElement>("JoinServerCol").style.display = DisplayStyle.Flex;
                     SetVEBorderColor(root.Q<VisualElement>("PSJoinServer"), borderButtonSelected);
                     break;
                 case 3:
@@ -245,14 +243,30 @@ public class UI_Titlescreen : MonoBehaviour
         StartCoroutine(LocalServerCheck());
     }
 
+    //This entire loop sucks, but it gets the job done idgaf
     IEnumerator LocalServerCheck()
     {
-        root.Q<Label>("NewLocalServerName").text = "Connecting To Server. . .";
-        yield return new WaitForSeconds(1.0f);
-        if(!foundLocalServer)
+        Label name = root.Q<Label>("NewLocalServerName");
+
+        int secondCount = 0;
+        while (true)
         {
-            m_NetworkManager.Shutdown();
-            root.Q<Label>("NewLocalServerName").text = "Could Not Connect To Server.";
+            name.text = "Connecting To Server";
+            for (int i = 0; i < secondCount + 1; i++)
+            {
+                name.text += ". ";
+            }
+            if (secondCount == 5)
+            {
+                if (!foundLocalServer)
+                {
+                    m_NetworkManager.Shutdown();
+                    name.text = "Could Not Connect To Server.";
+                }
+                break;
+            }
+            secondCount++;
+            yield return new WaitForSeconds(1.0f);
         }
     }
 
