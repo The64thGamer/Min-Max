@@ -1,15 +1,11 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using Unity.Netcode;
 using Unity.Netcode.Transports.UTP;
-using Unity.VisualScripting;
-using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UIElements;
-using UnityEngine.XR;
 using UnityEngine.XR.Management;
 
 public class UI_Titlescreen : MonoBehaviour
@@ -236,6 +232,7 @@ public class UI_Titlescreen : MonoBehaviour
                             //have to store "i" as a local variable. WHAT THE FUCK.
                             int e = i;
                             myUI.Q<Button>("Button").clicked += () => SetCurrentLocalServer(e);
+
                             visList.Add(myUI);
                         }
                     }
