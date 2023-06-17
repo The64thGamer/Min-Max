@@ -2,6 +2,7 @@
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.InputSystem.XR;
+using UnityEngine.XR.Interaction.Toolkit;
 
 public class MouseLook : NetworkBehaviour
 {
@@ -25,6 +26,8 @@ public class MouseLook : NetworkBehaviour
             UnityEngine.Cursor.lockState = CursorLockMode.Locked;
             UnityEngine.Cursor.visible = false;
             Destroy(cam.GetComponent<TrackedPoseDriver>());
+            Destroy(handR.GetComponent<ActionBasedController>());
+            Destroy(handL.GetComponent<ActionBasedController>());
         }
     }
     void LateUpdate()
