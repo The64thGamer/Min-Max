@@ -133,16 +133,20 @@ public class PlayerTracker : NetworkBehaviour
 
     public void ClientSyncPlayerInputs(PlayerDataSentToClient data)
     {
-        headset.localPosition = data.headsetPos;
-        headset.rotation = data.headsetRot;
-        rightController.localPosition = data.rHandPos;
-        rightController.rotation = data.rHandRot;
-        leftController.localPosition = data.lHandPos;
-        leftController.rotation = data.lHandRot;
+        if (!IsOwner)
+        {
+            headset.localPosition = data.headsetPos;
+            headset.rotation = data.headsetRot;
+            rightController.localPosition = data.rHandPos;
+            rightController.rotation = data.rHandRot;
+            leftController.localPosition = data.lHandPos;
+            leftController.rotation = data.lHandRot;
+        }
     }
 
     public void ServerSyncPlayerInputs(PlayerDataSentToServer data)
     {
+        if(data.predictionTime < predictionTime) { return; }
         headset.localPosition = data.headsetPos;
         headset.rotation = data.headsetRot;
         rightController.localPosition = data.rHandPos;
@@ -176,6 +180,7 @@ public class PlayerTracker : NetworkBehaviour
     {
         return new PlayerDataSentToServer()
         {
+            predictionTime = NetworkManager.Singleton.LocalTime.TimeAsFloat,
             rightJoystick = movementAxis,
             jump = rhandAButton,
             shoot = triggerR,

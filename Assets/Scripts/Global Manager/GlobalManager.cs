@@ -525,10 +525,13 @@ public class GlobalManager : NetworkBehaviour
         {
             AddNewTeam(a[i]);
         }
+        Debug.Log("Wires Attempt Send");
         if (b != null)
         {
+            Debug.Log("Wires Sent");
             for (int i = 0; i < b.Length; i++)
             {
+                Debug.Log("Wires Create " + i);
                 teamWires[b[i].teamNum].CreateNewClientWire(b[i]);
             }
         }
@@ -628,6 +631,7 @@ public struct PlayerInfoSentToClient : INetworkSerializable
 [System.Serializable]
 public struct PlayerDataSentToServer : INetworkSerializable
 {
+    public float predictionTime;
     public Vector3 headsetPos;
     public Quaternion headsetRot;
     public Vector3 rHandPos;
@@ -644,6 +648,7 @@ public struct PlayerDataSentToServer : INetworkSerializable
 
     public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
     {
+        serializer.SerializeValue(ref predictionTime);
         serializer.SerializeValue(ref headsetPos);
         serializer.SerializeValue(ref headsetRot);
         serializer.SerializeValue(ref rHandPos);

@@ -27,7 +27,7 @@ public class MouseLook : NetworkBehaviour
             Destroy(cam.GetComponent<TrackedPoseDriver>());
         }
     }
-    void Update()
+    void LateUpdate()
     {
         currentRotation.x += Input.GetAxis("Mouse X") * sensitivity;
         currentRotation.y -= Input.GetAxis("Mouse Y") * sensitivity;
