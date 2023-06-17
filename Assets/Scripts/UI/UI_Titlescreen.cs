@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UIElements;
@@ -12,6 +13,7 @@ public class UI_Titlescreen : MonoBehaviour
     [SerializeField] UIDocument doc;
     [SerializeField] List<Texture2D> mapIcons;
     [SerializeField] List<string> mapNames;
+    [SerializeField] NetworkManager m_NetworkManager;
 
 
     //Colors
@@ -25,6 +27,14 @@ public class UI_Titlescreen : MonoBehaviour
 
     private void OnEnable()
     {
+        //Pinging
+        if (m_NetworkManager != null)
+        {
+            m_NetworkManager.OnClientDisconnectCallback += OnClientDisconnectCallback;
+        }
+        NetworkManager.Singleton.NetworkConfig.ConnectionData = System.Text.Encoding.ASCII.GetBytes("P");
+
+        //Root
         root = doc.rootVisualElement;
 
         //Bottom Bar
@@ -107,6 +117,7 @@ public class UI_Titlescreen : MonoBehaviour
             alreadyLoading = true;
             if (currentSceneToLoad >= 0)
             {
+                PlayerPrefs.SetInt("ServerMapName", currentSceneToLoad);
                 AsyncOperation asyncLoad = SceneManager.LoadSceneAsync(mapNames[currentSceneToLoad]);
                 while (!asyncLoad.isDone)
                 {
@@ -266,6 +277,14 @@ public class UI_Titlescreen : MonoBehaviour
             {
                 yield return null;
             }
+        }
+    }
+
+    private void OnClientDisconnectCallback(ulong obj)
+    {
+        if (!m_NetworkManager.IsServer && m_NetworkManager.DisconnectReason != string.Empty)
+        {
+            Debug.Log($"Approval Declined Reason: {m_NetworkManager.DisconnectReason}");
         }
     }
 }

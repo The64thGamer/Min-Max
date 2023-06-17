@@ -12,6 +12,7 @@ public class GlobalManager : NetworkBehaviour
     List<TeamInfo> teams = new List<TeamInfo>();
     List<PlayerDataSentToClient> playerPosRPCData = new List<PlayerDataSentToClient>();
     [SerializeField] NetworkVariable<int> ServerTickRate = new NetworkVariable<int>(10);
+    [SerializeField] NetworkManager m_NetworkManager;
 
     [Header("Lists")]
     [SerializeField] GameObject clientPrefab;
@@ -30,7 +31,11 @@ public class GlobalManager : NetworkBehaviour
     const ulong botID = 64646464646464;
 
     private void Start()
-    {
+    {        //Pinging
+        if (m_NetworkManager != null)
+        {
+            m_NetworkManager.ConnectionApprovalCallback = ApprovalCheck;
+        }
         NetworkManager.Singleton.OnServerStarted += ServerStarted;
         al = GetComponent<AllStats>();
         currentGamemode = GetComponent<GenericGamemode>();
@@ -42,11 +47,13 @@ public class GlobalManager : NetworkBehaviour
         switch (PlayerPrefs.GetInt("LoadMapMode"))
         {
             case 0:
+                NetworkManager.Singleton.ConnectionApprovalCallback = ApprovalCheck;
                 NetworkManager.Singleton.StartHost();
                 currentGamemode.SetTeams();
                 Debug.Log("Started Host");
                 break;
             case 1:
+                NetworkManager.Singleton.ConnectionApprovalCallback = ApprovalCheck;
                 NetworkManager.Singleton.StartHost();
                 currentGamemode.SetTeams();
                 Debug.Log("Started Host");
@@ -123,7 +130,6 @@ public class GlobalManager : NetworkBehaviour
     {
         if (IsHost)
         {
-            Debug.Log("hhhhhhhhhhhhhhhh????????");
             UpdateClientMapDataClientRpc(teams.ToArray(),null);
         }
         for (int e = 0; e < teams.Count; e++)
@@ -292,6 +298,27 @@ public class GlobalManager : NetworkBehaviour
     {
         clients.Add(player);
         playerPosRPCData.Add(new PlayerDataSentToClient());
+    }
+
+    private void ApprovalCheck(NetworkManager.ConnectionApprovalRequest request, NetworkManager.ConnectionApprovalResponse response)
+    {
+        // Additional connection data defined by user code
+        string payload = System.Text.Encoding.ASCII.GetString(request.Payload);
+
+        if (payload[0] == 'P')
+        {
+            response.Approved = false;
+            response.Reason = 'P' + clients.Count + 0x1c + PlayerPrefs.GetInt("ServerMaxPlayers") + 0x1c + PlayerPrefs.GetString("ServerName") + 0x1c + PlayerPrefs.GetInt("ServerMapName");
+        }
+        else
+        {
+            response.Approved = true;
+            response.CreatePlayerObject = true;
+            response.PlayerPrefabHash = null;
+            response.Position = Vector3.zero;
+            response.Rotation = Quaternion.identity;
+            response.Pending = false;
+        }
     }
 
     [ServerRpc(RequireOwnership = false)]
