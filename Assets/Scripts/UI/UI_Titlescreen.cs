@@ -112,7 +112,7 @@ public class UI_Titlescreen : MonoBehaviour
         selectPort.value = PlayerPrefs.GetInt("ServerPort").ToString();
 
 
-        SwitchMainTab(0);
+        SwitchMainTab(1);
     }
 
     IEnumerator LoadMap()
@@ -216,7 +216,7 @@ public class UI_Titlescreen : MonoBehaviour
                         for (int i = 0; i < PlayerPrefs.GetInt("LocalServersAdded") + 1; i++)
                         {
                             TemplateContainer myUI = vta.Instantiate();
-                            myUI.Q<Label>("ServerName").text = PlayerPrefs.GetInt("LocalServer" + i).ToString();
+                            myUI.Q<Label>("ServerName").text = "(" + PlayerPrefs.GetInt("LocalServer" + i).ToString() + ") " + PlayerPrefs.GetString("LocalServerName" + i);
                             myUI.Q<Button>("Button").clicked += () => SetCurrentLocalServer(i);
 
                             visList.Add(myUI);
