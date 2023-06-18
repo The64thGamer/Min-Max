@@ -20,6 +20,9 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Game Assets/Scenes/Maps/pl_frequency/pl_frequency.unity
     guid: b7248a0a181720f4dbad0677a6b925f6
+  - enabled: 1
+    path: Assets/Game Assets/Scenes/Maps/cp_nara/cp_nara.unity
+    guid: b4afb4ee269afcf428e8364099b45161
   m_configObjects:
     Unity.XR.Oculus.Settings: {fileID: 11400000, guid: bfa1182bd221b4ca89619141f66f1260,
       type: 2}

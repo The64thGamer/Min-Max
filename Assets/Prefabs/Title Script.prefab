@@ -48,9 +48,11 @@ MonoBehaviour:
   mapIcons:
   - {fileID: 2800000, guid: 94d6e13b230b39c4fad8277561a59acc, type: 3}
   - {fileID: 2800000, guid: d31969135bb208f45b074f6f35b50675, type: 3}
+  - {fileID: 2800000, guid: d31969135bb208f45b074f6f35b50675, type: 3}
   mapNames:
   - pl_artpass
   - pl_frequency
+  - cp_nara
   m_NetworkManager: {fileID: 0}
   vta: {fileID: 9197481963319205126, guid: 52a12b2ec113cb44f9ff3f04f5cfdfcc, type: 3}
   borderButtonSelected: {r: 0.92941177, g: 0.85490197, b: 0.77254903, a: 1}
