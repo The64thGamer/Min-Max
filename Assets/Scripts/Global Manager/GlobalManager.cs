@@ -34,6 +34,7 @@ public class GlobalManager : NetworkBehaviour
     {
         //Pinging
         m_NetworkManager = GameObject.Find("Transport").GetComponent<NetworkManager>();
+        m_NetworkManager.NetworkConfig.ConnectionData = System.Text.Encoding.ASCII.GetBytes("C");
         m_NetworkManager.ConnectionApprovalCallback = ApprovalCheck;
         NetworkManager.Singleton.OnServerStarted += ServerStarted;
         al = GetComponent<AllStats>();
@@ -303,20 +304,29 @@ public class GlobalManager : NetworkBehaviour
     {
         // Additional connection data defined by user code
         string payload = System.Text.Encoding.ASCII.GetString(request.Payload);
+        Debug.Log(payload);
 
         if (payload[0] == 'P')
         {
+            Debug.Log("Player is Pinging Server, Sending Data");
             response.Approved = false;
             response.Reason = 'P' + clients.Count + 0x1c + PlayerPrefs.GetInt("ServerMaxPlayers") + 0x1c + PlayerPrefs.GetString("ServerName") + 0x1c + PlayerPrefs.GetInt("ServerMapName");
         }
-        else
+        else if(payload[0] == 'C')
         {
+            Debug.Log("Player is attempting to connect, Approved");
             response.Approved = true;
             response.CreatePlayerObject = true;
             response.PlayerPrefabHash = null;
             response.Position = Vector3.zero;
             response.Rotation = Quaternion.identity;
             response.Pending = false;
+        }
+        else
+        {
+            Debug.Log("Player is attempting to connect, Denied: Server was sent corrupted instructions");
+            response.Approved = false;
+            response.Reason = "E" + "Server was sent corrupted instructions";
         }
     }
 
