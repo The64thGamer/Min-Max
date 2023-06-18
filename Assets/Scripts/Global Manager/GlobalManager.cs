@@ -1,4 +1,4 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Unity.Netcode;
@@ -304,13 +304,15 @@ public class GlobalManager : NetworkBehaviour
     {
         // Additional connection data defined by user code
         string payload = System.Text.Encoding.ASCII.GetString(request.Payload);
-        Debug.Log(payload);
-
         if (payload[0] == 'P')
         {
             Debug.Log("Player is Pinging Server, Sending Data");
             response.Approved = false;
-            response.Reason = 'P' + clients.Count + 0x1c + PlayerPrefs.GetInt("ServerMaxPlayers") + 0x1c + PlayerPrefs.GetString("ServerName") + 0x1c + PlayerPrefs.GetInt("ServerMapName");
+            response.Reason = "P" 
+                + clients.Count + "😂" 
+                + PlayerPrefs.GetInt("ServerMaxPlayers") + "😂" 
+                + PlayerPrefs.GetString("ServerName") + "😂" 
+                + PlayerPrefs.GetInt("ServerMapName");
         }
         else if(payload[0] == 'C')
         {
