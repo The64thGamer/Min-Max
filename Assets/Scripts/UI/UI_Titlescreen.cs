@@ -3,10 +3,13 @@ using System.Collections;
 using System.Collections.Generic;
 using Unity.Netcode;
 using Unity.Netcode.Transports.UTP;
+using UnityEditor.PackageManager;
+using UnityEditor.PackageManager.Requests;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UIElements;
 using UnityEngine.XR.Management;
+using static Unity.Networking.Transport.NetworkPipelineStage;
 
 public class UI_Titlescreen : MonoBehaviour
 {
@@ -265,6 +268,10 @@ public class UI_Titlescreen : MonoBehaviour
         int secondCount = 0;
         while (true)
         {
+            if(foundLocalServer)
+            {
+                break;
+            }
             name.text = "Connecting To Server";
             for (int i = 0; i < secondCount + 1; i++)
             {
@@ -394,7 +401,52 @@ public class UI_Titlescreen : MonoBehaviour
         if (!m_NetworkManager.IsServer && m_NetworkManager.DisconnectReason != string.Empty)
         {
             foundLocalServer = true;
-            Debug.Log($"Approval Declined Reason: {m_NetworkManager.DisconnectReason}");
+            string payload = m_NetworkManager.DisconnectReason;
+           //response.Reason = 'P' + clients.Count + 0x1c + PlayerPrefs.GetInt("ServerMaxPlayers") + 0x1c + PlayerPrefs.GetString("ServerName") + 0x1c + PlayerPrefs.GetInt("ServerMapName");
+
+            if (payload[0] == 'P')
+            {
+                Debug.Log("uhhh" + payload);
+                int section = 0;
+                List<byte> message = new List<byte>();
+                for (int i = 1; i < payload.Length; i++)
+                {
+                    if (payload[i] == 0x1c)
+                    {
+                        switch (section)
+                        {
+                            case 0:
+                                root.Q<Label>("NewLocalPlayerCount").text = System.Text.Encoding.ASCII.GetString(message.ToArray());
+                                break;
+                            case 1:
+                                root.Q<Label>("NewLocalPlayerCount").text += "/" + System.Text.Encoding.ASCII.GetString(message.ToArray());
+                                break;
+                            case 2:
+                                root.Q<Label>("NewLocalServerName").text = System.Text.Encoding.ASCII.GetString(message.ToArray());
+                                break;
+                            case 3:
+                                root.Q<Label>("NewLocalMapName").text = System.Text.Encoding.ASCII.GetString(message.ToArray());
+                                break;
+                            default:
+                                break;
+                        }
+                        section++;
+                        message.Clear();
+                    }
+                    else
+                    {
+                        message.Add((byte)payload[i]);
+                    }
+                }
+            }
+            else if (payload[0] == 'E')
+            {
+                root.Q<Label>("NewLocalServerName").text = payload.Substring(1,payload.Length-1);
+            }
+            else
+            {
+                root.Q<Label>("NewLocalServerName").text = "Unknown Error: " + payload;
+            }
             root.Q<VisualElement>("NewLocalDeleteGame").style.display = DisplayStyle.Flex;
             root.Q<VisualElement>("NewLocalStartGame").style.display = DisplayStyle.Flex;
         }
