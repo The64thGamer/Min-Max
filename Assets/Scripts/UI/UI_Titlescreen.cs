@@ -5,6 +5,11 @@ using System.Linq;
 using System.Xml.Linq;
 using Unity.Netcode;
 using Unity.Netcode.Transports.UTP;
+using Unity.Networking.Transport.Relay;
+using Unity.Services.Authentication;
+using Unity.Services.Core;
+using Unity.Services.Relay.Models;
+using Unity.Services.Relay;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UIElements;
@@ -31,6 +36,8 @@ public class UI_Titlescreen : MonoBehaviour
     bool foundLocalServer;
     int joinLocalIndex;
     bool serverCheckRunning;
+
+    bool localOrServer;
 
     private void OnEnable()
     {
@@ -230,6 +237,7 @@ public class UI_Titlescreen : MonoBehaviour
                     root.Q<Label>("StartSetting").text = "Start Server (Join Code will copy to clipboard on start)";
                     break;
                 case 2:
+                    localOrServer = true;
                     root.Q<Button>("StartGame").style.display = DisplayStyle.Flex;
                     root.Q<VisualElement>("JoinLocalCol").style.display = DisplayStyle.Flex;
                     root.Q<VisualElement>("LocalServers").style.display = DisplayStyle.Flex;
@@ -247,7 +255,7 @@ public class UI_Titlescreen : MonoBehaviour
                         for (int i = 0; i < PlayerPrefs.GetInt("GlobalServersAdded"); i++)
                         {
                             TemplateContainer myUI = vta.Instantiate();
-                            myUI.Q<Label>("ServerName").text = "(" + PlayerPrefs.GetInt("GlobalServer" + i).ToString("00000") + ") " + PlayerPrefs.GetString("GlobalServerName" + i);
+                            myUI.Q<Label>("ServerName").text = "(" + PlayerPrefs.GetString("GlobalServer" + i) + ") " + PlayerPrefs.GetString("GlobalServerName" + i);
                             int e = i;
                             myUI.Q<Button>("Button").clicked += () => SetCurrentLocalServer(e);
 
@@ -257,6 +265,7 @@ public class UI_Titlescreen : MonoBehaviour
                     SetVEBorderColor(root.Q<VisualElement>("PSJoinServer"), borderButtonSelected);
                     break;
                 case 3:
+                    localOrServer = false;
                     root.Q<Button>("StartGame").style.display = DisplayStyle.Flex;
                     root.Q<VisualElement>("JoinLocalCol").style.display = DisplayStyle.Flex;
                     root.Q<VisualElement>("LocalServers").style.display = DisplayStyle.Flex;
@@ -297,9 +306,39 @@ public class UI_Titlescreen : MonoBehaviour
             root.Q<VisualElement>("NewLocalDeleteGame").style.display = DisplayStyle.None;
             joinLocalIndex = index;
             foundLocalServer = false;
-            m_NetworkManager.GetComponent<UnityTransport>().ConnectionData.Port = (ushort)PlayerPrefs.GetInt("LocalServer" + index);
+            if (localOrServer)
+            {
+                m_NetworkManager.GetComponent<UnityTransport>().ConnectionData.Port = (ushort)PlayerPrefs.GetInt("LocalServer" + index);
+                m_NetworkManager.StartClient();
+                StartCoroutine(LocalServerCheck());
+            }
+            else
+            {
+                JoinServer(PlayerPrefs.GetString("GlobalServer" + index));
+                StartCoroutine(LocalServerCheck());
+            }
+        }
+    }
+
+    async void JoinServer(string joinCode)
+    {
+        await UnityServices.InitializeAsync();
+        await AuthenticationService.Instance.SignInAnonymouslyAsync();
+
+        try
+        {
+            JoinAllocation joinAllocation = await RelayService.Instance.JoinAllocationAsync(joinCode);
+
+            RelayServerData relayServerData = new RelayServerData(joinAllocation, "dtls");
+
+            m_NetworkManager.GetComponent<UnityTransport>().SetRelayServerData(relayServerData);
+
             m_NetworkManager.StartClient();
-            StartCoroutine(LocalServerCheck());
+            Debug.Log("Started Server Client");
+        }
+        catch (RelayServiceException e)
+        {
+            Debug.Log(e);
         }
     }
 
@@ -338,24 +377,51 @@ public class UI_Titlescreen : MonoBehaviour
 
     void AddNewLocalServer(string port)
     {
-        PlayerPrefs.SetInt("LocalServersAdded", PlayerPrefs.GetInt("LocalServersAdded") + 1);
-        try
+        if (localOrServer)
         {
-            PlayerPrefs.SetInt("LocalServer" + (PlayerPrefs.GetInt("LocalServersAdded") - 1), (int)ushort.Parse(port));
+            PlayerPrefs.SetInt("GlobalServersAdded", PlayerPrefs.GetInt("GlobalServersAdded") + 1);
+            try
+            {
+                PlayerPrefs.SetString("GlobalServer" + (PlayerPrefs.GetInt("GlobalServersAdded") - 1), port);
+            }
+            catch (Exception)
+            {
+                PlayerPrefs.SetInt("GlobalServersAdded", PlayerPrefs.GetInt("GlobalServersAdded") - 1);
+            }
         }
-        catch (Exception)
+        else
         {
-            PlayerPrefs.SetInt("LocalServersAdded", PlayerPrefs.GetInt("LocalServersAdded") - 1);
+            PlayerPrefs.SetInt("LocalServersAdded", PlayerPrefs.GetInt("LocalServersAdded") + 1);
+            try
+            {
+                PlayerPrefs.SetInt("LocalServer" + (PlayerPrefs.GetInt("LocalServersAdded") - 1), (int)ushort.Parse(port));
+            }
+            catch (Exception)
+            {
+                PlayerPrefs.SetInt("LocalServersAdded", PlayerPrefs.GetInt("LocalServersAdded") - 1);
+            }
         }
         StartLocalOrHost(3);
+
     }
 
     void RemoveLocalServer(int index)
     {
-        PlayerPrefs.SetInt("LocalServersAdded", PlayerPrefs.GetInt("LocalServersAdded") - 1);
-        for (int i = index; i < PlayerPrefs.GetInt("LocalServersAdded"); i++)
+        if (localOrServer)
         {
-            PlayerPrefs.SetInt("LocalServer" + i, PlayerPrefs.GetInt("LocalServer" + (i + 1)));
+            PlayerPrefs.SetInt("GlobalServersAdded", PlayerPrefs.GetInt("GlobalServersAdded") - 1);
+            for (int i = index; i < PlayerPrefs.GetInt("LocalServersAdded"); i++)
+            {
+                PlayerPrefs.SetString("GlobalServer" + i, PlayerPrefs.GetString("GlobalServer" + (i + 1)));
+            }
+        }
+        else
+        {
+            PlayerPrefs.SetInt("LocalServersAdded", PlayerPrefs.GetInt("LocalServersAdded") - 1);
+            for (int i = index; i < PlayerPrefs.GetInt("LocalServersAdded"); i++)
+            {
+                PlayerPrefs.SetInt("LocalServer" + i, PlayerPrefs.GetInt("LocalServer" + (i + 1)));
+            }
         }
         StartLocalOrHost(3);
     }
