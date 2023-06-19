@@ -48,7 +48,7 @@ MonoBehaviour:
   mapIcons:
   - {fileID: 2800000, guid: 94d6e13b230b39c4fad8277561a59acc, type: 3}
   - {fileID: 2800000, guid: d31969135bb208f45b074f6f35b50675, type: 3}
-  - {fileID: 2800000, guid: d31969135bb208f45b074f6f35b50675, type: 3}
+  - {fileID: 2800000, guid: 94543ca0472bc8044a1e03dede34841f, type: 3}
   mapNames:
   - pl_artpass
   - pl_frequency

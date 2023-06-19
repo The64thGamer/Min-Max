@@ -138,20 +138,21 @@ public class GlobalManager : NetworkBehaviour
             Renderer[] meshes = teamGeometry[teams[e].spawns].GetComponentsInChildren<Renderer>();
             for (int i = 0; i < meshes.Length; i++)
             {
-                Material[] mats = meshes[i].sharedMaterials;
+                Material[] mats = meshes[i].materials;
                 for (int r = 0; r < mats.Length; r++)
                 {
                     mats[r].SetFloat("_Team_1", team1Final);
                 }
             }
-            for (int i = 0; i < clients.Count; i++)
-            {
-                clients[i].UpdateTeamColor();
-            }
+
             if (teamWires[teams[e].spawns] != null)
             {
                 teamWires[teams[e].spawns].SetTeam(teams[e].teamColor);
             }
+        }
+        for (int i = 0; i < clients.Count; i++)
+        {
+            clients[i].UpdateTeamColor();
         }
     }
 
