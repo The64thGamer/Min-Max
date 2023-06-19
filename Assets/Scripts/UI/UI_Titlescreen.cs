@@ -48,6 +48,7 @@ public class UI_Titlescreen : MonoBehaviour
 
         //Play Menu
         Button ps_joinserver = root.Q<Button>("PSJoinServer");
+        Button ps_joinlocal = root.Q<Button>("PSJoinLocal");
         Button ps_startserver = root.Q<Button>("PSStartServer");
         Button ps_startlocal = root.Q<Button>("PSStartLocal");
 
@@ -75,8 +76,9 @@ public class UI_Titlescreen : MonoBehaviour
         ps_startlocal.clicked += () => StartLocalOrHost(0);
         ps_startserver.clicked += () => StartLocalOrHost(1);
         ps_joinserver.clicked += () => StartLocalOrHost(2);
-        newLocalStart.clicked += () => StartLocalOrHost(3);
+        ps_joinlocal.clicked += () => StartLocalOrHost(3);
         ms_startgame.clicked += () => StartCoroutine(LoadMap());
+        newLocalStart.clicked += () => StartCoroutine(LoadMap());
         selectMap.RegisterValueChangedCallback(evt => SwapMap(selectMap));
         maxPlayers.RegisterValueChangedCallback(evt => PlayerPrefs.SetInt("ServerMaxPlayers", (int)maxPlayers.value));
         spectatorAsPlayer.RegisterValueChangedCallback(evt => PlayerPrefs.SetInt("ServerSpectatorAsPlayer", spectatorAsPlayer.value ? 1 : 0));
@@ -128,6 +130,7 @@ public class UI_Titlescreen : MonoBehaviour
             if (currentSceneToLoad >= 0)
             {
                 PlayerPrefs.SetInt("ServerMapName", currentSceneToLoad);
+                Application.backgroundLoadingPriority = ThreadPriority.Low;
                 AsyncOperation asyncLoad = SceneManager.LoadSceneAsync(mapNames[currentSceneToLoad]);
                 while (!asyncLoad.isDone)
                 {
