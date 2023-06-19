@@ -4,6 +4,8 @@ using System.Linq;
 using Unity.Netcode;
 using Unity.Netcode.Transports.UTP;
 using Unity.Networking.Transport.Relay;
+using Unity.Services.Authentication;
+using Unity.Services.Core;
 using Unity.Services.Relay;
 using Unity.Services.Relay.Models;
 using UnityEngine;
@@ -83,6 +85,9 @@ public class GlobalManager : NetworkBehaviour
 
     async void StartServer()
     {
+        await UnityServices.InitializeAsync();
+        await AuthenticationService.Instance.SignInAnonymouslyAsync();
+
         try
         {
             Allocation allocation = await RelayService.Instance.CreateAllocationAsync(PlayerPrefs.GetInt("ServerMaxPlayers") - 1);
@@ -101,6 +106,9 @@ public class GlobalManager : NetworkBehaviour
 
     async void JoinServer(string joinCode)
     {
+        await UnityServices.InitializeAsync();
+        await AuthenticationService.Instance.SignInAnonymouslyAsync();
+
         try
         {
             JoinAllocation joinAllocation = await RelayService.Instance.JoinAllocationAsync(joinCode);
