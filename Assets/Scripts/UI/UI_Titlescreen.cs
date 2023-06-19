@@ -41,6 +41,9 @@ public class UI_Titlescreen : MonoBehaviour
 
     bool localOrServer;
 
+    bool serverAttempt;
+    bool serverFail;
+
     private void OnEnable()
     {
         //Pinging
@@ -247,7 +250,7 @@ public class UI_Titlescreen : MonoBehaviour
                     root.Q<Label>("NewLocalMapName").text = "";
                     root.Q<Label>("NewLocalPlayerCount").text = "";
                     root.Q<VisualElement>("NewLocalMapIcon").style.backgroundImage = new StyleBackground(unknownMap);
-                    root.Q<Button>("AddNewLocalServer").text = "Join Key";
+                    root.Q<TextField>("NewLocalServerPort").label = "Join Key";
 
                     SetVEBorderColor(root.Q<VisualElement>("PSJoinServer"), borderButtonSelected);
 
@@ -270,13 +273,12 @@ public class UI_Titlescreen : MonoBehaviour
                     localOrServer = false;
                     root.Q<Button>("StartGame").style.display = DisplayStyle.Flex;
                     root.Q<VisualElement>("JoinLocalCol").style.display = DisplayStyle.Flex;
-                    root.Q<VisualElement>("LocalServers").style.display = DisplayStyle.Flex;
+                    root.Q<VisualElement>("LocalServers").style.display = DisplayStyle.Flex; 
                     root.Q<Label>("NewLocalServerName").text = "Select A Server";
                     root.Q<Label>("NewLocalMapName").text = "";
                     root.Q<Label>("NewLocalPlayerCount").text = "";
                     root.Q<VisualElement>("NewLocalMapIcon").style.backgroundImage = new StyleBackground(unknownMap);
-                    root.Q<Button>("AddNewLocalServer").text = "Port";
-
+                    root.Q<TextField>("NewLocalServerPort").label = "Port";
 
                     SetVEBorderColor(root.Q<VisualElement>("PSJoinLocal"), borderButtonSelected);
 
@@ -321,7 +323,7 @@ public class UI_Titlescreen : MonoBehaviour
         }
     }
 
-    async Task JoinServer(string joinCode)
+    async void JoinServer(string joinCode)
     {
         await UnityServices.InitializeAsync();
         await AuthenticationService.Instance.SignInAnonymouslyAsync();
@@ -335,10 +337,11 @@ public class UI_Titlescreen : MonoBehaviour
             m_NetworkManager.GetComponent<UnityTransport>().SetRelayServerData(relayServerData);
 
             m_NetworkManager.StartClient();
-            Debug.Log("Started Server Client 1");
+            serverAttempt = true;
         }
         catch (RelayServiceException e)
         {
+            serverFail = true;
             Debug.Log(e);
         }
     }
@@ -348,12 +351,21 @@ public class UI_Titlescreen : MonoBehaviour
     {
         Label name = root.Q<Label>("NewLocalServerName");
 
-        if(localOrServer)
+        if (localOrServer)
         {
-            var task = Task.Run(async () => await JoinServer(PlayerPrefs.GetString("GlobalServer" + index)));
-            yield return new WaitUntil(() => task.IsCompleted);
-            Debug.Log("Started Server Client 2");
-
+            serverAttempt = false;
+            serverFail = false;
+            name.text = "Attempting Allocation";
+            JoinServer(PlayerPrefs.GetString("GlobalServer" + index));
+            while (!serverAttempt || !serverFail)
+            {
+                yield return null;
+            }
+            if(serverFail)
+            {
+                serverCheckRunning = false;
+                name.text = "Could Not Connect To Server.";
+            }
         }
 
         int secondCount = 0;
@@ -397,6 +409,7 @@ public class UI_Titlescreen : MonoBehaviour
             {
                 PlayerPrefs.SetInt("GlobalServersAdded", PlayerPrefs.GetInt("GlobalServersAdded") - 1);
             }
+            StartLocalOrHost(2);
         }
         else
         {
@@ -409,8 +422,9 @@ public class UI_Titlescreen : MonoBehaviour
             {
                 PlayerPrefs.SetInt("LocalServersAdded", PlayerPrefs.GetInt("LocalServersAdded") - 1);
             }
+            StartLocalOrHost(3);
+
         }
-        StartLocalOrHost(3);
 
     }
 
@@ -423,6 +437,8 @@ public class UI_Titlescreen : MonoBehaviour
             {
                 PlayerPrefs.SetInt("LocalServer" + i, PlayerPrefs.GetInt("LocalServer" + (i + 1)));
             }
+            StartLocalOrHost(3);
+
         }
         else
         {
@@ -431,8 +447,8 @@ public class UI_Titlescreen : MonoBehaviour
             {
                 PlayerPrefs.SetString("GlobalServer" + i, PlayerPrefs.GetString("GlobalServer" + (i + 1)));
             }
+            StartLocalOrHost(2);
         }
-        StartLocalOrHost(3);
     }
 
     void SwitchMainTab(int tab)
