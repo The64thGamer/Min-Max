@@ -88,7 +88,7 @@ public class UI_Titlescreen : MonoBehaviour
         maxPlayers.RegisterValueChangedCallback(evt => PlayerPrefs.SetInt("ServerMaxPlayers", (int)maxPlayers.value));
         spectatorAsPlayer.RegisterValueChangedCallback(evt => PlayerPrefs.SetInt("ServerSpectatorAsPlayer", spectatorAsPlayer.value ? 1 : 0));
         selectPort.RegisterValueChangedCallback(evt => TryPortChange(selectPort));
-        serverName.RegisterValueChangedCallback(evt => ServerRename(selectPort));
+        serverName.RegisterValueChangedCallback(evt => ServerRename(serverName));
         team1.RegisterValueChangedCallback(evt => PlayerPrefs.SetInt("Team1Setting", team1.index));
         team2.RegisterValueChangedCallback(evt => PlayerPrefs.SetInt("Team2Setting", team2.index));
         spawnBots.RegisterValueChangedCallback(evt => PlayerPrefs.SetInt("SpawnBotsInEmpty", spawnBots.value ? 1 : 0));
@@ -123,7 +123,7 @@ public class UI_Titlescreen : MonoBehaviour
         team1.index = PlayerPrefs.GetInt("Team1Setting");
         team2.index = PlayerPrefs.GetInt("Team2Setting");
         selectPort.value = PlayerPrefs.GetInt("ServerPort").ToString();
-        serverName.SetValueWithoutNotify(PlayerPrefs.GetString("ServerName"));
+        serverName.value = PlayerPrefs.GetString("ServerName");
 
         SwitchMainTab(1);
     }
