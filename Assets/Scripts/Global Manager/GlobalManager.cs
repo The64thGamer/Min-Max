@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using Unity.Netcode;
 using Unity.Netcode.Transports.UTP;
 using Unity.Networking.Transport.Relay;
@@ -8,6 +9,7 @@ using Unity.Services.Authentication;
 using Unity.Services.Core;
 using Unity.Services.Relay;
 using Unity.Services.Relay.Models;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.Windows;
 
@@ -96,7 +98,8 @@ public class GlobalManager : NetworkBehaviour
             m_NetworkManager.GetComponent<UnityTransport>().SetRelayServerData(relayServerData);
             m_NetworkManager.StartHost();
             currentGamemode.SetTeams();
-            Debug.Log("Started Server Host");
+            GUIUtility.systemCopyBuffer = joinCode;
+            Debug.Log("Started Server Host, Code: " + joinCode);
         }
         catch (RelayServiceException e)
         {
