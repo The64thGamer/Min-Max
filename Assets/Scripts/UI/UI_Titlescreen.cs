@@ -15,6 +15,8 @@ using UnityEngine.SceneManagement;
 using UnityEngine.UIElements;
 using UnityEngine.Windows;
 using UnityEngine.XR.Management;
+using Unity.VisualScripting;
+using System.Threading.Tasks;
 
 public class UI_Titlescreen : MonoBehaviour
 {
@@ -306,21 +308,20 @@ public class UI_Titlescreen : MonoBehaviour
             root.Q<VisualElement>("NewLocalDeleteGame").style.display = DisplayStyle.None;
             joinLocalIndex = index;
             foundLocalServer = false;
-            if (localOrServer)
+            if (!localOrServer)
             {
                 m_NetworkManager.GetComponent<UnityTransport>().ConnectionData.Port = (ushort)PlayerPrefs.GetInt("LocalServer" + index);
                 m_NetworkManager.StartClient();
-                StartCoroutine(LocalServerCheck());
+                StartCoroutine(LocalServerCheck(index));
             }
             else
             {
-                JoinServer(PlayerPrefs.GetString("GlobalServer" + index));
-                StartCoroutine(LocalServerCheck());
+                StartCoroutine(LocalServerCheck(index));
             }
         }
     }
 
-    async void JoinServer(string joinCode)
+    async Task JoinServer(string joinCode)
     {
         await UnityServices.InitializeAsync();
         await AuthenticationService.Instance.SignInAnonymouslyAsync();
@@ -334,7 +335,7 @@ public class UI_Titlescreen : MonoBehaviour
             m_NetworkManager.GetComponent<UnityTransport>().SetRelayServerData(relayServerData);
 
             m_NetworkManager.StartClient();
-            Debug.Log("Started Server Client");
+            Debug.Log("Started Server Client 1");
         }
         catch (RelayServiceException e)
         {
@@ -343,9 +344,17 @@ public class UI_Titlescreen : MonoBehaviour
     }
 
     //This entire loop sucks, but it gets the job done idgaf
-    IEnumerator LocalServerCheck()
+    IEnumerator LocalServerCheck(int index)
     {
         Label name = root.Q<Label>("NewLocalServerName");
+
+        if(localOrServer)
+        {
+            var task = Task.Run(async () => await JoinServer(PlayerPrefs.GetString("GlobalServer" + index)));
+            yield return new WaitUntil(() => task.IsCompleted);
+            Debug.Log("Started Server Client 2");
+
+        }
 
         int secondCount = 0;
         while (true)
@@ -407,20 +416,20 @@ public class UI_Titlescreen : MonoBehaviour
 
     void RemoveLocalServer(int index)
     {
-        if (localOrServer)
-        {
-            PlayerPrefs.SetInt("GlobalServersAdded", PlayerPrefs.GetInt("GlobalServersAdded") - 1);
-            for (int i = index; i < PlayerPrefs.GetInt("LocalServersAdded"); i++)
-            {
-                PlayerPrefs.SetString("GlobalServer" + i, PlayerPrefs.GetString("GlobalServer" + (i + 1)));
-            }
-        }
-        else
+        if (!localOrServer)
         {
             PlayerPrefs.SetInt("LocalServersAdded", PlayerPrefs.GetInt("LocalServersAdded") - 1);
             for (int i = index; i < PlayerPrefs.GetInt("LocalServersAdded"); i++)
             {
                 PlayerPrefs.SetInt("LocalServer" + i, PlayerPrefs.GetInt("LocalServer" + (i + 1)));
+            }
+        }
+        else
+        {
+            PlayerPrefs.SetInt("GlobalServersAdded", PlayerPrefs.GetInt("GlobalServersAdded") - 1);
+            for (int i = index; i < PlayerPrefs.GetInt("LocalServersAdded"); i++)
+            {
+                PlayerPrefs.SetString("GlobalServer" + i, PlayerPrefs.GetString("GlobalServer" + (i + 1)));
             }
         }
         StartLocalOrHost(3);
