@@ -1,11 +1,14 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
+using System.Xml.Linq;
 using Unity.Netcode;
 using Unity.Netcode.Transports.UTP;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UIElements;
+using UnityEngine.Windows;
 using UnityEngine.XR.Management;
 
 public class UI_Titlescreen : MonoBehaviour
@@ -62,6 +65,8 @@ public class UI_Titlescreen : MonoBehaviour
         DropdownField team1 = root.Q<DropdownField>("SelectTeam1");
         DropdownField team2 = root.Q<DropdownField>("SelectTeam2");
         Toggle spawnBots = root.Q<Toggle>("SpawnBots");
+        TextField serverName = root.Q<TextField>("ServerName");
+
 
         //Join Local
         Button addnewLocalServer = root.Q<Button>("AddNewLocalServer");
@@ -83,6 +88,7 @@ public class UI_Titlescreen : MonoBehaviour
         maxPlayers.RegisterValueChangedCallback(evt => PlayerPrefs.SetInt("ServerMaxPlayers", (int)maxPlayers.value));
         spectatorAsPlayer.RegisterValueChangedCallback(evt => PlayerPrefs.SetInt("ServerSpectatorAsPlayer", spectatorAsPlayer.value ? 1 : 0));
         selectPort.RegisterValueChangedCallback(evt => TryPortChange(selectPort));
+        serverName.RegisterValueChangedCallback(evt => ServerRename(selectPort));
         team1.RegisterValueChangedCallback(evt => PlayerPrefs.SetInt("Team1Setting", team1.index));
         team2.RegisterValueChangedCallback(evt => PlayerPrefs.SetInt("Team2Setting", team2.index));
         spawnBots.RegisterValueChangedCallback(evt => PlayerPrefs.SetInt("SpawnBotsInEmpty", spawnBots.value ? 1 : 0));
@@ -117,7 +123,7 @@ public class UI_Titlescreen : MonoBehaviour
         team1.index = PlayerPrefs.GetInt("Team1Setting");
         team2.index = PlayerPrefs.GetInt("Team2Setting");
         selectPort.value = PlayerPrefs.GetInt("ServerPort").ToString();
-
+        serverName.SetValueWithoutNotify(PlayerPrefs.GetString("ServerName"));
 
         SwitchMainTab(1);
     }
@@ -151,6 +157,17 @@ public class UI_Titlescreen : MonoBehaviour
             PlayerPrefs.SetInt("ServerPort", 7777);
             selectPort.value = PlayerPrefs.GetInt("ServerPort").ToString();
         }
+    }
+
+    void ServerRename(TextField name)
+    {
+        string rename = name.text;
+        if(rename.Length > 20)
+        {
+            rename = rename.Substring(0, 20);
+        }
+        rename = string.Join("", rename.ToCharArray().Where(x => ((int)x) < 127));
+        PlayerPrefs.SetString("ServerName", rename);
     }
 
     void StartLocalOrHost(int loadmapmode)
@@ -413,7 +430,13 @@ public class UI_Titlescreen : MonoBehaviour
                     }
                     else
                     {
-                        root.Q<Label>("NewLocalServerName").text = "'" + limiters[2] + "'";
+                        string rename = limiters[2];
+                        if (rename.Length > 20)
+                        {
+                            rename = rename.Substring(0, 20);
+                        }
+                        rename = string.Join("", rename.ToCharArray().Where(x => ((int)x) < 127));
+                        root.Q<Label>("NewLocalServerName").text = "'" + rename + "'";
                         PlayerPrefs.SetString("LocalServerName" + joinLocalIndex, limiters[2]);
                     }
                     int currentMap = Convert.ToInt16(limiters[3]);

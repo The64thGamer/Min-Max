@@ -26,6 +26,7 @@
     border-top-right-radius: 10px;
     border-bottom-right-radius: 10px;
     flex-grow: 1;
+    max-width: initial;
 }
 
 .button {
@@ -57,6 +58,7 @@
 .unity-base-text-field {
     color: rgb(238, 226, 223);
     background-color: rgba(83, 64, 61, 0);
+    max-width: none;
 }
 
 .unity-base-text-field__input {
@@ -66,6 +68,7 @@
     padding-right: 5px;
     padding-top: 0;
     padding-bottom: 0;
+    max-width: initial;
 }
 
 .unity-base-popup-field__input {
@@ -112,6 +115,7 @@
     flex-wrap: nowrap;
     max-height: none;
     min-height: 35px;
+    max-width: 500px;
 }
 
 .dropdown {
@@ -133,4 +137,5 @@
     -unity-text-align: middle-left;
     max-height: none;
     min-height: 70px;
+    max-width: 500px;
 }
