@@ -50,7 +50,6 @@ public class UI_Titlescreen : MonoBehaviour
         Button ps_joinserver = root.Q<Button>("PSJoinServer");
         Button ps_startserver = root.Q<Button>("PSStartServer");
         Button ps_startlocal = root.Q<Button>("PSStartLocal");
-        Button ps_joinlocal = root.Q<Button>("PSJoinLocal");
 
         //Create Local
         Button ms_startgame = root.Q<Button>("StartGame");
@@ -67,7 +66,7 @@ public class UI_Titlescreen : MonoBehaviour
         Button addnewLocalServer = root.Q<Button>("AddNewLocalServer");
         TextField newLocalPort = root.Q<TextField>("NewLocalServerPort");
         Button newLocalDelete = root.Q<Button>("NewLocalDeleteGame");
-
+        Button newLocalStart = root.Q<Button>("NewLocalStartGame");
 
         //Functions When Button is Clicked
         rc_startVR.clicked += () => SwitchMainTab(0);
@@ -76,7 +75,7 @@ public class UI_Titlescreen : MonoBehaviour
         ps_startlocal.clicked += () => StartLocalOrHost(0);
         ps_startserver.clicked += () => StartLocalOrHost(1);
         ps_joinserver.clicked += () => StartLocalOrHost(2);
-        ps_joinlocal.clicked += () => StartLocalOrHost(3);
+        newLocalStart.clicked += () => StartLocalOrHost(3);
         ms_startgame.clicked += () => StartCoroutine(LoadMap());
         selectMap.RegisterValueChangedCallback(evt => SwapMap(selectMap));
         maxPlayers.RegisterValueChangedCallback(evt => PlayerPrefs.SetInt("ServerMaxPlayers", (int)maxPlayers.value));
@@ -184,6 +183,7 @@ public class UI_Titlescreen : MonoBehaviour
                     root.Q<VisualElement>("ServerSettings").style.display = DisplayStyle.Flex;
                     root.Q<VisualElement>("StartMapCol").style.display = DisplayStyle.Flex;
                     SetVEBorderColor(root.Q<VisualElement>("PSStartLocal"), borderButtonSelected);
+                    currentSceneToLoad = root.Q<DropdownField>("SelectMap").index;
                     break;
                 case 1:
                     root.Q<Label>("SendPlayerKey").style.display = DisplayStyle.Flex;
@@ -191,6 +191,7 @@ public class UI_Titlescreen : MonoBehaviour
                     root.Q<VisualElement>("ServerSettings").style.display = DisplayStyle.Flex;
                     root.Q<VisualElement>("StartMapCol").style.display = DisplayStyle.Flex;
                     SetVEBorderColor(root.Q<VisualElement>("PSStartServer"), borderButtonSelected);
+                    currentSceneToLoad = root.Q<DropdownField>("SelectMap").index;
                     break;
                 case 2:
                     root.Q<Button>("StartGame").style.display = DisplayStyle.Flex;
@@ -227,11 +228,6 @@ public class UI_Titlescreen : MonoBehaviour
                         {
                             TemplateContainer myUI = vta.Instantiate();
                             myUI.Q<Label>("ServerName").text = "(" + PlayerPrefs.GetInt("LocalServer" + i).ToString("00000") + ") " + PlayerPrefs.GetString("LocalServerName" + i);
-
-                            //THIS IS THE STUPIDEST COMPILER BLACK MAGIC EVER
-                            //"i" is actually a reference, meaning the ctx
-                            //gets changed every section of the loop. You
-                            //have to store "i" as a local variable. WHAT THE FUCK.
                             int e = i;
                             myUI.Q<Button>("Button").clicked += () => SetCurrentLocalServer(e);
 
@@ -415,9 +411,12 @@ public class UI_Titlescreen : MonoBehaviour
                     else
                     {
                         root.Q<Label>("NewLocalServerName").text = "'" + limiters[2] + "'";
+                        PlayerPrefs.SetString("LocalServerName" + joinLocalIndex, limiters[2]);
                     }
-                    root.Q<Label>("NewLocalMapName").text = mapNames[Convert.ToInt16(limiters[3])];
-                    root.Q<VisualElement>("NewLocalMapIcon").style.backgroundImage = new StyleBackground(mapIcons[Convert.ToInt16(limiters[3])]);
+                    int currentMap = Convert.ToInt16(limiters[3]);
+                    root.Q<Label>("NewLocalMapName").text = mapNames[currentMap];
+                    root.Q<VisualElement>("NewLocalMapIcon").style.backgroundImage = new StyleBackground(mapIcons[currentMap]);
+                    currentSceneToLoad = currentMap;
                     root.Q<VisualElement>("NewLocalStartGame").style.display = DisplayStyle.Flex;
                 }
                 else
