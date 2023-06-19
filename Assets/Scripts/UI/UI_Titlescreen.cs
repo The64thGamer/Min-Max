@@ -181,6 +181,8 @@ public class UI_Titlescreen : MonoBehaviour
             root.Q<VisualElement>("JoinLocalCol").style.display = DisplayStyle.None;
             root.Q<VisualElement>("NewLocalDeleteGame").style.display = DisplayStyle.None;
             root.Q<VisualElement>("NewLocalStartGame").style.display = DisplayStyle.None;
+            root.Q<TextField>("SelectPort").style.display = DisplayStyle.None;
+
 
             root.Q<Button>("StartGame").style.display = DisplayStyle.None;
 
@@ -193,6 +195,18 @@ public class UI_Titlescreen : MonoBehaviour
             {
                 SetVEBorderColor(col1.ElementAt(i), noBorder);
             }
+            //Clear Old List
+            VisualElement visList = root.Q<VisualElement>("LocalServerList");
+            List<VisualElement> children = new List<VisualElement>();
+            foreach (var child in visList.Children())
+            {
+                //This stupid setup is because you can't delete children in foreach statement.
+                children.Add(child);
+            }
+            for (int i = 0; i < children.Count; i++)
+            {
+                visList.Remove(children[i]);
+            }
 
             PlayerPrefs.SetInt("LoadMapMode", loadmapmode);
 
@@ -203,18 +217,43 @@ public class UI_Titlescreen : MonoBehaviour
                     root.Q<VisualElement>("ServerSettings").style.display = DisplayStyle.Flex;
                     root.Q<VisualElement>("StartMapCol").style.display = DisplayStyle.Flex;
                     SetVEBorderColor(root.Q<VisualElement>("PSStartLocal"), borderButtonSelected);
+                    root.Q<TextField>("SelectPort").style.display = DisplayStyle.Flex;
                     currentSceneToLoad = root.Q<DropdownField>("SelectMap").index;
+                    root.Q<Label>("StartSetting").text = "Start Local Game";
                     break;
                 case 1:
-                    root.Q<Label>("SendPlayerKey").style.display = DisplayStyle.Flex;
-                    root.Q<Button>("RequestKey").style.display = DisplayStyle.Flex;
+                    root.Q<Button>("StartGame").style.display = DisplayStyle.Flex;
                     root.Q<VisualElement>("ServerSettings").style.display = DisplayStyle.Flex;
                     root.Q<VisualElement>("StartMapCol").style.display = DisplayStyle.Flex;
                     SetVEBorderColor(root.Q<VisualElement>("PSStartServer"), borderButtonSelected);
                     currentSceneToLoad = root.Q<DropdownField>("SelectMap").index;
+                    root.Q<Label>("StartSetting").text = "Start Server (Join Code will copy to clipboard on start)";
                     break;
                 case 2:
                     root.Q<Button>("StartGame").style.display = DisplayStyle.Flex;
+                    root.Q<VisualElement>("JoinLocalCol").style.display = DisplayStyle.Flex;
+                    root.Q<VisualElement>("LocalServers").style.display = DisplayStyle.Flex;
+                    root.Q<Label>("NewLocalServerName").text = "Select A Server";
+                    root.Q<Label>("NewLocalMapName").text = "";
+                    root.Q<Label>("NewLocalPlayerCount").text = "";
+                    root.Q<VisualElement>("NewLocalMapIcon").style.backgroundImage = new StyleBackground(unknownMap);
+                    root.Q<Button>("AddNewLocalServer").text = "Join Key";
+
+                    SetVEBorderColor(root.Q<VisualElement>("PSJoinServer"), borderButtonSelected);
+
+                    //Recreate List
+                    if (PlayerPrefs.GetInt("GlobalServersAdded") > 0)
+                    {
+                        for (int i = 0; i < PlayerPrefs.GetInt("GlobalServersAdded"); i++)
+                        {
+                            TemplateContainer myUI = vta.Instantiate();
+                            myUI.Q<Label>("ServerName").text = "(" + PlayerPrefs.GetInt("GlobalServer" + i).ToString("00000") + ") " + PlayerPrefs.GetString("GlobalServerName" + i);
+                            int e = i;
+                            myUI.Q<Button>("Button").clicked += () => SetCurrentLocalServer(e);
+
+                            visList.Add(myUI);
+                        }
+                    }
                     SetVEBorderColor(root.Q<VisualElement>("PSJoinServer"), borderButtonSelected);
                     break;
                 case 3:
@@ -225,21 +264,10 @@ public class UI_Titlescreen : MonoBehaviour
                     root.Q<Label>("NewLocalMapName").text = "";
                     root.Q<Label>("NewLocalPlayerCount").text = "";
                     root.Q<VisualElement>("NewLocalMapIcon").style.backgroundImage = new StyleBackground(unknownMap);
+                    root.Q<Button>("AddNewLocalServer").text = "Port";
+
 
                     SetVEBorderColor(root.Q<VisualElement>("PSJoinLocal"), borderButtonSelected);
-
-                    //Clear Old List
-                    VisualElement visList = root.Q<VisualElement>("LocalServerList");
-                    List<VisualElement> children = new List<VisualElement>();
-                    foreach (var child in visList.Children())
-                    {
-                        //This stupid setup is because you can't delete children in foreach statement.
-                        children.Add(child);
-                    }
-                    for (int i = 0; i < children.Count; i++)
-                    {
-                        visList.Remove(children[i]);
-                    }
 
                     //Recreate List
                     if (PlayerPrefs.GetInt("LocalServersAdded") > 0)
