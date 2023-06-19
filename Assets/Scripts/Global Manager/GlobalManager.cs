@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using Unity.Netcode;
 using Unity.Netcode.Transports.UTP;
+using Unity.Networking.Transport.Relay;
+using Unity.Services.Relay;
+using Unity.Services.Relay.Models;
 using UnityEngine;
 using UnityEngine.Windows;
 
@@ -43,28 +46,26 @@ public class GlobalManager : NetworkBehaviour
         //Settings
         m_NetworkManager.GetComponent<UnityTransport>().ConnectionData.Port = (ushort)PlayerPrefs.GetInt("ServerPort");
 
-        //Local Host, Server Relay Host, Client Connect
         switch (PlayerPrefs.GetInt("LoadMapMode"))
         {
             case 0:
-                NetworkManager.Singleton.ConnectionApprovalCallback = ApprovalCheck;
+                //Start Local
                 NetworkManager.Singleton.StartHost();
                 currentGamemode.SetTeams();
-                Debug.Log("Started Host");
+                Debug.Log("Started Local Host");
                 break;
             case 1:
-                NetworkManager.Singleton.ConnectionApprovalCallback = ApprovalCheck;
-                NetworkManager.Singleton.StartHost();
-                currentGamemode.SetTeams();
-                Debug.Log("Started Host");
+                //Start Server
+                StartServer();
                 break;
             case 2:
-                NetworkManager.Singleton.StartClient();
-                Debug.Log("Started Client");
+                //Join Server
+                JoinServer(PlayerPrefs.GetString("JoinCode"));
                 break;
             case 3:
+                //Join Local
                 NetworkManager.Singleton.StartClient();
-                Debug.Log("Started Client");
+                Debug.Log("Started Local Client");
                 break;
             default:
                 break;
@@ -77,6 +78,43 @@ public class GlobalManager : NetworkBehaviour
                 //Probably a bad idea for 24/7 servers, though what's a player gonna gain out of controlling bots?
                 SpawnNewPlayerHostServerRpc(botID + (uint)i);
             }
+        }
+    }
+
+    async void StartServer()
+    {
+        try
+        {
+            Allocation allocation = await RelayService.Instance.CreateAllocationAsync(PlayerPrefs.GetInt("ServerMaxPlayers") - 1);
+            string joinCode = await RelayService.Instance.GetJoinCodeAsync(allocation.AllocationId);
+            RelayServerData relayServerData = new RelayServerData(allocation, "dtls");
+            m_NetworkManager.GetComponent<UnityTransport>().SetRelayServerData(relayServerData);
+            m_NetworkManager.StartHost();
+            currentGamemode.SetTeams();
+            Debug.Log("Started Server Host");
+        }
+        catch (RelayServiceException e)
+        {
+            Debug.Log(e);
+        }
+    }
+
+    async void JoinServer(string joinCode)
+    {
+        try
+        {
+            JoinAllocation joinAllocation = await RelayService.Instance.JoinAllocationAsync(joinCode);
+
+            RelayServerData relayServerData = new RelayServerData(joinAllocation, "dtls");
+
+            m_NetworkManager.GetComponent<UnityTransport>().SetRelayServerData(relayServerData);
+
+            m_NetworkManager.StartClient();
+            Debug.Log("Started Server Client");
+        }
+        catch (RelayServiceException e)
+        {
+            Debug.Log(e);
         }
     }
 
@@ -332,6 +370,7 @@ public class GlobalManager : NetworkBehaviour
             response.Reason = "E" + "Server was sent corrupted instructions";
         }
     }
+
 
     [ServerRpc(RequireOwnership = false)]
     void SendJoystickServerRpc(PlayerDataSentToServer serverData, ulong id)
