@@ -55,4 +55,5 @@ MonoBehaviour:
   - cp_nara
   m_NetworkManager: {fileID: 0}
   vta: {fileID: 9197481963319205126, guid: 52a12b2ec113cb44f9ff3f04f5cfdfcc, type: 3}
+  unknownMap: {fileID: 2800000, guid: 30c08eebd63016c4fa4eb4637bbc8637, type: 3}
   borderButtonSelected: {r: 0.92941177, g: 0.85490197, b: 0.77254903, a: 1}

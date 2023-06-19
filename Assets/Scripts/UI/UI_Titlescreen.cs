@@ -15,6 +15,7 @@ public class UI_Titlescreen : MonoBehaviour
     [SerializeField] List<string> mapNames;
     [SerializeField] NetworkManager m_NetworkManager;
     [SerializeField] VisualTreeAsset vta;
+    [SerializeField] Texture2D unknownMap;
 
     //Colors
     [SerializeField] Color borderButtonSelected;
@@ -108,7 +109,7 @@ public class UI_Titlescreen : MonoBehaviour
 
         //Set Values
         selectMap.choices = mapNames;
-        selectMap.index = 0;
+        selectMap.index = PlayerPrefs.GetInt("ServerMapName");
         maxPlayers.value = Mathf.Max(PlayerPrefs.GetInt("ServerMaxPlayers"), 1);
         spawnBots.value = Convert.ToBoolean(PlayerPrefs.GetInt("SpawnBotsInEmpty"));
         spectatorAsPlayer.value = Convert.ToBoolean(PlayerPrefs.GetInt("ServerSpectatorAsPlayer"));
@@ -202,6 +203,7 @@ public class UI_Titlescreen : MonoBehaviour
                     root.Q<Label>("NewLocalServerName").text = "Select A Server";
                     root.Q<Label>("NewLocalMapName").text = "";
                     root.Q<Label>("NewLocalPlayerCount").text = "";
+                    root.Q<VisualElement>("NewLocalMapIcon").style.backgroundImage = new StyleBackground(unknownMap);
 
                     SetVEBorderColor(root.Q<VisualElement>("PSJoinLocal"), borderButtonSelected);
 
@@ -415,6 +417,7 @@ public class UI_Titlescreen : MonoBehaviour
                         root.Q<Label>("NewLocalServerName").text = "'" + limiters[2] + "'";
                     }
                     root.Q<Label>("NewLocalMapName").text = mapNames[Convert.ToInt16(limiters[3])];
+                    root.Q<VisualElement>("NewLocalMapIcon").style.backgroundImage = new StyleBackground(mapIcons[Convert.ToInt16(limiters[3])]);
                     root.Q<VisualElement>("NewLocalStartGame").style.display = DisplayStyle.Flex;
                 }
                 else
