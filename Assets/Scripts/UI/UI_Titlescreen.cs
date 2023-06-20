@@ -554,29 +554,43 @@ public class UI_Titlescreen : MonoBehaviour
             if (payload[0] == 'P')
             {
                 string[] limiters = payload.Substring(1, payload.Length - 1).Split("😂", StringSplitOptions.None);
-                if (limiters.Length == 4)
+                if (limiters.Length == 5)
                 {
-                    root.Q<Label>("NewLocalPlayerCount").text = limiters[0] + "/" + limiters[1];
-                    if (limiters[2] == "")
+                    if (Convert.ToUInt16(limiters[4]) == m_NetworkManager.NetworkConfig.ProtocolVersion)
                     {
-                        root.Q<Label>("NewLocalServerName").text = "'Unnamed Server'";
+                        root.Q<Label>("NewLocalPlayerCount").text = limiters[0] + "/" + limiters[1];
+                        if (limiters[2] == "")
+                        {
+                            root.Q<Label>("NewLocalServerName").text = "'Unnamed Server'";
+                        }
+                        else
+                        {
+                            string rename = limiters[2];
+                            if (rename.Length > 20)
+                            {
+                                rename = rename.Substring(0, 20);
+                            }
+                            rename = string.Join("", rename.ToCharArray().Where(x => ((int)x) < 127));
+                            root.Q<Label>("NewLocalServerName").text = "'" + rename + "'";
+                            PlayerPrefs.SetString("LocalServerName" + joinLocalIndex, limiters[2]);
+                        }
+                        int currentMap = Convert.ToInt16(limiters[3]);
+                        root.Q<Label>("NewLocalMapName").text = mapNames[currentMap];
+                        root.Q<VisualElement>("NewLocalMapIcon").style.backgroundImage = new StyleBackground(mapIcons[currentMap]);
+                        currentSceneToLoad = currentMap;
+                        root.Q<VisualElement>("NewLocalStartGame").style.display = DisplayStyle.Flex;
                     }
                     else
                     {
-                        string rename = limiters[2];
-                        if (rename.Length > 20)
+                        if(Convert.ToUInt16(limiters[4]) > m_NetworkManager.NetworkConfig.ProtocolVersion)
                         {
-                            rename = rename.Substring(0, 20);
+                            root.Q<Label>("NewLocalServerName").text = "Err. Server is running newer version.";
                         }
-                        rename = string.Join("", rename.ToCharArray().Where(x => ((int)x) < 127));
-                        root.Q<Label>("NewLocalServerName").text = "'" + rename + "'";
-                        PlayerPrefs.SetString("LocalServerName" + joinLocalIndex, limiters[2]);
+                        else
+                        {
+                            root.Q<Label>("NewLocalServerName").text = "Err. Server is running older version.";
+                        }
                     }
-                    int currentMap = Convert.ToInt16(limiters[3]);
-                    root.Q<Label>("NewLocalMapName").text = mapNames[currentMap];
-                    root.Q<VisualElement>("NewLocalMapIcon").style.backgroundImage = new StyleBackground(mapIcons[currentMap]);
-                    currentSceneToLoad = currentMap;
-                    root.Q<VisualElement>("NewLocalStartGame").style.display = DisplayStyle.Flex;
                 }
                 else
                 {

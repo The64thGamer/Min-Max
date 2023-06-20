@@ -365,7 +365,8 @@ public class GlobalManager : NetworkBehaviour
                 + clients.Count + "😂" 
                 + PlayerPrefs.GetInt("ServerMaxPlayers") + "😂" 
                 + PlayerPrefs.GetString("ServerName") + "😂" 
-                + PlayerPrefs.GetInt("ServerMapName");
+                + PlayerPrefs.GetInt("ServerMapName") + "😂"
+                + m_NetworkManager.NetworkConfig.ProtocolVersion;
         }
         else if(payload[0] == 'C')
         {
