@@ -368,9 +368,13 @@ public class UI_Titlescreen : MonoBehaviour
             {
                 yield return null;
             }
-            if(serverFail)
+            if (serverFail)
             {
                 name.text = "Could Not Connect To Server.";
+            }
+            else
+            {
+                PlayerPrefs.SetString("JoinCode", PlayerPrefs.GetString("GlobalServer" + index));
             }
         }
 
