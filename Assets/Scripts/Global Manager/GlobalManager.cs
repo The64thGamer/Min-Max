@@ -53,6 +53,14 @@ public class GlobalManager : NetworkBehaviour
                 //Start Local
                 NetworkManager.Singleton.StartHost();
                 currentGamemode.SetTeams();
+                if (PlayerPrefs.GetInt("SpawnBotsInEmpty") > 0)
+                {
+                    for (int i = 0; i < PlayerPrefs.GetInt("ServerMaxPlayers"); i++)
+                    {
+                        //Probably a bad idea for 24/7 servers, though what's a player gonna gain out of controlling bots?
+                        SpawnNewPlayerHostServerRpc(botID + (uint)i);
+                    }
+                }
                 Debug.Log("Started Local Host");
                 break;
             case 1:
@@ -72,14 +80,7 @@ public class GlobalManager : NetworkBehaviour
                 break;
         }
 
-        if (PlayerPrefs.GetInt("SpawnBotsInEmpty") > 0)
-        {
-            for (int i = 0; i < PlayerPrefs.GetInt("ServerMaxPlayers"); i++)
-            {
-                //Probably a bad idea for 24/7 servers, though what's a player gonna gain out of controlling bots?
-                SpawnNewPlayerHostServerRpc(botID + (uint)i);
-            }
-        }
+
     }
 
     async void StartServer()
@@ -95,6 +96,14 @@ public class GlobalManager : NetworkBehaviour
             m_NetworkManager.GetComponent<UnityTransport>().SetRelayServerData(relayServerData);
             m_NetworkManager.StartHost();
             currentGamemode.SetTeams();
+            if (PlayerPrefs.GetInt("SpawnBotsInEmpty") > 0)
+            {
+                for (int i = 0; i < PlayerPrefs.GetInt("ServerMaxPlayers"); i++)
+                {
+                    //Probably a bad idea for 24/7 servers, though what's a player gonna gain out of controlling bots?
+                    SpawnNewPlayerHostServerRpc(botID + (uint)i);
+                }
+            }
             GUIUtility.systemCopyBuffer = joinCode;
             Debug.Log("Started Server Host, Code: " + joinCode);
         }
