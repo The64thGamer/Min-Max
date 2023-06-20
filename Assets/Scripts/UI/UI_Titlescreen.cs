@@ -326,7 +326,14 @@ public class UI_Titlescreen : MonoBehaviour
     async void JoinServer(string joinCode)
     {
         await UnityServices.InitializeAsync();
-        await AuthenticationService.Instance.SignInAnonymouslyAsync();
+        try
+        {
+            await AuthenticationService.Instance.SignInAnonymouslyAsync();
+        }
+        catch (Exception)
+        {
+            Debug.Log("Already Signed In");
+        }
 
         try
         {
@@ -357,43 +364,46 @@ public class UI_Titlescreen : MonoBehaviour
             serverFail = false;
             name.text = "Attempting Allocation";
             JoinServer(PlayerPrefs.GetString("GlobalServer" + index));
-            while (!serverAttempt || !serverFail)
+            while (!serverAttempt && !serverFail)
             {
                 yield return null;
             }
             if(serverFail)
             {
-                serverCheckRunning = false;
                 name.text = "Could Not Connect To Server.";
             }
         }
 
-        int secondCount = 0;
-        while (true)
+        if (!serverFail)
         {
-            if (foundLocalServer)
+            int secondCount = 0;
+            while (true)
             {
-                break;
-            }
-            name.text = "Connecting To Server";
-            for (int i = 0; i < secondCount + 1; i++)
-            {
-                name.text += ". ";
-            }
-            if (secondCount == 5)
-            {
-                if (!foundLocalServer)
+                if (foundLocalServer)
                 {
-                    m_NetworkManager.Shutdown();
-                    name.text = "Could Not Connect To Server.";
-                    root.Q<VisualElement>("NewLocalDeleteGame").style.display = DisplayStyle.Flex;
+                    break;
                 }
-                break;
+                name.text = "Connecting To Server";
+                for (int i = 0; i < secondCount + 1; i++)
+                {
+                    name.text += ". ";
+                }
+                if (secondCount == 5)
+                {
+                    if (!foundLocalServer)
+                    {
+                        m_NetworkManager.Shutdown();
+                        name.text = "Could Not Connect To Server.";
+                        root.Q<VisualElement>("NewLocalDeleteGame").style.display = DisplayStyle.Flex;
+                    }
+                    break;
+                }
+                secondCount++;
+                yield return new WaitForSeconds(1.0f);
             }
-            secondCount++;
-            yield return new WaitForSeconds(1.0f);
         }
         serverCheckRunning = false;
+        serverFail = false;
     }
 
     void AddNewLocalServer(string port)

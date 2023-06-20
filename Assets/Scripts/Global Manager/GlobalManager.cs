@@ -1,7 +1,6 @@
-﻿using System.Collections;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net;
 using Unity.Netcode;
 using Unity.Netcode.Transports.UTP;
 using Unity.Networking.Transport.Relay;
@@ -9,9 +8,7 @@ using Unity.Services.Authentication;
 using Unity.Services.Core;
 using Unity.Services.Relay;
 using Unity.Services.Relay.Models;
-using UnityEditor;
 using UnityEngine;
-using UnityEngine.Windows;
 
 public class GlobalManager : NetworkBehaviour
 {
@@ -110,8 +107,14 @@ public class GlobalManager : NetworkBehaviour
     async void JoinServer(string joinCode)
     {
         await UnityServices.InitializeAsync();
-        await AuthenticationService.Instance.SignInAnonymouslyAsync();
-
+        try
+        {
+            await AuthenticationService.Instance.SignInAnonymouslyAsync();
+        }
+        catch (Exception)
+        {
+            Debug.Log("Already Signed In");
+        }
         try
         {
             JoinAllocation joinAllocation = await RelayService.Instance.JoinAllocationAsync(joinCode);
@@ -436,7 +439,7 @@ public class GlobalManager : NetworkBehaviour
 
         //Auto Team
         ClassList autoClass = ClassList.programmer;
-        int random = Random.Range(0, 2);
+        int random = UnityEngine.Random.Range(0, 2);
         if (random == 0)
         {
             autoClass = ClassList.programmer;
@@ -576,7 +579,7 @@ public class GlobalManager : NetworkBehaviour
                 {
                     if (teams[e].teamColor == team)
                     {
-                        Vector3 spawnPos = teamSpawns[teams[e].spawns].GetChild(Random.Range(0, teamSpawns[teams[e].spawns].childCount)).position;
+                        Vector3 spawnPos = teamSpawns[teams[e].spawns].GetChild(UnityEngine.Random.Range(0, teamSpawns[teams[e].spawns].childCount)).position;
                         clients[i].GetTracker().ForceNewPosition(spawnPos);
                         Debug.Log("Player " + id + " respawned in " + team.ToString() + " spawn room");
                         return;
