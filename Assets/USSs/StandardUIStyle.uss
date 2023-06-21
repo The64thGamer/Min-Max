@@ -12,6 +12,7 @@
     border-right-width: 5px;
     border-top-width: 5px;
     border-bottom-width: 5px;
+    -unity-font-definition: url('project://database/Assets/Game%20Assets/UI/Fonts/Righteous-Regular.ttf?fileID=12800000&guid=79229ad28a642354294f940fd3db3cf9&type=3#Righteous-Regular');
 }
 
 .downbackdrop {
@@ -69,11 +70,16 @@
     padding-top: 0;
     padding-bottom: 0;
     max-width: initial;
+    -unity-font-definition: url('project://database/Assets/Game%20Assets/UI/Fonts/256%20bytes.otf?fileID=12800000&guid=3da65d8dec80e0048a336d733ed50505&type=3#256 bytes');
+    letter-spacing: 10px;
 }
 
 .unity-base-popup-field__input {
     background-color: rgb(85, 66, 57);
     color: rgb(237, 218, 197);
+    letter-spacing: 5px;
+    -unity-font-definition: url('project://database/Assets/Game%20Assets/UI/Fonts/256%20bytes.otf?fileID=12800000&guid=3da65d8dec80e0048a336d733ed50505&type=3#256 bytes');
+    word-spacing: 15px;
 }
 
 .unity-base-popup-field__arrow {

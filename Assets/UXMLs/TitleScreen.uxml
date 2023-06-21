@@ -1,6 +1,6 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="False">
     <Style src="project://database/Assets/USSs/StandardUIStyle.uss?fileID=7433441132597879392&amp;guid=67066f1d9b7d7574b905dc33f01d1cf0&amp;type=3#StandardUIStyle" />
-    <ui:VisualElement name="Window" class="backdrop" style="flex-grow: 1; width: 1280px; height: 720px; max-width: 1280px; min-width: 1280px; max-height: 720px; min-height: 720px;">
+    <ui:VisualElement name="Window" class="backdrop" style="flex-grow: 1; width: 1280px; height: 720px; max-width: none; min-width: 1280px; max-height: none; min-height: 720px;">
         <ui:VisualElement name="TopBar" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0); flex-direction: row; flex-shrink: 1; flex-wrap: nowrap; max-height: 50px;">
             <ui:VisualElement style="flex-grow: 1; background-color: rgba(0, 0, 0, 0); background-image: url(&apos;project://database/Assets/Game%20Assets/UI/Logo/Logo%201k.png?fileID=2800000&amp;guid=5ccbcfe7d6adba94bac659de8bee444a&amp;type=3#Logo 1k&apos;); -unity-background-scale-mode: scale-to-fit; max-width: 50px; max-height: 50px; margin-left: 5px; margin-right: 5px; margin-top: 0; margin-bottom: 0;" />
             <ui:Label tabindex="-1" text="Min-Max" display-tooltip-when-elided="true" name="Title" style="width: auto; justify-content: flex-start; align-self: flex-start; -unity-text-align: middle-left; font-size: 35px;" />
