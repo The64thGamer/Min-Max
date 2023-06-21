@@ -27,6 +27,7 @@ public class GlobalManager : NetworkBehaviour
 
     //Ect
     AllStats al;
+    AudioSource au;
     float tickTimer;
     bool serverStarted;
     GenericGamemode currentGamemode;
@@ -42,6 +43,7 @@ public class GlobalManager : NetworkBehaviour
         m_NetworkManager.ConnectionApprovalCallback = ApprovalCheck;
         NetworkManager.Singleton.OnServerStarted += ServerStarted;
         al = GetComponent<AllStats>();
+        au = GetComponent<AudioSource>();
         currentGamemode = GetComponent<GenericGamemode>();
 
         //Settings
@@ -670,6 +672,17 @@ public class GlobalManager : NetworkBehaviour
             if (clients[i].GetPlayerID() == id)
             {
                 clients[i].SetHealth(currentHealth);
+            }
+            if (clients[i].GetPlayerID() == idOfKiller && clients[i].IsOwner)
+            {
+                if(currentHealth <= 0)
+                {
+                    au.PlayOneShot((AudioClip)Resources.Load("killsound", typeof(AudioClip)));
+                }
+                else
+                {
+                    au.PlayOneShot((AudioClip)Resources.Load("hitsound", typeof(AudioClip)));
+                }
             }
         }
     }
