@@ -21,6 +21,7 @@ public class Player : NetworkBehaviour
     [SerializeField] Transform vrSetup;
     [SerializeField] Transform clientSetup;
     [SerializeField] GameObject[] playerModels;
+    [SerializeField] WireSounds wireSounds;
     GlobalManager gm;
     AllStats al;
     bool currentPlayerVisibility;
@@ -272,6 +273,10 @@ public class Player : NetworkBehaviour
 
     public void RemoveHeldWire(Vector3 finalPos)
     {
+        if (heldWire != null)
+        {
+            wireSounds.RemoveWire();
+        }
         heldWire.point = finalPos;
         heldWire = null;
     }
@@ -279,7 +284,10 @@ public class Player : NetworkBehaviour
     public void SetWirePoint(Wire.WirePoint wire)
     {
         heldWire = wire;
-        gm.GetGlobalAudioSource().PlayOneShot((AudioClip)Resources.Load("Sounds/Surge/Surge Pickup", typeof(AudioClip))); ;
+        if(heldWire != null)
+        {
+            wireSounds.AddWire();
+        }
     }
 
     public Wire.WirePoint GetWirePoint()

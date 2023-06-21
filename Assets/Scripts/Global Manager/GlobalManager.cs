@@ -590,6 +590,11 @@ public class GlobalManager : NetworkBehaviour
                 //Refresh Stats
                 clients[i].ResetClassStats();
 
+                if (IsHost)
+                {
+                    RemoveClientWireClientRpc(clients[i].GetPlayerID(), clients[i].GetWirePoint().point);
+                }
+
                 //Spawning
                 for (int e = 0; e < teams.Count; e++)
                 {
