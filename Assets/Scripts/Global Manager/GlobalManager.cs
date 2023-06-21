@@ -677,11 +677,11 @@ public class GlobalManager : NetworkBehaviour
             {
                 if(currentHealth <= 0)
                 {
-                    au.PlayOneShot((AudioClip)Resources.Load("killsound", typeof(AudioClip)));
+                    au.PlayOneShot((AudioClip)Resources.Load("Sounds/Damage/killsound", typeof(AudioClip)));
                 }
                 else
                 {
-                    au.PlayOneShot((AudioClip)Resources.Load("hitsound", typeof(AudioClip)));
+                    au.PlayOneShot((AudioClip)Resources.Load("Sounds/Damage/hitsound", typeof(AudioClip)));
                 }
             }
         }
