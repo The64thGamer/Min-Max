@@ -279,6 +279,7 @@ public class Player : NetworkBehaviour
     public void SetWirePoint(Wire.WirePoint wire)
     {
         heldWire = wire;
+        gm.GetGlobalAudioSource().PlayOneShot((AudioClip)Resources.Load("Sounds/Surge/Surge Pickup", typeof(AudioClip))); ;
     }
 
     public Wire.WirePoint GetWirePoint()

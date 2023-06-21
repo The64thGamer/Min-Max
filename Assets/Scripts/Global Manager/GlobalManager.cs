@@ -343,6 +343,10 @@ public class GlobalManager : NetworkBehaviour
         }
     }
 
+    public AudioSource GetGlobalAudioSource()
+    {
+        return au;
+    }
     public void UpdateTickrates(int server)
     {
         ServerTickRate.Value = server;
