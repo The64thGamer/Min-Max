@@ -590,7 +590,7 @@ public class GlobalManager : NetworkBehaviour
                 //Refresh Stats
                 clients[i].ResetClassStats();
 
-                if (IsHost)
+                if (IsHost && clients[i].GetWirePoint() != null)
                 {
                     RemoveClientWireClientRpc(clients[i].GetPlayerID(), clients[i].GetWirePoint().point);
                 }

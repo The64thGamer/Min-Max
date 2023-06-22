@@ -8,18 +8,17 @@ public class WireSounds : MonoBehaviour
     void Start()
     {
         au = GetComponent<AudioSource>();
-        au.Pause();
     }
 
     public void AddWire()
     {
-        au.PlayOneShot((AudioClip)Resources.Load("Sounds/Surge/Surge Pickup", typeof(AudioClip)));
         au.Play();
+        au.PlayOneShot((AudioClip)Resources.Load("Sounds/Surge/Surge Pickup", typeof(AudioClip)));
     }
 
     public void RemoveWire()
     {
-        au.Pause();
-        au.PlayOneShot((AudioClip)Resources.Load("Sounds/Surge/Surge Pickup", typeof(AudioClip)));
+        au.Stop(); 
+        au.PlayOneShot((AudioClip)Resources.Load("Sounds/Surge/Surge Drop", typeof(AudioClip)),1);
     }
 }

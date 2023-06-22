@@ -44,7 +44,6 @@ public class Wire : MonoBehaviour
                 WirePoint final = new WirePoint() { parent = closest, isOn = true, point = playerPos, wireID = lastID + 1 };
                 lastID++;
                 closest.children.Add(final);
-                Debug.Log(closest.children.Count);
                 AddNewLineRenderer(final);
                 return final;
             }
