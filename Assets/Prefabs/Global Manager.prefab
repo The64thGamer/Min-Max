@@ -98,6 +98,72 @@ MonoBehaviour:
     baseSpeed: 30
     baseAccel: 10
     classEyeHeight: 0
+  cosmetics:
+  - name: Programmer's Hair
+    icon: {fileID: 2800000, guid: 53c42cf3eac60b545911ee66c1dd7364, type: 3}
+    prefab: {fileID: 0}
+    hideBodyGroups: 0
+    givenClass: 3
+  - name: Programmer's Vest
+    icon: {fileID: 2800000, guid: b535e5302b5f68d47bf37e9d4ce38e5c, type: 3}
+    prefab: {fileID: 0}
+    hideBodyGroups: 2
+    givenClass: 3
+  - name: Programmer's Pants
+    icon: {fileID: 2800000, guid: e489dec5100de5c4c81369d10adae440, type: 3}
+    prefab: {fileID: 0}
+    hideBodyGroups: 0
+    givenClass: 3
+  - name: Programmer's Shoes
+    icon: {fileID: 2800000, guid: bc0a87a0ddd9eaa43ac09290a72e99bf, type: 3}
+    prefab: {fileID: 0}
+    hideBodyGroups: 0
+    givenClass: 3
+  - name: Programmer's Pocket Terminal
+    icon: {fileID: 2800000, guid: 5396cee472cc70e4d85fd87df86b55a1, type: 3}
+    prefab: {fileID: 0}
+    hideBodyGroups: 0
+    givenClass: 3
+  - name: Space-Age Headwear
+    icon: {fileID: 2800000, guid: 5396cee472cc70e4d85fd87df86b55a1, type: 3}
+    prefab: {fileID: 0}
+    hideBodyGroups: 0
+    givenClass: 3
+  - name: Fabricator's Hair
+    icon: {fileID: 2800000, guid: a960698256abdec4aa01ff52f94e6beb, type: 3}
+    prefab: {fileID: 0}
+    hideBodyGroups: 0
+    givenClass: 5
+  - name: Fabricator's Welding Goggles
+    icon: {fileID: 2800000, guid: 24c59ff9db4f2554fb9414540291c4cb, type: 3}
+    prefab: {fileID: 0}
+    hideBodyGroups: 0
+    givenClass: 5
+  - name: Fabricator's Overalls
+    icon: {fileID: 2800000, guid: 5367b4ae80149e74fb9e3e2f5f13e8e8, type: 3}
+    prefab: {fileID: 0}
+    hideBodyGroups: 206
+    givenClass: 5
+  - name: Fabricator's Gloves
+    icon: {fileID: 2800000, guid: 9a282c08fbe73fc47907b5b09b4afe84, type: 3}
+    prefab: {fileID: 0}
+    hideBodyGroups: 48
+    givenClass: 5
+  - name: Fabricator's Boots
+    icon: {fileID: 2800000, guid: 959593c95e28aa244bf2681c3ceeb8b5, type: 3}
+    prefab: {fileID: 0}
+    hideBodyGroups: 768
+    givenClass: 5
+  - name: Rad Gloves
+    icon: {fileID: 2800000, guid: aeeb89a2e611de149a7457d1d0c4ec40, type: 3}
+    prefab: {fileID: 0}
+    hideBodyGroups: 48
+    givenClass: 5
+  - name: R-Eye-Ot Shield
+    icon: {fileID: 2800000, guid: 2f4003b48a650fc4db759120f738b884, type: 3}
+    prefab: {fileID: 0}
+    hideBodyGroups: 0
+    givenClass: 5
   mMChips:
   - buffsNerfs:
     - buffNerf: 1
