@@ -17,6 +17,35 @@ public class Cosmetics : MonoBehaviour
         freelancer,
         craftsman,
         manager;
+
+    public List<Cosmetic> GetClassCosmetics(ClassList classes)
+    {
+        switch (classes)
+        {
+            case ClassList.labourer:
+                return labourer;
+            case ClassList.woodworker:
+                return woodworker;
+            case ClassList.developer:
+                return developer;
+            case ClassList.programmer:
+                return programmer;
+            case ClassList.computer:
+                return computer;
+            case ClassList.fabricator:
+                return fabricator;
+            case ClassList.artist:
+                return artist;
+            case ClassList.freelancer:
+                return freelancer;
+            case ClassList.craftsman:
+                return craftsman;
+            case ClassList.manager:
+                return manager;
+            default:
+                return null;
+        }
+    }
 }
 
 [Flags]

@@ -69,10 +69,11 @@ public class Player : NetworkBehaviour
         gm.DisconnectClient(this);
     }
 
-    public void SetClass(ClassList setClass)
+    public void SetClass(ClassList setClass, List<Cosmetic> classCosmetics)
     {
         currentClass = setClass;
         currentStats = gm.GetComponent<AllStats>().GetClassStats(setClass);
+        SetupCosmetics(classCosmetics);
         SetCharacterVisibility(currentPlayerVisibility);
         UpdateTeamColor();
     }
@@ -95,6 +96,48 @@ public class Player : NetworkBehaviour
         gunObject.GetComponent<Gun>().SetPlayer(this);
         currentGun = gunObject.GetComponent<Gun>();
         UpdateTeamColor();
+    }
+
+    void SetupCosmetics(List<Cosmetic> classCosmetics)
+    {
+        cosmetics = new List<Cosmetic>();
+        for (int i = 0; i < classCosmetics.Count; i++)
+        {
+            bool isDupeEquipRegion = false;
+            for (int e = 0; e < cosmetics.Count; e++)
+            {
+                if (cosmetics[e].region == classCosmetics[i].region)
+                {
+                    isDupeEquipRegion = true;
+                }
+            }
+            if (classCosmetics[i].givenClass == currentClass && !isDupeEquipRegion)
+            {
+
+                cosmetics.Add(classCosmetics[i]);
+            }
+        }
+        //Stock
+        List<Cosmetic> stockCosmetics = gm.GetCosmetics().GetClassCosmetics(currentClass);
+        for (int i = 0; i < stockCosmetics.Count; i++)
+        {
+            if (stockCosmetics[i].stock == StockCosmetic.stock && stockCosmetics[i].givenClass == currentClass)
+            {
+                bool isStockDupeEquipRegion = false;
+                for (int e = 0; e < cosmetics.Count; e++)
+                {
+                    if (cosmetics[e].region == stockCosmetics[i].region)
+                    {
+                        isStockDupeEquipRegion = true;
+                    }
+                }
+                if (!isStockDupeEquipRegion)
+                {
+
+                    cosmetics.Add(stockCosmetics[i]);
+                }
+            }
+        }
     }
 
     public void UpdateTeamColor()

@@ -28,6 +28,7 @@ public class GlobalManager : NetworkBehaviour
     //Ect
     AllStats al;
     AudioSource au;
+    Cosmetics co;
     float tickTimer;
     bool serverStarted;
     GenericGamemode currentGamemode;
@@ -44,6 +45,7 @@ public class GlobalManager : NetworkBehaviour
         NetworkManager.Singleton.OnServerStarted += ServerStarted;
         al = GetComponent<AllStats>();
         au = GetComponent<AudioSource>();
+        co = GetComponent<Cosmetics>();
         currentGamemode = GetComponent<GenericGamemode>();
 
         //Settings
@@ -304,6 +306,11 @@ public class GlobalManager : NetworkBehaviour
     public AllStats GetAllStats()
     {
         return al;
+    }
+
+    public Cosmetics GetCosmetics()
+    {
+        return co;
     }
 
     public Wire GetWire(TeamList team)
