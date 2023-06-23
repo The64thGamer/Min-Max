@@ -9,7 +9,7 @@ public class Cosmetics : MonoBehaviour
     List<Cosmetic>
         labourer,
         woodworker,
-        engineer,
+        developer,
         programmer,
         computer,
         fabricator,

@@ -9,7 +9,7 @@ public class AllStats : MonoBehaviour
     [SerializeField] ClassStats 
         labourer,
         woodworker,
-        engineer,
+        developer,
         programmer,
         computer,
         fabricator,
@@ -69,7 +69,7 @@ public enum ClassList
 {
     labourer,
     woodworker,
-    engineer,
+    developer,
     programmer,
     computer,
     fabricator,
