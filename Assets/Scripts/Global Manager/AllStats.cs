@@ -42,8 +42,8 @@ public class AllStats : MonoBehaviour
                 return labourer;
             case ClassList.woodworker:
                 return woodworker;
-            case ClassList.engineer:
-                return engineer;
+            case ClassList.developer:
+                return developer;
             case ClassList.programmer:
                 return programmer;
             case ClassList.computer:
