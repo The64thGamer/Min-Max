@@ -46,7 +46,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   labourer: []
   woodworker: []
-  engineer: []
+  developer: []
   programmer:
   - name: Programmer's Hair
     icon: {fileID: 2800000, guid: 53c42cf3eac60b545911ee66c1dd7364, type: 3}
@@ -84,7 +84,7 @@ MonoBehaviour:
     givenClass: 3
     stock: 1
   - name: Space-Age Headwear
-    icon: {fileID: 2800000, guid: 5396cee472cc70e4d85fd87df86b55a1, type: 3}
+    icon: {fileID: 2800000, guid: 9c92225852f6bfb49a43775a8454759c, type: 3}
     prefab: {fileID: 0}
     region: 0
     hideBodyGroups: 0

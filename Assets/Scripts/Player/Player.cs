@@ -16,12 +16,11 @@ public class Player : NetworkBehaviour
     [SerializeField] TeamList currentTeam;
     [SerializeField] ClassList currentClass;
     [SerializeField] ClassStats currentStats;
-    [SerializeField] PlayerTracker tracker;
-    [SerializeField] FirstPersonController controller;
-    [SerializeField] Transform vrSetup;
-    [SerializeField] Transform clientSetup;
     [SerializeField] GameObject[] playerModels;
-    [SerializeField] WireSounds wireSounds;
+    [SerializeField] List<Cosmetic> cosmetics;
+    WireSounds wireSounds;
+    PlayerTracker tracker;
+    FirstPersonController controller;
     GlobalManager gm;
     AllStats al;
     bool currentPlayerVisibility;
@@ -36,6 +35,7 @@ public class Player : NetworkBehaviour
         gm = GameObject.Find("Global Manager").GetComponent<GlobalManager>();
         al = gm.GetComponent<AllStats>();
         gm.AddPlayerToClientList(this);
+        wireSounds = transform.Find("WireSounds").GetComponent<WireSounds>();
 
         //Debug Default
         SetGun(gm.GetComponent<AllStats>().SearchGuns("Worker Ionizing Pistol"));
