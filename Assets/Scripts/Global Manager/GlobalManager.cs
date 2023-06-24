@@ -473,7 +473,10 @@ public class GlobalManager : NetworkBehaviour
         }
 
         Debug.Log("New Player Joined (#" + clients.Count + "), Team " + debugList);
-        SendNewPlayerDataBackClientRpc(id, debugList, autoClass);
+
+        int[] cos = new int[0];
+
+        SendNewPlayerDataBackClientRpc(id, debugList, autoClass, cos);
         RespawnPlayerClientRpc(id, debugList);
         PlayerInfoSentToClient[] data = new PlayerInfoSentToClient[clients.Count];
         for (int i = 0; i < clients.Count; i++)
@@ -485,7 +488,7 @@ public class GlobalManager : NetworkBehaviour
                 currentClass = clients[i].GetCurrentClass(),
             };
         }
-        SendAllPlayerDataToNewPlayerClientRpc(data, id);
+        SendAllPlayerDataToNewPlayerClientRpc(data, id,cos);
 
         List<Wire.WirePointData> wireData = new List<Wire.WirePointData>();
         for (int i = 0; i < teamWires.Count; i++)
@@ -530,19 +533,7 @@ public class GlobalManager : NetworkBehaviour
         }
     }
 
-    [ClientRpc]
-    void SendNewPlayerDataBackClientRpc(ulong id, TeamList team, ClassList autoClass)
-    {
-        for (int i = 0; i < clients.Count; i++)
-        {
-            if (clients[i].GetPlayerID() == id)
-            {
-                clients[i].SetTeam(team);
-                clients[i].SetClass(autoClass);
-                return;
-            }
-        }
-    }
+
 
     [ClientRpc]
     public void GiveClientWireClientRpc(ulong id, uint wireID, uint parentID, TeamList teamWireNeeded)
@@ -616,10 +607,23 @@ public class GlobalManager : NetworkBehaviour
             }
         }
     }
-
+    
+    [ClientRpc]
+    void SendNewPlayerDataBackClientRpc(ulong id, TeamList team, ClassList autoClass, int[] cosmetics)
+    {
+        for (int i = 0; i < clients.Count; i++)
+        {
+            if (clients[i].GetPlayerID() == id)
+            {
+                clients[i].SetTeam(team);
+                clients[i].SetClass(autoClass,cosmetics);
+                return;
+            }
+        }
+    }
 
     [ClientRpc]
-    void SendAllPlayerDataToNewPlayerClientRpc(PlayerInfoSentToClient[] data, ulong id)
+    void SendAllPlayerDataToNewPlayerClientRpc(PlayerInfoSentToClient[] data, ulong id, int[] cosmetics)
     {
         for (int i = 0; i < clients.Count; i++)
         {
@@ -632,7 +636,7 @@ public class GlobalManager : NetworkBehaviour
                     {
                         if (clients[e].GetPlayerID() == data[j].id)
                         {
-                            clients[e].SetClass(data[j].currentClass);
+                            clients[e].SetClass(data[j].currentClass,cosmetics);
                             clients[e].SetTeam(data[j].currentTeam);
                         }
                     }

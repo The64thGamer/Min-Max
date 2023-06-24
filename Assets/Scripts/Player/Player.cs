@@ -69,7 +69,7 @@ public class Player : NetworkBehaviour
         gm.DisconnectClient(this);
     }
 
-    public void SetClass(ClassList setClass, List<Cosmetic> classCosmetics)
+    public void SetClass(ClassList setClass, int[] classCosmetics)
     {
         currentClass = setClass;
         currentStats = gm.GetComponent<AllStats>().GetClassStats(setClass);
@@ -98,27 +98,30 @@ public class Player : NetworkBehaviour
         UpdateTeamColor();
     }
 
-    void SetupCosmetics(List<Cosmetic> classCosmetics)
+    void SetupCosmetics(int[] classCosmetics)
     {
+        List<Cosmetic> stockCosmetics = gm.GetCosmetics().GetClassCosmetics(currentClass);
         cosmetics = new List<Cosmetic>();
-        for (int i = 0; i < classCosmetics.Count; i++)
+        for (int i = 0; i < classCosmetics.Length; i++)
         {
-            bool isDupeEquipRegion = false;
-            for (int e = 0; e < cosmetics.Count; e++)
+            if (classCosmetics[i] < stockCosmetics.Count)
             {
-                if (cosmetics[e].region == classCosmetics[i].region)
+                Cosmetic cm = stockCosmetics[classCosmetics[i]];
+                bool isDupeEquipRegion = false;
+                for (int e = 0; e < cosmetics.Count; e++)
                 {
-                    isDupeEquipRegion = true;
+                    if (cosmetics[e].region == cm.region)
+                    {
+                        isDupeEquipRegion = true;
+                    }
                 }
-            }
-            if (classCosmetics[i].givenClass == currentClass && !isDupeEquipRegion)
-            {
-
-                cosmetics.Add(classCosmetics[i]);
+                if (!isDupeEquipRegion)
+                {
+                    cosmetics.Add(cm);
+                }
             }
         }
         //Stock
-        List<Cosmetic> stockCosmetics = gm.GetCosmetics().GetClassCosmetics(currentClass);
         for (int i = 0; i < stockCosmetics.Count; i++)
         {
             if (stockCosmetics[i].stock == StockCosmetic.stock && stockCosmetics[i].givenClass == currentClass)
@@ -246,10 +249,61 @@ public class Player : NetworkBehaviour
             {
                 if (i == (int)currentClass)
                 {
+                    //Reveal class
                     playerModels[i].SetActive(true);
+
+                    //Get Combination Hide Bodygroups Enum
+                    BodyGroups combined = new BodyGroups();
+                    for (int e = 0; e < cosmetics.Count; e++)
+                    {
+                        combined = combined | cosmetics[e].hideBodyGroups;
+                    }
+                    
+                    //Apply Bodygroup Hiding
+                    if (combined.HasFlag(BodyGroups.armL))
+                    {
+                        playerModels[i].transform.Find("Skin Arm L").gameObject.SetActive(false);
+                    }
+                    if (combined.HasFlag(BodyGroups.armR))
+                    {
+                        playerModels[i].transform.Find("Skin Arm R").gameObject.SetActive(false);
+                    }
+                    if (combined.HasFlag(BodyGroups.body))
+                    {
+                        playerModels[i].transform.Find("Skin Body").gameObject.SetActive(false);
+                    }
+                    if (combined.HasFlag(BodyGroups.footL))
+                    {
+                        playerModels[i].transform.Find("Skin Foot L").gameObject.SetActive(false);
+                    }
+                    if (combined.HasFlag(BodyGroups.footR))
+                    {
+                        playerModels[i].transform.Find("Skin Foot R").gameObject.SetActive(false);
+                    }
+                    if (combined.HasFlag(BodyGroups.handL))
+                    {
+                        playerModels[i].transform.Find("Skin Hand L").gameObject.SetActive(false);
+                    }
+                    if (combined.HasFlag(BodyGroups.handR))
+                    {
+                        playerModels[i].transform.Find("Skin Hand R").gameObject.SetActive(false);
+                    }
+                    if (combined.HasFlag(BodyGroups.head))
+                    {
+                        playerModels[i].transform.Find("Skin Head").gameObject.SetActive(false);
+                    }
+                    if (combined.HasFlag(BodyGroups.legL))
+                    {
+                        playerModels[i].transform.Find("Skin Leg L").gameObject.SetActive(false);
+                    }
+                    if (combined.HasFlag(BodyGroups.legR))
+                    {
+                        playerModels[i].transform.Find("Skin Leg R").gameObject.SetActive(false);
+                    }
+
+                    //Animation
                     Transform handR = null;
                     Transform head = null;
-
                     foreach (Transform g in transform.GetComponentsInChildren<Transform>())
                     {
                         if (g.name == "Hand R")
@@ -261,11 +315,11 @@ public class Player : NetworkBehaviour
                             head = g;
                         }
                     }
-
                     GetTracker().SetCharacter(playerModels[i].GetComponentInChildren<Animator>(), playerModels[i].transform, handR, head);
                 }
                 else
                 {
+                    //Hide other classes
                     playerModels[i].SetActive(false);
                 }
             }
@@ -300,7 +354,7 @@ public class Player : NetworkBehaviour
     public void SetHealth(int health)
     {
         currentStats.baseHealth = health;
-        if(health <= 0)
+        if (health <= 0)
         {
             if (IsHost)
             {
@@ -327,7 +381,7 @@ public class Player : NetworkBehaviour
     public void SetWirePoint(Wire.WirePoint wire)
     {
         heldWire = wire;
-        if(heldWire != null)
+        if (heldWire != null)
         {
             wireSounds.AddWire();
         }
