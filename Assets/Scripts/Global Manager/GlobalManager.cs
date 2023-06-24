@@ -16,9 +16,9 @@ public class GlobalManager : NetworkBehaviour
     List<TeamInfo> teams = new List<TeamInfo>();
     List<PlayerDataSentToClient> playerPosRPCData = new List<PlayerDataSentToClient>();
     [SerializeField] NetworkVariable<int> ServerTickRate = new NetworkVariable<int>(10);
-    [SerializeField] NetworkManager m_NetworkManager;
 
     [Header("Lists")]
+    [SerializeField] Cosmetics co;
     [SerializeField] GameObject clientPrefab;
     List<Player> clients = new List<Player>();
     [SerializeField] List<Transform> teamSpawns;
@@ -28,7 +28,7 @@ public class GlobalManager : NetworkBehaviour
     //Ect
     AllStats al;
     AudioSource au;
-    Cosmetics co;
+    NetworkManager m_NetworkManager;
     float tickTimer;
     bool serverStarted;
     GenericGamemode currentGamemode;
@@ -45,7 +45,6 @@ public class GlobalManager : NetworkBehaviour
         NetworkManager.Singleton.OnServerStarted += ServerStarted;
         al = GetComponent<AllStats>();
         au = GetComponent<AudioSource>();
-        co = GetComponent<Cosmetics>();
         currentGamemode = GetComponent<GenericGamemode>();
 
         //Settings

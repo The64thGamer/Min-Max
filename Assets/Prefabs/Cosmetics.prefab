@@ -50,42 +50,48 @@ MonoBehaviour:
   programmer:
   - name: Programmer's Hair
     icon: {fileID: 2800000, guid: 53c42cf3eac60b545911ee66c1dd7364, type: 3}
-    prefab: {fileID: 0}
+    prefab: {fileID: 7786079082835269877, guid: 02ead10b0bcc8ca4eb7c15180a58465f,
+      type: 3}
     region: 0
     hideBodyGroups: 0
     givenClass: 3
     stock: 1
   - name: Programmer's Vest
     icon: {fileID: 2800000, guid: b535e5302b5f68d47bf37e9d4ce38e5c, type: 3}
-    prefab: {fileID: 0}
+    prefab: {fileID: 7786079082835269877, guid: 02ead10b0bcc8ca4eb7c15180a58465f,
+      type: 3}
     region: 4
     hideBodyGroups: 2
     givenClass: 3
     stock: 1
   - name: Programmer's Pants
     icon: {fileID: 2800000, guid: e489dec5100de5c4c81369d10adae440, type: 3}
-    prefab: {fileID: 0}
+    prefab: {fileID: 7786079082835269877, guid: 02ead10b0bcc8ca4eb7c15180a58465f,
+      type: 3}
     region: 6
     hideBodyGroups: 0
     givenClass: 3
     stock: 1
   - name: Programmer's Shoes
     icon: {fileID: 2800000, guid: bc0a87a0ddd9eaa43ac09290a72e99bf, type: 3}
-    prefab: {fileID: 0}
+    prefab: {fileID: 7786079082835269877, guid: 02ead10b0bcc8ca4eb7c15180a58465f,
+      type: 3}
     region: 8
     hideBodyGroups: 0
     givenClass: 3
     stock: 1
   - name: Programmer's Pocket Terminal
     icon: {fileID: 2800000, guid: 5396cee472cc70e4d85fd87df86b55a1, type: 3}
-    prefab: {fileID: 0}
+    prefab: {fileID: 7786079082835269877, guid: 02ead10b0bcc8ca4eb7c15180a58465f,
+      type: 3}
     region: 7
     hideBodyGroups: 0
     givenClass: 3
     stock: 1
   - name: Space-Age Headwear
     icon: {fileID: 2800000, guid: 9c92225852f6bfb49a43775a8454759c, type: 3}
-    prefab: {fileID: 0}
+    prefab: {fileID: 7786079082835269877, guid: 02ead10b0bcc8ca4eb7c15180a58465f,
+      type: 3}
     region: 0
     hideBodyGroups: 0
     givenClass: 3
@@ -94,49 +100,55 @@ MonoBehaviour:
   fabricator:
   - name: Fabricator's Hair
     icon: {fileID: 2800000, guid: a960698256abdec4aa01ff52f94e6beb, type: 3}
-    prefab: {fileID: 0}
+    prefab: {fileID: 7786079082835269877, guid: 02ead10b0bcc8ca4eb7c15180a58465f,
+      type: 3}
     region: 0
     hideBodyGroups: 0
     givenClass: 5
     stock: 2
   - name: Fabricator's Welding Goggles
     icon: {fileID: 2800000, guid: 24c59ff9db4f2554fb9414540291c4cb, type: 3}
-    prefab: {fileID: 0}
+    prefab: {fileID: 67651411841702350, guid: c53ea6f7fd68ccf41830067fc1505e2a, type: 3}
     region: 1
     hideBodyGroups: 0
     givenClass: 5
     stock: 2
   - name: Fabricator's Overalls
     icon: {fileID: 2800000, guid: 5367b4ae80149e74fb9e3e2f5f13e8e8, type: 3}
-    prefab: {fileID: 0}
+    prefab: {fileID: 5086984814945533734, guid: d3b6d06505965e94c8bfef1480809463,
+      type: 3}
     region: 4
     hideBodyGroups: 206
     givenClass: 5
     stock: 1
   - name: Fabricator's Gloves
     icon: {fileID: 2800000, guid: 9a282c08fbe73fc47907b5b09b4afe84, type: 3}
-    prefab: {fileID: 0}
+    prefab: {fileID: 3751114962029465882, guid: d0fd4aa5d397fd8478e222458f2b947f,
+      type: 3}
     region: 9
     hideBodyGroups: 48
     givenClass: 5
     stock: 1
   - name: Fabricator's Boots
     icon: {fileID: 2800000, guid: 959593c95e28aa244bf2681c3ceeb8b5, type: 3}
-    prefab: {fileID: 0}
+    prefab: {fileID: 8733337227494980605, guid: fab0f6c0937733c4b86e8c0e1d62dc43,
+      type: 3}
     region: 8
     hideBodyGroups: 768
     givenClass: 5
     stock: 1
   - name: Rad Gloves
     icon: {fileID: 2800000, guid: aeeb89a2e611de149a7457d1d0c4ec40, type: 3}
-    prefab: {fileID: 0}
+    prefab: {fileID: 4189674191292929374, guid: 7c1fdc46ea447554b9611c894e247375,
+      type: 3}
     region: 9
     hideBodyGroups: 48
     givenClass: 5
     stock: 0
   - name: R-Eye-Ot Shield
     icon: {fileID: 2800000, guid: 2f4003b48a650fc4db759120f738b884, type: 3}
-    prefab: {fileID: 0}
+    prefab: {fileID: 2115284168798725274, guid: 050630f8271d2bd49886d37489ec8670,
+      type: 3}
     region: 1
     hideBodyGroups: 0
     givenClass: 5

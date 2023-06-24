@@ -1,6 +1,7 @@
 using StarterAssets;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using Unity.Netcode;
 using Unity.XR.CoreUtils;
 using UnityEngine;
@@ -18,6 +19,7 @@ public class Player : NetworkBehaviour
     [SerializeField] ClassStats currentStats;
     [SerializeField] GameObject[] playerModels;
     [SerializeField] List<Cosmetic> cosmetics;
+    List<GameObject> currentCharMeshes = new List<GameObject>();
     WireSounds wireSounds;
     PlayerTracker tracker;
     FirstPersonController controller;
@@ -242,6 +244,11 @@ public class Player : NetworkBehaviour
 
     public void SetCharacterVisibility(bool visible)
     {
+        while (currentCharMeshes.Count > 0)
+        {
+            Destroy(currentCharMeshes[0]);
+            currentCharMeshes.RemoveAt(0);
+        }
         currentPlayerVisibility = visible;
         for (int i = 0; i < playerModels.Length; i++)
         {
@@ -249,16 +256,8 @@ public class Player : NetworkBehaviour
             {
                 if (visible)
                 {
-
                     //Reveal class
                     playerModels[i].SetActive(true);
-
-                    //Get Combination Hide Bodygroups Enum
-                    BodyGroups combined = new BodyGroups();
-                    for (int e = 0; e < cosmetics.Count; e++)
-                    {
-                        combined = combined | cosmetics[e].hideBodyGroups;
-                    }
 
                     //Apply Bodygroup Hiding
                     Transform t = playerModels[i].transform;
@@ -272,6 +271,14 @@ public class Player : NetworkBehaviour
                     SetMeshVis(t, "Skin Head", true);
                     SetMeshVis(t, "Skin Leg L", true);
                     SetMeshVis(t, "Skin Leg R", true);
+
+                    //Get Combination Hide Bodygroups Enum
+                    BodyGroups combined = new BodyGroups();
+                    for (int e = 0; e < cosmetics.Count; e++)
+                    {
+                        combined = combined | cosmetics[e].hideBodyGroups;
+                    }
+
                     if (combined.HasFlag(BodyGroups.armL))
                     {
                         SetMeshVis(t, "Skin Arm L", false);
@@ -328,6 +335,16 @@ public class Player : NetworkBehaviour
                         }
                     }
                     GetTracker().SetCharacter(playerModels[i].GetComponentInChildren<Animator>(), playerModels[i].transform, handR, head);
+
+                    //Apply Cosmetics
+                    for (int e = 0; e < cosmetics.Count; e++)
+                    {
+                        GameObject g = GameObject.Instantiate(cosmetics[e].prefab,t);
+                        SkinnedMeshRenderer smk = g.GetComponent<SkinnedMeshRenderer>();
+                        smk.rootBone = playerModels[i].transform.Find("Armature").GetChild(0);
+                        smk.bones = smk.GetComponentsInChildren<Transform>();
+                        currentCharMeshes.Add(g);
+                    }
                 }
                 else
                 {
@@ -348,7 +365,7 @@ public class Player : NetworkBehaviour
             else
             {
                 //Hide other classes
-                playerModels[i].SetActive(true);
+                playerModels[i].SetActive(false);
             }
         }
 
