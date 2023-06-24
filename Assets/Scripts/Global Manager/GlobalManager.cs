@@ -473,9 +473,50 @@ public class GlobalManager : NetworkBehaviour
 
         Debug.Log("New Player Joined (#" + clients.Count + "), Team " + debugList);
 
-        int[] cos = new int[0];
+        //Random cosmetics
+        List<int> cos = new List<int>();
+        switch (autoClass)
+        {
+            case ClassList.programmer:
+                int randoP = UnityEngine.Random.Range(0, 4);
+                switch (randoP)
+                {
+                    case 0:
+                        cos.Add(5);
+                        break;
+                    default:
+                        break;
+                }
+                break;
+            case ClassList.fabricator:
+                int randoF = UnityEngine.Random.Range(0, 4);
+                switch (randoF)
+                {
+                    case 0:
+                        cos.Add(0);
+                        cos.Add(1);
+                        break;
+                    case 1:
+                        cos.Add(0);
+                        cos.Add(6);
+                        break;
+                    case 2:
+                        cos.Add(1);
+                        cos.Add(5);
+                        break;
+                    case 3:
+                        cos.Add(0);
+                        cos.Add(5);
+                        break;
+                    default:
+                        break;
+                }
+                break;
+            default:
+                break;
+        }
 
-        SendNewPlayerDataBackClientRpc(id, debugList, autoClass, cos);
+        SendNewPlayerDataBackClientRpc(id, debugList, autoClass, cos.ToArray());
         RespawnPlayerClientRpc(id, debugList);
         PlayerInfoSentToClient[] data = new PlayerInfoSentToClient[clients.Count];
         for (int i = 0; i < clients.Count; i++)
@@ -487,7 +528,7 @@ public class GlobalManager : NetworkBehaviour
                 currentClass = clients[i].GetCurrentClass(),
             };
         }
-        SendAllPlayerDataToNewPlayerClientRpc(data, id,cos);
+        SendAllPlayerDataToNewPlayerClientRpc(data, id,cos.ToArray());
 
         List<Wire.WirePointData> wireData = new List<Wire.WirePointData>();
         for (int i = 0; i < teamWires.Count; i++)
