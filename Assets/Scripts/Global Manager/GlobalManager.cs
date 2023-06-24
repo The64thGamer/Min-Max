@@ -528,7 +528,7 @@ public class GlobalManager : NetworkBehaviour
                 currentClass = clients[i].GetCurrentClass(),
             };
         }
-        SendAllPlayerDataToNewPlayerClientRpc(data, id,cos.ToArray());
+        SendAllPlayerDataToNewPlayerClientRpc(data, id);
 
         List<Wire.WirePointData> wireData = new List<Wire.WirePointData>();
         for (int i = 0; i < teamWires.Count; i++)
@@ -663,7 +663,7 @@ public class GlobalManager : NetworkBehaviour
     }
 
     [ClientRpc]
-    void SendAllPlayerDataToNewPlayerClientRpc(PlayerInfoSentToClient[] data, ulong id, int[] cosmetics)
+    void SendAllPlayerDataToNewPlayerClientRpc(PlayerInfoSentToClient[] data, ulong id)
     {
         for (int i = 0; i < clients.Count; i++)
         {
@@ -676,7 +676,7 @@ public class GlobalManager : NetworkBehaviour
                     {
                         if (clients[e].GetPlayerID() == data[j].id)
                         {
-                            clients[e].SetClass(data[j].currentClass,cosmetics);
+                            clients[e].SetClass(data[j].currentClass, data[j].cosmetics);
                             clients[e].SetTeam(data[j].currentTeam);
                         }
                     }
@@ -797,12 +797,14 @@ public struct PlayerInfoSentToClient : INetworkSerializable
     public ulong id;
     public ClassList currentClass;
     public TeamList currentTeam;
+    public int[] cosmetics;
 
     public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
     {
         serializer.SerializeValue(ref id);
         serializer.SerializeValue(ref currentClass);
         serializer.SerializeValue(ref currentTeam);
+        serializer.SerializeValue(ref cosmetics);
     }
 }
 

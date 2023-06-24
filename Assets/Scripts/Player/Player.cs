@@ -19,7 +19,7 @@ public class Player : NetworkBehaviour
     [SerializeField] ClassList currentClass;
     [SerializeField] ClassStats currentStats;
     [SerializeField] GameObject[] playerModels;
-    [SerializeField] List<Cosmetic> cosmetics;
+    int[] cosmeticInts;
     List<GameObject> currentCharMeshes = new List<GameObject>();
     WireSounds wireSounds;
     PlayerTracker tracker;
@@ -74,6 +74,7 @@ public class Player : NetworkBehaviour
 
     public void SetClass(ClassList setClass, int[] classCosmetics)
     {
+        cosmeticInts = classCosmetics;
         currentClass = setClass;
         currentStats = gm.GetComponent<AllStats>().GetClassStats(setClass);
         SetupCosmetics(classCosmetics);
@@ -104,7 +105,7 @@ public class Player : NetworkBehaviour
     void SetupCosmetics(int[] classCosmetics)
     {
         List<Cosmetic> stockCosmetics = gm.GetCosmetics().GetClassCosmetics(currentClass);
-        cosmetics = new List<Cosmetic>();
+        List<Cosmetic> cosmetics = new List<Cosmetic>();
         for (int i = 0; i < classCosmetics.Length; i++)
         {
             if (classCosmetics[i] < stockCosmetics.Count)
@@ -257,6 +258,8 @@ public class Player : NetworkBehaviour
             {
                 if (visible)
                 {
+                    List<Cosmetic> classCosmetics = gm.GetCosmetics().GetClassCosmetics(currentClass);
+
                     //Reveal class
                     playerModels[i].SetActive(true);
 
@@ -275,9 +278,9 @@ public class Player : NetworkBehaviour
 
                     //Get Combination Hide Bodygroups Enum
                     BodyGroups combined = new BodyGroups();
-                    for (int e = 0; e < cosmetics.Count; e++)
+                    for (int e = 0; e < cosmeticInts.Length; e++)
                     {
-                        combined = combined | cosmetics[e].hideBodyGroups;
+                        combined = combined | classCosmetics[cosmeticInts[e]].hideBodyGroups;
                     }
 
                     if (combined.HasFlag(BodyGroups.armL))
@@ -338,11 +341,11 @@ public class Player : NetworkBehaviour
                     GetTracker().SetCharacter(playerModels[i].GetComponentInChildren<Animator>(), playerModels[i].transform, handR, head);
 
                     //Apply Cosmetics
-                    for (int e = 0; e < cosmetics.Count; e++)
+                    for (int e = 0; e < cosmeticInts.Length; e++)
                     {
                         GameObject g = GameObject.Instantiate(new GameObject(), t);
                         SkinnedMeshRenderer targetSkin = g.AddComponent<SkinnedMeshRenderer>();
-                        SkinnedMeshRenderer originalSkin = cosmetics[e].prefab.GetComponentInChildren<SkinnedMeshRenderer>();
+                        SkinnedMeshRenderer originalSkin = classCosmetics[cosmeticInts[e]].prefab.GetComponentInChildren<SkinnedMeshRenderer>();
 
                         targetSkin.SetSharedMaterials(originalSkin.sharedMaterials.ToList<Material>());
                         targetSkin.sharedMesh = originalSkin.sharedMesh;
