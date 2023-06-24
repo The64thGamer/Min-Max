@@ -526,6 +526,7 @@ public class GlobalManager : NetworkBehaviour
                 id = clients[i].GetPlayerID(),
                 currentTeam = clients[i].GetTeam(),
                 currentClass = clients[i].GetCurrentClass(),
+                cosmetics = clients[i].GetCosmeticInts(),
             };
         }
         SendAllPlayerDataToNewPlayerClientRpc(data, id);

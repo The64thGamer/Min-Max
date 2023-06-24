@@ -19,7 +19,7 @@ public class Player : NetworkBehaviour
     [SerializeField] ClassList currentClass;
     [SerializeField] ClassStats currentStats;
     [SerializeField] GameObject[] playerModels;
-    int[] cosmeticInts;
+    int[] cosmeticInts = new int[0];
     List<GameObject> currentCharMeshes = new List<GameObject>();
     WireSounds wireSounds;
     PlayerTracker tracker;
@@ -105,23 +105,23 @@ public class Player : NetworkBehaviour
     void SetupCosmetics(int[] classCosmetics)
     {
         List<Cosmetic> stockCosmetics = gm.GetCosmetics().GetClassCosmetics(currentClass);
-        List<Cosmetic> cosmetics = new List<Cosmetic>();
+        List<int> cosmeticIntList = cosmeticInts.ToList<int>();
         for (int i = 0; i < classCosmetics.Length; i++)
         {
             if (classCosmetics[i] < stockCosmetics.Count)
             {
                 Cosmetic cm = stockCosmetics[classCosmetics[i]];
                 bool isDupeEquipRegion = false;
-                for (int e = 0; e < cosmetics.Count; e++)
+                for (int e = 0; e < cosmeticIntList.Count; e++)
                 {
-                    if (cosmetics[e].region == cm.region)
+                    if (stockCosmetics[cosmeticIntList[e]].region == cm.region)
                     {
                         isDupeEquipRegion = true;
                     }
                 }
                 if (!isDupeEquipRegion)
                 {
-                    cosmetics.Add(cm);
+                    cosmeticIntList.Add(classCosmetics[i]);
                 }
             }
         }
@@ -131,9 +131,9 @@ public class Player : NetworkBehaviour
             if (stockCosmetics[i].stock == StockCosmetic.stock && stockCosmetics[i].givenClass == currentClass)
             {
                 bool isStockDupeEquipRegion = false;
-                for (int e = 0; e < cosmetics.Count; e++)
+                for (int e = 0; e < cosmeticIntList.Count; e++)
                 {
-                    if (cosmetics[e].region == stockCosmetics[i].region)
+                    if (stockCosmetics[cosmeticIntList[e]].region == stockCosmetics[i].region)
                     {
                         isStockDupeEquipRegion = true;
                     }
@@ -141,10 +141,11 @@ public class Player : NetworkBehaviour
                 if (!isStockDupeEquipRegion)
                 {
 
-                    cosmetics.Add(stockCosmetics[i]);
+                    cosmeticIntList.Add(i);
                 }
             }
         }
+        cosmeticInts = cosmeticIntList.ToArray();
     }
 
     public void UpdateTeamColor()
@@ -215,6 +216,11 @@ public class Player : NetworkBehaviour
     public ulong GetPlayerID()
     {
         return OwnerClientId;
+    }
+
+    public int[] GetCosmeticInts()
+    {
+        return cosmeticInts;
     }
 
     public int GetTeamLayer()
