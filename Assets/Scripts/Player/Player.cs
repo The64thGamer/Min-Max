@@ -10,6 +10,7 @@ using UnityEngine.Rendering.Universal;
 using UnityEngine.UI;
 using UnityEngine.UIElements;
 using UnityEngine.XR.Interaction.Toolkit;
+using static UnityEngine.UI.Image;
 
 public class Player : NetworkBehaviour
 {
@@ -339,11 +340,32 @@ public class Player : NetworkBehaviour
                     //Apply Cosmetics
                     for (int e = 0; e < cosmetics.Count; e++)
                     {
-                        GameObject g = GameObject.Instantiate(cosmetics[e].prefab,t);
-                        SkinnedMeshRenderer smk = g.GetComponent<SkinnedMeshRenderer>();
-                        smk.rootBone = playerModels[i].transform.Find("Armature").GetChild(0);
-                        smk.bones = smk.GetComponentsInChildren<Transform>();
+                        GameObject g = GameObject.Instantiate(new GameObject(), t);
+                        SkinnedMeshRenderer targetSkin = g.AddComponent<SkinnedMeshRenderer>();
+                        SkinnedMeshRenderer originalSkin = cosmetics[e].prefab.GetComponentInChildren<SkinnedMeshRenderer>();
+
+                        targetSkin.SetSharedMaterials(originalSkin.sharedMaterials.ToList<Material>());
+                        targetSkin.sharedMesh = originalSkin.sharedMesh;
+                        targetSkin.rootBone = playerModels[i].transform.Find("Armature").GetChild(0);
                         currentCharMeshes.Add(g);
+
+                        Transform[] newBones = new Transform[originalSkin.bones.Length];
+
+                        int a = 0;
+                        foreach (var originalBone in originalSkin.bones)
+                        {
+
+                            foreach (var newBone in targetSkin.rootBone.GetComponentsInChildren<Transform>())
+                            {
+                                if (newBone.name == originalBone.name)
+                                {
+                                    newBones[a] = newBone;
+                                    continue;
+                                }
+                            }
+                            a++;
+                        }
+                        targetSkin.bones = newBones;
                     }
                 }
                 else
