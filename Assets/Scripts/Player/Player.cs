@@ -245,10 +245,11 @@ public class Player : NetworkBehaviour
         currentPlayerVisibility = visible;
         for (int i = 0; i < playerModels.Length; i++)
         {
-            if (visible)
+            if (i == (int)currentClass)
             {
-                if (i == (int)currentClass)
+                if (visible)
                 {
+
                     //Reveal class
                     playerModels[i].SetActive(true);
 
@@ -258,47 +259,58 @@ public class Player : NetworkBehaviour
                     {
                         combined = combined | cosmetics[e].hideBodyGroups;
                     }
-                    
+
                     //Apply Bodygroup Hiding
+                    Transform t = playerModels[i].transform;
+                    SetMeshVis(t, "Skin Arm L", true);
+                    SetMeshVis(t, "Skin Arm R", true);
+                    SetMeshVis(t, "Skin Body", true);
+                    SetMeshVis(t, "Skin Foot L", true);
+                    SetMeshVis(t, "Skin Foot R", true);
+                    SetMeshVis(t, "Skin Hand L", true);
+                    SetMeshVis(t, "Skin Hand R", true);
+                    SetMeshVis(t, "Skin Head", true);
+                    SetMeshVis(t, "Skin Leg L", true);
+                    SetMeshVis(t, "Skin Leg R", true);
                     if (combined.HasFlag(BodyGroups.armL))
                     {
-                        playerModels[i].transform.Find("Skin Arm L").gameObject.SetActive(false);
+                        SetMeshVis(t, "Skin Arm L", false);
                     }
                     if (combined.HasFlag(BodyGroups.armR))
                     {
-                        playerModels[i].transform.Find("Skin Arm R").gameObject.SetActive(false);
+                        SetMeshVis(t, "Skin Arm R", false);
                     }
                     if (combined.HasFlag(BodyGroups.body))
                     {
-                        playerModels[i].transform.Find("Skin Body").gameObject.SetActive(false);
+                        SetMeshVis(t, "Skin Body", false);
                     }
                     if (combined.HasFlag(BodyGroups.footL))
                     {
-                        playerModels[i].transform.Find("Skin Foot L").gameObject.SetActive(false);
+                        SetMeshVis(t, "Skin Foot L", false);
                     }
                     if (combined.HasFlag(BodyGroups.footR))
                     {
-                        playerModels[i].transform.Find("Skin Foot R").gameObject.SetActive(false);
+                        SetMeshVis(t, "Skin Foot R", false);
                     }
                     if (combined.HasFlag(BodyGroups.handL))
                     {
-                        playerModels[i].transform.Find("Skin Hand L").gameObject.SetActive(false);
+                        SetMeshVis(t, "Skin Hand L", false);
                     }
                     if (combined.HasFlag(BodyGroups.handR))
                     {
-                        playerModels[i].transform.Find("Skin Hand R").gameObject.SetActive(false);
+                        SetMeshVis(t, "Skin Hand R", false);
                     }
                     if (combined.HasFlag(BodyGroups.head))
                     {
-                        playerModels[i].transform.Find("Skin Head").gameObject.SetActive(false);
+                        SetMeshVis(t, "Skin Head", false);
                     }
                     if (combined.HasFlag(BodyGroups.legL))
                     {
-                        playerModels[i].transform.Find("Skin Leg L").gameObject.SetActive(false);
+                        SetMeshVis(t, "Skin Leg L", false);
                     }
                     if (combined.HasFlag(BodyGroups.legR))
                     {
-                        playerModels[i].transform.Find("Skin Leg R").gameObject.SetActive(false);
+                        SetMeshVis(t, "Skin Leg R", false);
                     }
 
                     //Animation
@@ -319,13 +331,24 @@ public class Player : NetworkBehaviour
                 }
                 else
                 {
-                    //Hide other classes
-                    playerModels[i].SetActive(false);
+                    playerModels[i].SetActive(true);
+                    Transform t = playerModels[i].transform;
+                    SetMeshVis(t, "Skin Arm L", false);
+                    SetMeshVis(t, "Skin Arm R", false);
+                    SetMeshVis(t, "Skin Body", false);
+                    SetMeshVis(t, "Skin Foot L", false);
+                    SetMeshVis(t, "Skin Foot R", false);
+                    SetMeshVis(t, "Skin Hand L", true);
+                    SetMeshVis(t, "Skin Hand R", true);
+                    SetMeshVis(t, "Skin Head", false);
+                    SetMeshVis(t, "Skin Leg L", false);
+                    SetMeshVis(t, "Skin Leg R", false);
                 }
             }
             else
             {
-                playerModels[i].SetActive(false);
+                //Hide other classes
+                playerModels[i].SetActive(true);
             }
         }
 
@@ -340,6 +363,11 @@ public class Player : NetworkBehaviour
                 currentGun.SetGunTransformParent(tracker.GetRightHand(), false);
             }
         }
+    }
+
+    void SetMeshVis(Transform trans, string meshName, bool set)
+    {
+        trans.Find(meshName).gameObject.SetActive(set);
     }
 
     public void TakeDamage(ulong id, int amount)
