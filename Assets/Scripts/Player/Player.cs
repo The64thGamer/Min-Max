@@ -128,7 +128,7 @@ public class Player : NetworkBehaviour
         //Stock
         for (int i = 0; i < stockCosmetics.Count; i++)
         {
-            if (stockCosmetics[i].stock == StockCosmetic.stock && stockCosmetics[i].givenClass == currentClass)
+            if (stockCosmetics[i].stock == StockCosmetic.stock)
             {
                 bool isStockDupeEquipRegion = false;
                 for (int e = 0; e < cosmeticIntList.Count; e++)
@@ -349,32 +349,7 @@ public class Player : NetworkBehaviour
                     //Apply Cosmetics
                     for (int e = 0; e < cosmeticInts.Length; e++)
                     {
-                        GameObject g = GameObject.Instantiate(new GameObject(), t);
-                        SkinnedMeshRenderer targetSkin = g.AddComponent<SkinnedMeshRenderer>();
-                        SkinnedMeshRenderer originalSkin = classCosmetics[cosmeticInts[e]].prefab.GetComponentInChildren<SkinnedMeshRenderer>();
-
-                        targetSkin.SetSharedMaterials(originalSkin.sharedMaterials.ToList<Material>());
-                        targetSkin.sharedMesh = originalSkin.sharedMesh;
-                        targetSkin.rootBone = playerModels[i].transform.Find("Armature").GetChild(0);
-                        currentCharMeshes.Add(g);
-
-                        Transform[] newBones = new Transform[originalSkin.bones.Length];
-
-                        int a = 0;
-                        foreach (var originalBone in originalSkin.bones)
-                        {
-
-                            foreach (var newBone in targetSkin.rootBone.GetComponentsInChildren<Transform>())
-                            {
-                                if (newBone.name == originalBone.name)
-                                {
-                                    newBones[a] = newBone;
-                                    continue;
-                                }
-                            }
-                            a++;
-                        }
-                        targetSkin.bones = newBones;
+                        ApplyCosmetics(classCosmetics[cosmeticInts[e]].prefab, e, t);
                     }
                 }
                 else
@@ -391,6 +366,15 @@ public class Player : NetworkBehaviour
                     SetMeshVis(t, "Skin Head", false);
                     SetMeshVis(t, "Skin Leg L", false);
                     SetMeshVis(t, "Skin Leg R", false);
+                    List<Cosmetic> classCosmetics = gm.GetCosmetics().GetClassCosmetics(currentClass);
+                    //Apply Only Hand Cosmetics
+                    for (int e = 0; e < cosmeticInts.Length; e++)
+                    {
+                        if (classCosmetics[cosmeticInts[e]].region == EquipRegion.hands)
+                        {
+                            ApplyCosmetics(classCosmetics[cosmeticInts[e]].prefab, e, t);
+                        }
+                    }
                 }
             }
             else
@@ -411,6 +395,35 @@ public class Player : NetworkBehaviour
                 currentGun.SetGunTransformParent(tracker.GetRightHand(), false);
             }
         }
+    }
+
+    void ApplyCosmetics(GameObject prefab, int e, Transform t)
+    {
+        GameObject g = GameObject.Instantiate(new GameObject(), t);
+        SkinnedMeshRenderer targetSkin = g.AddComponent<SkinnedMeshRenderer>();
+        SkinnedMeshRenderer originalSkin = prefab.GetComponentInChildren<SkinnedMeshRenderer>();
+        targetSkin.SetSharedMaterials(originalSkin.sharedMaterials.ToList<Material>());
+        targetSkin.sharedMesh = originalSkin.sharedMesh;
+        targetSkin.rootBone = t.Find("Armature").GetChild(0);
+        currentCharMeshes.Add(g);
+
+        Transform[] newBones = new Transform[originalSkin.bones.Length];
+
+        int a = 0;
+        foreach (var originalBone in originalSkin.bones)
+        {
+
+            foreach (var newBone in targetSkin.rootBone.GetComponentsInChildren<Transform>())
+            {
+                if (newBone.name == originalBone.name)
+                {
+                    newBones[a] = newBone;
+                    continue;
+                }
+            }
+            a++;
+        }
+        targetSkin.bones = newBones;
     }
 
     void SetMeshVis(Transform trans, string meshName, bool set)

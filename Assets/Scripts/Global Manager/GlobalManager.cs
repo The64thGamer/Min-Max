@@ -461,15 +461,22 @@ public class GlobalManager : NetworkBehaviour
 
         //Auto Team
         ClassList autoClass = ClassList.programmer;
-        int random = UnityEngine.Random.Range(0, 2);
-        if (random == 0)
+        int random = UnityEngine.Random.Range(0, 3);
+        switch (random)
         {
-            autoClass = ClassList.programmer;
+            case 0:
+                autoClass = ClassList.programmer;
+                break;
+            case 1:
+                autoClass = ClassList.computer;
+                break;
+            case 2:
+                autoClass = ClassList.fabricator;
+                break;
+            default:
+                break;
         }
-        else
-        {
-            autoClass = ClassList.fabricator;
-        }
+
 
         Debug.Log("New Player Joined (#" + clients.Count + "), Team " + debugList);
 

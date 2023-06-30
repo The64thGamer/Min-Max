@@ -75,6 +75,7 @@ public enum EquipRegion
     belt,
     shoes,
     hands,
+    shoulders,
 }
 
 public enum StockCosmetic
@@ -92,6 +93,5 @@ public struct Cosmetic
     public GameObject prefab;
     public EquipRegion region;
     public BodyGroups hideBodyGroups;
-    public ClassList givenClass;
     public StockCosmetic stock;
 }
