@@ -2,7 +2,9 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
 using Unity.Netcode;
+using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.AI;
 
 public class AiPlayer : NetworkBehaviour
 {
@@ -12,11 +14,16 @@ public class AiPlayer : NetworkBehaviour
     GlobalManager gm;
     const ulong botID = 64646464646464;
     PlayerTracker tracker;
+    NavMeshAgent agent;
 
     //Target
     Player target;
     Transform targetHeadset;
     bool isTargetEnemy;
+
+    //Timers
+    float timeToSwap;
+    float timeToChangePos;
 
     private void Start()
     {
@@ -29,11 +36,12 @@ public class AiPlayer : NetworkBehaviour
         headset = player.GetTracker().GetCamera();
         rhand = player.GetTracker().GetRightHand();
         tracker = player.GetTracker();
+        agent = this.AddComponent<NavMeshAgent>();
     }
 
-    float timeToSwap;
     void Update()
     {
+        //Swapping Target
         if (timeToSwap <= 0)
         {
             timeToSwap = Random.Range(1, 10);
@@ -41,12 +49,33 @@ public class AiPlayer : NetworkBehaviour
         }
         timeToSwap -= Time.deltaTime;
 
+        //Swapping Target Position
+        if (timeToChangePos <= 0)
+        {
+            timeToChangePos = Random.Range(0.1f, 5.0f);
+        }
+        timeToChangePos -= Time.deltaTime;
+
         if (targetHeadset != null)
         {
-            PlayerDataSentToClient data = tracker.GetPlayerPosData();
+            PlayerDataSentToServer data = tracker.GetPlayerNetworkData();
             data.rHandRot = Quaternion.Lerp(rhand.rotation, Quaternion.LookRotation(targetHeadset.position - rhand.position, Vector3.up), Time.deltaTime * 20);
             data.headsetRot = Quaternion.Lerp(headset.rotation, Quaternion.LookRotation(targetHeadset.position - headset.position, Vector3.up), Time.deltaTime * 10);
-            tracker.ClientSyncPlayerInputs(data);
+            if(target.GetTeam() != player.GetTeam())
+            {
+                data.shoot = true;
+            }
+            else
+            {
+                data.shoot = false;
+            }
+            tracker.ServerSyncPlayerInputs(data);
+        }
+        else
+        {
+            PlayerDataSentToServer data = tracker.GetPlayerNetworkData();
+            data.shoot = false;
+            tracker.ServerSyncPlayerInputs(data);
         }
     }
 
