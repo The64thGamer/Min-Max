@@ -519,6 +519,11 @@ public class GlobalManager : NetworkBehaviour
                         break;
                 }
                 break;
+            case ClassList.computer:
+                cos.Add(0);
+                cos.Add(1);
+                cos.Add(2);
+                break;
             default:
                 break;
         }
