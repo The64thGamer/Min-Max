@@ -25,6 +25,9 @@ public class AiPlayer : NetworkBehaviour
     float timeToSwap;
     float timeToChangePos;
 
+    //Const
+    const float maxNavRange = 40;
+
     private void Start()
     {
         player = GetComponent<Player>();
@@ -32,11 +35,14 @@ public class AiPlayer : NetworkBehaviour
         {
             Destroy(this);
         }
-        gm = GameObject.Find("Global Manager").GetComponent<GlobalManager>();
-        headset = player.GetTracker().GetCamera();
-        rhand = player.GetTracker().GetRightHand();
-        tracker = player.GetTracker();
-        agent = this.AddComponent<NavMeshAgent>();
+        else
+        {
+            gm = GameObject.Find("Global Manager").GetComponent<GlobalManager>();
+            headset = player.GetTracker().GetCamera();
+            rhand = player.GetTracker().GetRightHand();
+            tracker = player.GetTracker();
+            agent = this.AddComponent<NavMeshAgent>();
+        }
     }
 
     void Update()
@@ -53,6 +59,21 @@ public class AiPlayer : NetworkBehaviour
         if (timeToChangePos <= 0)
         {
             timeToChangePos = Random.Range(0.1f, 5.0f);
+
+            Vector3 setDestination = Vector3.zero;
+            if (target != null && isTargetEnemy)
+            {
+                NavMeshHit hit;
+                NavMesh.SamplePosition(target.transform.position, out hit, maxNavRange, 1);
+                setDestination = hit.position;
+            }
+            else
+            {
+                NavMeshHit hit;
+                NavMesh.SamplePosition((Random.insideUnitSphere * maxNavRange) + transform.position, out hit, maxNavRange, 1);
+                setDestination = hit.position;
+            }
+            agent.SetDestination(setDestination);
         }
         timeToChangePos -= Time.deltaTime;
 
@@ -61,7 +82,7 @@ public class AiPlayer : NetworkBehaviour
             PlayerDataSentToServer data = tracker.GetPlayerNetworkData();
             data.rHandRot = Quaternion.Lerp(rhand.rotation, Quaternion.LookRotation(targetHeadset.position - rhand.position, Vector3.up), Time.deltaTime * 20);
             data.headsetRot = Quaternion.Lerp(headset.rotation, Quaternion.LookRotation(targetHeadset.position - headset.position, Vector3.up), Time.deltaTime * 10);
-            if(target.GetTeam() != player.GetTeam())
+            if (isTargetEnemy)
             {
                 data.shoot = true;
             }
@@ -109,7 +130,7 @@ public class AiPlayer : NetworkBehaviour
                                 currentFind = collidePlayer;
                             }
                         }
-                        else if(currentlyOnlyFriendlies && isEnemy)
+                        else if (currentlyOnlyFriendlies && isEnemy)
                         {
                             currentFind = collidePlayer;
                         }
@@ -117,18 +138,17 @@ public class AiPlayer : NetworkBehaviour
                 }
             }
         }
-        if(currentFind == null)
-        {
-            //When cant find a target, looks at random player in the map
-            target = clients[Random.Range(0, gm.GetClients().Count)];
-            targetHeadset = target.GetTracker().GetCamera();
-            isTargetEnemy = false;
-        }
-        else
+        if (currentFind != null)
         {
             target = currentFind;
             targetHeadset = target.GetTracker().GetCamera();
             isTargetEnemy = currentFind.GetTeam() != player.GetTeam();
+        }
+        else
+        {
+            target = null;
+            targetHeadset = null;
+            isTargetEnemy = false;
         }
     }
 }
