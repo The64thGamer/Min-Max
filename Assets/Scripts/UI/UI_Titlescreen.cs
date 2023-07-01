@@ -571,7 +571,12 @@ public class UI_Titlescreen : MonoBehaviour
                             PlayerPrefs.SetString("LocalServerName" + joinLocalIndex, limiters[2]);
                         }
                         int currentMap = Convert.ToInt16(limiters[3]);
-                        root.Q<Label>("NewLocalMapName").text = mapNames[currentMap];
+                        string mapName = "Unknown Map";
+                        if(currentMap < mapNames.Count)
+                        {
+                            mapName = mapNames[currentMap];
+                        }
+                        root.Q<Label>("NewLocalMapName").text = mapName;
                         root.Q<VisualElement>("NewLocalMapIcon").style.backgroundImage = new StyleBackground(mapIcons[currentMap]);
                         currentSceneToLoad = currentMap;
                         root.Q<VisualElement>("NewLocalStartGame").style.display = DisplayStyle.Flex;
