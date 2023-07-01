@@ -400,8 +400,8 @@ public class Player : NetworkBehaviour
 
     void ApplyCosmetics(GameObject prefab, Transform t)
     {
-        GameObject g = GameObject.Instantiate(new GameObject(), t);
-        g.name = prefab.name;
+        GameObject g = new GameObject(prefab.name);
+        g.transform.parent = t;
         SkinnedMeshRenderer targetSkin = g.AddComponent<SkinnedMeshRenderer>();
         SkinnedMeshRenderer originalSkin = prefab.GetComponentInChildren<SkinnedMeshRenderer>();
         targetSkin.SetSharedMaterials(originalSkin.sharedMaterials.ToList<Material>());
