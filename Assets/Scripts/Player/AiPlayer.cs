@@ -77,7 +77,7 @@ public class AiPlayer : NetworkBehaviour
         }
         timeToChangePos -= Time.deltaTime;
 
-        if (targetHeadset != null)
+        if (target != null && targetHeadset.position - rhand.position != Vector3.zero && targetHeadset.position - headset.position != Vector3.zero)
         {
             PlayerDataSentToServer data = tracker.GetPlayerNetworkData();
             data.rHandRot = Quaternion.Lerp(rhand.rotation, Quaternion.LookRotation(targetHeadset.position - rhand.position, Vector3.up), Time.deltaTime * 20);
