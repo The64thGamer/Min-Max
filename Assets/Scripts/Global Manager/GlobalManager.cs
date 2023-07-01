@@ -24,6 +24,7 @@ public class GlobalManager : NetworkBehaviour
     [SerializeField] List<Transform> teamSpawns;
     [SerializeField] List<Transform> teamGeometry;
     [SerializeField] List<Wire> teamWires;
+    [SerializeField] List<Transform> teamBlocks;
 
     //Ect
     AllStats al;
@@ -212,6 +213,46 @@ public class GlobalManager : NetworkBehaviour
             if (teamWires[teams[e].spawns] != null)
             {
                 teamWires[teams[e].spawns].SetTeam(teams[e].teamColor);
+            }
+            if (teamBlocks[teams[e].spawns] != null)
+            {
+                int layer = 0;
+                switch (teams[e].teamColor)
+                {
+                    case TeamList.orange:
+                        layer = LayerMask.NameToLayer("OrangeTeam");
+                        break;
+                    case TeamList.yellow:
+                        layer = LayerMask.NameToLayer("YellowTeam");
+                        break;
+                    case TeamList.green:
+                        layer = LayerMask.NameToLayer("GreenTeam");
+                        break;
+                    case TeamList.lightBlue:
+                        layer = LayerMask.NameToLayer("LightBlueTeam");
+                        break;
+                    case TeamList.blue:
+                        layer = LayerMask.NameToLayer("BlueTeam");
+                        break;
+                    case TeamList.purple:
+                        layer = LayerMask.NameToLayer("PurpleTeam");
+                        break;
+                    case TeamList.beige:
+                        layer = LayerMask.NameToLayer("BeigeTeam");
+                        break;
+                    case TeamList.brown:
+                        layer = LayerMask.NameToLayer("BrownTeam");
+                        break;
+                    case TeamList.gray:
+                        layer = LayerMask.NameToLayer("GrayTeam");
+                        break;
+                    default:
+                        break;
+                }
+                foreach (Transform child in teamBlocks[teams[e].spawns].transform)
+                {
+                    child.gameObject.layer = layer;
+                }
             }
         }
         for (int i = 0; i < clients.Count; i++)
