@@ -73,7 +73,7 @@ MonoBehaviour:
     baseHealth: 100
     baseSpeed: 30
     baseAccel: 10
-    classEyeHeight: 0
+    classEyeHeight: 1.646
   fabricator:
     baseHealth: 100
     baseSpeed: 30
@@ -129,7 +129,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   ServerTickRate:
     m_InternalValue: 60
-  m_NetworkManager: {fileID: 0}
   co: {fileID: 2645215035361401876}
   clientPrefab: {fileID: 8093838907312818641, guid: 183b441558cd63c45bf2e7be831cfa21,
     type: 3}
