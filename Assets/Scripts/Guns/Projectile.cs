@@ -26,6 +26,7 @@ public class Projectile : MonoBehaviour
         if (t > 1)
         {
             GameObject dsp = GameObject.Instantiate(destroyParticle, hitPoint, transform.rotation,transform.parent);
+            dsp.name = "Projectile Particle";
             dsp.layer = this.gameObject.layer;
             dsp.GetComponent<AudioSource>().PlayOneShot(hitSound);
             Destroy(this.gameObject);

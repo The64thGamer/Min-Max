@@ -454,6 +454,7 @@ public class GlobalManager : NetworkBehaviour
         }
         Debug.Log("Player Spawned On Host");
         GameObject client = GameObject.Instantiate(clientPrefab, Vector3.zero, Quaternion.identity);
+        client.name = "Client #" + id; 
         client.GetComponent<NetworkObject>().SpawnWithOwnership(id);
 
         //Client Object Spawning

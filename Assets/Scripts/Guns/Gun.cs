@@ -44,6 +44,7 @@ public abstract class Gun : MonoBehaviour
         {
             Vector3 firepos = player.GetTracker().GetRightHandFirePos(defaultStats.firepoint);
             GameObject currentProjectile = GameObject.Instantiate(defaultStats.firePrefab);
+            currentProjectile.name = "Projectile";
             Vector3 fireAngle = CalculateFireAngle(player);
             currentProjectile.GetComponent<Projectile>().SetProjectile(firepos, fireAngle, player.GetCurrentGun().FindStat(ChangableWeaponStats.bulletSpeed), player.GetTeamLayer(), CalculateHitPosition(fireAngle, player, firepos));
         }

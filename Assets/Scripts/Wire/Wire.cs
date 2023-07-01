@@ -82,6 +82,7 @@ public class Wire : MonoBehaviour
     void AddNewLineRenderer(WirePoint point)
     {
         GameObject bruh = new GameObject();
+        bruh.name = "WirePoint";
         bruh.transform.parent = transform;
         LineRenderer lr = bruh.AddComponent<LineRenderer>();
         lr.material = wireMat;
