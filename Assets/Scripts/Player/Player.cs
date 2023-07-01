@@ -349,7 +349,7 @@ public class Player : NetworkBehaviour
                     //Apply Cosmetics
                     for (int e = 0; e < cosmeticInts.Length; e++)
                     {
-                        ApplyCosmetics(classCosmetics[cosmeticInts[e]].prefab, e, t);
+                        ApplyCosmetics(classCosmetics[cosmeticInts[e]].prefab, t);
                     }
                 }
                 else
@@ -372,7 +372,7 @@ public class Player : NetworkBehaviour
                     {
                         if (classCosmetics[cosmeticInts[e]].region == EquipRegion.hands)
                         {
-                            ApplyCosmetics(classCosmetics[cosmeticInts[e]].prefab, e, t);
+                            ApplyCosmetics(classCosmetics[cosmeticInts[e]].prefab, t);
                         }
                     }
                 }
@@ -397,9 +397,10 @@ public class Player : NetworkBehaviour
         }
     }
 
-    void ApplyCosmetics(GameObject prefab, int e, Transform t)
+    void ApplyCosmetics(GameObject prefab, Transform t)
     {
         GameObject g = GameObject.Instantiate(new GameObject(), t);
+        g.name = prefab.name;
         SkinnedMeshRenderer targetSkin = g.AddComponent<SkinnedMeshRenderer>();
         SkinnedMeshRenderer originalSkin = prefab.GetComponentInChildren<SkinnedMeshRenderer>();
         targetSkin.SetSharedMaterials(originalSkin.sharedMaterials.ToList<Material>());
