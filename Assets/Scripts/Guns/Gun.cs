@@ -10,7 +10,6 @@ public abstract class Gun : MonoBehaviour
     const float MAXSPHERECASTDISTANCE = 20;
     const float MAXRAYCASTDISTANCE = 1000;
 
-
     [SerializeField]
     protected List<WeaponStats> changableStats = new List<WeaponStats>()
     {
@@ -43,10 +42,43 @@ public abstract class Gun : MonoBehaviour
         if (defaultStats.firePrefab != null)
         {
             Vector3 firepos = player.GetTracker().GetRightHandFirePos(defaultStats.firepoint);
-            GameObject currentProjectile = GameObject.Instantiate(defaultStats.firePrefab);
-            currentProjectile.name = "Projectile";
             Vector3 fireAngle = CalculateFireAngle(player);
-            currentProjectile.GetComponent<Projectile>().SetProjectile(firepos, fireAngle, player.GetCurrentGun().FindStat(ChangableWeaponStats.bulletSpeed), player.GetTeamLayer(), CalculateHitPosition(fireAngle, player, firepos));
+
+            Transform gunAngle = player.GetTracker().GetRightHand();
+            int numBullets = FindStat(ChangableWeaponStats.bulletsPerShot);
+            float angle = FindStat(ChangableWeaponStats.bulletSpreadAngle);
+            float angleStep = 0;
+            if(numBullets < 4)
+            {
+                angleStep = 360f / numBullets;
+            }
+            else
+            {
+                angleStep = 360f / (numBullets-1);
+            }
+
+            for (int i = 0; i < numBullets; i++)
+            {
+                GameObject currentProjectile = GameObject.Instantiate(defaultStats.firePrefab);
+                currentProjectile.name = "Projectile";
+                Vector3 finalAngle = fireAngle;
+                if (!(numBullets >= 4 && i == 0))
+                {
+                    int newi = i;
+                    if(numBullets >= 4)
+                    {
+                        newi--;
+                    }
+                    float currentAngle = newi * angleStep;
+
+                    // Convert angle to radians
+                    float angleInRadians = currentAngle * Mathf.Deg2Rad;
+
+                    finalAngle = Quaternion.AngleAxis(Mathf.Cos(angleInRadians) * angle, gunAngle.right) * finalAngle;
+                    finalAngle = Quaternion.AngleAxis(Mathf.Sin(angleInRadians) * angle, gunAngle.up) * finalAngle;
+                }
+                currentProjectile.GetComponent<Projectile>().SetProjectile(firepos, finalAngle, player.GetCurrentGun().FindStat(ChangableWeaponStats.bulletSpeed), player.GetTeamLayer(), CalculateHitPosition(finalAngle, player, firepos));
+            }
         }
     }
 
@@ -127,17 +159,49 @@ public abstract class Gun : MonoBehaviour
         Vector3 firepos = player.GetTracker().GetRightHandFirePos(defaultStats.firepoint);
         Vector3 fireAngle = CalculateFireAngle(player);
 
-        RaycastHit hit;
-        LayerMask layermask = GetIgnoreTeamAndVRLayerMask(player);
-        float dotAngle = Vector3.Dot(player.GetTracker().GetRightHandSafeForward(), fireAngle.normalized);
-        if (dotAngle > MINANGLE)
+        Transform gunAngle = player.GetTracker().GetRightHand();
+        int numBullets = FindStat(ChangableWeaponStats.bulletsPerShot);
+        float angle = FindStat(ChangableWeaponStats.bulletSpreadAngle);
+        float angleStep = 0;
+        if (numBullets < 4)
         {
-            if (Physics.Raycast(firepos, fireAngle, out hit, MAXRAYCASTDISTANCE, layermask))
+            angleStep = 360f / numBullets;
+        }
+        else
+        {
+            angleStep = 360f / (numBullets - 1);
+        }
+
+        for (int i = 0; i < numBullets; i++)
+        {
+            Vector3 finalAngle = fireAngle;
+            if (!(numBullets >= 4 && i == 0))
             {
-                Player hitPlayer = hit.collider.GetComponent<Player>();
-                if (hitPlayer != null)
+                int newi = i;
+                if (numBullets >= 4)
                 {
-                    hitPlayer.TakeDamage(player.GetPlayerID(), FindStat(ChangableWeaponStats.damage));
+                    newi--;
+                }
+                float currentAngle = newi * angleStep;
+
+                // Convert angle to radians
+                float angleInRadians = currentAngle * Mathf.Deg2Rad;
+
+                finalAngle = Quaternion.AngleAxis(Mathf.Cos(angleInRadians) * angle, gunAngle.right) * finalAngle;
+                finalAngle = Quaternion.AngleAxis(Mathf.Sin(angleInRadians) * angle, gunAngle.up) * finalAngle;
+            }
+            RaycastHit hit;
+            LayerMask layermask = GetIgnoreTeamAndVRLayerMask(player);
+            float dotAngle = Vector3.Dot(player.GetTracker().GetRightHandSafeForward(), fireAngle.normalized);
+            if (dotAngle > MINANGLE)
+            {
+                if (Physics.Raycast(firepos, finalAngle, out hit, MAXRAYCASTDISTANCE, layermask))
+                {
+                    Player hitPlayer = hit.collider.GetComponent<Player>();
+                    if (hitPlayer != null)
+                    {
+                        hitPlayer.TakeDamage(player.GetPlayerID(), FindStat(ChangableWeaponStats.damage));
+                    }
                 }
             }
         }
@@ -170,4 +234,5 @@ public enum ChangableWeaponStats
     maxAmmo,
     bulletSpeed,
     damage,
+    bulletSpreadAngle,
 }

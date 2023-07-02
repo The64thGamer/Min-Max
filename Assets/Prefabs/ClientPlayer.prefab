@@ -2742,10 +2742,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fb533ed8a3542bc4ea5ea9fcc95b222a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  JumpHeight: 1.2
-  Gravity: -20
-  JumpTimeout: 0
-  FallTimeout: 0.15
   _mainCamera: {fileID: 6447799786635912044}
 --- !u!114 &3553998420938263425
 MonoBehaviour:
