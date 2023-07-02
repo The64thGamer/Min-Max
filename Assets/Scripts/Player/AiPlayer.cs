@@ -5,6 +5,7 @@ using Unity.Netcode;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.AI;
+using UnityEngine.Windows;
 
 public class AiPlayer : NetworkBehaviour
 {
@@ -14,7 +15,6 @@ public class AiPlayer : NetworkBehaviour
     GlobalManager gm;
     const ulong botID = 64646464646464;
     PlayerTracker tracker;
-    NavMeshAgent agent;
 
     //Target
     Player target;
@@ -24,6 +24,10 @@ public class AiPlayer : NetworkBehaviour
     //Timers
     float timeToSwap;
     float timeToChangePos;
+
+    //Navmesh
+    NavMeshPath path;
+    int currentNavCorner = 0;
 
     //Const
     const float maxNavRange = 40;
@@ -37,11 +41,11 @@ public class AiPlayer : NetworkBehaviour
         }
         else
         {
+            path = new NavMeshPath();
             gm = GameObject.Find("Global Manager").GetComponent<GlobalManager>();
             headset = player.GetTracker().GetCamera();
             rhand = player.GetTracker().GetRightHand();
             tracker = player.GetTracker();
-            agent = this.AddComponent<NavMeshAgent>();
         }
     }
 
@@ -64,22 +68,33 @@ public class AiPlayer : NetworkBehaviour
             if (target != null && isTargetEnemy)
             {
                 NavMeshHit hit;
-                NavMesh.SamplePosition(target.transform.position, out hit, maxNavRange, 1);
-                setDestination = hit.position;
+                if (NavMesh.SamplePosition(target.transform.position, out hit, maxNavRange, 1))
+                {
+                    setDestination = hit.position;
+                }
             }
             else
             {
                 NavMeshHit hit;
-                NavMesh.SamplePosition((Random.insideUnitSphere * maxNavRange) + transform.position, out hit, maxNavRange, 1);
-                setDestination = hit.position;
+                if(NavMesh.SamplePosition((Random.insideUnitSphere * maxNavRange) + transform.position, out hit, maxNavRange, 1))
+                {
+                    setDestination = hit.position;
+
+                }
             }
-            agent.SetDestination(setDestination);
+            if (setDestination != Vector3.zero)
+            {
+                NavMesh.CalculatePath(transform.position, setDestination, NavMesh.AllAreas, path);
+            }
         }
         timeToChangePos -= Time.deltaTime;
 
+
+        //Data
+        PlayerDataSentToServer data = tracker.GetPlayerNetworkData();
+
         if (target != null && targetHeadset.position - rhand.position != Vector3.zero && targetHeadset.position - headset.position != Vector3.zero)
         {
-            PlayerDataSentToServer data = tracker.GetPlayerNetworkData();
             data.rHandRot = Quaternion.Lerp(rhand.rotation, Quaternion.LookRotation(targetHeadset.position - rhand.position, Vector3.up), Time.deltaTime * 20);
             data.headsetRot = Quaternion.Lerp(headset.rotation, Quaternion.LookRotation(targetHeadset.position - headset.position, Vector3.up), Time.deltaTime * 10);
             if (isTargetEnemy)
@@ -90,13 +105,40 @@ public class AiPlayer : NetworkBehaviour
             {
                 data.shoot = false;
             }
-            tracker.ServerSyncPlayerInputs(data);
         }
         else
         {
-            PlayerDataSentToServer data = tracker.GetPlayerNetworkData();
             data.shoot = false;
-            tracker.ServerSyncPlayerInputs(data);
+        }
+        if(path != null && path.corners.Length != 0)
+        {
+            if(currentNavCorner >= path.corners.Length)
+            {
+                currentNavCorner = path.corners.Length-1;
+            }
+            Vector3 currentPath = path.corners[currentNavCorner] - transform.position;
+            Vector3 camForward = headset.forward;
+            Vector3 camRight = headset.right;
+            if (currentPath.magnitude <= 0.1f)
+            {
+                currentNavCorner = Mathf.Min(path.corners.Length, currentNavCorner + 1);
+            }
+            currentPath.Normalize();
+            camForward.y = 0;
+            camRight.y = 0;
+            data.rightJoystick.y = Vector3.Dot(currentPath, camForward);
+            data.rightJoystick.x = Vector3.Dot(currentPath, camRight);
+
+        }
+        tracker.ServerSyncPlayerInputs(data);
+
+    }
+
+    private void OnDrawGizmosSelected()
+    {
+        if (path != null)
+        {
+            Gizmos.DrawLineList(path.corners);
         }
     }
 
