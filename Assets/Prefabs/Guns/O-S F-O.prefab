@@ -60,9 +60,9 @@ MonoBehaviour:
   - statName: 3
     stat: 200
   - statName: 4
-    stat: 5
+    stat: 10
   - statName: 5
-    stat: 5
+    stat: 4
   firePoint: {fileID: 5960225029509838066}
   crosshair: {fileID: 3381283269250820758}
   currentPlayer: {fileID: 0}

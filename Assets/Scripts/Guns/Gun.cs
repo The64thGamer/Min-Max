@@ -77,7 +77,7 @@ public abstract class Gun : MonoBehaviour
                     finalAngle = Quaternion.AngleAxis(Mathf.Cos(angleInRadians) * angle, gunAngle.right) * finalAngle;
                     finalAngle = Quaternion.AngleAxis(Mathf.Sin(angleInRadians) * angle, gunAngle.up) * finalAngle;
                 }
-                currentProjectile.GetComponent<Projectile>().SetProjectile(firepos, finalAngle, player.GetCurrentGun().FindStat(ChangableWeaponStats.bulletSpeed), player.GetTeamLayer(), CalculateHitPosition(finalAngle, player, firepos));
+                currentProjectile.GetComponent<Projectile>().SetProjectile(firepos, finalAngle, player.GetCurrentGun().FindStat(ChangableWeaponStats.bulletSpeed), player.GetTeamLayer(), CalculateHitPosition(finalAngle, player, firepos),1/numBullets);
             }
         }
     }
