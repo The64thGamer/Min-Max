@@ -6,20 +6,6 @@ namespace StarterAssets
     [RequireComponent(typeof(CharacterController))]
     public class FirstPersonController : NetworkBehaviour
     {
-        [Header("Player")]
-
-
-        [Space(10)]
-        [Tooltip("The height the player can jump")]
-        public float JumpHeight = 1.2f;
-        [Tooltip("The character uses its own gravity value. The engine default is -9.81f")]
-        public float Gravity = -15.0f;
-
-        [Space(10)]
-        [Tooltip("Time required to pass before being able to jump again. Set to 0f to instantly jump again")]
-        public float JumpTimeout = 0.1f;
-        [Tooltip("Time required to pass before entering the fall state. Useful for walking down stairs")]
-        public float FallTimeout = 0.15f;
 
         //Objects
         CharacterController _controller;
@@ -33,12 +19,16 @@ namespace StarterAssets
         const float acceleration = 9;
         const float deceleration = 6;
         const float hasMovedDeltaTimeout = 15;
+        const float JumpHeight = 1.0f;
+        const float Gravity = -15.0f;
+        const float FallTimeout = 0.15f;
+
+
 
         // player
         Vector3 _speed;
         float _verticalVelocity;
         float _terminalVelocity = 53.0f;
-        float _jumpTimeoutDelta;
         float _fallTimeoutDelta;
         float _hasBeenMovingDelta;
 
@@ -61,7 +51,7 @@ namespace StarterAssets
             player = GetComponent<Player>();
 
             // reset our timeouts on start
-            _jumpTimeoutDelta = JumpTimeout;
+
             _fallTimeoutDelta = FallTimeout;
         }
 
@@ -224,22 +214,15 @@ namespace StarterAssets
                 }
 
                 // Jump
-                if (jump && _jumpTimeoutDelta <= 0.0f)
+                if (jump)
                 {
                     // the square root of H * -2 * G = how much velocity needed to reach desired height
                     _verticalVelocity = Mathf.Sqrt(JumpHeight * -2f * Gravity);
                 }
-
-                // jump timeout
-                if (_jumpTimeoutDelta >= 0.0f)
-                {
-                    _jumpTimeoutDelta -= Time.deltaTime;
-                }
             }
             else
             {
-                // reset the jump timeout timer
-                _jumpTimeoutDelta = JumpTimeout;
+
 
                 // fall timeout
                 if (_fallTimeoutDelta >= 0.0f)
