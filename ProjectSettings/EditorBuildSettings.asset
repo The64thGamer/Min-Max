@@ -23,6 +23,9 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Game Assets/Scenes/Maps/cp_nara/cp_nara.unity
     guid: b4afb4ee269afcf428e8364099b45161
+  - enabled: 1
+    path: Assets/Game Assets/Scenes/Maps/pl_blackmarket/pl_blackmarket.unity
+    guid: ee3c2ec27616fbb4fbf23b6e66e45ffe
   m_configObjects:
     Unity.XR.Oculus.Settings: {fileID: 11400000, guid: bfa1182bd221b4ca89619141f66f1260,
       type: 2}

@@ -49,10 +49,12 @@ MonoBehaviour:
   - {fileID: 2800000, guid: 94d6e13b230b39c4fad8277561a59acc, type: 3}
   - {fileID: 2800000, guid: d31969135bb208f45b074f6f35b50675, type: 3}
   - {fileID: 2800000, guid: 94543ca0472bc8044a1e03dede34841f, type: 3}
+  - {fileID: 2800000, guid: 70d86af10b32f8c4faa822669ee587f6, type: 3}
   mapNames:
   - pl_artpass
   - pl_frequency
   - cp_nara
+  - pl_blackmarket
   m_NetworkManager: {fileID: 0}
   vta: {fileID: 9197481963319205126, guid: 52a12b2ec113cb44f9ff3f04f5cfdfcc, type: 3}
   unknownMap: {fileID: 2800000, guid: 30c08eebd63016c4fa4eb4637bbc8637, type: 3}

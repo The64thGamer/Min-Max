@@ -52,52 +52,42 @@ MonoBehaviour:
   labourer:
     baseHealth: 100
     baseSpeed: 30
-    baseAccel: 10
     classEyeHeight: 0
   woodworker:
     baseHealth: 100
     baseSpeed: 30
-    baseAccel: 10
     classEyeHeight: 0
   developer:
     baseHealth: 0
     baseSpeed: 0
-    baseAccel: 0
     classEyeHeight: 0
   programmer:
-    baseHealth: 100
-    baseSpeed: 30
-    baseAccel: 10
+    baseHealth: 150
+    baseSpeed: 100
     classEyeHeight: 1.584
   computer:
-    baseHealth: 100
-    baseSpeed: 30
-    baseAccel: 10
+    baseHealth: 125
+    baseSpeed: 105
     classEyeHeight: 1.646
   fabricator:
     baseHealth: 100
-    baseSpeed: 30
-    baseAccel: 10
+    baseSpeed: 90
     classEyeHeight: 1.4116
   artist:
     baseHealth: 100
     baseSpeed: 30
-    baseAccel: 10
     classEyeHeight: 0
   freelancer:
     baseHealth: 100
     baseSpeed: 30
-    baseAccel: 10
     classEyeHeight: 0
   craftsman:
     baseHealth: 100
     baseSpeed: 30
-    baseAccel: 10
     classEyeHeight: 0
   manager:
     baseHealth: 100
     baseSpeed: 30
-    baseAccel: 10
     classEyeHeight: 0
   mMChips:
   - buffsNerfs:
@@ -135,6 +125,7 @@ MonoBehaviour:
   teamSpawns: []
   teamGeometry: []
   teamWires: []
+  teamBlocks: []
 --- !u!114 &7623448802612895609
 MonoBehaviour:
   m_ObjectHideFlags: 0

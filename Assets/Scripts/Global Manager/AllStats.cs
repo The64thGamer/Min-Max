@@ -98,7 +98,6 @@ public struct ClassStats
 {
     public int baseHealth;
     public int baseSpeed;
-    public int baseAccel;
     public float classEyeHeight;
 }
 

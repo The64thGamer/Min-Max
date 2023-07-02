@@ -7,8 +7,6 @@ namespace StarterAssets
     public class FirstPersonController : NetworkBehaviour
     {
         [Header("Player")]
-        [Tooltip("Move speed of the character in m/s")]
-        public float MoveSpeed = 4.0f;
         [Tooltip("Acceleration and deceleration")]
         public float SpeedChangeRate = 10.0f;
 
@@ -68,7 +66,7 @@ namespace StarterAssets
         {
             if (_controller == null) { return; }
 
-            float targetSpeed = MoveSpeed;
+            float targetSpeed = player.GetClassStats().baseSpeed / 25.0f;
             Vector3 forward = _mainCamera.transform.forward;
             Vector3 right = _mainCamera.transform.right;
             forward.y = 0f;
