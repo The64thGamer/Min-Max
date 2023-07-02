@@ -498,17 +498,21 @@ public class GlobalManager : NetworkBehaviour
 
         //Auto Team
         ClassList autoClass = ClassList.programmer;
+        string autoGun = "";
         int random = UnityEngine.Random.Range(0, 3);
         switch (random)
         {
             case 0:
                 autoClass = ClassList.programmer;
+                autoGun = "W.I.P.";
                 break;
             case 1:
                 autoClass = ClassList.computer;
+                autoGun = "W.I.P.";
                 break;
             case 2:
                 autoClass = ClassList.fabricator;
+                autoGun = "O-S F-O";
                 break;
             default:
                 break;
@@ -565,7 +569,7 @@ public class GlobalManager : NetworkBehaviour
                 break;
         }
 
-        SendNewPlayerDataBackClientRpc(id, debugList, autoClass, cos.ToArray());
+        SendNewPlayerDataBackClientRpc(id, debugList, autoClass, cos.ToArray(),autoGun);
         RespawnPlayerClientRpc(id, debugList);
         PlayerInfoSentToClient[] data = new PlayerInfoSentToClient[clients.Count];
         for (int i = 0; i < clients.Count; i++)
@@ -699,7 +703,7 @@ public class GlobalManager : NetworkBehaviour
     }
     
     [ClientRpc]
-    void SendNewPlayerDataBackClientRpc(ulong id, TeamList team, ClassList autoClass, int[] cosmetics)
+    void SendNewPlayerDataBackClientRpc(ulong id, TeamList team, ClassList autoClass, int[] cosmetics, string gunName)
     {
         for (int i = 0; i < clients.Count; i++)
         {
@@ -707,6 +711,7 @@ public class GlobalManager : NetworkBehaviour
             {
                 clients[i].SetTeam(team);
                 clients[i].SetClass(autoClass,cosmetics);
+                clients[i].SetGun(al.SearchGuns(gunName));
                 return;
             }
         }

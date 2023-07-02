@@ -34,14 +34,10 @@ public class Player : NetworkBehaviour
         //Before
         tracker = GetComponentInChildren<PlayerTracker>();
         controller = GetComponentInChildren<FirstPersonController>();
-        currentGun = GetComponentInChildren<GenericGun>();
         gm = GameObject.Find("Global Manager").GetComponent<GlobalManager>();
         al = gm.GetComponent<AllStats>();
         gm.AddPlayerToClientList(this);
         wireSounds = transform.Find("WireSounds").GetComponent<WireSounds>();
-
-        //Debug Default
-        SetGun(gm.GetComponent<AllStats>().SearchGuns("Worker Ionizing Pistol"));
 
         //After
         if (IsOwner)
@@ -96,10 +92,15 @@ public class Player : NetworkBehaviour
 
     public void SetGun(GunProjectiles gun)
     {
+        if(currentGun != null)
+        {
+            Destroy(currentGun.gameObject);
+        }
         GameObject gunObject = GameObject.Instantiate(gun.gunPrefab, Vector3.zero, Quaternion.identity, this.transform);
         gunObject.name = gun.gunName;
-        gunObject.GetComponent<Gun>().SetPlayer(this);
         currentGun = gunObject.GetComponent<Gun>();
+        currentGun.SetPlayer(this);
+        currentGun.SetDefaultStats(gun);
         UpdateTeamColor();
     }
 
