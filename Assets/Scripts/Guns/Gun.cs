@@ -218,6 +218,11 @@ public abstract class Gun : MonoBehaviour
         }
         return 0;
     }
+
+    public void SetDefaultStats(GunProjectiles stat)
+    {
+        defaultStats = stat;
+    }
 }
 [System.Serializable]
 public class WeaponStats

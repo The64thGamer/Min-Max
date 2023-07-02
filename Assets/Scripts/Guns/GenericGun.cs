@@ -26,7 +26,6 @@ public class GenericGun : Gun
     {
         au = this.GetComponent<AudioSource>();
         gm = GameObject.Find("Global Manager").GetComponent<GlobalManager>();
-        defaultStats = gm.GetComponent<AllStats>().SearchGuns(GetNameKey());
         if (currentPlayer.IsOwner)
         {
             showCrosshair = true;
