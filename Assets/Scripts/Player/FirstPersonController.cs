@@ -7,8 +7,8 @@ namespace StarterAssets
     public class FirstPersonController : NetworkBehaviour
     {
         [Header("Player")]
-        [Tooltip("Acceleration and deceleration")]
-        public float SpeedChangeRate = 10.0f;
+        public float acceleration = 100.0f;
+        public float deceleration = 1.0f;
 
         [Space(10)]
         [Tooltip("The height the player can jump")]
@@ -33,7 +33,7 @@ namespace StarterAssets
         const float crouchSpeed = 7;
 
         // player
-        float _speed;
+        Vector3 _speed;
         float _verticalVelocity;
         float _terminalVelocity = 53.0f;
         float _jumpTimeoutDelta;
@@ -66,7 +66,6 @@ namespace StarterAssets
         {
             if (_controller == null) { return; }
 
-            float targetSpeed = player.GetClassStats().baseSpeed / 25.0f;
             Vector3 forward = _mainCamera.transform.forward;
             Vector3 right = _mainCamera.transform.right;
             forward.y = 0f;
@@ -75,15 +74,17 @@ namespace StarterAssets
             right.Normalize();
             Vector3 newAxis = forward * _input.y + right * _input.x;
 
+            Vector3 targetSpeed = newAxis * player.GetClassStats().baseSpeed / 25.0f;
+
             Wire.WirePoint heldWire = player.GetWirePoint();
 
             //Crouch
             if (crouch && _controller.isGrounded)
             {
-                if(!hasBeenCrouched)
+                if (!hasBeenCrouched)
                 {
                     hasBeenCrouched = true;
-                    if(IsHost)
+                    if (IsHost)
                     {
                         player.SetWirePoint(gm.GetWire(player.GetTeam()).RequestForWire(transform.position));
                         heldWire = player.GetWirePoint();
@@ -101,14 +102,14 @@ namespace StarterAssets
                 {
                     if (IsHost && heldWire != null)
                     {
-                        gm.RemoveClientWireClientRpc(player.GetPlayerID(),heldWire.point);
+                        gm.RemoveClientWireClientRpc(player.GetPlayerID(), heldWire.point);
                         player.RemoveHeldWire(heldWire.point);
                     }
                     hasBeenCrouched = false;
                 }
                 currentCrouchLerp = Mathf.Clamp01(currentCrouchLerp - (Time.deltaTime * crouchSpeed));
             }
-            if(jump)
+            if (jump)
             {
                 if (IsHost && heldWire != null)
                 {
@@ -169,41 +170,39 @@ namespace StarterAssets
 
             // note: Vector2's == operator uses approximation so is not floating point error prone, and is cheaper than magnitude
             // if there is no input, set the target speed to 0
-            if (newAxis == Vector3.zero) targetSpeed = 0.0f;
+            if (newAxis == Vector3.zero) targetSpeed = Vector2.zero;
 
-            // a reference to the players current horizontal velocity
-            float currentHorizontalSpeed = new Vector3(_controller.velocity.x, 0.0f, _controller.velocity.z).magnitude;
-
-            float speedOffset = 0.1f;
 
             // accelerate or decelerate to target speed
-            if (currentHorizontalSpeed < targetSpeed - speedOffset || currentHorizontalSpeed > targetSpeed + speedOffset)
-            {
-                // creates curved result rather than a linear one giving a more organic speed change
-                // note T in Lerp is clamped, so we don't need to clamp our speed
-                _speed = Mathf.Lerp(currentHorizontalSpeed, targetSpeed, Time.deltaTime * SpeedChangeRate);
 
-                // round speed to 3 decimal places
-                _speed = Mathf.Round(_speed * 1000f) / 1000f;
+            if (targetSpeed != Vector3.zero)
+            {
+                _speed.x = Mathf.Lerp(_controller.velocity.x, targetSpeed.x, Time.deltaTime * acceleration);
+                _speed.z = Mathf.Lerp(_controller.velocity.z, targetSpeed.z, Time.deltaTime * acceleration);
             }
             else
             {
-                _speed = targetSpeed;
+                _speed.x = Mathf.Lerp(_controller.velocity.x, targetSpeed.x, Time.deltaTime * deceleration);
+                _speed.z = Mathf.Lerp(_controller.velocity.z, targetSpeed.z, Time.deltaTime * deceleration);
             }
+
+
 
             // normalise input direction
             Vector3 inputDirection = new Vector3(newAxis.x, 0.0f, newAxis.z).normalized;
 
             // note: Vector2's != operator uses approximation so is not floating point error prone, and is cheaper than magnitude
             // if there is a move input rotate player when the player is moving
-            if (newAxis != Vector3.zero)
+            if (newAxis == Vector3.zero)
             {
                 // move
-                inputDirection = transform.right * newAxis.x + transform.forward * newAxis.z;
+                inputDirection = _controller.velocity.normalized;
+                //inputDirection = transform.right * newAxis.x + transform.forward * newAxis.z;
             }
 
             // move the player
-            Vector3 finalVelocity = inputDirection.normalized * (_speed * Time.deltaTime) + new Vector3(0.0f, _verticalVelocity, 0.0f) * Time.deltaTime;
+            //Vector3 finalVelocity = inputDirection.normalized * (_speed * Time.deltaTime) + new Vector3(0.0f, _verticalVelocity, 0.0f) * Time.deltaTime;
+            Vector3 finalVelocity = (_speed * Time.deltaTime) + new Vector3(0.0f, _verticalVelocity, 0.0f) * Time.deltaTime;
 
             _controller.Move(finalVelocity);
 

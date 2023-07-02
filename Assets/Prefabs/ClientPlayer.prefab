@@ -2428,7 +2428,6 @@ MonoBehaviour:
   currentStats:
     baseHealth: 0
     baseSpeed: 0
-    baseAccel: 0
     classEyeHeight: 0
   playerModels:
   - {fileID: 5307819127951601842}
@@ -2743,8 +2742,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fb533ed8a3542bc4ea5ea9fcc95b222a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  MoveSpeed: 4
-  SpeedChangeRate: 10
+  acceleration: 4
+  deceleration: 7
   JumpHeight: 1.2
   Gravity: -20
   JumpTimeout: 0.1
