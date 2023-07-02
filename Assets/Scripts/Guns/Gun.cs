@@ -9,6 +9,7 @@ public abstract class Gun : MonoBehaviour
     const float MINANGLE = 0.8f;
     const float MAXSPHERECASTDISTANCE = 20;
     const float MAXRAYCASTDISTANCE = 1000;
+    const float maxDamageFalloff = 20;
 
     [SerializeField]
     protected List<WeaponStats> changableStats = new List<WeaponStats>()
@@ -200,7 +201,11 @@ public abstract class Gun : MonoBehaviour
                     Player hitPlayer = hit.collider.GetComponent<Player>();
                     if (hitPlayer != null)
                     {
-                        hitPlayer.TakeDamage(player.GetPlayerID(), FindStat(ChangableWeaponStats.damage));
+                        int damage = Mathf.CeilToInt(Mathf.Max(0,Mathf.SmoothStep(FindStat(ChangableWeaponStats.damage),0, hit.distance / maxDamageFalloff)));
+                        if (damage > 0)
+                        {
+                            hitPlayer.TakeDamage(player.GetPlayerID(), damage);
+                        }
                     }
                 }
             }
