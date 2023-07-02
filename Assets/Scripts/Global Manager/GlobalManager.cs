@@ -9,6 +9,7 @@ using Unity.Services.Core;
 using Unity.Services.Relay;
 using Unity.Services.Relay.Models;
 using UnityEngine;
+using UnityEngine.Windows;
 
 public class GlobalManager : NetworkBehaviour
 {
@@ -160,13 +161,7 @@ public class GlobalManager : NetworkBehaviour
             {
                 clients[i].GetCurrentGun().Fire();
             }
-        }
-    }
 
-    private void FixedUpdate()
-    {
-        for (int i = 0; i < clients.Count; i++)
-        {
             PlayerDataSentToServer inputs = clients[i].GetTracker().GetPlayerNetworkData();
             clients[i].GetController().MovePlayer(inputs.rightJoystick, inputs.jump, inputs.crouch);
         }
