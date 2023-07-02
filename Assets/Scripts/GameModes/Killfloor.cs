@@ -10,7 +10,7 @@ public class Killfloor : MonoBehaviour
         Player player = other.GetComponent<Player>();
         if(player != null)
         {
-            player.TakeDamage(-1, 99999);
+            player.TakeDamage(player.GetPlayerID(), 99999);
         }
     }
 }
