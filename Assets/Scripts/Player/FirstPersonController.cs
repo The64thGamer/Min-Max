@@ -73,16 +73,7 @@ namespace StarterAssets
             forward.Normalize();
             right.Normalize();
             Vector3 newAxis = forward * _input.y + right * _input.x;
-
-            // normalise input direction
-            Vector3 inputDirection = new Vector3(newAxis.x, 0.0f, newAxis.z).normalized;
-
-            if (newAxis == Vector3.zero)
-            {
-                // move
-                inputDirection = new Vector3(_controller.velocity.x,0, _controller.velocity.z).normalized;
-            }
-            Vector3 targetSpeed = inputDirection * player.GetClassStats().baseSpeed / 25.0f;
+            Vector3 targetSpeed = new Vector3(newAxis.x, 0.0f, newAxis.z).normalized * player.GetClassStats().baseSpeed / 25.0f;
 
             Wire.WirePoint heldWire = player.GetWirePoint();
 
@@ -170,8 +161,6 @@ namespace StarterAssets
                 hasBeenStopped = false;
 
             }
-
-
 
             //Jump
             JumpAndGravity(jump);
