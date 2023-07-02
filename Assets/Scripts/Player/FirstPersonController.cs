@@ -7,8 +7,7 @@ namespace StarterAssets
     public class FirstPersonController : NetworkBehaviour
     {
         [Header("Player")]
-        public float acceleration = 100.0f;
-        public float deceleration = 1.0f;
+
 
         [Space(10)]
         [Tooltip("The height the player can jump")]
@@ -31,6 +30,9 @@ namespace StarterAssets
 
         //Consts
         const float crouchSpeed = 7;
+        const float acceleration = 9;
+        const float deceleration = 6;
+        const float hasMovedDeltaTimeout = 15;
 
         // player
         Vector3 _speed;
@@ -38,6 +40,7 @@ namespace StarterAssets
         float _terminalVelocity = 53.0f;
         float _jumpTimeoutDelta;
         float _fallTimeoutDelta;
+        float _hasBeenMovingDelta;
 
         //Midair Movement
         Vector3 oldAxis;
@@ -159,29 +162,40 @@ namespace StarterAssets
             {
                 hasBeenGrounded = false;
                 hasBeenStopped = false;
+                // accelerate or decelerate to target speed
+                if (newAxis == Vector3.zero) targetSpeed = Vector2.zero;
 
+                if (_hasBeenMovingDelta > 0.01f)
+                {
+                    if (targetSpeed != Vector3.zero)
+                    {
+                        _speed.x = Mathf.Lerp(_controller.velocity.x, targetSpeed.x, Time.deltaTime * acceleration);
+                        _speed.z = Mathf.Lerp(_controller.velocity.z, targetSpeed.z, Time.deltaTime * acceleration);
+                    }
+                    else
+                    {
+                        _speed.x = Mathf.Lerp(_controller.velocity.x, targetSpeed.x, Time.deltaTime * deceleration);
+                        _speed.z = Mathf.Lerp(_controller.velocity.z, targetSpeed.z, Time.deltaTime * deceleration);
+                    }
+                }
+                else
+                {
+                    _speed = targetSpeed;
+                }
             }
 
             //Jump
             JumpAndGravity(jump);
 
-            // note: Vector2's == operator uses approximation so is not floating point error prone, and is cheaper than magnitude
-            // if there is no input, set the target speed to 0
-            if (newAxis == Vector3.zero) targetSpeed = Vector2.zero;
-
-
-            // accelerate or decelerate to target speed
-
-            if (targetSpeed != Vector3.zero)
+            if (_input.magnitude == 0)
             {
-                _speed.x = Mathf.Lerp(_controller.velocity.x, targetSpeed.x, Time.deltaTime * acceleration);
-                _speed.z = Mathf.Lerp(_controller.velocity.z, targetSpeed.z, Time.deltaTime * acceleration);
+                _hasBeenMovingDelta = Mathf.Lerp(_hasBeenMovingDelta, 0, Time.deltaTime * hasMovedDeltaTimeout);
             }
             else
             {
-                _speed.x = Mathf.Lerp(_controller.velocity.x, targetSpeed.x, Time.deltaTime * deceleration);
-                _speed.z = Mathf.Lerp(_controller.velocity.z, targetSpeed.z, Time.deltaTime * deceleration);
+                _hasBeenMovingDelta = Mathf.Lerp(_hasBeenMovingDelta, 1, Time.deltaTime * hasMovedDeltaTimeout);
             }
+
 
             // move the player
             Vector3 finalVelocity = (_speed * Time.deltaTime) + new Vector3(0.0f, _verticalVelocity, 0.0f) * Time.deltaTime;
