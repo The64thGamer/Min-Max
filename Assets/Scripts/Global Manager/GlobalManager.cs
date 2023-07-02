@@ -788,7 +788,7 @@ public class GlobalManager : NetworkBehaviour
             {
                 clients[i].SetHealth(currentHealth);
             }
-            if (clients[i].GetPlayerID() == idOfKiller && clients[i].IsOwner)
+            if (clients[i].GetPlayerID() == idOfKiller && clients[i].IsOwner && id != idOfKiller)
             {
                 if(currentHealth <= 0)
                 {
