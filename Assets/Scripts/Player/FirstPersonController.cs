@@ -74,7 +74,15 @@ namespace StarterAssets
             right.Normalize();
             Vector3 newAxis = forward * _input.y + right * _input.x;
 
-            Vector3 targetSpeed = newAxis * player.GetClassStats().baseSpeed / 25.0f;
+            // normalise input direction
+            Vector3 inputDirection = new Vector3(newAxis.x, 0.0f, newAxis.z).normalized;
+
+            if (newAxis == Vector3.zero)
+            {
+                // move
+                inputDirection = new Vector3(_controller.velocity.x,0, _controller.velocity.z).normalized;
+            }
+            Vector3 targetSpeed = inputDirection * player.GetClassStats().baseSpeed / 25.0f;
 
             Wire.WirePoint heldWire = player.GetWirePoint();
 
@@ -186,22 +194,7 @@ namespace StarterAssets
                 _speed.z = Mathf.Lerp(_controller.velocity.z, targetSpeed.z, Time.deltaTime * deceleration);
             }
 
-
-
-            // normalise input direction
-            Vector3 inputDirection = new Vector3(newAxis.x, 0.0f, newAxis.z).normalized;
-
-            // note: Vector2's != operator uses approximation so is not floating point error prone, and is cheaper than magnitude
-            // if there is a move input rotate player when the player is moving
-            if (newAxis == Vector3.zero)
-            {
-                // move
-                inputDirection = _controller.velocity.normalized;
-                //inputDirection = transform.right * newAxis.x + transform.forward * newAxis.z;
-            }
-
             // move the player
-            //Vector3 finalVelocity = inputDirection.normalized * (_speed * Time.deltaTime) + new Vector3(0.0f, _verticalVelocity, 0.0f) * Time.deltaTime;
             Vector3 finalVelocity = (_speed * Time.deltaTime) + new Vector3(0.0f, _verticalVelocity, 0.0f) * Time.deltaTime;
 
             _controller.Move(finalVelocity);
