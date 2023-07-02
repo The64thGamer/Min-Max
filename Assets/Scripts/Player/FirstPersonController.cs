@@ -165,22 +165,23 @@ namespace StarterAssets
                 // accelerate or decelerate to target speed
                 if (newAxis == Vector3.zero) targetSpeed = Vector2.zero;
 
-                if (_hasBeenMovingDelta > 0.01f)
+
+                if (targetSpeed != Vector3.zero)
                 {
-                    if (targetSpeed != Vector3.zero)
+                    if (_hasBeenMovingDelta > 0.01f)
                     {
                         _speed.x = Mathf.Lerp(_controller.velocity.x, targetSpeed.x, Time.deltaTime * acceleration);
                         _speed.z = Mathf.Lerp(_controller.velocity.z, targetSpeed.z, Time.deltaTime * acceleration);
                     }
                     else
                     {
-                        _speed.x = Mathf.Lerp(_controller.velocity.x, targetSpeed.x, Time.deltaTime * deceleration);
-                        _speed.z = Mathf.Lerp(_controller.velocity.z, targetSpeed.z, Time.deltaTime * deceleration);
+                        _speed = targetSpeed;
                     }
                 }
                 else
                 {
-                    _speed = targetSpeed;
+                    _speed.x = Mathf.Lerp(_controller.velocity.x, targetSpeed.x, Time.deltaTime * deceleration);
+                    _speed.z = Mathf.Lerp(_controller.velocity.z, targetSpeed.z, Time.deltaTime * deceleration);
                 }
             }
 
