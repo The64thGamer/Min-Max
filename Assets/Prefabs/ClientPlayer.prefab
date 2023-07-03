@@ -2460,6 +2460,7 @@ MonoBehaviour:
   animController: {fileID: 0}
   modelRoot: {fileID: 0}
   playerRHand: {fileID: 0}
+  playerLHand: {fileID: 0}
   playerHead: {fileID: 0}
   upPos: {fileID: 4162775645214600964}
   downPos: {fileID: 3118867174539291273}
