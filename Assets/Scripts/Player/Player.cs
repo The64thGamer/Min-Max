@@ -440,12 +440,12 @@ public class Player : NetworkBehaviour
         trans.Find(meshName).gameObject.SetActive(set);
     }
 
-    public void ChangeHealth(ulong id, int amount)
+    public void ChangeHealth(ulong id, int amount, int idHash)
     {
         if (IsHost)
         {
             int finalHealth = Mathf.Min(currentHealth + amount, currentStats.baseHealth);
-            gm.PlayerTookDamageClientRpc(GetPlayerID(), finalHealth, id);
+            gm.PlayerTookDamageClientRpc(GetPlayerID(), finalHealth, id, idHash);
         }
     }
 

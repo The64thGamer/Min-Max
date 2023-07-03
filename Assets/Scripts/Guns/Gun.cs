@@ -173,6 +173,8 @@ public abstract class Gun : MonoBehaviour
             angleStep = 360f / (numBullets - 1);
         }
 
+        int bulletIdHash = Random.Range(-999999999, 999999999);
+
         for (int i = 0; i < numBullets; i++)
         {
             Vector3 finalAngle = fireAngle;
@@ -204,7 +206,7 @@ public abstract class Gun : MonoBehaviour
                         int damage = Mathf.CeilToInt(Mathf.Max(0,Mathf.SmoothStep(FindStat(ChangableWeaponStats.damage),0, hit.distance / maxDamageFalloff)));
                         if (damage > 0)
                         {
-                            hitPlayer.ChangeHealth(player.GetPlayerID(), -damage);
+                            hitPlayer.ChangeHealth(player.GetPlayerID(), -damage, bulletIdHash);
                         }
                     }
                 }

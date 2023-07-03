@@ -26,6 +26,7 @@ public class GlobalManager : NetworkBehaviour
     [SerializeField] List<Transform> teamGeometry;
     [SerializeField] List<Wire> teamWires;
     [SerializeField] List<Transform> teamBlocks;
+    List<int> damageHashes = new List<int>();
 
     //Ect
     AllStats al;
@@ -183,6 +184,8 @@ public class GlobalManager : NetworkBehaviour
             }
         }
         tickTimer += Time.deltaTime;
+
+        damageHashes = new List<int>();
     }
 
 
@@ -418,14 +421,14 @@ public class GlobalManager : NetworkBehaviour
         {
             Debug.Log("Player is Pinging Server, Sending Data");
             response.Approved = false;
-            response.Reason = "P" 
-                + clients.Count + "😂" 
-                + PlayerPrefs.GetInt("ServerMaxPlayers") + "😂" 
-                + PlayerPrefs.GetString("ServerName") + "😂" 
+            response.Reason = "P"
+                + clients.Count + "😂"
+                + PlayerPrefs.GetInt("ServerMaxPlayers") + "😂"
+                + PlayerPrefs.GetString("ServerName") + "😂"
                 + PlayerPrefs.GetInt("ServerMapName") + "😂"
                 + m_NetworkManager.NetworkConfig.ProtocolVersion;
         }
-        else if(payload[0] == 'C')
+        else if (payload[0] == 'C')
         {
             Debug.Log("Player is attempting to connect, Approved");
             response.Approved = true;
@@ -490,7 +493,7 @@ public class GlobalManager : NetworkBehaviour
         }
         Debug.Log("Player Spawned On Host");
         GameObject client = GameObject.Instantiate(clientPrefab, Vector3.zero, Quaternion.identity);
-        client.name = "Client #" + id; 
+        client.name = "Client #" + id;
         client.GetComponent<NetworkObject>().SpawnWithOwnership(id);
 
         //Client Object Spawning
@@ -569,7 +572,7 @@ public class GlobalManager : NetworkBehaviour
                 break;
         }
 
-        SendNewPlayerDataBackClientRpc(id, debugList, autoClass, cos.ToArray(),autoGun);
+        SendNewPlayerDataBackClientRpc(id, debugList, autoClass, cos.ToArray(), autoGun);
         RespawnPlayerClientRpc(id, debugList);
         PlayerInfoSentToClient[] data = new PlayerInfoSentToClient[clients.Count];
         for (int i = 0; i < clients.Count; i++)
@@ -701,7 +704,7 @@ public class GlobalManager : NetworkBehaviour
             }
         }
     }
-    
+
     [ClientRpc]
     void SendNewPlayerDataBackClientRpc(ulong id, TeamList team, ClassList autoClass, int[] cosmetics, string gunName)
     {
@@ -710,7 +713,7 @@ public class GlobalManager : NetworkBehaviour
             if (clients[i].GetPlayerID() == id)
             {
                 clients[i].SetTeam(team);
-                clients[i].SetClass(autoClass,cosmetics);
+                clients[i].SetClass(autoClass, cosmetics);
                 clients[i].SetGun(al.SearchGuns(gunName));
                 return;
             }
@@ -772,7 +775,7 @@ public class GlobalManager : NetworkBehaviour
     }
 
     [ClientRpc]
-    public void PlayerTookDamageClientRpc(ulong id, int currentHealth, ulong idOfKiller)
+    public void PlayerTookDamageClientRpc(ulong id, int currentHealth, ulong idOfKiller, int idHash)
     {
         if (currentHealth <= 0)
         {
@@ -790,9 +793,22 @@ public class GlobalManager : NetworkBehaviour
             }
             if (clients[i].GetPlayerID() == idOfKiller && clients[i].IsOwner && id != idOfKiller)
             {
-                if(currentHealth <= 0)
+                if (currentHealth <= 0)
                 {
-                    au.PlayOneShot((AudioClip)Resources.Load("Sounds/Damage/killsound", typeof(AudioClip)));
+                    //Ensures a gun firing 10 bullets doesn't play 10 hitsounds
+                    bool isntDuplicate = true;
+                    for (int e = 0; e < damageHashes.Count; e++)
+                    {
+                        if (damageHashes[e] == idHash)
+                        {
+                            isntDuplicate = false;
+                        }
+                    }
+                    if (isntDuplicate)
+                    {
+                        au.PlayOneShot((AudioClip)Resources.Load("Sounds/Damage/killsound", typeof(AudioClip)));
+                        damageHashes.Add(idHash);
+                    }
                 }
                 else
                 {
