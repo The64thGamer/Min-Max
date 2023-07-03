@@ -639,7 +639,10 @@ public class GlobalManager : NetworkBehaviour
         }
         for (int i = 0; i < teamWires.Count; i++)
         {
-            teamWires[i].RemoveAllWires();
+            if (teamWires[i] != null)
+            {
+                teamWires[i].RemoveAllWires();
+            }
         }
     }
 
