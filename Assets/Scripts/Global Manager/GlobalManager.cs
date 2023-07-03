@@ -630,7 +630,18 @@ public class GlobalManager : NetworkBehaviour
         }
     }
 
-
+    [ClientRpc]
+    public void RemoveAllWiresClientRpc()
+    {
+        for (int i = 0; i < clients.Count; i++)
+        {
+            clients[i].RemoveHeldWire(Vector3.zero);
+        }
+        for (int i = 0; i < teamWires.Count; i++)
+        {
+            teamWires[i].RemoveAllWires();
+        }
+    }
 
     [ClientRpc]
     public void GiveClientWireClientRpc(ulong id, uint wireID, uint parentID, TeamList teamWireNeeded)
@@ -660,7 +671,6 @@ public class GlobalManager : NetworkBehaviour
     [ClientRpc]
     public void RemoveClientWireClientRpc(ulong id, Vector3 finalPos)
     {
-        if (IsHost) { return; }
         for (int i = 0; i < clients.Count; i++)
         {
             if (clients[i].GetPlayerID() == id)
