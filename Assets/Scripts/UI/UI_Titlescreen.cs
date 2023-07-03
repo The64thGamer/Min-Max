@@ -39,10 +39,12 @@ public class UI_Titlescreen : MonoBehaviour
 
     bool serverAttempt;
     bool serverFail;
+    string serverFailMessage;
 
     private void OnEnable()
     {
         //Pinging
+        m_NetworkManager = GameObject.Find("Transport").GetComponent<NetworkManager>();
         if (m_NetworkManager != null)
         {
             m_NetworkManager.OnClientDisconnectCallback += OnClientDisconnectCallback;
@@ -345,7 +347,7 @@ public class UI_Titlescreen : MonoBehaviour
         catch (RelayServiceException e)
         {
             serverFail = true;
-            Debug.Log(e);
+            serverFailMessage = e.Message;
         }
     }
 
@@ -364,11 +366,7 @@ public class UI_Titlescreen : MonoBehaviour
             {
                 yield return null;
             }
-            if (serverFail)
-            {
-                name.text = "Could Not Connect To Server.";
-            }
-            else
+            if (!serverFail)
             {
                 PlayerPrefs.SetString("JoinCode", PlayerPrefs.GetString("GlobalServer" + index));
             }
@@ -392,15 +390,23 @@ public class UI_Titlescreen : MonoBehaviour
                 {
                     if (!foundLocalServer)
                     {
-                        m_NetworkManager.Shutdown();
-                        name.text = "Could Not Connect To Server.";
-                        root.Q<VisualElement>("NewLocalDeleteGame").style.display = DisplayStyle.Flex;
+                        serverFail = true;
+                        serverFailMessage = "Could Not Connect To Server.";
                     }
                     break;
                 }
                 secondCount++;
                 yield return new WaitForSeconds(1.0f);
             }
+        }
+        if(serverFail)
+        {
+            if (m_NetworkManager != null && m_NetworkManager.isActiveAndEnabled)
+            {
+                m_NetworkManager.Shutdown();
+            }
+            name.text = serverFailMessage;
+            root.Q<VisualElement>("NewLocalDeleteGame").style.display = DisplayStyle.Flex;
         }
         serverCheckRunning = false;
         serverFail = false;

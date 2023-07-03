@@ -93,24 +93,31 @@ MonoBehaviour:
     m_ObsoleteSerializedBakingSets: []
     sceneToBakingSet:
       m_Keys:
-      - e342c76d9b4ae37408571a894f4c6852
       - b4afb4ee269afcf428e8364099b45161
+      - e342c76d9b4ae37408571a894f4c6852
+      - ee3c2ec27616fbb4fbf23b6e66e45ffe
+      - b7248a0a181720f4dbad0677a6b925f6
       m_Values:
-      - {fileID: 11400000, guid: 9270d4f33f5248949b907eaa601b848f, type: 2}
-      - {fileID: 11400000, guid: 8fb2d63f7fe69894b931e30b01044fdd, type: 2}
+      - {fileID: 11400000, guid: 2086e11c8aa625148ab37554037ee413, type: 2}
+      - {fileID: 11400000, guid: 4683078c91e7e1f4c8db08f5cf45b324, type: 2}
+      - {fileID: 11400000, guid: 9bc93989d2155da4b879d8c1d6476110, type: 2}
+      - {fileID: 11400000, guid: 50a8d5925bcef23498c298e1e6c9fc1a, type: 2}
     bakingSets:
     - {fileID: 11400000, guid: 2086e11c8aa625148ab37554037ee413, type: 2}
+    - {fileID: 11400000, guid: 4683078c91e7e1f4c8db08f5cf45b324, type: 2}
     - {fileID: 11400000, guid: 9270d4f33f5248949b907eaa601b848f, type: 2}
-    - {fileID: 11400000, guid: 8fb2d63f7fe69894b931e30b01044fdd, type: 2}
+    - {fileID: 11400000, guid: 9bc93989d2155da4b879d8c1d6476110, type: 2}
+    - {fileID: 11400000, guid: 80eab57fba1df2d43884ad060dd3f8d0, type: 2}
+    - {fileID: 11400000, guid: 50a8d5925bcef23498c298e1e6c9fc1a, type: 2}
     sceneBounds:
       m_Keys: []
       m_Values: []
     hasProbeVolumes:
       m_Keys: []
       m_Values: 
-  m_PrefilteringModeMainLightShadows: 1
+  m_PrefilteringModeMainLightShadows: 0
   m_PrefilteringModeAdditionalLight: 1
-  m_PrefilteringModeAdditionalLightShadows: 2
+  m_PrefilteringModeAdditionalLightShadows: 0
   m_PrefilterXRKeywords: 0
   m_PrefilteringModeForwardPlus: 0
   m_PrefilteringModeDeferredRendering: 0
