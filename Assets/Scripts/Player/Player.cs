@@ -477,9 +477,9 @@ public class Player : NetworkBehaviour
         if (heldWire != null)
         {
             wireSounds.RemoveWire();
+            heldWire.point = finalPos;
+            heldWire = null;
         }
-        heldWire.point = finalPos;
-        heldWire = null;
     }
 
     public void SetWirePoint(Wire.WirePoint wire)

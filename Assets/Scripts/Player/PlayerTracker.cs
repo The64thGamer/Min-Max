@@ -37,7 +37,9 @@ public class PlayerTracker : NetworkBehaviour
     [SerializeField] Player player;
     [SerializeField] CharacterController charController;
 
+    //other
     bool isInFirstPerson;
+    bool alreadyPressed;
 
     //Modified by either the player or the server
     Vector2 movementAxis;
@@ -77,7 +79,16 @@ public class PlayerTracker : NetworkBehaviour
             rhandAButton = jump.action.IsPressed();
             triggerR = triggerRAction.action.IsPressed();
             triggerL = triggerLAction.action.IsPressed();
-            pressRstick = pressRStickAction.action.IsPressed();
+
+            if (pressRStickAction.action.IsPressed() && !alreadyPressed)
+            {
+                alreadyPressed = true;
+                pressRstick = !pressRstick;
+            }
+            if(!pressRStickAction.action.IsPressed())
+            {
+                alreadyPressed = false;
+            }
         }
     }
 
@@ -95,7 +106,7 @@ public class PlayerTracker : NetworkBehaviour
             animController.SetFloat("HandX", CalcLerpVector3(centerPos.position, rightPos.position, rightController.position, false) - CalcLerpVector3(centerPos.position, leftPos.position, rightController.position, false));
             animController.SetFloat("HandY", CalcLerpVector3(centerPos.position, upPos.position, rightController.position, true) - CalcLerpVector3(centerPos.position, downPos.position, rightController.position, true));
             playerHead.rotation = headset.rotation;
-            modelRoot.rotation = Quaternion.Lerp(modelRoot.rotation, playerHead.rotation, Time.deltaTime*3);
+            modelRoot.rotation = Quaternion.Lerp(modelRoot.rotation, playerHead.rotation, Time.deltaTime * 3);
             modelRoot.eulerAngles = new Vector3(0, modelRoot.eulerAngles.y, 0);
             modelRoot.position = forwardRoot.position;
             playerRHand.rotation = rightController.rotation;
@@ -115,7 +126,7 @@ public class PlayerTracker : NetworkBehaviour
         if (!IsHost)
         {
             //Lerping client-side movement with server positions for a smoother experience
-            transform.position = Vector3.Lerp(transform.position, predictedPos, Mathf.Clamp01(Vector3.Distance(transform.position, predictedPos)-1));
+            transform.position = Vector3.Lerp(transform.position, predictedPos, Mathf.Clamp01(Vector3.Distance(transform.position, predictedPos) - 1));
         }
     }
     void OnEnable()
@@ -158,7 +169,7 @@ public class PlayerTracker : NetworkBehaviour
 
     public void ServerSyncPlayerInputs(PlayerDataSentToServer data)
     {
-        if(data.predictionTime < predictionTime) { return; }
+        if (data.predictionTime < predictionTime) { return; }
         headset.localPosition = data.headsetPos;
         headset.rotation = data.headsetRot;
         rightController.localPosition = data.rHandPos;
@@ -305,7 +316,7 @@ public class PlayerTracker : NetworkBehaviour
         return modelRoot;
     }
 
-    public void SetCharacter(Animator playerAnim, Transform rootModel, Transform rHandPlayer,Transform lHandPlayer, Transform headPlayer, bool firstPerson)
+    public void SetCharacter(Animator playerAnim, Transform rootModel, Transform rHandPlayer, Transform lHandPlayer, Transform headPlayer, bool firstPerson)
     {
         animController = playerAnim;
         modelRoot = rootModel;

@@ -31,6 +31,18 @@ public class Wire : MonoBehaviour
         }
     }
 
+    //There is a potential bug that if someone times out long enough after this reset
+    //and someone else creates a wire from the starting point, and then again,
+    //that it would error out. Error wire creation should have a backup to re-download
+    //the server's wiring.
+    public void RemoveAllWires()
+    {
+        foreach (Transform child in transform)
+        {
+            GameObject.Destroy(child.gameObject);
+        }
+    }
+
     public WirePoint RequestForWire(Vector3 playerPos)
     {
         //This should only be called by the host
