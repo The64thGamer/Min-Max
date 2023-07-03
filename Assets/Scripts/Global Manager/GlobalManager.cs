@@ -734,6 +734,19 @@ public class GlobalManager : NetworkBehaviour
     }
 
     [ClientRpc]
+    public void SetPlayerTeam(ulong id, TeamList team)
+    {
+        for (int i = 0; i < clients.Count; i++)
+        {
+            if (clients[i].GetPlayerID() == id)
+            {
+                clients[i].SetTeam(team);
+                return;
+            }
+        }
+    }
+
+    [ClientRpc]
     void SendAllPlayerDataToNewPlayerClientRpc(PlayerInfoSentToClient[] data, ulong id)
     {
         for (int i = 0; i < clients.Count; i++)

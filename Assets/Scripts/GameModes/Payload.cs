@@ -74,7 +74,7 @@ public class Payload : GenericGamemode
         //Re-apply Player Teams
         for (int i = 0; i < clients.Count; i++)
         {
-            clients[i].SetTeam(gm.GetTeams()[clientTeams[i]].teamColor);
+            gm.SetPlayerTeam(clients[i].GetPlayerID(), gm.GetTeams()[clientTeams[i]].teamColor);
         }
 
         gm.ModifyTeamsAcrossServer();
