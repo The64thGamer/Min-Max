@@ -27,11 +27,11 @@ public abstract class GenericGamemode : NetworkBehaviour
             {
                 if (clients[i].GetTeam() == team1)
                 {
-                    gm.SetPlayerTeam(clients[i].GetPlayerID(), team2);
+                    gm.SetPlayerTeamClientRpc(clients[i].GetPlayerID(), team2);
                 }
                 else if (clients[i].GetTeam() == team2)
                 {
-                    gm.SetPlayerTeam(clients[i].GetPlayerID(), team1);
+                    gm.SetPlayerTeamClientRpc(clients[i].GetPlayerID(), team1);
                 }
             }
 

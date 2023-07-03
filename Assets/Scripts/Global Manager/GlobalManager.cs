@@ -734,7 +734,7 @@ public class GlobalManager : NetworkBehaviour
     }
 
     [ClientRpc]
-    public void SetPlayerTeam(ulong id, TeamList team)
+    public void SetPlayerTeamClientRpc(ulong id, TeamList team)
     {
         for (int i = 0; i < clients.Count; i++)
         {
