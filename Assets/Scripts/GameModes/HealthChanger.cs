@@ -9,10 +9,13 @@ public class HealthChanger : MonoBehaviour
     [SerializeField] DamageChangerSettings setting;
     [SerializeField] float respawnTime;
     [SerializeField] float looptime;
+    [SerializeField] bool healthIsPercent;
+    [SerializeField] bool spinObject;
 
     float loopTimer;
     float respawningTimer;
-    List<Player> currentPlayer;
+    List<Player> currentPlayer = new List<Player>();
+    bool alreadyDespawn;
 
     private void OnTriggerEnter(Collider other)
     {
@@ -40,7 +43,11 @@ public class HealthChanger : MonoBehaviour
         {
             case DamageChangerSettings.despawnOnTouch:
                 respawningTimer = Mathf.Max(0, respawningTimer - Time.deltaTime);
-                RespawnDespawn(true);
+                if(respawningTimer == 0)
+                {
+                    RespawnDespawn(true);
+                    alreadyDespawn = true;
+                }
                 break;
             case DamageChangerSettings.loopWhileInside:
                 loopTimer = Mathf.Max(0, loopTimer - Time.deltaTime);
@@ -48,6 +55,10 @@ public class HealthChanger : MonoBehaviour
                 break;
             default:
                 break;
+        }
+        if(spinObject)
+        {
+            this.transform.Rotate(Vector3.up,Time.deltaTime * 100);
         }
     }
 
@@ -60,6 +71,7 @@ public class HealthChanger : MonoBehaviour
                 case DamageChangerSettings.despawnOnTouch:
                     if (respawningTimer <= 0)
                     {
+                        alreadyDespawn = false;
                         respawningTimer = respawnTime;
                         TakeDamage();
                         RespawnDespawn(false);
@@ -85,22 +97,30 @@ public class HealthChanger : MonoBehaviour
         {
             if (currentPlayer != null)
             {
-                currentPlayer[i].TakeDamage(currentPlayer[i].GetPlayerID(), health);
+                int healthFinal = health;
+                if(healthIsPercent)
+                {
+                    healthFinal = Mathf.CeilToInt((currentPlayer[i].GetClassStats().baseHealth / 100.0f) * health);
+                }
+                currentPlayer[i].ChangeHealth(currentPlayer[i].GetPlayerID(), healthFinal);
             }
         }
     }
 
     void RespawnDespawn(bool respawn)
     {
-        Renderer[] rend = this.GetComponentsInChildren<Renderer>();
-        for (int i = 0; i < rend.Length; i++)
+        if (!alreadyDespawn)
         {
-            rend[i].enabled = respawn;
-        }
-        this.GetComponent<BoxCollider>().enabled = respawn;
-        if(!respawn)
-        {
-            currentPlayer = new List<Player>();
+            Renderer[] rend = this.GetComponentsInChildren<Renderer>();
+            for (int i = 0; i < rend.Length; i++)
+            {
+                rend[i].enabled = respawn;
+            }
+            this.GetComponent<BoxCollider>().enabled = respawn;
+            if (!respawn)
+            {
+                currentPlayer = new List<Player>();
+            }
         }
     }
 

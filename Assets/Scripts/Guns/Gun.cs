@@ -204,7 +204,7 @@ public abstract class Gun : MonoBehaviour
                         int damage = Mathf.CeilToInt(Mathf.Max(0,Mathf.SmoothStep(FindStat(ChangableWeaponStats.damage),0, hit.distance / maxDamageFalloff)));
                         if (damage > 0)
                         {
-                            hitPlayer.TakeDamage(player.GetPlayerID(), damage);
+                            hitPlayer.ChangeHealth(player.GetPlayerID(), -damage);
                         }
                     }
                 }
