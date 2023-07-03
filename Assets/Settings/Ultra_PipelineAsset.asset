@@ -93,21 +93,11 @@ MonoBehaviour:
     m_ObsoleteSerializedBakingSets: []
     sceneToBakingSet:
       m_Keys:
-      - e342c76d9b4ae37408571a894f4c6852
       - ee3c2ec27616fbb4fbf23b6e66e45ffe
-      - b7248a0a181720f4dbad0677a6b925f6
-      - b4afb4ee269afcf428e8364099b45161
       m_Values:
-      - {fileID: 11400000, guid: 9270d4f33f5248949b907eaa601b848f, type: 2}
       - {fileID: 11400000, guid: 80eab57fba1df2d43884ad060dd3f8d0, type: 2}
-      - {fileID: 11400000, guid: b08fb5193980d484589548ef27dbf7c2, type: 2}
-      - {fileID: 11400000, guid: 8fb2d63f7fe69894b931e30b01044fdd, type: 2}
     bakingSets:
-    - {fileID: 11400000, guid: 2086e11c8aa625148ab37554037ee413, type: 2}
-    - {fileID: 11400000, guid: 9270d4f33f5248949b907eaa601b848f, type: 2}
     - {fileID: 11400000, guid: 80eab57fba1df2d43884ad060dd3f8d0, type: 2}
-    - {fileID: 11400000, guid: b08fb5193980d484589548ef27dbf7c2, type: 2}
-    - {fileID: 11400000, guid: 8fb2d63f7fe69894b931e30b01044fdd, type: 2}
     sceneBounds:
       m_Keys:
       - e342c76d9b4ae37408571a894f4c6852

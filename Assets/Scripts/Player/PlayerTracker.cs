@@ -63,7 +63,7 @@ public class PlayerTracker : NetworkBehaviour
     Vector3 predictedPos;
 
     //Const
-    const float crouchMinHeight = 0.7f;
+    const float crouchMinHeight = -0.3f;
 
     public enum ButtonState
     {
@@ -335,7 +335,7 @@ public class PlayerTracker : NetworkBehaviour
 
     public void ModifyPlayerHeight(float crouchHeight)
     {
-        camOffset.localPosition = new Vector3(0, (height - 0.127f) * (((1 - crouchHeight) * (1 - crouchMinHeight)) + crouchMinHeight), 0);
+        camOffset.localPosition = new Vector3(0, Mathf.Lerp(0,crouchMinHeight,crouchHeight), 0);
     }
 
 

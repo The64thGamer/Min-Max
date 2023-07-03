@@ -9,6 +9,7 @@ public class MouseLook : NetworkBehaviour
     [SerializeField] Transform cam;
     [SerializeField] Transform handR;
     [SerializeField] Transform handL;
+    [SerializeField] Transform firstPersonOffset;
 
     const float sensitivity = 10f;
     const float maxYAngle = 80f;
@@ -23,6 +24,7 @@ public class MouseLook : NetworkBehaviour
         }
         else
         {
+            firstPersonOffset.transform.localPosition = new Vector3(0, PlayerPrefs.GetFloat("PlayerHeight") - 0.127f, 0);
             UnityEngine.Cursor.lockState = CursorLockMode.Locked;
             UnityEngine.Cursor.visible = false;
             Destroy(cam.GetComponent<TrackedPoseDriver>());
