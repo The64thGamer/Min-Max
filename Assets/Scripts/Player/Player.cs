@@ -28,6 +28,7 @@ public class Player : NetworkBehaviour
     AllStats al;
     bool currentPlayerVisibility;
     Wire.WirePoint heldWire;
+    int currentHealth;
 
     public override void OnNetworkSpawn()
     {
@@ -73,6 +74,7 @@ public class Player : NetworkBehaviour
         cosmeticInts = classCosmetics;
         currentClass = setClass;
         currentStats = gm.GetComponent<AllStats>().GetClassStats(setClass);
+        currentHealth = currentStats.baseHealth;
         SetupCosmetics(classCosmetics);
         SetCharacterVisibility(currentPlayerVisibility);
         UpdateTeamColor();
@@ -332,22 +334,6 @@ public class Player : NetworkBehaviour
                         SetMeshVis(t, "Skin Leg R", false);
                     }
 
-                    //Animation
-                    Transform handR = null;
-                    Transform head = null;
-                    foreach (Transform g in transform.GetComponentsInChildren<Transform>())
-                    {
-                        if (g.name == "Hand R")
-                        {
-                            handR = g;
-                        }
-                        if (g.name == "Head")
-                        {
-                            head = g;
-                        }
-                    }
-                    GetTracker().SetCharacter(playerModels[i].GetComponentInChildren<Animator>(), playerModels[i].transform, handR, head);
-
                     //Apply Cosmetics
                     for (int e = 0; e < cosmeticInts.Length; e++)
                     {
@@ -378,6 +364,26 @@ public class Player : NetworkBehaviour
                         }
                     }
                 }
+                //Animation
+                Transform handR = null;
+                Transform handL = null;
+                Transform head = null;
+                foreach (Transform g in playerModels[i].GetComponentsInChildren<Transform>())
+                {
+                    if (g.name == "Hand R")
+                    {
+                        handR = g;
+                    }
+                    if (g.name == "Hand L")
+                    {
+                        handL = g;
+                    }
+                    if (g.name == "Head")
+                    {
+                        head = g;
+                    }
+                }
+                GetTracker().SetCharacter(playerModels[i].GetComponentInChildren<Animator>(), playerModels[i].transform, handR, handL, head, !visible);
             }
             else
             {
@@ -434,18 +440,18 @@ public class Player : NetworkBehaviour
         trans.Find(meshName).gameObject.SetActive(set);
     }
 
-    public void TakeDamage(ulong id, int amount)
+    public void ChangeHealth(ulong id, int amount)
     {
         if (IsHost)
         {
-            int currentHealth = currentStats.baseHealth - amount;
-            gm.PlayerTookDamageClientRpc(GetPlayerID(), currentHealth, id);
+            int finalHealth = Mathf.Min(currentHealth + amount, currentStats.baseHealth);
+            gm.PlayerTookDamageClientRpc(GetPlayerID(), finalHealth, id);
         }
     }
 
     public void SetHealth(int health)
     {
-        currentStats.baseHealth = health;
+        currentHealth = health;
         if (health <= 0)
         {
             if (IsHost)
@@ -455,9 +461,15 @@ public class Player : NetworkBehaviour
         }
     }
 
+    public int GetHealth()
+    {
+        return currentHealth;
+    }
+
     public void ResetClassStats()
     {
         currentStats = al.GetClassStats(currentClass);
+        currentHealth = currentStats.baseHealth;
     }
 
     public void RemoveHeldWire(Vector3 finalPos)

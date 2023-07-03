@@ -17,6 +17,7 @@ public class PlayerTracker : NetworkBehaviour
     [SerializeField] Animator animController;
     [SerializeField] Transform modelRoot;
     [SerializeField] Transform playerRHand;
+    [SerializeField] Transform playerLHand;
     [SerializeField] Transform playerHead;
 
 
@@ -35,6 +36,8 @@ public class PlayerTracker : NetworkBehaviour
     [SerializeField] InputActionProperty pressRStickAction;
     [SerializeField] Player player;
     [SerializeField] CharacterController charController;
+
+    bool isInFirstPerson;
 
     //Modified by either the player or the server
     Vector2 movementAxis;
@@ -87,17 +90,26 @@ public class PlayerTracker : NetworkBehaviour
         prevRHandRight = rightController.right;
 
         //Animations
-        if (animController != null && animController.gameObject.activeSelf)
+        if (animController != null)
         {
             animController.SetFloat("HandX", CalcLerpVector3(centerPos.position, rightPos.position, rightController.position, false) - CalcLerpVector3(centerPos.position, leftPos.position, rightController.position, false));
             animController.SetFloat("HandY", CalcLerpVector3(centerPos.position, upPos.position, rightController.position, true) - CalcLerpVector3(centerPos.position, downPos.position, rightController.position, true));
-            playerRHand.rotation = rightController.rotation;
-            playerRHand.Rotate(new Vector3(-90, 180, 0));
-            playerRHand.Rotate(new Vector3(9.99f, 27.48f, 0));
             playerHead.rotation = headset.rotation;
             modelRoot.rotation = Quaternion.Lerp(modelRoot.rotation, playerHead.rotation, Time.deltaTime*3);
             modelRoot.eulerAngles = new Vector3(0, modelRoot.eulerAngles.y, 0);
             modelRoot.position = forwardRoot.position;
+            playerRHand.rotation = rightController.rotation;
+            playerRHand.Rotate(new Vector3(-90, 180, 0));
+            playerRHand.Rotate(new Vector3(9.99f, 27.48f, 0));
+            if (isInFirstPerson)
+            {
+                playerRHand.position = rightController.position;
+
+                playerLHand.position = leftController.position;
+                playerLHand.rotation = leftController.rotation;
+                playerLHand.Rotate(new Vector3(-90, 180, 0));
+                playerLHand.Rotate(new Vector3(9.99f, 27.48f, 0));
+            }
         }
 
         if (!IsHost)
@@ -293,12 +305,14 @@ public class PlayerTracker : NetworkBehaviour
         return modelRoot;
     }
 
-    public void SetCharacter(Animator playerAnim, Transform rootModel, Transform rHandPlayer, Transform headPlayer)
+    public void SetCharacter(Animator playerAnim, Transform rootModel, Transform rHandPlayer,Transform lHandPlayer, Transform headPlayer, bool firstPerson)
     {
         animController = playerAnim;
         modelRoot = rootModel;
         playerRHand = rHandPlayer;
+        playerLHand = lHandPlayer;
         playerHead = headPlayer;
+        isInFirstPerson = firstPerson;
     }
 
     public void ModifyPlayerHeight(float crouchHeight)
