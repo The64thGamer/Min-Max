@@ -5,7 +5,14 @@ using UnityEngine.Events;
 
 public class WireCheck : MonoBehaviour
 {
-    [SerializeField] UnityEvent wireFound; 
+    [SerializeField] UnityEvent wireFound;
+    [SerializeField] int attackerTeam = 1;
+    GlobalManager gm;
+    private void Start()
+    {
+        gm = GameObject.Find("Global Manager").GetComponent<GlobalManager>();
+    }
+
     private void OnTriggerEnter(Collider other)
     {
         Player player = other.GetComponent<Player>();
@@ -14,7 +21,10 @@ public class WireCheck : MonoBehaviour
             Wire.WirePoint wire = player.GetWirePoint();
             if(wire != null)
             {
-                wireFound.Invoke();
+                if (player.GetTeam() == gm.GetTeams()[attackerTeam].teamColor)
+                {
+                    wireFound.Invoke();
+                }
             }
         }
     }

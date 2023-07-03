@@ -13,7 +13,7 @@ public abstract class GenericGamemode : NetworkBehaviour
 
     public void ResetMatch()
     {
-        if(IsHost)
+        if (IsHost)
         {
             GlobalManager gm = GameObject.Find("Global Manager").GetComponent<GlobalManager>();
             gm.RemoveAllWiresClientRpc();
@@ -83,13 +83,13 @@ public abstract class GenericGamemode : NetworkBehaviour
                         default:
                             break;
                     }
-                    if(i > 0)
+                    if (i > 0)
                     {
                         //Finds the best possible teams that complements the current ones
                         otherOptions = oldOptions.Intersect(otherOptions).ToArray();
 
                         //If no valid best possible result, pick a random team not chosen yet.
-                        if(otherOptions.Length == 0)
+                        if (otherOptions.Length == 0)
                         {
                             List<TeamList> allteams = new List<TeamList> { TeamList.orange, TeamList.yellow, TeamList.green, TeamList.lightBlue, TeamList.blue, TeamList.purple, TeamList.beige, TeamList.brown };
                             for (int e = 0; e < teamRef.Count; e++)
