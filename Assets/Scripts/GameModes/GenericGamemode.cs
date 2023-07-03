@@ -4,12 +4,43 @@ using System.Linq;
 using Unity.Netcode;
 using UnityEngine;
 
-public abstract class GenericGamemode : MonoBehaviour
+public abstract class GenericGamemode : NetworkBehaviour
 {
     public abstract void SetTeams();
     public abstract void SetTeams(List<TeamList> setTeams);
 
     public abstract TeamList DecideWhichPlayerTeam();
+
+    public void ResetMatch()
+    {
+        if(IsHost)
+        {
+            GlobalManager gm = GameObject.Find("Global Manager").GetComponent<GlobalManager>();
+            gm.RemoveAllWiresClientRpc();
+            List<Player> clients = gm.GetClients();
+
+            //Assuming only 2 teams, please rewrite later
+            TeamList team1 = gm.GetTeams()[1].teamColor;
+            TeamList team2 = gm.GetTeams()[2].teamColor;
+
+            for (int i = 0; i < clients.Count; i++)
+            {
+                if (clients[i].GetTeam() == team1)
+                {
+                    clients[i].SetTeam(team2);
+                }
+                if (clients[i].GetTeam() == team2)
+                {
+                    clients[i].SetTeam(team1);
+                }
+            }
+
+            for (int i = 0; i < clients.Count; i++)
+            {
+                gm.RespawnPlayerClientRpc(clients[i].GetPlayerID(), clients[i].GetTeam());
+            }
+        }
+    }
 
     protected TeamList SelectTeams(List<TeamList> teamRef, int setting)
     {

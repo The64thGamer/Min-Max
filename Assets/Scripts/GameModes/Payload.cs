@@ -9,6 +9,8 @@ public class Payload : GenericGamemode
     GlobalManager gm;
     [UnityEngine.Range(2,8)]
     [SerializeField] uint noOfTeams = 2;
+    [SerializeField]
+
     private void Start()
     {
         gm = this.GetComponent<GlobalManager>();

@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using Unity.Netcode;
 using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.InputSystem.HID;
 
 public class Wire : MonoBehaviour
 {
@@ -37,10 +38,12 @@ public class Wire : MonoBehaviour
     //the server's wiring.
     public void RemoveAllWires()
     {
-        foreach (Transform child in transform)
+        for (int i = 0; i < meshes.Count; i++)
         {
-            GameObject.Destroy(child.gameObject);
+            GameObject.Destroy(meshes[i].gameObject);
         }
+        meshes = new List<LineRenderer>();
+        startingWire.children = new List<WirePoint>();
     }
 
     public WirePoint RequestForWire(Vector3 playerPos)
@@ -95,7 +98,7 @@ public class Wire : MonoBehaviour
     {
         GameObject bruh = new GameObject();
         bruh.name = "WirePoint";
-        bruh.transform.parent = transform;
+        bruh.transform.parent = startPoint;
         LineRenderer lr = bruh.AddComponent<LineRenderer>();
         lr.material = wireMat;
         lr.material.color = palette.GetPixel((int)currentTeam, 7);
