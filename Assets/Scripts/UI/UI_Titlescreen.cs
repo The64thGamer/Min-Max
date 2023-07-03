@@ -386,7 +386,7 @@ public class UI_Titlescreen : MonoBehaviour
                 {
                     name.text += ". ";
                 }
-                if (secondCount == 5)
+                if (secondCount >= 10)
                 {
                     if (!foundLocalServer)
                     {
