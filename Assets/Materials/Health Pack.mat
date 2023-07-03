@@ -20,7 +20,7 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: GoreSlice
+  m_Name: Health Pack
   m_Shader: {fileID: -6465566751694194690, guid: a0d5affa1328c2c46a308ae09a2d4540,
     type: 3}
   m_Parent: {fileID: 0}
@@ -40,7 +40,7 @@ Material:
     serializedVersion: 3
     m_TexEnvs:
     - _Base:
-        m_Texture: {fileID: 2800000, guid: 13f73eaf34143e4429b44b05502e650f, type: 3}
+        m_Texture: {fileID: 2800000, guid: 97d5cc7f9ec22e64dbb8c276a305d093, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _BaseMap:
@@ -76,11 +76,11 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _MixMap:
-        m_Texture: {fileID: 2800000, guid: 9efaf7ef21c9ea84797f63b8c5958da5, type: 3}
+        m_Texture: {fileID: 2800000, guid: c08bf4a1173ab3a4c90517be7a59984b, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _Normal:
-        m_Texture: {fileID: 2800000, guid: 61886e7ce53e87a4f92497069ec26b10, type: 3}
+        m_Texture: {fileID: 2800000, guid: c00c59a2ea0999f46b4451799e817c22, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _OcclusionMap:
@@ -185,9 +185,10 @@ Material:
     - _Team_1: 0
     - _WorkflowMode: 1
     - _ZWrite: 1
+    - _aaaa: 0.2
     m_Colors:
     - _BaseColor: {r: 1, g: 1, b: 1, a: 1}
-    - _Base_Color: {r: 1, g: 1, b: 1, a: 1}
+    - _Base_Color: {r: 1, g: 1, b: 1, a: 0}
     - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _SpecColor: {r: 0.19999996, g: 0.19999996, b: 0.19999996, a: 1}
