@@ -40,6 +40,8 @@ public class PlayerTracker : NetworkBehaviour
     //other
     bool isInFirstPerson;
     bool alreadyPressed;
+    float height;
+
 
     //Modified by either the player or the server
     Vector2 movementAxis;
@@ -69,6 +71,11 @@ public class PlayerTracker : NetworkBehaviour
         started,
         on,
         cancelled,
+    }
+
+    private void Start()
+    {
+        height = PlayerPrefs.GetFloat("PlayerHeight") - 0.127f;
     }
 
     private void Update()
@@ -328,10 +335,9 @@ public class PlayerTracker : NetworkBehaviour
 
     public void ModifyPlayerHeight(float crouchHeight)
     {
-        float height = PlayerPrefs.GetFloat("PlayerHeight") - 0.127f; //Height offset by 5 inches (Height from eyes to top of head)
         camOffset.localPosition = new Vector3(0, (height - 0.127f) * (((1 - crouchHeight) * (1 - crouchMinHeight)) + crouchMinHeight), 0);
-        forwardRoot.localScale = Vector3.one * (player.GetClassStats().classEyeHeight / height);
     }
+
 
     private void OnDrawGizmos()
     {
