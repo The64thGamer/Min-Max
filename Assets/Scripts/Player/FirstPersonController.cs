@@ -95,7 +95,6 @@ namespace StarterAssets
                     if (IsHost && heldWire != null)
                     {
                         gm.RemoveClientWireClientRpc(player.GetPlayerID(), heldWire.point);
-                        player.RemoveHeldWire(heldWire.point);
                     }
                     hasBeenCrouched = false;
                 }
@@ -106,7 +105,6 @@ namespace StarterAssets
                 if (IsHost && heldWire != null)
                 {
                     gm.RemoveClientWireClientRpc(player.GetPlayerID(), heldWire.point);
-                    player.RemoveHeldWire(heldWire.point);
                 }
             }
             targetSpeed *= ((1 - currentCrouchLerp) / 2.0f) + 0.5f;

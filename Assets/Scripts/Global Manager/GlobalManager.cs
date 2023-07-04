@@ -67,7 +67,7 @@ public class GlobalManager : NetworkBehaviour
                     for (int i = 0; i < PlayerPrefs.GetInt("ServerMaxPlayers"); i++)
                     {
                         //Probably a bad idea for 24/7 servers, though what's a player gonna gain out of controlling bots?
-                        SpawnNewPlayerHostServerRpc(botID + (uint)i);
+                        SpawnPlayer(botID + (uint)i);
                     }
                 }
                 Debug.Log("Started Local Host");
@@ -121,7 +121,7 @@ public class GlobalManager : NetworkBehaviour
                 for (int i = 0; i < PlayerPrefs.GetInt("ServerMaxPlayers"); i++)
                 {
                     //Probably a bad idea for 24/7 servers, though what's a player gonna gain out of controlling bots?
-                    SpawnNewPlayerHostServerRpc(botID + (uint)i);
+                    SpawnPlayer(botID + (uint)i);
                 }
             }
             GUIUtility.systemCopyBuffer = joinCode;
@@ -168,7 +168,7 @@ public class GlobalManager : NetworkBehaviour
             //Client Networking
             if (clients[i].IsOwner)
             {
-                SendJoystickServerRpc(clients[i].GetTracker().GetPlayerNetworkData(), clients[i].GetPlayerID());
+                SendJoystickServerRpc(clients[i].GetTracker().GetPlayerNetworkData());
             }
 
             //Game Logic
@@ -382,25 +382,27 @@ public class GlobalManager : NetworkBehaviour
 
     public void DisconnectClient(Player player)
     {
-        for (int i = 0; i < clients.Count; i++)
+        if (IsHost)
         {
-            if (clients[i] == player)
+            for (int i = 0; i < clients.Count; i++)
             {
-                Wire.WirePoint wireHeld = clients[i].GetWirePoint();
-                if (wireHeld != null)
+                if (clients[i] == player)
                 {
-                    RemoveClientWireClientRpc(player.GetPlayerID(), wireHeld.point);
-                    player.RemoveHeldWire(wireHeld.point);
-                }
+                    Wire.WirePoint wireHeld = clients[i].GetWirePoint();
+                    if (wireHeld != null)
+                    {
+                        RemoveClientWireClientRpc(player.GetPlayerID(), wireHeld.point);
+                    }
 
-                Destroy(clients[i].gameObject);
-                clients.RemoveAt(i);
-                playerPosRPCData = new List<PlayerDataSentToClient>();
-                for (int e = 0; e < clients.Count; e++)
-                {
-                    playerPosRPCData.Add(new PlayerDataSentToClient());
+                    Destroy(clients[i].gameObject);
+                    clients.RemoveAt(i);
+                    playerPosRPCData = new List<PlayerDataSentToClient>();
+                    for (int e = 0; e < clients.Count; e++)
+                    {
+                        playerPosRPCData.Add(new PlayerDataSentToClient());
+                    }
+                    return;
                 }
-                return;
             }
         }
     }
@@ -463,13 +465,25 @@ public class GlobalManager : NetworkBehaviour
         }
     }
 
-
     [ServerRpc(RequireOwnership = false)]
-    void SendJoystickServerRpc(PlayerDataSentToServer serverData, ulong id)
+    public void DisconnectClientServerRPC(ServerRpcParams serverRpcParams = default)
     {
         for (int i = 0; i < clients.Count; i++)
         {
-            if (clients[i].GetPlayerID() == id && !clients[i].IsOwner)
+            if (clients[i].GetPlayerID() == serverRpcParams.Receive.SenderClientId)
+            {
+                DisconnectClient(clients[i]);
+                return;
+            }
+        }
+    }
+
+    [ServerRpc(RequireOwnership = false)]
+    void SendJoystickServerRpc(PlayerDataSentToServer serverData, ServerRpcParams serverRpcParams = default)
+    {
+        for (int i = 0; i < clients.Count; i++)
+        {
+            if (clients[i].GetPlayerID() == serverRpcParams.Receive.SenderClientId && !clients[i].IsOwner)
             {
                 clients[i].GetTracker().ServerSyncPlayerInputs(serverData);
                 return;
@@ -478,7 +492,12 @@ public class GlobalManager : NetworkBehaviour
     }
 
     [ServerRpc(RequireOwnership = false)]
-    public void SpawnNewPlayerHostServerRpc(ulong id)
+    public void SpawnNewPlayerHostServerRpc(ServerRpcParams serverRpcParams = default)
+    {
+        SpawnPlayer(serverRpcParams.Receive.SenderClientId);
+    }
+
+    void SpawnPlayer(ulong id)
     {
         for (int i = 0; i < clients.Count; i++)
         {
@@ -691,7 +710,6 @@ public class GlobalManager : NetworkBehaviour
         {
             if (clients[i].GetPlayerID() == id)
             {
-                Debug.Log("??????");
                 clients[i].SetWirePoint(neededWire.CreateNewClientWire(wireID, parentID));
                 return;
             }
