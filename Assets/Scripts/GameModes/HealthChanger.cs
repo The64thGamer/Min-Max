@@ -82,10 +82,12 @@ public class HealthChanger : MonoBehaviour
                     {
                         loopTimer = looptime;
                         TakeDamage();
+
                     }
                     break;
                 default:
                     TakeDamage();
+                    currentPlayer = new List<Player>();
                     break;
             }
         }
@@ -101,6 +103,10 @@ public class HealthChanger : MonoBehaviour
                 if(healthIsPercent)
                 {
                     healthFinal = Mathf.CeilToInt((currentPlayer[i].GetClassStats().baseHealth / 100.0f) * health);
+                }
+                if (currentPlayer[i].GetHealth() + healthFinal <= 0)
+                {
+                    currentPlayer[i] = null;
                 }
                 currentPlayer[i].ChangeHealth(currentPlayer[i].GetPlayerID(), healthFinal,Random.Range(-999999999,999999999));
             }
