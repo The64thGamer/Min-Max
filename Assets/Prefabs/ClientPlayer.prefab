@@ -2656,7 +2656,6 @@ MonoBehaviour:
   cam: {fileID: 3839109303961143040}
   handR: {fileID: 4021970662802244310}
   handL: {fileID: 8756789624271952682}
-  firstPersonOffset: {fileID: 0}
 --- !u!114 &-3600588047747913216
 MonoBehaviour:
   m_ObjectHideFlags: 0
