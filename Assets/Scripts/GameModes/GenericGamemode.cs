@@ -25,19 +25,89 @@ public abstract class GenericGamemode : NetworkBehaviour
 
             for (int i = 0; i < clients.Count; i++)
             {
+                TeamList team = TeamList.gray;
                 if (clients[i].GetTeam() == team1)
                 {
-                    gm.SetPlayerTeamClientRpc(clients[i].GetPlayerID(), team2);
+                    team = team2;
                 }
                 else if (clients[i].GetTeam() == team2)
                 {
-                    gm.SetPlayerTeamClientRpc(clients[i].GetPlayerID(), team1);
+                    team = team1;
                 }
-            }
 
-            for (int i = 0; i < clients.Count; i++)
-            {
+                //Auto Team
+                ClassList autoClass = ClassList.programmer;
+                string autoGun = "";
+                int random = UnityEngine.Random.Range(0, 3);
+                switch (random)
+                {
+                    case 0:
+                        autoClass = ClassList.programmer;
+                        autoGun = "W.I.P.";
+                        break;
+                    case 1:
+                        autoClass = ClassList.computer;
+                        autoGun = "W.I.P.";
+                        break;
+                    case 2:
+                        autoClass = ClassList.fabricator;
+                        autoGun = "O-S F-O";
+                        break;
+                    default:
+                        break;
+                }
+
+                //Random cosmetics
+                List<int> cos = new List<int>();
+                switch (autoClass)
+                {
+                    case ClassList.programmer:
+                        int randoP = UnityEngine.Random.Range(0, 4);
+                        switch (randoP)
+                        {
+                            case 0:
+                                cos.Add(5);
+                                break;
+                            default:
+                                break;
+                        }
+                        break;
+                    case ClassList.fabricator:
+                        int randoF = UnityEngine.Random.Range(0, 4);
+                        switch (randoF)
+                        {
+                            case 0:
+                                cos.Add(0);
+                                cos.Add(1);
+                                break;
+                            case 1:
+                                cos.Add(0);
+                                cos.Add(6);
+                                break;
+                            case 2:
+                                cos.Add(1);
+                                cos.Add(5);
+                                break;
+                            case 3:
+                                cos.Add(0);
+                                cos.Add(5);
+                                break;
+                            default:
+                                break;
+                        }
+                        break;
+                    case ClassList.computer:
+                        cos.Add(0);
+                        cos.Add(1);
+                        cos.Add(2);
+                        break;
+                    default:
+                        break;
+                }
+
+                gm.AssignPlayerClassAndTeamClientRpc(clients[i].GetPlayerID(), team, autoClass, cos.ToArray(), autoGun);
                 gm.RespawnPlayerClientRpc(clients[i].GetPlayerID(), clients[i].GetTeam());
+
             }
         }
     }

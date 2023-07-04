@@ -572,7 +572,7 @@ public class GlobalManager : NetworkBehaviour
                 break;
         }
 
-        SendNewPlayerDataBackClientRpc(id, debugList, autoClass, cos.ToArray(), autoGun);
+        AssignPlayerClassAndTeamClientRpc(id, debugList, autoClass, cos.ToArray(), autoGun);
         RespawnPlayerClientRpc(id, debugList);
         PlayerInfoSentToClient[] data = new PlayerInfoSentToClient[clients.Count];
         for (int i = 0; i < clients.Count; i++)
@@ -719,7 +719,7 @@ public class GlobalManager : NetworkBehaviour
     }
 
     [ClientRpc]
-    void SendNewPlayerDataBackClientRpc(ulong id, TeamList team, ClassList autoClass, int[] cosmetics, string gunName)
+    public void AssignPlayerClassAndTeamClientRpc(ulong id, TeamList team, ClassList autoClass, int[] cosmetics, string gunName)
     {
         for (int i = 0; i < clients.Count; i++)
         {
