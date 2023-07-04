@@ -13,8 +13,9 @@ public class AiPlayer : NetworkBehaviour
     Transform headset;
     Transform rhand;
     GlobalManager gm;
-    const ulong botID = 64646464646464;
     PlayerTracker tracker;
+    float height;
+
 
     //Target
     Player target;
@@ -31,6 +32,8 @@ public class AiPlayer : NetworkBehaviour
 
     //Const
     const float maxNavRange = 40;
+    const ulong botID = 64646464646464;
+
 
     private void Start()
     {
@@ -46,6 +49,8 @@ public class AiPlayer : NetworkBehaviour
             headset = player.GetTracker().GetCamera();
             rhand = player.GetTracker().GetRightHand();
             tracker = player.GetTracker();
+            height = PlayerPrefs.GetFloat("PlayerHeight") - 0.127f;
+
         }
     }
 
@@ -110,7 +115,12 @@ public class AiPlayer : NetworkBehaviour
         {
             data.shoot = false;
         }
-        if(path != null && path.corners.Length != 0)
+
+        data.headsetPos = new Vector3(0, height, 0);
+        data.rHandPos = new Vector3(0, height - 0.5f, 0) + (headset.right * 0.35f);
+        data.lHandPos = new Vector3(0, height - 0.5f, 0) + (headset.right * -0.35f);
+
+        if (path != null && path.corners.Length != 0)
         {
             if(currentNavCorner >= path.corners.Length)
             {
