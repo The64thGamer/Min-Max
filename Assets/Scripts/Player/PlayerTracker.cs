@@ -130,7 +130,7 @@ public class PlayerTracker : NetworkBehaviour
             }
         }
 
-        if (!IsHost)
+        if (!IsHost && IsOwner)
         {
             //Lerping client-side movement with server positions for a smoother experience
             transform.position = Vector3.Lerp(transform.position, predictedPos, Mathf.Clamp01(Vector3.Distance(transform.position, predictedPos) - 1));
