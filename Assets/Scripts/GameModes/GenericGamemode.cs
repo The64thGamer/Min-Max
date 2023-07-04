@@ -37,7 +37,7 @@ public abstract class GenericGamemode : NetworkBehaviour
 
                 //Auto Team
                 ClassList autoClass = ClassList.programmer;
-                string autoGun = "";
+                string autoGun = "W.I.P.";
                 int random = UnityEngine.Random.Range(0, 3);
                 switch (random)
                 {
@@ -104,8 +104,15 @@ public abstract class GenericGamemode : NetworkBehaviour
                     default:
                         break;
                 }
-
-                gm.AssignPlayerClassAndTeamClientRpc(clients[i].GetPlayerID(), team, autoClass, cos.ToArray(), autoGun);
+                PlayerInfoSentToClient pdstc = new PlayerInfoSentToClient
+                {
+                    id = clients[i].GetPlayerID(),
+                    currentClass = autoClass,
+                    currentTeam = team,
+                    cosmetics = cos.ToArray(),
+                    gunName = autoGun,
+                };
+                gm.AssignPlayerClassAndTeamClientRpc(pdstc);
                 gm.RespawnPlayerClientRpc(clients[i].GetPlayerID(), clients[i].GetTeam());
 
             }

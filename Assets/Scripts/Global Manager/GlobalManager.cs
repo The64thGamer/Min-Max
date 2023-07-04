@@ -501,7 +501,7 @@ public class GlobalManager : NetworkBehaviour
 
         //Auto Team
         ClassList autoClass = ClassList.programmer;
-        string autoGun = "";
+        string autoGun = "W.I.P.";
         int random = UnityEngine.Random.Range(0, 3);
         switch (random)
         {
@@ -572,8 +572,17 @@ public class GlobalManager : NetworkBehaviour
                 break;
         }
 
-        AssignPlayerClassAndTeamClientRpc(id, debugList, autoClass, cos.ToArray(), autoGun);
+        PlayerInfoSentToClient pdstc = new PlayerInfoSentToClient
+        {
+            id = id,
+            currentClass = autoClass,
+            currentTeam = debugList,
+            cosmetics = cos.ToArray(),
+            gunName = autoGun,
+        };
+        AssignPlayerClassAndTeamClientRpc(pdstc);
         RespawnPlayerClientRpc(id, debugList);
+
         PlayerInfoSentToClient[] data = new PlayerInfoSentToClient[clients.Count];
         for (int i = 0; i < clients.Count; i++)
         {
@@ -583,6 +592,7 @@ public class GlobalManager : NetworkBehaviour
                 currentTeam = clients[i].GetTeam(),
                 currentClass = clients[i].GetCurrentClass(),
                 cosmetics = clients[i].GetCosmeticInts(),
+                gunName = clients[i].GetCurrentGun().name,
             };
         }
         SendAllPlayerDataToNewPlayerClientRpc(data, id);
@@ -719,15 +729,16 @@ public class GlobalManager : NetworkBehaviour
     }
 
     [ClientRpc]
-    public void AssignPlayerClassAndTeamClientRpc(ulong id, TeamList team, ClassList autoClass, int[] cosmetics, string gunName)
+    public void AssignPlayerClassAndTeamClientRpc(PlayerInfoSentToClient data)
     {
         for (int i = 0; i < clients.Count; i++)
         {
-            if (clients[i].GetPlayerID() == id)
+            if (clients[i].GetPlayerID() == data.id)
             {
-                clients[i].SetTeam(team);
-                clients[i].SetClass(autoClass, cosmetics);
-                clients[i].SetGun(al.SearchGuns(gunName));
+                clients[i].SetClass(data.currentClass, data.cosmetics);
+                clients[i].SetTeam(data.currentTeam);
+                Debug.Log(data.gunName);
+                clients[i].SetGun(al.SearchGuns(data.gunName));
                 return;
             }
         }
@@ -762,6 +773,8 @@ public class GlobalManager : NetworkBehaviour
                         {
                             clients[e].SetClass(data[j].currentClass, data[j].cosmetics);
                             clients[e].SetTeam(data[j].currentTeam);
+                            clients[e].SetGun(al.SearchGuns(data[j].gunName));
+
                         }
                     }
                 }
@@ -894,6 +907,7 @@ public struct PlayerInfoSentToClient : INetworkSerializable
     public ulong id;
     public ClassList currentClass;
     public TeamList currentTeam;
+    public string gunName;
     public int[] cosmetics;
 
     public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
@@ -902,6 +916,7 @@ public struct PlayerInfoSentToClient : INetworkSerializable
         serializer.SerializeValue(ref currentClass);
         serializer.SerializeValue(ref currentTeam);
         serializer.SerializeValue(ref cosmetics);
+        serializer.SerializeValue(ref gunName);
     }
 }
 

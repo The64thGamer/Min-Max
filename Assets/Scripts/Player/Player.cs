@@ -106,6 +106,7 @@ public class Player : NetworkBehaviour
         currentGun.SetPlayer(this);
         currentGun.SetDefaultStats(gun);
         UpdateTeamColor();
+        SetCharacterVisibility(currentPlayerVisibility);
     }
 
     void SetupCosmetics(int[] classCosmetics)
