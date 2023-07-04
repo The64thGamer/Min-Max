@@ -94,11 +94,13 @@ public class GlobalManager : NetworkBehaviour
 
     void Disconnect(ulong u)
     {
+        DisconnectClientServerRPC();
         m_NetworkManager.Shutdown();
         SceneManager.LoadScene("Startup");
     }
     public void Disconnect(bool u)
     {
+        DisconnectClientServerRPC();
         m_NetworkManager.Shutdown();
         SceneManager.LoadScene("Startup");
     }
