@@ -75,7 +75,7 @@ MonoBehaviour:
   RunInBackground: 1
   LogLevel: 1
   NetworkConfig:
-    ProtocolVersion: 2
+    ProtocolVersion: 3
     NetworkTransport: {fileID: 7298412108145094526}
     PlayerPrefab: {fileID: 77071493114205003, guid: 67a29be464190674cb80df4bfe3f9630,
       type: 3}
