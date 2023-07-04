@@ -9,6 +9,7 @@ using Unity.Services.Core;
 using Unity.Services.Relay;
 using Unity.Services.Relay.Models;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.Windows;
 
 public class GlobalManager : NetworkBehaviour
@@ -46,6 +47,8 @@ public class GlobalManager : NetworkBehaviour
         m_NetworkManager.NetworkConfig.ConnectionData = System.Text.Encoding.ASCII.GetBytes("C");
         m_NetworkManager.ConnectionApprovalCallback = ApprovalCheck;
         NetworkManager.Singleton.OnServerStarted += ServerStarted;
+        NetworkManager.Singleton.OnClientDisconnectCallback += Disconnect;
+        NetworkManager.Singleton.OnServerStopped += Disconnect;
         al = GetComponent<AllStats>();
         au = GetComponent<AudioSource>();
         currentGamemode = GetComponent<GenericGamemode>();
@@ -87,6 +90,17 @@ public class GlobalManager : NetworkBehaviour
         }
 
 
+    }
+
+    void Disconnect(ulong u)
+    {
+        m_NetworkManager.Shutdown();
+        SceneManager.LoadScene("Startup");
+    }
+    public void Disconnect(bool u)
+    {
+        m_NetworkManager.Shutdown();
+        SceneManager.LoadScene("Startup");
     }
 
     async void StartServer()
@@ -185,7 +199,10 @@ public class GlobalManager : NetworkBehaviour
         }
         tickTimer += Time.deltaTime;
 
-        damageHashes = new List<int>();
+        if (damageHashes.Count > 0)
+        {
+            damageHashes = new List<int>();
+        }
     }
 
 

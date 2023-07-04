@@ -3,6 +3,7 @@ using NUnit.Framework.Constraints;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.InputSystem.XR;
+using UnityEngine.SceneManagement;
 using UnityEngine.XR.Interaction.Toolkit;
 
 public class MouseLook : NetworkBehaviour
@@ -49,7 +50,7 @@ public class MouseLook : NetworkBehaviour
         cam.localPosition = new Vector3(0, height, 0);
         if (Input.GetKey(KeyCode.Escape))
         {
-            Application.Quit();
+            GameObject.Find("Global Manager").GetComponent<GlobalManager>().Disconnect(false);
         }
     }
 }
