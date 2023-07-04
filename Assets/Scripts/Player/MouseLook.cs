@@ -1,4 +1,5 @@
 
+using NUnit.Framework.Constraints;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.InputSystem.XR;
@@ -9,11 +10,11 @@ public class MouseLook : NetworkBehaviour
     [SerializeField] Transform cam;
     [SerializeField] Transform handR;
     [SerializeField] Transform handL;
-    [SerializeField] Transform firstPersonOffset;
 
     const float sensitivity = 10f;
     const float maxYAngle = 80f;
     Vector2 currentRotation;
+    float height;
 
     private void Start()
     {
@@ -24,7 +25,7 @@ public class MouseLook : NetworkBehaviour
         }
         else
         {
-            firstPersonOffset.transform.localPosition = new Vector3(0, PlayerPrefs.GetFloat("PlayerHeight") - 0.127f, 0);
+            height = PlayerPrefs.GetFloat("PlayerHeight") - 0.127f;
             UnityEngine.Cursor.lockState = CursorLockMode.Locked;
             UnityEngine.Cursor.visible = false;
             Destroy(cam.GetComponent<TrackedPoseDriver>());
@@ -43,7 +44,10 @@ public class MouseLook : NetworkBehaviour
         cam.transform.localPosition = Vector3.zero;
         handR.rotation = rot;
         handL.rotation = rot;
-        if(Input.GetKey(KeyCode.Escape))
+        handR.localPosition = new Vector3(0, height - 0.5f, 0) +  (cam.right * 0.35f);
+        handL.localPosition = new Vector3(0, height - 0.5f, 0) + (cam.right * -0.35f);
+        cam.localPosition = new Vector3(0, height, 0);
+        if (Input.GetKey(KeyCode.Escape))
         {
             Application.Quit();
         }

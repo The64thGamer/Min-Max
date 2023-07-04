@@ -277,16 +277,16 @@ public class Player : NetworkBehaviour
 
                     //Apply Bodygroup Hiding
                     Transform t = playerModels[i].transform;
-                    SetMeshVis(t, "Skin Arm L", true);
-                    SetMeshVis(t, "Skin Arm R", true);
-                    SetMeshVis(t, "Skin Body", true);
-                    SetMeshVis(t, "Skin Foot L", true);
-                    SetMeshVis(t, "Skin Foot R", true);
-                    SetMeshVis(t, "Skin Hand L", true);
-                    SetMeshVis(t, "Skin Hand R", true);
-                    SetMeshVis(t, "Skin Head", true);
-                    SetMeshVis(t, "Skin Leg L", true);
-                    SetMeshVis(t, "Skin Leg R", true);
+                    SetMeshVis(t, "Skin Arm L", true,false);
+                    SetMeshVis(t, "Skin Arm R", true, false);
+                    SetMeshVis(t, "Skin Body", true, false);
+                    SetMeshVis(t, "Skin Foot L", true, false);
+                    SetMeshVis(t, "Skin Foot R", true, false);
+                    SetMeshVis(t, "Skin Hand L", true, false);
+                    SetMeshVis(t, "Skin Hand R", true, false);
+                    SetMeshVis(t, "Skin Head", true, false);
+                    SetMeshVis(t, "Skin Leg L", true, false);
+                    SetMeshVis(t, "Skin Leg R", true, false);
 
                     //Get Combination Hide Bodygroups Enum
                     BodyGroups combined = new BodyGroups();
@@ -297,43 +297,43 @@ public class Player : NetworkBehaviour
 
                     if (combined.HasFlag(BodyGroups.armL))
                     {
-                        SetMeshVis(t, "Skin Arm L", false);
+                        SetMeshVis(t, "Skin Arm L", false, false);
                     }
                     if (combined.HasFlag(BodyGroups.armR))
                     {
-                        SetMeshVis(t, "Skin Arm R", false);
+                        SetMeshVis(t, "Skin Arm R", false, false);
                     }
                     if (combined.HasFlag(BodyGroups.body))
                     {
-                        SetMeshVis(t, "Skin Body", false);
+                        SetMeshVis(t, "Skin Body", false, false);
                     }
                     if (combined.HasFlag(BodyGroups.footL))
                     {
-                        SetMeshVis(t, "Skin Foot L", false);
+                        SetMeshVis(t, "Skin Foot L", false, false);
                     }
                     if (combined.HasFlag(BodyGroups.footR))
                     {
-                        SetMeshVis(t, "Skin Foot R", false);
+                        SetMeshVis(t, "Skin Foot R", false, false);
                     }
                     if (combined.HasFlag(BodyGroups.handL))
                     {
-                        SetMeshVis(t, "Skin Hand L", false);
+                        SetMeshVis(t, "Skin Hand L", false, false);
                     }
                     if (combined.HasFlag(BodyGroups.handR))
                     {
-                        SetMeshVis(t, "Skin Hand R", false);
+                        SetMeshVis(t, "Skin Hand R", false, false);
                     }
                     if (combined.HasFlag(BodyGroups.head))
                     {
-                        SetMeshVis(t, "Skin Head", false);
+                        SetMeshVis(t, "Skin Head", false, false);
                     }
                     if (combined.HasFlag(BodyGroups.legL))
                     {
-                        SetMeshVis(t, "Skin Leg L", false);
+                        SetMeshVis(t, "Skin Leg L", false, false);
                     }
                     if (combined.HasFlag(BodyGroups.legR))
                     {
-                        SetMeshVis(t, "Skin Leg R", false);
+                        SetMeshVis(t, "Skin Leg R", false, false);
                     }
 
                     //Apply Cosmetics
@@ -346,16 +346,16 @@ public class Player : NetworkBehaviour
                 {
                     playerModels[i].SetActive(true);
                     Transform t = playerModels[i].transform;
-                    SetMeshVis(t, "Skin Arm L", false);
-                    SetMeshVis(t, "Skin Arm R", false);
-                    SetMeshVis(t, "Skin Body", false);
-                    SetMeshVis(t, "Skin Foot L", false);
-                    SetMeshVis(t, "Skin Foot R", false);
-                    SetMeshVis(t, "Skin Hand L", true);
-                    SetMeshVis(t, "Skin Hand R", true);
-                    SetMeshVis(t, "Skin Head", false);
-                    SetMeshVis(t, "Skin Leg L", false);
-                    SetMeshVis(t, "Skin Leg R", false);
+                    SetMeshVis(t, "Skin Arm L", false, false);
+                    SetMeshVis(t, "Skin Arm R", false, false);
+                    SetMeshVis(t, "Skin Body", false, false);
+                    SetMeshVis(t, "Skin Foot L", false, false);
+                    SetMeshVis(t, "Skin Foot R", false, false);
+                    SetMeshVis(t, "Skin Hand L", true, true);
+                    SetMeshVis(t, "Skin Hand R", true, true);
+                    SetMeshVis(t, "Skin Head", false, false);
+                    SetMeshVis(t, "Skin Leg L", false, false);
+                    SetMeshVis(t, "Skin Leg R", false, false);
                     List<Cosmetic> classCosmetics = gm.GetCosmetics().GetClassCosmetics(currentClass);
                     //Apply Only Hand Cosmetics
                     for (int e = 0; e < cosmeticInts.Length; e++)
@@ -437,9 +437,15 @@ public class Player : NetworkBehaviour
         targetSkin.bones = newBones;
     }
 
-    void SetMeshVis(Transform trans, string meshName, bool set)
+    void SetMeshVis(Transform trans, string meshName, bool set, bool alwaysUpdate)
     {
-        trans.Find(meshName).gameObject.SetActive(set);
+        GameObject g = trans.Find(meshName).gameObject;
+        SkinnedMeshRenderer r = g.GetComponent<SkinnedMeshRenderer>();
+        if (r != null)
+        {
+            r.updateWhenOffscreen = alwaysUpdate;
+        }
+        g.SetActive(set);
     }
 
     public void ChangeHealth(ulong id, int amount, int idHash)

@@ -121,9 +121,9 @@ public class PlayerTracker : NetworkBehaviour
             playerRHand.Rotate(new Vector3(9.99f, 27.48f, 0));
             if (isInFirstPerson)
             {
-                playerRHand.position = rightController.position;
+                playerRHand.position = rightController.position + (rightController.up * -0.1f) + (rightController.forward * -0.1f);
 
-                playerLHand.position = leftController.position;
+                playerLHand.position = leftController.position + (leftController.up * -0.1f) + (leftController.forward * -0.1f);
                 playerLHand.rotation = leftController.rotation;
                 playerLHand.Rotate(new Vector3(-90, 180, 0));
                 playerLHand.Rotate(new Vector3(9.99f, 27.48f, 0));
