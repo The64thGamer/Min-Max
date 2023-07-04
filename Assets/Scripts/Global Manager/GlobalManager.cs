@@ -497,7 +497,7 @@ public class GlobalManager : NetworkBehaviour
         client.GetComponent<NetworkObject>().SpawnWithOwnership(id);
 
         //Client Object Spawning
-        TeamList debugList = currentGamemode.DecideWhichPlayerTeam();
+        TeamList decidedTeam = currentGamemode.DecideWhichPlayerTeam();
 
         //Auto Team
         ClassList autoClass = ClassList.programmer;
@@ -522,7 +522,7 @@ public class GlobalManager : NetworkBehaviour
         }
 
 
-        Debug.Log("New Player Joined (#" + clients.Count + "), Team " + debugList);
+        Debug.Log("New Player Joined (#" + clients.Count + "), Team " + decidedTeam);
 
         //Random cosmetics
         List<int> cos = new List<int>();
@@ -576,12 +576,12 @@ public class GlobalManager : NetworkBehaviour
         {
             id = id,
             currentClass = autoClass,
-            currentTeam = debugList,
+            currentTeam = decidedTeam,
             cosmetics = cos.ToArray(),
             gunName = autoGun,
         };
         AssignPlayerClassAndTeamClientRpc(pdstc);
-        RespawnPlayerClientRpc(id, debugList);
+        RespawnPlayerClientRpc(id, decidedTeam);
 
         PlayerInfoSentToClient[] data = new PlayerInfoSentToClient[clients.Count];
         for (int i = 0; i < clients.Count; i++)
@@ -737,7 +737,6 @@ public class GlobalManager : NetworkBehaviour
             {
                 clients[i].SetClass(data.currentClass, data.cosmetics);
                 clients[i].SetTeam(data.currentTeam);
-                Debug.Log(data.gunName);
                 clients[i].SetGun(al.SearchGuns(data.gunName));
                 return;
             }
@@ -774,7 +773,6 @@ public class GlobalManager : NetworkBehaviour
                             clients[e].SetClass(data[j].currentClass, data[j].cosmetics);
                             clients[e].SetTeam(data[j].currentTeam);
                             clients[e].SetGun(al.SearchGuns(data[j].gunName));
-
                         }
                     }
                 }

@@ -105,8 +105,8 @@ public class Player : NetworkBehaviour
         currentGun = gunObject.GetComponent<Gun>();
         currentGun.SetPlayer(this);
         currentGun.SetDefaultStats(gun);
-        UpdateTeamColor();
         SetCharacterVisibility(currentPlayerVisibility);
+        UpdateTeamColor();
     }
 
     void SetupCosmetics(int[] classCosmetics)
