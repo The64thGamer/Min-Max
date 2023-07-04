@@ -32,6 +32,7 @@ public class AiPlayer : NetworkBehaviour
 
     //Const
     const float maxNavRange = 40;
+    const float maxEnemyNavRange = 10;
     const ulong botID = 64646464646464;
 
 
@@ -59,7 +60,6 @@ public class AiPlayer : NetworkBehaviour
         //Swapping Target
         if (timeToSwap <= 0)
         {
-            timeToSwap = Random.Range(1, 10);
             ChangeFocus();
         }
         timeToSwap -= Time.deltaTime;
@@ -73,7 +73,7 @@ public class AiPlayer : NetworkBehaviour
             if (target != null && isTargetEnemy)
             {
                 NavMeshHit hit;
-                if (NavMesh.SamplePosition(target.transform.position, out hit, maxNavRange, 1))
+                if (NavMesh.SamplePosition(target.transform.position + (Random.insideUnitSphere * maxEnemyNavRange), out hit, maxNavRange, 1))
                 {
                     setDestination = hit.position;
                 }
@@ -160,7 +160,7 @@ public class AiPlayer : NetworkBehaviour
         for (int i = 0; i < clients.Count; i++)
         {
             //Check for players within view
-            if (Physics.Raycast(headset.position, clients[i].GetTracker().GetCamera().position - headset.position, out hit))
+            if (Physics.Raycast(headset.position, clients[i].GetTracker().GetCamera().position + (Vector3.up * -0.4f) - headset.position, out hit))
             {
                 Player collidePlayer = hit.collider.GetComponent<Player>();
                 if (collidePlayer != null)
@@ -195,12 +195,15 @@ public class AiPlayer : NetworkBehaviour
             target = currentFind;
             targetHeadset = target.GetTracker().GetCamera();
             isTargetEnemy = currentFind.GetTeam() != player.GetTeam();
+            timeToSwap = Random.Range(0.3f, 2f);
+            timeToChangePos = 0;
         }
         else
         {
             target = null;
             targetHeadset = null;
             isTargetEnemy = false;
+            timeToSwap = Random.Range(0.1f, 1);
         }
     }
 }
