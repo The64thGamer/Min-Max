@@ -47,7 +47,6 @@ public class GlobalManager : NetworkBehaviour
         m_NetworkManager.NetworkConfig.ConnectionData = System.Text.Encoding.ASCII.GetBytes("C");
         m_NetworkManager.ConnectionApprovalCallback = ApprovalCheck;
         NetworkManager.Singleton.OnServerStarted += ServerStarted;
-        NetworkManager.Singleton.OnClientDisconnectCallback += Disconnect;
         NetworkManager.Singleton.OnServerStopped += Disconnect;
         al = GetComponent<AllStats>();
         au = GetComponent<AudioSource>();
