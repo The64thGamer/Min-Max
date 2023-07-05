@@ -50,7 +50,7 @@ public class MouseLook : NetworkBehaviour
         cam.localPosition = new Vector3(0, height, 0);
         if (Input.GetKey(KeyCode.Escape))
         {
-            GameObject.Find("Global Manager").GetComponent<GlobalManager>().Disconnect(false);
+            GameObject.Find("Global Manager").GetComponent<GlobalManager>().DisconnectToTitleScreen(false);
         }
     }
 }

@@ -98,9 +98,8 @@ public class Payload : GenericGamemode
                 }
             }
         }
-        int minValue = teamCounts.Min();
-        int minIndex = teamCounts.ToList().IndexOf(minValue);
-        return teams[minIndex];
+        Debug.Log("Smallest Team is " + teamCounts.ToList().IndexOf(teamCounts.Min()) + ", Largest is " + teamCounts.ToList().IndexOf(teamCounts.Max()));
+        return teams[teamCounts.ToList().IndexOf(teamCounts.Min())];
     }
 
 }

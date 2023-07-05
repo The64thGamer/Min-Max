@@ -47,7 +47,8 @@ public class GlobalManager : NetworkBehaviour
         m_NetworkManager.NetworkConfig.ConnectionData = System.Text.Encoding.ASCII.GetBytes("C");
         m_NetworkManager.ConnectionApprovalCallback = ApprovalCheck;
         NetworkManager.Singleton.OnServerStarted += ServerStarted;
-        NetworkManager.Singleton.OnServerStopped += Disconnect;
+        NetworkManager.Singleton.OnServerStopped += DisconnectToTitleScreen;
+        NetworkManager.Singleton.OnClientDisconnectCallback += DisconnectClient;
         al = GetComponent<AllStats>();
         au = GetComponent<AudioSource>();
         currentGamemode = GetComponent<GenericGamemode>();
@@ -91,17 +92,17 @@ public class GlobalManager : NetworkBehaviour
 
     }
 
-    void Disconnect(ulong u)
+    public void DisconnectToTitleScreen(bool u)
     {
-        DisconnectClientServerRPC();
         m_NetworkManager.Shutdown();
-        SceneManager.LoadScene("Startup");
-    }
-    public void Disconnect(bool u)
-    {
-        DisconnectClientServerRPC();
-        m_NetworkManager.Shutdown();
-        SceneManager.LoadScene("Startup");
+        if (PlayerPrefs.GetInt("IsVREnabled") == 1)
+        {
+            SceneManager.LoadScene("VR Title Screen");
+        }
+        else
+        {
+            SceneManager.LoadScene("Title Screen");
+        }
     }
 
     async void StartServer()
@@ -164,6 +165,7 @@ public class GlobalManager : NetworkBehaviour
 
     private void Update()
     {
+        clients.RemoveAll(item => item == null);
         for (int i = 0; i < clients.Count; i++)
         {
             //Client Networking
@@ -381,29 +383,25 @@ public class GlobalManager : NetworkBehaviour
         return null;
     }
 
-    public void DisconnectClient(Player player)
+    public void DisconnectClient(ulong id)
     {
-        if (IsHost)
+        for (int i = 0; i < clients.Count; i++)
         {
-            for (int i = 0; i < clients.Count; i++)
+            if (clients[i].GetPlayerID() == id)
             {
-                if (clients[i] == player)
+                Wire.WirePoint wireHeld = clients[i].GetWirePoint();
+                if (wireHeld != null)
                 {
-                    Wire.WirePoint wireHeld = clients[i].GetWirePoint();
-                    if (wireHeld != null)
-                    {
-                        RemoveClientWireClientRpc(player.GetPlayerID(), wireHeld.point);
-                    }
-
-                    Destroy(clients[i].gameObject);
-                    clients.RemoveAt(i);
-                    playerPosRPCData = new List<PlayerDataSentToClient>();
-                    for (int e = 0; e < clients.Count; e++)
-                    {
-                        playerPosRPCData.Add(new PlayerDataSentToClient());
-                    }
-                    return;
+                    RemoveClientWireClientRpc(id, wireHeld.point);
                 }
+                Destroy(clients[i].gameObject);
+                clients.RemoveAt(i);
+                playerPosRPCData = new List<PlayerDataSentToClient>();
+                for (int e = 0; e < clients.Count; e++)
+                {
+                    playerPosRPCData.Add(new PlayerDataSentToClient());
+                }
+                return;
             }
         }
     }
@@ -467,19 +465,6 @@ public class GlobalManager : NetworkBehaviour
     }
 
     [ServerRpc(RequireOwnership = false)]
-    public void DisconnectClientServerRPC(ServerRpcParams serverRpcParams = default)
-    {
-        for (int i = 0; i < clients.Count; i++)
-        {
-            if (clients[i].GetPlayerID() == serverRpcParams.Receive.SenderClientId)
-            {
-                DisconnectClient(clients[i]);
-                return;
-            }
-        }
-    }
-
-    [ServerRpc(RequireOwnership = false)]
     void SendJoystickServerRpc(PlayerDataSentToServer serverData, ServerRpcParams serverRpcParams = default)
     {
         for (int i = 0; i < clients.Count; i++)
@@ -517,7 +502,7 @@ public class GlobalManager : NetworkBehaviour
                 if (clients[i].GetPlayerID() >= botID)
                 {
                     Debug.Log("Bot " + id + " removed from playerlist to make room for new player.");
-                    DisconnectClient(clients[i]);
+                    DisconnectClient(clients[i].GetPlayerID());
                     goodToGo = true;
                     break;
                 }
@@ -720,23 +705,23 @@ public class GlobalManager : NetworkBehaviour
     [ClientRpc]
     public void RemoveClientWireClientRpc(ulong id, Vector3 finalPos)
     {
+        Debug.Log("recieved it");
         for (int i = 0; i < clients.Count; i++)
         {
             if (clients[i].GetPlayerID() == id)
             {
+                Debug.Log("attempted to remove");
                 clients[i].RemoveHeldWire(finalPos);
                 return;
             }
         }
     }
 
+
     [ClientRpc]
-    /// <summary>
-    /// "Team" is required due to clients possibly being out of sync with player team.
-    /// </summary>
-    /// <param name="data"></param>
     public void RespawnPlayerClientRpc(ulong id, TeamList team)
     {
+        Debug.Log("im getting it????");
         for (int i = 0; i < clients.Count; i++)
         {
             if (clients[i].GetPlayerID() == id)
@@ -744,8 +729,10 @@ public class GlobalManager : NetworkBehaviour
                 //Refresh Stats
                 clients[i].ResetClassStats();
 
+                Debug.Log("yea its working");
                 if (IsHost && clients[i].GetWirePoint() != null)
                 {
+                    Debug.Log("sent the thing");
                     RemoveClientWireClientRpc(clients[i].GetPlayerID(), clients[i].GetWirePoint().point);
                 }
 

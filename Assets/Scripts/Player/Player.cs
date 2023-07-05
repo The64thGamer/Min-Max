@@ -64,11 +64,6 @@ public class Player : NetworkBehaviour
         }
     }
 
-    void OnDestroy()
-    {
-        gm.DisconnectClient(this);
-    }
-
     public void SetClass(ClassList setClass, int[] classCosmetics)
     {
         cosmeticInts = classCosmetics;
@@ -461,12 +456,9 @@ public class Player : NetworkBehaviour
     public void SetHealth(int health)
     {
         currentHealth = health;
-        if (health <= 0)
+        if (currentHealth <= 0 && IsHost)
         {
-            if (IsHost)
-            {
                 gm.RespawnPlayerClientRpc(GetPlayerID(), GetTeam());
-            }
         }
     }
 
@@ -485,6 +477,7 @@ public class Player : NetworkBehaviour
     {
         if (heldWire != null)
         {
+            Debug.Log("actually removed");
             wireSounds.RemoveWire();
             heldWire.point = finalPos;
             heldWire = null;
