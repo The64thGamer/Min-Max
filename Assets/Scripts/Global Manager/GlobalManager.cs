@@ -706,7 +706,6 @@ public class GlobalManager : NetworkBehaviour
                 break;
             }
         }
-        Debug.Log(neededWire);
         for (int i = 0; i < clients.Count; i++)
         {
             if (clients[i].GetPlayerID() == id)
@@ -727,7 +726,7 @@ public class GlobalManager : NetworkBehaviour
             {
                 Debug.Log("attempted to remove");
                 clients[i].RemoveHeldWire(finalPos);
-                return;
+                break;
             }
         }
     }
@@ -752,7 +751,7 @@ public class GlobalManager : NetworkBehaviour
                         Vector3 spawnPos = teamSpawns[teams[e].spawns].GetChild(UnityEngine.Random.Range(0, teamSpawns[teams[e].spawns].childCount)).position;
                         clients[i].GetTracker().ForceNewPosition(spawnPos);
                         Debug.Log("Player " + id + " respawned in " + team.ToString() + " spawn room");
-                        return;
+                        break;
                     }
                 }
             }

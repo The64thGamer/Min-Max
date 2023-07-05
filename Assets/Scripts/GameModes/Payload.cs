@@ -7,7 +7,7 @@ using UnityEngine;
 public class Payload : GenericGamemode
 {
     GlobalManager gm;
-    [UnityEngine.Range(2,8)]
+    [UnityEngine.Range(2, 8)]
     [SerializeField] uint noOfTeams = 2;
     [SerializeField]
 
@@ -98,8 +98,14 @@ public class Payload : GenericGamemode
                 }
             }
         }
-        Debug.Log("Smallest Team is " + teamCounts.ToList().IndexOf(teamCounts.Min()) + ", Largest is " + teamCounts.ToList().IndexOf(teamCounts.Max()));
-        return teams[teamCounts.ToList().IndexOf(teamCounts.Min())];
+        int finalIndex = 0;
+        for (int i = 0; i < teamCounts.Length; i++)
+        {
+            if (teamCounts[i] < teamCounts[finalIndex])
+            {
+                finalIndex = i;
+            }
+        }
+        return teams[teamCounts[finalIndex]];
     }
-
 }
