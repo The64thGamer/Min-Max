@@ -458,7 +458,7 @@ public class Player : NetworkBehaviour
         currentHealth = health;
         if (currentHealth <= 0 && IsHost)
         {
-            gm.RespawnPlayerClientRpc(GetPlayerID(), GetTeam());
+            gm.RespawnPlayer(GetPlayerID(), GetTeam());
         }
     }
 

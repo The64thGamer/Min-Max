@@ -420,6 +420,21 @@ public class GlobalManager : NetworkBehaviour
         serverStarted = true;
     }
 
+    public void RespawnPlayer(ulong id, TeamList team)
+    {
+        if (IsHost)
+        {
+            RespawnPlayerClientRpc(id, team);
+            for (int i = 0; i < clients.Count; i++)
+            {
+                if (clients[i].GetPlayerID() == id && clients[i].GetWirePoint() != null)
+                {
+                    RemoveClientWireClientRpc(clients[i].GetPlayerID(), clients[i].GetWirePoint().point);
+                }
+            }
+        }
+    }
+
     public bool GetServerStatus()
     {
         return serverStarted;
@@ -603,7 +618,7 @@ public class GlobalManager : NetworkBehaviour
             gunName = autoGun,
         };
         AssignPlayerClassAndTeamClientRpc(pdstc);
-        RespawnPlayerClientRpc(id, decidedTeam);
+        RespawnPlayer(id, decidedTeam);
 
         PlayerInfoSentToClient[] data = new PlayerInfoSentToClient[clients.Count];
         for (int i = 0; i < clients.Count; i++)
@@ -705,7 +720,7 @@ public class GlobalManager : NetworkBehaviour
     [ClientRpc]
     public void RemoveClientWireClientRpc(ulong id, Vector3 finalPos)
     {
-        Debug.Log("recieved it");
+        Debug.Log("RemoveClientWireClientRpc");
         for (int i = 0; i < clients.Count; i++)
         {
             if (clients[i].GetPlayerID() == id)
@@ -719,22 +734,15 @@ public class GlobalManager : NetworkBehaviour
 
 
     [ClientRpc]
-    public void RespawnPlayerClientRpc(ulong id, TeamList team)
+    void RespawnPlayerClientRpc(ulong id, TeamList team)
     {
-        Debug.Log("im getting it????");
+        Debug.Log("RespawnPlayerClientRpc");
         for (int i = 0; i < clients.Count; i++)
         {
             if (clients[i].GetPlayerID() == id)
             {
                 //Refresh Stats
                 clients[i].ResetClassStats();
-
-                Debug.Log("yea its working");
-                if (IsHost && clients[i].GetWirePoint() != null)
-                {
-                    Debug.Log("sent the thing");
-                    RemoveClientWireClientRpc(clients[i].GetPlayerID(), clients[i].GetWirePoint().point);
-                }
 
                 //Spawning
                 for (int e = 0; e < teams.Count; e++)
