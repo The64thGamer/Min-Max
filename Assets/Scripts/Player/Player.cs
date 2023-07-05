@@ -91,7 +91,7 @@ public class Player : NetworkBehaviour
 
     public void SetGun(GunProjectiles gun)
     {
-        if(currentGun != null)
+        if (currentGun != null)
         {
             Destroy(currentGun.gameObject);
         }
@@ -273,7 +273,7 @@ public class Player : NetworkBehaviour
 
                     //Apply Bodygroup Hiding
                     Transform t = playerModels[i].transform;
-                    SetMeshVis(t, "Skin Arm L", true,false);
+                    SetMeshVis(t, "Skin Arm L", true, false);
                     SetMeshVis(t, "Skin Arm R", true, false);
                     SetMeshVis(t, "Skin Body", true, false);
                     SetMeshVis(t, "Skin Foot L", true, false);
@@ -458,7 +458,7 @@ public class Player : NetworkBehaviour
         currentHealth = health;
         if (currentHealth <= 0 && IsHost)
         {
-                gm.RespawnPlayerClientRpc(GetPlayerID(), GetTeam());
+            gm.RespawnPlayerClientRpc(GetPlayerID(), GetTeam());
         }
     }
 
