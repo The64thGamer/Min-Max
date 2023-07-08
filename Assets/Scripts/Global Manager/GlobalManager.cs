@@ -424,11 +424,13 @@ public class GlobalManager : NetworkBehaviour
     {
         if (IsHost)
         {
+            Debug.Log("RespawPlayer Sent to Clients");
             RespawnPlayerClientRpc(id, team);
             for (int i = 0; i < clients.Count; i++)
             {
                 if (clients[i].GetPlayerID() == id && clients[i].GetWirePoint() != null)
                 {
+                    Debug.Log("RemoveClientWire Sent to Clients");
                     RemoveClientWireClientRpc(clients[i].GetPlayerID(), clients[i].GetWirePoint().point);
                 }
             }
@@ -724,7 +726,6 @@ public class GlobalManager : NetworkBehaviour
         {
             if (clients[i].GetPlayerID() == id)
             {
-                Debug.Log("attempted to remove");
                 clients[i].RemoveHeldWire(finalPos);
                 break;
             }
