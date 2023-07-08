@@ -106,6 +106,6 @@ public class Payload : GenericGamemode
                 finalIndex = i;
             }
         }
-        return teams[teamCounts[finalIndex]];
+        return teams[finalIndex];
     }
 }
