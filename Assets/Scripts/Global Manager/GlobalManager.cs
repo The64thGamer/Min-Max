@@ -432,7 +432,6 @@ public class GlobalManager : NetworkBehaviour
                     RemoveClientWireClientRpc(clients[i].GetPlayerID(), clients[i].GetWirePoint().point);
                 }
             }
-            Debug.Log("RespawnPlayer Sent to Clients");
 
             //Spawning
             Vector3 spawnPos = Vector3.zero;
@@ -445,8 +444,8 @@ public class GlobalManager : NetworkBehaviour
                 }
             }
 
+            Debug.Log("RespawnPlayer Sent to Clients");
             RespawnPlayerClientRpc(id, team, spawnPos);
-            return;
         }
     }
 

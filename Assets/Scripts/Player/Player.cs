@@ -448,6 +448,10 @@ public class Player : NetworkBehaviour
         {
             int finalHealth = Mathf.Min(currentHealth + amount, currentStats.baseHealth);
             gm.PlayerTookDamageClientRpc(GetPlayerID(), finalHealth, id, idHash);
+            if (currentHealth <= 0)
+            {
+                gm.RespawnPlayer(id, GetTeam());
+            }
             return finalHealth;
         }
         return 0;
@@ -456,10 +460,6 @@ public class Player : NetworkBehaviour
     public void SetHealth(int health)
     {
         currentHealth = health;
-        if (currentHealth <= 0 && IsHost)
-        {
-            gm.RespawnPlayer(GetPlayerID(), GetTeam());
-        }
     }
 
     public int GetHealth()
