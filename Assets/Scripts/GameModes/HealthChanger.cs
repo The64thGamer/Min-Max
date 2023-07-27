@@ -104,11 +104,13 @@ public class HealthChanger : MonoBehaviour
                 {
                     healthFinal = Mathf.CeilToInt((currentPlayer[i].GetClassStats().baseHealth / 100.0f) * health);
                 }
+
+                currentPlayer[i].ChangeHealth(currentPlayer[i].GetPlayerID(), healthFinal,Random.Range(-999999999,999999999));
+
                 if (currentPlayer[i].GetHealth() + healthFinal <= 0)
                 {
                     currentPlayer[i] = null;
                 }
-                currentPlayer[i].ChangeHealth(currentPlayer[i].GetPlayerID(), healthFinal,Random.Range(-999999999,999999999));
             }
         }
     }
