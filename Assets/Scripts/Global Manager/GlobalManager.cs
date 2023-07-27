@@ -837,7 +837,10 @@ public class GlobalManager : NetworkBehaviour
         {
             if (clients[i].GetPlayerID() == id)
             {
-                clients[i].GetCurrentGun().SpawnProjectile(clients[i]);
+                if (clients[i].GetCurrentGun() != null)
+                {
+                    clients[i].GetCurrentGun().SpawnProjectile(clients[i]);
+                }
             }
         }
     }

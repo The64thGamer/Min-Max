@@ -7,11 +7,9 @@ using Unity.XR.CoreUtils;
 using UnityEngine;
 using UnityEngine.InputSystem.XR;
 using UnityEngine.Rendering.Universal;
-using UnityEngine.UI;
-using UnityEngine.UIElements;
 using UnityEngine.XR.Interaction.Toolkit;
-using static UnityEngine.UI.Image;
 
+[RequireComponent(typeof(NetworkObject))]
 public class Player : NetworkBehaviour
 {
     [SerializeField] Gun currentGun;
