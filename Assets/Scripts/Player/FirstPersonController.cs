@@ -1,4 +1,5 @@
 ﻿using Unity.Netcode;
+using Unity.VisualScripting;
 using UnityEngine;
 
 namespace StarterAssets
@@ -23,8 +24,6 @@ namespace StarterAssets
         const float Gravity = -15.0f;
         const float FallTimeout = 0.15f;
 
-
-
         // player
         Vector3 _speed;
         float _verticalVelocity;
@@ -43,9 +42,9 @@ namespace StarterAssets
         bool hasBeenCrouched;
 
         //Wire
-        Vector3 wireStartPoint;
         bool directionDecided;
         Vector3 wireCollisionVector;
+        Wire.WirePoint heldWire;
 
 
         public override void OnNetworkSpawn()
@@ -73,7 +72,7 @@ namespace StarterAssets
             Vector3 newAxis = forward * _input.y + right * _input.x;
             Vector3 targetSpeed = new Vector3(newAxis.x, 0.0f, newAxis.z).normalized * player.GetClassStats().baseSpeed / 25.0f;
 
-            Wire.WirePoint heldWire = player.GetWirePoint();
+            heldWire = player.GetWirePoint();
 
             //Crouch
             if (crouch && _controller.isGrounded)
@@ -118,11 +117,11 @@ namespace StarterAssets
             //Holding Wire
             if (IsHost && heldWire != null)
             {
-                float distance = Vector3.Distance(wireStartPoint, transform.position);
+                float distance = Vector3.Distance(heldWire.parent.point, transform.position);
                 if (distance > _controller.radius && !directionDecided)
                 {
                     directionDecided = true;
-                    wireCollisionVector = (transform.position - wireStartPoint).normalized;
+                    wireCollisionVector = (transform.position - heldWire.parent.point).normalized;
                 }
                 else if(distance < _controller.radius)
                 {
@@ -131,7 +130,7 @@ namespace StarterAssets
                 if(directionDecided)
                 {
                     //Extremely cheap and fast collision for wires, using the player's current hitbox
-                    if(Vector3.Distance(wireCollisionVector * distance,transform.position) > _controller.radius*2)
+                    if(Vector3.Distance((wireCollisionVector * distance) + heldWire.parent.point, transform.position) > _controller.radius)
                     {
                         directionDecided = false;
 
@@ -274,5 +273,12 @@ namespace StarterAssets
             }
         }
 
+        private void OnDrawGizmos()
+        {
+            if (heldWire != null)
+            {
+                Gizmos.DrawLine((wireCollisionVector * Vector3.Distance(heldWire.parent.point, transform.position)) + heldWire.parent.point, transform.position);
+            }
+        }
     }
 }
