@@ -424,8 +424,6 @@ public class GlobalManager : NetworkBehaviour
     {
         if (IsHost)
         {
-            Debug.Log("RespawPlayer Sent to Clients");
-            RespawnPlayerClientRpc(id, team);
             for (int i = 0; i < clients.Count; i++)
             {
                 if (clients[i].GetPlayerID() == id && clients[i].GetWirePoint() != null)
@@ -434,6 +432,21 @@ public class GlobalManager : NetworkBehaviour
                     RemoveClientWireClientRpc(clients[i].GetPlayerID(), clients[i].GetWirePoint().point);
                 }
             }
+            Debug.Log("RespawnPlayer Sent to Clients");
+
+            //Spawning
+            Vector3 spawnPos = Vector3.zero;
+            for (int e = 0; e < teams.Count; e++)
+            {
+                if (teams[e].teamColor == team)
+                {
+                    spawnPos = teamSpawns[teams[e].spawns].GetChild(UnityEngine.Random.Range(0, teamSpawns[teams[e].spawns].childCount)).position;
+                    break;
+                }
+            }
+
+            RespawnPlayerClientRpc(id, team, spawnPos);
+            return;
         }
     }
 
@@ -734,7 +747,7 @@ public class GlobalManager : NetworkBehaviour
 
 
     [ClientRpc]
-    void RespawnPlayerClientRpc(ulong id, TeamList team)
+    void RespawnPlayerClientRpc(ulong id, TeamList team, Vector3 spawnPos)
     {
         Debug.Log("RespawnPlayerClientRpc");
         for (int i = 0; i < clients.Count; i++)
@@ -743,18 +756,9 @@ public class GlobalManager : NetworkBehaviour
             {
                 //Refresh Stats
                 clients[i].ResetClassStats();
-
-                //Spawning
-                for (int e = 0; e < teams.Count; e++)
-                {
-                    if (teams[e].teamColor == team)
-                    {
-                        Vector3 spawnPos = teamSpawns[teams[e].spawns].GetChild(UnityEngine.Random.Range(0, teamSpawns[teams[e].spawns].childCount)).position;
-                        clients[i].GetTracker().ForceNewPosition(spawnPos);
-                        Debug.Log("Player " + id + " respawned in " + team.ToString() + " spawn room");
-                        break;
-                    }
-                }
+                clients[i].GetTracker().ForceNewPosition(spawnPos);
+                Debug.Log("Player " + id + " respawned in " + team.ToString() + " spawn room");
+                return;
             }
         }
     }
