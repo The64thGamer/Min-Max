@@ -4,6 +4,7 @@ using Unity.Netcode;
 using UnityEngine;
 
 [RequireComponent(typeof(BoxCollider))]
+[RequireComponent(typeof(NetworkObject))]
 public class HealthChanger : NetworkBehaviour
 {
     NetworkVariable<bool> currentState = new NetworkVariable<bool>(true,NetworkVariableReadPermission.Everyone,NetworkVariableWritePermission.Server);
