@@ -113,8 +113,8 @@ MonoBehaviour:
       - b4afb4ee269afcf428e8364099b45161
       - ee3c2ec27616fbb4fbf23b6e66e45ffe
       m_Values:
-      - m_Center: {x: 0, y: 0, z: -40.5}
-        m_Extent: {x: 81, y: 81, z: 40.5}
+      - m_Center: {x: 40.5, y: 0, z: 40.5}
+        m_Extent: {x: 121.5, y: 81, z: 121.5}
       - m_Center: {x: 0, y: 40.5, z: 0}
         m_Extent: {x: 81, y: 40.5, z: 81}
       - m_Center: {x: 0, y: 0, z: 0}

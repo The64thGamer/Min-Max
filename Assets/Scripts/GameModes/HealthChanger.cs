@@ -97,7 +97,7 @@ public class HealthChanger : MonoBehaviour
     {
         for (int i = 0; i < currentPlayer.Count; i++)
         {
-            if (currentPlayer != null)
+            if (currentPlayer[i] != null)
             {
                 int healthFinal = health;
                 if(healthIsPercent)
