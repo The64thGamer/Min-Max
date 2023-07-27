@@ -106,6 +106,7 @@ public class Wire : MonoBehaviour
         lr.endColor = lr.startColor;
         lr.startWidth = 0.1f;
         lr.endWidth = lr.startWidth;
+        lr.numCapVertices = 5;
         meshes.Add(lr);
     }
 

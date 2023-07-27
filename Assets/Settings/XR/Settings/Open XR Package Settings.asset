@@ -13,11 +13,11 @@ MonoBehaviour:
   m_Name: DPadInteraction Standalone
   m_EditorClassIdentifier: 
   m_enabled: 0
-  nameUi: 
-  version: 
-  featureIdInternal: 
-  openxrExtensionStrings: 
-  company: 
+  nameUi: D-Pad Binding
+  version: 0.0.1
+  featureIdInternal: com.unity.openxr.feature.input.dpadinteraction
+  openxrExtensionStrings: XR_KHR_binding_modification XR_EXT_dpad_binding
+  company: Unity
   priority: 0
   required: 0
   forceThresholdLeft: 0.5
@@ -46,11 +46,11 @@ MonoBehaviour:
   m_Name: PalmPoseInteraction Standalone
   m_EditorClassIdentifier: 
   m_enabled: 0
-  nameUi: 
-  version: 
-  featureIdInternal: 
-  openxrExtensionStrings: 
-  company: 
+  nameUi: Palm Pose
+  version: 0.0.1
+  featureIdInternal: com.unity.openxr.feature.input.palmpose
+  openxrExtensionStrings: XR_EXT_palm_pose
+  company: Unity
   priority: 0
   required: 0
 --- !u!114 &-8051376628536773164
@@ -87,8 +87,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   features:
   - {fileID: 4963040286616351577}
+  - {fileID: -8628360464863664038}
   - {fileID: 4893829345954421791}
+  - {fileID: -5018361206349821563}
+  - {fileID: -5747760685602681725}
   - {fileID: -8051376628536773164}
+  - {fileID: -6550704027987053780}
   - {fileID: 2497339995422133549}
   - {fileID: -5941725581135416239}
   - {fileID: -6190486893500925776}
@@ -97,6 +101,7 @@ MonoBehaviour:
   - {fileID: 7413458854745118488}
   - {fileID: 4054846353496584751}
   - {fileID: 154189092879288027}
+  - {fileID: -8466618753966788317}
   - {fileID: 2316775424616146661}
   - {fileID: -5611916350011621528}
   m_renderMode: 1
@@ -114,11 +119,11 @@ MonoBehaviour:
   m_Name: HPReverbG2ControllerProfile Standalone
   m_EditorClassIdentifier: 
   m_enabled: 0
-  nameUi: 
-  version: 
-  featureIdInternal: 
-  openxrExtensionStrings: 
-  company: 
+  nameUi: HP Reverb G2 Controller Profile
+  version: 0.0.1
+  featureIdInternal: com.unity.openxr.feature.input.hpreverb
+  openxrExtensionStrings: XR_EXT_hp_mixed_reality_controller
+  company: Unity
   priority: 0
   required: 0
 --- !u!114 &-6190486893500925776
@@ -174,11 +179,11 @@ MonoBehaviour:
   m_Name: HandInteractionProfile Standalone
   m_EditorClassIdentifier: 
   m_enabled: 0
-  nameUi: 
-  version: 
-  featureIdInternal: 
-  openxrExtensionStrings: 
-  company: 
+  nameUi: Hand Interaction Profile
+  version: 0.0.1
+  featureIdInternal: com.unity.openxr.feature.input.handinteraction
+  openxrExtensionStrings: XR_EXT_hand_interaction
+  company: Unity
   priority: 0
   required: 0
 --- !u!114 &-5611916350011621528
@@ -214,11 +219,11 @@ MonoBehaviour:
   m_Name: HandCommonPosesInteraction Standalone
   m_EditorClassIdentifier: 
   m_enabled: 0
-  nameUi: 
-  version: 
-  featureIdInternal: 
-  openxrExtensionStrings: 
-  company: 
+  nameUi: Hand Interaction Poses
+  version: 0.0.1
+  featureIdInternal: com.unity.openxr.feature.input.handinteractionposes
+  openxrExtensionStrings: XR_EXT_hand_interaction
+  company: Unity
   priority: 0
   required: 0
 --- !u!114 &11400000

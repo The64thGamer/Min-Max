@@ -42,6 +42,11 @@ namespace StarterAssets
         float currentCrouchLerp;
         bool hasBeenCrouched;
 
+        //Wire
+        Vector3 wireStartPoint;
+        bool directionDecided;
+        Vector3 wireCollisionVector;
+
 
         public override void OnNetworkSpawn()
         {
@@ -109,6 +114,36 @@ namespace StarterAssets
             }
             targetSpeed *= ((1 - currentCrouchLerp) / 2.0f) + 0.5f;
             tracker.ModifyPlayerHeight(currentCrouchLerp);
+
+            //Holding Wire
+            if (IsHost && heldWire != null)
+            {
+                float distance = Vector3.Distance(wireStartPoint, transform.position);
+                if (distance > _controller.radius && !directionDecided)
+                {
+                    directionDecided = true;
+                    wireCollisionVector = (transform.position - wireStartPoint).normalized;
+                }
+                else if(distance < _controller.radius)
+                {
+                    directionDecided = false;
+                }
+                if(directionDecided)
+                {
+                    //Extremely cheap and fast collision for wires, using the player's current hitbox
+                    if(Vector3.Distance(wireCollisionVector * distance,transform.position) > _controller.radius*2)
+                    {
+                        directionDecided = false;
+
+                        player.SetWirePoint(gm.GetWire(player.GetTeam()).RequestForWire(transform.position));
+                        heldWire = player.GetWirePoint();
+                        if (heldWire != null)
+                        {
+                            gm.SegmentClientWireClientRpc(player.GetPlayerID(), heldWire.point, heldWire.wireID, heldWire.parent.wireID, player.GetTeam());
+                        }
+                    }
+                }
+            }
 
             //Movement rotation halted in midair
             if (!_controller.isGrounded)

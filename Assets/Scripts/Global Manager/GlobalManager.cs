@@ -744,6 +744,32 @@ public class GlobalManager : NetworkBehaviour
         }
     }
 
+    [ClientRpc]
+    public void SegmentClientWireClientRpc(ulong id, Vector3 finalPos, uint wireID, uint parentID, TeamList teamWireNeeded)
+    {
+        if (IsHost) { return; }
+
+        Debug.Log("SegmentClientWireClientRpc");
+        Wire neededWire = null;
+        for (int e = 0; e < teams.Count; e++)
+        {
+            if (teams[e].teamColor == teamWireNeeded)
+            {
+                neededWire = teamWires[teams[e].spawns];
+                break;
+            }
+        }
+        for (int i = 0; i < clients.Count; i++)
+        {
+            if (clients[i].GetPlayerID() == id)
+            {
+                clients[i].RemoveHeldWire(finalPos);
+                clients[i].SetWirePoint(neededWire.CreateNewClientWire(wireID, parentID));
+                return;
+            }
+        }
+    }
+
 
     [ClientRpc]
     void RespawnPlayerClientRpc(ulong id, TeamList team, Vector3 spawnPos)
@@ -761,6 +787,8 @@ public class GlobalManager : NetworkBehaviour
             }
         }
     }
+
+
 
     [ClientRpc]
     public void AssignPlayerClassAndTeamClientRpc(PlayerInfoSentToClient data)
