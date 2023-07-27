@@ -473,21 +473,23 @@ public class Player : NetworkBehaviour
         currentHealth = currentStats.baseHealth;
     }
 
-    public void RemoveHeldWire(Vector3 finalPos)
+    public void RemoveHeldWire(Vector3 finalPos, bool playSound)
     {
         if (heldWire != null)
         {
-            Debug.Log("actually removed");
-            wireSounds.RemoveWire();
+            if (playSound)
+            {
+                wireSounds.RemoveWire();
+            }
             heldWire.point = finalPos;
             heldWire = null;
         }
     }
 
-    public void SetWirePoint(Wire.WirePoint wire)
+    public void SetWirePoint(Wire.WirePoint wire, bool playSound)
     {
         heldWire = wire;
-        if (heldWire != null)
+        if (heldWire != null && playSound)
         {
             wireSounds.AddWire();
         }

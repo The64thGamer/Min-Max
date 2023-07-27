@@ -83,7 +83,7 @@ namespace StarterAssets
                     hasBeenCrouched = true;
                     if (IsHost)
                     {
-                        player.SetWirePoint(gm.GetWire(player.GetTeam()).RequestForWire(transform.position));
+                        player.SetWirePoint(gm.GetWire(player.GetTeam()).RequestForWire(transform.position), true);
                         heldWire = player.GetWirePoint();
                         if (heldWire != null)
                         {
@@ -99,7 +99,7 @@ namespace StarterAssets
                 {
                     if (IsHost && heldWire != null)
                     {
-                        gm.RemoveClientWireClientRpc(player.GetPlayerID(), heldWire.point);
+                        gm.RemoveClientWireClientRpc(player.GetPlayerID(), heldWire.point, true);
                     }
                     hasBeenCrouched = false;
                 }
@@ -109,7 +109,7 @@ namespace StarterAssets
             {
                 if (IsHost && heldWire != null)
                 {
-                    gm.RemoveClientWireClientRpc(player.GetPlayerID(), heldWire.point);
+                    gm.RemoveClientWireClientRpc(player.GetPlayerID(), heldWire.point, true);
                 }
             }
             targetSpeed *= ((1 - currentCrouchLerp) / 2.0f) + 0.5f;
@@ -135,7 +135,7 @@ namespace StarterAssets
                     {
                         directionDecided = false;
 
-                        player.SetWirePoint(gm.GetWire(player.GetTeam()).RequestForWire(transform.position));
+                        player.SetWirePoint(gm.GetWire(player.GetTeam()).RequestForWire(transform.position), true);
                         heldWire = player.GetWirePoint();
                         if (heldWire != null)
                         {

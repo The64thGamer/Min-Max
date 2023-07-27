@@ -392,7 +392,7 @@ public class GlobalManager : NetworkBehaviour
                 Wire.WirePoint wireHeld = clients[i].GetWirePoint();
                 if (wireHeld != null)
                 {
-                    RemoveClientWireClientRpc(id, wireHeld.point);
+                    RemoveClientWireClientRpc(id, wireHeld.point, false);
                 }
                 Destroy(clients[i].gameObject);
                 clients.RemoveAt(i);
@@ -429,7 +429,7 @@ public class GlobalManager : NetworkBehaviour
                 if (clients[i].GetPlayerID() == id && clients[i].GetWirePoint() != null)
                 {
                     Debug.Log("RemoveClientWire Sent to Clients");
-                    RemoveClientWireClientRpc(clients[i].GetPlayerID(), clients[i].GetWirePoint().point);
+                    RemoveClientWireClientRpc(clients[i].GetPlayerID(), clients[i].GetWirePoint().point, false);
                 }
             }
 
@@ -696,7 +696,7 @@ public class GlobalManager : NetworkBehaviour
     {
         for (int i = 0; i < clients.Count; i++)
         {
-            clients[i].RemoveHeldWire(Vector3.zero);
+            clients[i].RemoveHeldWire(Vector3.zero, false);
         }
         for (int i = 0; i < teamWires.Count; i++)
         {
@@ -724,21 +724,21 @@ public class GlobalManager : NetworkBehaviour
         {
             if (clients[i].GetPlayerID() == id)
             {
-                clients[i].SetWirePoint(neededWire.CreateNewClientWire(wireID, parentID));
+                clients[i].SetWirePoint(neededWire.CreateNewClientWire(wireID, parentID), true);
                 return;
             }
         }
     }
 
     [ClientRpc]
-    public void RemoveClientWireClientRpc(ulong id, Vector3 finalPos)
+    public void RemoveClientWireClientRpc(ulong id, Vector3 finalPos, bool playSound)
     {
         Debug.Log("RemoveClientWireClientRpc");
         for (int i = 0; i < clients.Count; i++)
         {
             if (clients[i].GetPlayerID() == id)
             {
-                clients[i].RemoveHeldWire(finalPos);
+                clients[i].RemoveHeldWire(finalPos, playSound);
                 break;
             }
         }
@@ -763,8 +763,8 @@ public class GlobalManager : NetworkBehaviour
         {
             if (clients[i].GetPlayerID() == id)
             {
-                clients[i].RemoveHeldWire(finalPos);
-                clients[i].SetWirePoint(neededWire.CreateNewClientWire(wireID, parentID));
+                clients[i].RemoveHeldWire(finalPos, false);
+                clients[i].SetWirePoint(neededWire.CreateNewClientWire(wireID, parentID), false);
                 return;
             }
         }
