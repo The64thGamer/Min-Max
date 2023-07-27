@@ -1,10 +1,13 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.Netcode;
 using UnityEngine;
 
 [RequireComponent(typeof(BoxCollider))]
-public class HealthChanger : MonoBehaviour
+public class HealthChanger : NetworkBehaviour
 {
+    NetworkVariable<bool> currentState = new NetworkVariable<bool>(true,NetworkVariableReadPermission.Everyone,NetworkVariableWritePermission.Server);
+
     [SerializeField] int health;
     [SerializeField] DamageChangerSettings setting;
     [SerializeField] float respawnTime;
@@ -17,48 +20,73 @@ public class HealthChanger : MonoBehaviour
     List<Player> currentPlayer = new List<Player>();
     bool alreadyDespawn;
 
+    public override void OnNetworkSpawn()
+    {
+        if (!IsHost)
+        {
+            currentState.OnValueChanged += ClientRespawn;
+        }
+    }
+
+    public override void OnNetworkDespawn()
+    {
+        if (!IsHost)
+        {
+            currentState.OnValueChanged -= ClientRespawn;
+        }
+    }
+
     private void OnTriggerEnter(Collider other)
     {
-        Player player = other.GetComponent<Player>();
-        if (player != null)
+        if (IsHost)
         {
-            currentPlayer.Add(player);
-            AttemptHealthChange();
+            Player player = other.GetComponent<Player>();
+            if (player != null)
+            {
+                currentPlayer.Add(player);
+                AttemptHealthChange();
+            }
         }
     }
 
     private void OnTriggerExit(Collider other)
     {
-        Player player = other.GetComponent<Player>();
-        if (player != null)
+        if (IsHost)
         {
-            currentPlayer.Remove(player);
-            AttemptHealthChange();
+            Player player = other.GetComponent<Player>();
+            if (player != null)
+            {
+                currentPlayer.Remove(player);
+                AttemptHealthChange();
+            }
         }
     }
 
     private void Update()
     {
-        switch (setting)
+        if (IsHost)
         {
-            case DamageChangerSettings.despawnOnTouch:
-                respawningTimer = Mathf.Max(0, respawningTimer - Time.deltaTime);
-                if(respawningTimer == 0)
-                {
-                    RespawnDespawn(true);
-                    alreadyDespawn = true;
-                }
-                break;
-            case DamageChangerSettings.loopWhileInside:
-                loopTimer = Mathf.Max(0, loopTimer - Time.deltaTime);
-                AttemptHealthChange();
-                break;
-            default:
-                break;
+            switch (setting)
+            {
+                case DamageChangerSettings.despawnOnTouch:
+                    respawningTimer = Mathf.Max(0, respawningTimer - Time.deltaTime);
+                    if (respawningTimer == 0)
+                    {
+                        RespawnDespawn(true);
+                        alreadyDespawn = true;
+                    }
+                    break;
+                case DamageChangerSettings.loopWhileInside:
+                    loopTimer = Mathf.Max(0, loopTimer - Time.deltaTime);
+                    AttemptHealthChange();
+                    break;
+                default:
+                    break;
+            }   
         }
-        if(spinObject)
+        if (spinObject)
         {
-            this.transform.Rotate(Vector3.up,Time.deltaTime * 100);
+            this.transform.Rotate(Vector3.up, Time.deltaTime * 100);
         }
     }
 
@@ -73,46 +101,73 @@ public class HealthChanger : MonoBehaviour
                     {
                         alreadyDespawn = false;
                         respawningTimer = respawnTime;
-                        TakeDamage();
-                        RespawnDespawn(false);
+                        for (int i = 0; i < currentPlayer.Count; i++)
+                        {
+                            if (currentPlayer[i] != null)
+                            {
+                                if (TakeDamage(i))
+                                {
+                                    RespawnDespawn(false);
+                                }
+                            }
+                        }
+                        
                     }
                     break;
                 case DamageChangerSettings.loopWhileInside:
                     if (loopTimer <= 0)
                     {
                         loopTimer = looptime;
-                        TakeDamage();
+                        for (int i = 0; i < currentPlayer.Count; i++)
+                        {
+                            if (currentPlayer[i] != null)
+                            {
+                                TakeDamage(i);
+                            }
+                        }
 
                     }
                     break;
                 default:
-                    TakeDamage();
+                    for (int i = 0; i < currentPlayer.Count; i++)
+                    {
+                        if (currentPlayer[i] != null)
+                        {
+                            TakeDamage(i);
+                        }
+                    }
                     currentPlayer = new List<Player>();
                     break;
             }
         }
     }
 
-    void TakeDamage()
+    bool TakeDamage(int i)
     {
-        for (int i = 0; i < currentPlayer.Count; i++)
+        int oldHealth = currentPlayer[i].GetHealth();
+        int healthFinal = health;
+        if (healthIsPercent)
         {
-            if (currentPlayer[i] != null)
-            {
-                int healthFinal = health;
-                if(healthIsPercent)
-                {
-                    healthFinal = Mathf.CeilToInt((currentPlayer[i].GetClassStats().baseHealth / 100.0f) * health);
-                }
-
-                currentPlayer[i].ChangeHealth(currentPlayer[i].GetPlayerID(), healthFinal,Random.Range(-999999999,999999999));
-
-                if (currentPlayer[i].GetHealth() + healthFinal <= 0)
-                {
-                    currentPlayer[i] = null;
-                }
-            }
+            healthFinal = Mathf.CeilToInt((currentPlayer[i].GetClassStats().baseHealth / 100.0f) * health);
         }
+
+        if (currentPlayer[i].ChangeHealth(currentPlayer[i].GetPlayerID(), healthFinal, Random.Range(-999999999, 999999999)) == oldHealth)
+        {
+            return false;
+        }
+        else
+        {
+            if (currentPlayer[i].GetHealth() + healthFinal <= 0)
+            {
+                currentPlayer[i] = null;
+            }
+            return true;
+        }
+    }
+
+    void ClientRespawn(bool prev, bool current)
+    {
+        RespawnDespawn(currentState.Value);
     }
 
     void RespawnDespawn(bool respawn)
@@ -128,6 +183,10 @@ public class HealthChanger : MonoBehaviour
             if (!respawn)
             {
                 currentPlayer = new List<Player>();
+            }
+            if(IsHost)
+            {
+                currentState.Value = respawn;
             }
         }
     }

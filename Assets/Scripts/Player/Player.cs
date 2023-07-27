@@ -444,13 +444,15 @@ public class Player : NetworkBehaviour
         g.SetActive(set);
     }
 
-    public void ChangeHealth(ulong id, int amount, int idHash)
+    public int ChangeHealth(ulong id, int amount, int idHash)
     {
         if (IsHost)
         {
             int finalHealth = Mathf.Min(currentHealth + amount, currentStats.baseHealth);
             gm.PlayerTookDamageClientRpc(GetPlayerID(), finalHealth, id, idHash);
+            return finalHealth;
         }
+        return 0;
     }
 
     public void SetHealth(int health)
