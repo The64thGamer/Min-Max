@@ -450,7 +450,7 @@ public class Player : NetworkBehaviour
             gm.PlayerTookDamageClientRpc(GetPlayerID(), finalHealth, id, idHash);
             if (currentHealth <= 0)
             {
-                gm.RespawnPlayer(id, GetTeam());
+                gm.RespawnPlayer(GetPlayerID(), GetTeam());
             }
             return finalHealth;
         }
