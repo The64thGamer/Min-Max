@@ -134,7 +134,7 @@ namespace StarterAssets
                     {
                         directionDecided = false;
 
-                        player.SetWirePoint(gm.GetWire(player.GetTeam()).RequestForWire(transform.position), true);
+                        player.SetWirePoint(gm.GetWire(player.GetTeam()).RequestForWire(transform.position), false);
                         heldWire = player.GetWirePoint();
                         if (heldWire != null)
                         {

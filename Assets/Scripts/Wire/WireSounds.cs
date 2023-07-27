@@ -21,4 +21,14 @@ public class WireSounds : MonoBehaviour
         au.Stop(); 
         au.PlayOneShot((AudioClip)Resources.Load("Sounds/Surge/Surge Drop", typeof(AudioClip)),1);
     }
+
+    public void PauseWire()
+    {
+        au.Stop();
+    }
+
+    public void ResumeWire()
+    {
+        au.Play();
+    }
 }

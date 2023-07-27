@@ -481,6 +481,10 @@ public class Player : NetworkBehaviour
             {
                 wireSounds.RemoveWire();
             }
+            else
+            {
+                wireSounds.PauseWire();
+            }
             heldWire.point = finalPos;
             heldWire = null;
         }
@@ -489,9 +493,16 @@ public class Player : NetworkBehaviour
     public void SetWirePoint(Wire.WirePoint wire, bool playSound)
     {
         heldWire = wire;
-        if (heldWire != null && playSound)
+        if (playSound)
         {
-            wireSounds.AddWire();
+            if (heldWire != null)
+            {
+                wireSounds.AddWire();
+            }
+        }
+        else
+        {
+            wireSounds.ResumeWire();
         }
     }
 
