@@ -40,18 +40,20 @@ public class WorldSpaceUIDocument : MonoBehaviour
 
     private void Update()
     {
-        Ray ray = new Ray(finger.position, finger.forward);
-        if (meshCollider.Raycast(ray, out var hit, Mathf.Infinity))
+        if (finger != null)
         {
-            screenDot.position = hit.point;
-            screenDot.forward = transform.forward;
-            screenDot.localScale = Vector3.one;
+            Ray ray = new Ray(finger.position, finger.forward);
+            if (meshCollider.Raycast(ray, out var hit, Mathf.Infinity))
+            {
+                screenDot.position = hit.point;
+                screenDot.forward = transform.forward;
+                screenDot.localScale = Vector3.one;
+            }
+            else
+            {
+                screenDot.localScale = Vector3.zero;
+            }
         }
-        else
-        {
-            screenDot.localScale = Vector3.zero;
-        }
-
     }
 
 #if UNITY_EDITOR
@@ -130,8 +132,16 @@ public class WorldSpaceUIDocument : MonoBehaviour
 
     private Vector2 ConvertScreenSpacePositionToPanelSpacePosition(Vector2 screenPosition)
     {
-        Ray ray = new Ray(finger.position, finger.forward);
-
+        Ray ray;
+        if (finger != null)
+        {
+            ray = new Ray(finger.position, finger.forward);
+        }
+        else
+        {
+            screenPosition.y = Screen.height - screenPosition.y;
+            ray = mainCamera.ScreenPointToRay(screenPosition);
+        }
         if (!meshCollider.Raycast(ray, out var hit, Mathf.Infinity)) return new Vector2(float.NaN, float.NaN);
 
         var targetTexture = uiDocument.panelSettings.targetTexture;
