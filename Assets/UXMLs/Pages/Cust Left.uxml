@@ -5,48 +5,26 @@
         <ui:Label text="Customization" style="-unity-font-definition: url(&apos;project://database/Assets/Game%20Assets/UI/Fonts/256%20bytes.otf?fileID=12800000&amp;guid=3da65d8dec80e0048a336d733ed50505&amp;type=3#256 bytes&apos;); font-size: 120px; color: rgb(26, 28, 26); margin-left: 0; margin-right: 0; margin-top: 0; margin-bottom: 0; padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0;" />
         <ui:VisualElement style="flex-grow: initial; background-color: rgba(0, 0, 0, 0); white-space: normal; flex-direction: row; justify-content: space-between;">
             <ui:Button text="&lt;&lt;" name="ClassLeft" class="Button ButtonPaper" />
-            <ui:Label text="The Programmer" style="-unity-font-definition: url(&apos;project://database/Assets/Game%20Assets/UI/Fonts/PTMono-Regular.ttf?fileID=12800000&amp;guid=cc1735a3c585aba4480bc03c8d93b029&amp;type=3#PTMono-Regular&apos;); font-size: 40px; color: rgb(26, 28, 26); margin-left: 0; margin-right: 0; margin-top: 0; margin-bottom: 0; padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0; justify-content: space-between; align-self: center;" />
+            <ui:Label text="The Programmer" name="ClassLabel" style="-unity-font-definition: url(&apos;project://database/Assets/Game%20Assets/UI/Fonts/PTMono-Regular.ttf?fileID=12800000&amp;guid=cc1735a3c585aba4480bc03c8d93b029&amp;type=3#PTMono-Regular&apos;); font-size: 40px; color: rgb(26, 28, 26); margin-left: 0; margin-right: 0; margin-top: 0; margin-bottom: 0; padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0; justify-content: space-between; align-self: center;" />
             <ui:Button text="&gt;&gt;" name="ClassRight" class="Button ButtonPaper" />
         </ui:VisualElement>
         <ui:VisualElement style="flex-grow: initial; background-color: rgba(0, 0, 0, 0); white-space: normal; flex-direction: row; justify-content: space-between;">
             <ui:Button text="&lt;&lt;" name="TeamLeft" class="Button ButtonPaper" />
-            <ui:VisualElement style="flex-grow: 0; background-color: rgb(164, 139, 0); flex-shrink: 0; width: 90px; height: 90px; justify-content: center; align-items: center; align-self: center; border-left-width: 4px; border-right-width: 4px; border-top-width: 4px; border-bottom-width: 4px; border-left-color: rgb(26, 28, 26); border-right-color: rgb(26, 28, 26); border-top-color: rgb(26, 28, 26); border-bottom-color: rgb(26, 28, 26);">
-                <ui:VisualElement style="background-image: url(&apos;project://database/Assets/Game%20Assets/UI/Team%20Logos/C%20Team%201k.png?fileID=2800000&amp;guid=e3525ea08a543a2489c8eaad6c0c08a1&amp;type=3#C Team 1k&apos;); width: 80px; height: 80px;" />
+            <ui:VisualElement style="flex-grow: 0; background-color: rgba(164, 139, 0, 0); flex-shrink: 0; width: 90px; height: 90px; justify-content: center; align-items: center; align-self: center; border-left-width: 4px; border-right-width: 4px; border-top-width: 4px; border-bottom-width: 4px; border-left-color: rgb(26, 28, 26); border-right-color: rgb(26, 28, 26); border-top-color: rgb(26, 28, 26); border-bottom-color: rgb(26, 28, 26);">
+                <ui:VisualElement name="TeamIcon" style="background-image: url(&apos;project://database/Assets/Game%20Assets/UI/Team%20Logos/C%20Team%201k.png?fileID=2800000&amp;guid=e3525ea08a543a2489c8eaad6c0c08a1&amp;type=3#C Team 1k&apos;); width: 80px; height: 80px; background-color: rgb(164, 139, 0); margin-left: 0; margin-right: 0; margin-top: 0; margin-bottom: 0; padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0;" />
             </ui:VisualElement>
             <ui:Button text="&gt;&gt;" name="TeamRight" class="Button ButtonPaper" />
             <ui:Button text="&lt;&lt;" name="LoadoutLeft" class="Button ButtonPaper" />
-            <ui:Label text="Var A" style="-unity-font-definition: url(&apos;project://database/Assets/Game%20Assets/UI/Fonts/PTMono-Regular.ttf?fileID=12800000&amp;guid=cc1735a3c585aba4480bc03c8d93b029&amp;type=3#PTMono-Regular&apos;); font-size: 40px; color: rgb(26, 28, 26); margin-left: 0; margin-right: 0; margin-top: 0; margin-bottom: 0; padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0; justify-content: space-between; align-self: center;" />
+            <ui:Label text="Var A" name="LoadoutLabel" style="-unity-font-definition: url(&apos;project://database/Assets/Game%20Assets/UI/Fonts/PTMono-Regular.ttf?fileID=12800000&amp;guid=cc1735a3c585aba4480bc03c8d93b029&amp;type=3#PTMono-Regular&apos;); font-size: 40px; color: rgb(26, 28, 26); margin-left: 0; margin-right: 0; margin-top: 0; margin-bottom: 0; padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0; justify-content: space-between; align-self: center;" />
             <ui:Button text="&gt;&gt;" name="LoadoutRight" class="Button ButtonPaper" />
         </ui:VisualElement>
-        <ui:VisualElement style="flex-grow: 1; background-color: rgba(0, 0, 0, 0); height: 829px; flex-direction: row; flex-wrap: wrap; justify-content: flex-start; align-items: flex-start;">
-            <ui:Button class="Button ButtonPaper CosmeticIcon">
-                <ui:VisualElement style="flex-grow: 1; background-color: rgba(0, 0, 0, 0); background-image: url(&apos;project://database/Assets/Game%20Assets/UI/Backpack%20Icons/AltGlove.png?fileID=2800000&amp;guid=aeeb89a2e611de149a7457d1d0c4ec40&amp;type=3#AltGlove&apos;);" />
-            </ui:Button>
-            <ui:Button class="Button ButtonPaper CosmeticIcon">
-                <ui:VisualElement style="flex-grow: 1; background-color: rgba(0, 0, 0, 0); background-image: url(&apos;project://database/Assets/Game%20Assets/UI/Backpack%20Icons/AltGlove.png?fileID=2800000&amp;guid=aeeb89a2e611de149a7457d1d0c4ec40&amp;type=3#AltGlove&apos;);" />
-            </ui:Button>
-            <ui:Button class="Button ButtonPaper CosmeticIcon">
-                <ui:VisualElement style="flex-grow: 1; background-color: rgba(0, 0, 0, 0); background-image: url(&apos;project://database/Assets/Game%20Assets/UI/Backpack%20Icons/AltGlove.png?fileID=2800000&amp;guid=aeeb89a2e611de149a7457d1d0c4ec40&amp;type=3#AltGlove&apos;);" />
-            </ui:Button>
-            <ui:Button class="Button ButtonPaper CosmeticIcon">
-                <ui:VisualElement style="flex-grow: 1; background-color: rgba(0, 0, 0, 0); background-image: url(&apos;project://database/Assets/Game%20Assets/UI/Backpack%20Icons/AltGlove.png?fileID=2800000&amp;guid=aeeb89a2e611de149a7457d1d0c4ec40&amp;type=3#AltGlove&apos;);" />
-            </ui:Button>
-            <ui:Button class="Button ButtonPaper CosmeticIcon">
-                <ui:VisualElement style="flex-grow: 1; background-color: rgba(0, 0, 0, 0); background-image: url(&apos;project://database/Assets/Game%20Assets/UI/Backpack%20Icons/AltGlove.png?fileID=2800000&amp;guid=aeeb89a2e611de149a7457d1d0c4ec40&amp;type=3#AltGlove&apos;);" />
-            </ui:Button>
-            <ui:Button class="Button ButtonPaper CosmeticIcon">
-                <ui:VisualElement style="flex-grow: 1; background-color: rgba(0, 0, 0, 0); background-image: url(&apos;project://database/Assets/Game%20Assets/UI/Backpack%20Icons/AltGlove.png?fileID=2800000&amp;guid=aeeb89a2e611de149a7457d1d0c4ec40&amp;type=3#AltGlove&apos;);" />
-            </ui:Button>
-            <ui:Button class="Button ButtonPaper CosmeticIcon">
-                <ui:VisualElement style="flex-grow: 1; background-color: rgba(0, 0, 0, 0); background-image: url(&apos;project://database/Assets/Game%20Assets/UI/Backpack%20Icons/AltGlove.png?fileID=2800000&amp;guid=aeeb89a2e611de149a7457d1d0c4ec40&amp;type=3#AltGlove&apos;);" />
-            </ui:Button>
-        </ui:VisualElement>
+        <ui:VisualElement name="IconHolder" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0); height: 829px; flex-direction: row; flex-wrap: wrap; justify-content: flex-start; align-items: flex-start;" />
         <ui:VisualElement style="flex-grow: initial; background-color: rgba(0, 0, 0, 0); white-space: normal; flex-direction: row; justify-content: space-between;">
             <ui:Button text="&lt;&lt;" name="CosmeticLeft" class="Button ButtonPaper" />
-            <ui:Label text="Hair / Hats" style="-unity-font-definition: url(&apos;project://database/Assets/Game%20Assets/UI/Fonts/PTMono-Regular.ttf?fileID=12800000&amp;guid=cc1735a3c585aba4480bc03c8d93b029&amp;type=3#PTMono-Regular&apos;); font-size: 40px; color: rgb(26, 28, 26); margin-left: 0; margin-right: 0; margin-top: 0; margin-bottom: 0; padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0; justify-content: space-between; align-self: center;" />
+            <ui:Label text="Hair / Hats" name="CosmeticTypeLabel" style="-unity-font-definition: url(&apos;project://database/Assets/Game%20Assets/UI/Fonts/PTMono-Regular.ttf?fileID=12800000&amp;guid=cc1735a3c585aba4480bc03c8d93b029&amp;type=3#PTMono-Regular&apos;); font-size: 40px; color: rgb(26, 28, 26); margin-left: 0; margin-right: 0; margin-top: 0; margin-bottom: 0; padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0; justify-content: space-between; align-self: center;" />
             <ui:Button text="&gt;&gt;" name="CosmeticRight" class="Button ButtonPaper" />
             <ui:Button text="&lt;&lt;" name="PageLeft" class="Button ButtonPaper" />
-            <ui:Label text="Page 1" style="-unity-font-definition: url(&apos;project://database/Assets/Game%20Assets/UI/Fonts/PTMono-Regular.ttf?fileID=12800000&amp;guid=cc1735a3c585aba4480bc03c8d93b029&amp;type=3#PTMono-Regular&apos;); font-size: 40px; color: rgb(26, 28, 26); margin-left: 0; margin-right: 0; margin-top: 0; margin-bottom: 0; padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0; justify-content: space-between; align-self: center;" />
+            <ui:Label text="Page 1" name="PageLabel" style="-unity-font-definition: url(&apos;project://database/Assets/Game%20Assets/UI/Fonts/PTMono-Regular.ttf?fileID=12800000&amp;guid=cc1735a3c585aba4480bc03c8d93b029&amp;type=3#PTMono-Regular&apos;); font-size: 40px; color: rgb(26, 28, 26); margin-left: 0; margin-right: 0; margin-top: 0; margin-bottom: 0; padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0; justify-content: space-between; align-self: center;" />
             <ui:Button text="&gt;&gt;" name="PageRight" class="Button ButtonPaper" />
         </ui:VisualElement>
         <ui:Button text="Back" name="Back" class="Button ButtonPaper" />

@@ -1,23 +1,48 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UIElements;
 using UnityEngine.XR.Management;
+using static UnityEditor.Rendering.FilterWindow;
 
 public class Menu : MonoBehaviour
 {
+    [Header("Physical Menu")]
     [SerializeField] MenuPage[] pages;
     [SerializeField] UIDocument leftMenu;
     [SerializeField] UIDocument rightMenu;
-    NetworkManager m_NetworkManager;
     [SerializeField] Transform centerRing;
     [SerializeField] RenderTexture menuLeftRT;
     [SerializeField] RenderTexture menuRightRT;
     [SerializeField] RenderTexture fakeMenuLeftRT;
     [SerializeField] RenderTexture fakeMenuRightRT;
+
+    [Header("Lists")]
+    [SerializeField] Texture2D[] teamIcons;
+    [SerializeField] Color[] teamColors;
+    [SerializeField] GameObject[] playerModels;
+    [SerializeField] string[] cosmeticTypes;
+
+    [Header("Objects")]
+    [SerializeField] GameObject customizeMenuCamera;
+    [SerializeField] Cosmetics cosmetics;
+    [SerializeField] VisualTreeAsset cosmeticIconVTA;
+    List<GameObject> currentCharMeshes = new List<GameObject>();
+
+    int[] cosmeticInts;
+    NetworkManager m_NetworkManager;
     bool flippingPage;
+
+    //Labels
+    int currentCustClass;
+    int currentCustTeam;
+    int currentCustPage;
+    int currentCustCosmType;
+    int currentCustLoadout;
 
     private void OnEnable()
     {
@@ -34,7 +59,7 @@ public class Menu : MonoBehaviour
 
     private void Update()
     {
-        if(flippingPage)
+        if (flippingPage)
         {
             centerRing.eulerAngles = new Vector3(0, centerRing.eulerAngles.y + (Time.deltaTime * 750), 0);
             if (centerRing.eulerAngles.y > 359 || centerRing.eulerAngles.y < 180)
@@ -92,6 +117,21 @@ public class Menu : MonoBehaviour
                             break;
                         case "Customization":
                             SwitchPage(1);
+                            currentCustClass = 3;
+                            currentCustTeam = 0;
+                            currentCustPage = 0;
+                            currentCustLoadout = 0;
+                            currentCustCosmType = -1;
+                            currentCustCosmType = CheckCosmeticType(1);
+                            SetCharacterVisibility((ClassList)currentCustClass, new int[0]);
+                            SetPicture("TeamIcon", teamIcons[currentCustTeam], teamColors[currentCustTeam], false);
+                            SetLabel("CosmeticTypeLabel", cosmeticTypes[currentCustCosmType].PadRight(10), false);
+                            SetLabel("ClassLabel", "The " + System.Globalization.CultureInfo.CurrentCulture.TextInfo.ToTitleCase(Enum.GetName(typeof(ClassList), currentCustClass)), false);
+                            SetLabel("LoadoutLabel", "Var " + (char)('A' + currentCustLoadout % 26), false);
+                            SetLabel("PageLabel", "Page " + currentCustPage.ToString(), false);
+                            UpdateTeamColor();
+                            customizeMenuCamera.SetActive(true);
+                            CreateCosmeticPage();
                             break;
                         case "Statistics":
                             SwitchPage(2);
@@ -112,8 +152,67 @@ public class Menu : MonoBehaviour
                 case "Cust Left":
                     switch (button)
                     {
+                        case "ClassLeft":
+                            currentCustClass = Mathf.Max(currentCustClass - 1, 0);
+                            SetLabel("ClassLabel", "The " + System.Globalization.CultureInfo.CurrentCulture.TextInfo.ToTitleCase(Enum.GetName(typeof(ClassList), currentCustClass)), false);
+                            SetCharacterVisibility((ClassList)currentCustClass, new int[0]);
+                            UpdateTeamColor();
+                            CreateCosmeticPage();
+                            break;
+                        case "ClassRight":
+                            currentCustClass = Mathf.Min(currentCustClass + 1, 9);
+                            SetLabel("ClassLabel", "The " + System.Globalization.CultureInfo.CurrentCulture.TextInfo.ToTitleCase(Enum.GetName(typeof(ClassList), currentCustClass)), false);
+                            SetCharacterVisibility((ClassList)currentCustClass, new int[0]);
+                            UpdateTeamColor();
+                            CreateCosmeticPage();
+                            break;
+                        case "TeamLeft":
+                            currentCustTeam = Mathf.Max(currentCustTeam - 1, 0);
+                            SetPicture("TeamIcon", teamIcons[currentCustTeam], teamColors[currentCustTeam], false);
+                            CreateCosmeticPage();
+                            UpdateTeamColor();
+                            break;
+                        case "TeamRight":
+                            currentCustTeam = Mathf.Min(currentCustTeam + 1, 8);
+                            SetPicture("TeamIcon", teamIcons[currentCustTeam], teamColors[currentCustTeam], false);
+                            CreateCosmeticPage();
+                            UpdateTeamColor();
+                            break;
+                        case "LoadoutLeft":
+                            currentCustLoadout = Mathf.Max(currentCustLoadout - 1, 0);
+                            SetLabel("LoadoutLabel", "Var " + (char)('A' + currentCustLoadout % 26), false);
+                            SetCharacterVisibility((ClassList)currentCustClass, new int[0]);
+                            UpdateTeamColor();
+                            break;
+                        case "LoadoutRight":
+                            currentCustLoadout = Mathf.Min(currentCustLoadout + 1, 25);
+                            SetLabel("LoadoutLabel", "Var " + (char)('A' + currentCustLoadout % 26), false);
+                            SetCharacterVisibility((ClassList)currentCustClass, new int[0]);
+                            UpdateTeamColor();
+                            break;
+                        case "CosmeticLeft":
+                            currentCustCosmType = CheckCosmeticType(-1);
+                            SetLabel("CosmeticTypeLabel", cosmeticTypes[currentCustCosmType].PadRight(10), false);
+                            CreateCosmeticPage();
+                            break;
+                        case "CosmeticRight":
+                            currentCustCosmType = CheckCosmeticType(1);
+                            SetLabel("CosmeticTypeLabel", cosmeticTypes[currentCustCosmType].PadRight(10), false);
+                            CreateCosmeticPage();
+                            break;
+                        case "PageLeft":
+                            currentCustPage = Mathf.Max(currentCustPage - 1, 0);
+                            CreateCosmeticPage();
+                            SetLabel("PageLabel", "Page " + currentCustPage.ToString(), false);
+                            break;
+                        case "PageRight":
+                            currentCustPage = Mathf.Min(currentCustPage + 1, 10);
+                            CreateCosmeticPage();
+                            SetLabel("PageLabel", "Page " + currentCustPage.ToString(), false);
+                            break;
                         case "Back":
                             SwitchPage(0);
+                            customizeMenuCamera.SetActive(false);
                             break;
                         default:
                             break;
@@ -155,6 +254,88 @@ public class Menu : MonoBehaviour
         }
     }
 
+    int CheckCosmeticType(int adjust)
+    {
+        int neededValue = Mathf.Clamp(currentCustCosmType + adjust, 0, 10);
+        List<Cosmetic> currentCosmetics = cosmetics.GetClassCosmetics((ClassList)currentCustClass);
+        while (true)
+        {
+            if (neededValue < 0 || neededValue > 10)
+            {
+                return currentCustCosmType;
+            }
+            int cosmeticsInRegion = 0;
+            for (int i = 0; i < currentCosmetics.Count; i++)
+            {
+                if (currentCosmetics[i].region == (EquipRegion)neededValue)
+                {
+                    cosmeticsInRegion++;
+                }
+            }
+            if (cosmeticsInRegion > 0)
+            {
+                return neededValue;
+            }
+            neededValue += adjust;
+        }
+
+    }
+
+    void CreateCosmeticPage()
+    {
+        VisualElement visList = leftMenu.rootVisualElement.Q<VisualElement>("IconHolder");
+
+        //Clear old children
+        List<VisualElement> children = new List<VisualElement>();
+        foreach (var child in visList.Children())
+        {
+            children.Add(child);
+        }
+        for (int i = 0; i < children.Count; i++)
+        {
+            visList.Remove(children[i]);
+        }
+
+        //Create new icons
+        List<Cosmetic> currentCosmetics = cosmetics.GetClassCosmetics((ClassList)currentCustClass);
+        for (int i = 0; i < currentCosmetics.Count; i++)
+        {
+            if (currentCosmetics[i].region == (EquipRegion)currentCustCosmType)
+            {
+                TemplateContainer myUI = cosmeticIconVTA.Instantiate();
+                myUI.Q<VisualElement>("Icon").style.backgroundImage = new StyleBackground(currentCosmetics[i].icon);
+                visList.Add(myUI);
+            }
+        }
+
+    }
+
+    void SetLabel(string element, string text, bool isRightPage)
+    {
+        if (isRightPage)
+        {
+            rightMenu.rootVisualElement.Q<Label>(element).text = text;
+        }
+        else
+        {
+            leftMenu.rootVisualElement.Q<Label>(element).text = text;
+        }
+    }
+
+    void SetPicture(string element, Texture2D bgImage, Color color, bool isRightPage)
+    {
+        if (isRightPage)
+        {
+            rightMenu.rootVisualElement.Q<VisualElement>(element).style.backgroundImage = new StyleBackground(bgImage);
+            rightMenu.rootVisualElement.Q<VisualElement>(element).style.backgroundColor = color;
+        }
+        else
+        {
+            leftMenu.rootVisualElement.Q<VisualElement>(element).style.backgroundImage = new StyleBackground(bgImage);
+            leftMenu.rootVisualElement.Q<VisualElement>(element).style.backgroundColor = color;
+        }
+    }
+
     private void OnClientDisconnectCallback(ulong obj)
     {
 
@@ -185,6 +366,209 @@ public class Menu : MonoBehaviour
                 yield return null;
             }
         }
+    }
+
+
+    public void SetCharacterVisibility(ClassList currentClass, int[] newCosInts)
+    {
+        cosmeticInts = newCosInts;
+        SetupCosmetics(currentClass, newCosInts);
+
+        while (currentCharMeshes.Count > 0)
+        {
+            Destroy(currentCharMeshes[0]);
+            currentCharMeshes.RemoveAt(0);
+        }
+        for (int i = 0; i < playerModels.Length; i++)
+        {
+            if (i == (int)currentClass)
+            {
+                Debug.Log(i + " a " + currentClass);
+
+                List<Cosmetic> classCosmetics = cosmetics.GetClassCosmetics(currentClass);
+
+                //Reveal class
+                playerModels[i].SetActive(true);
+
+                //Apply Bodygroup Hiding
+                Transform t = playerModels[i].transform;
+                SetMeshVis(t, "Skin Arm L", true, false);
+                SetMeshVis(t, "Skin Arm R", true, false);
+                SetMeshVis(t, "Skin Body", true, false);
+                SetMeshVis(t, "Skin Foot L", true, false);
+                SetMeshVis(t, "Skin Foot R", true, false);
+                SetMeshVis(t, "Skin Hand L", true, false);
+                SetMeshVis(t, "Skin Hand R", true, false);
+                SetMeshVis(t, "Skin Head", true, false);
+                SetMeshVis(t, "Skin Leg L", true, false);
+                SetMeshVis(t, "Skin Leg R", true, false);
+
+                //Get Combination Hide Bodygroups Enum
+                BodyGroups combined = new BodyGroups();
+                for (int e = 0; e < cosmeticInts.Length; e++)
+                {
+                    combined = combined | classCosmetics[cosmeticInts[e]].hideBodyGroups;
+                }
+
+                if (combined.HasFlag(BodyGroups.armL))
+                {
+                    SetMeshVis(t, "Skin Arm L", false, false);
+                }
+                if (combined.HasFlag(BodyGroups.armR))
+                {
+                    SetMeshVis(t, "Skin Arm R", false, false);
+                }
+                if (combined.HasFlag(BodyGroups.body))
+                {
+                    SetMeshVis(t, "Skin Body", false, false);
+                }
+                if (combined.HasFlag(BodyGroups.footL))
+                {
+                    SetMeshVis(t, "Skin Foot L", false, false);
+                }
+                if (combined.HasFlag(BodyGroups.footR))
+                {
+                    SetMeshVis(t, "Skin Foot R", false, false);
+                }
+                if (combined.HasFlag(BodyGroups.handL))
+                {
+                    SetMeshVis(t, "Skin Hand L", false, false);
+                }
+                if (combined.HasFlag(BodyGroups.handR))
+                {
+                    SetMeshVis(t, "Skin Hand R", false, false);
+                }
+                if (combined.HasFlag(BodyGroups.head))
+                {
+                    SetMeshVis(t, "Skin Head", false, false);
+                }
+                if (combined.HasFlag(BodyGroups.legL))
+                {
+                    SetMeshVis(t, "Skin Leg L", false, false);
+                }
+                if (combined.HasFlag(BodyGroups.legR))
+                {
+                    SetMeshVis(t, "Skin Leg R", false, false);
+                }
+
+                //Apply Cosmetics
+                for (int e = 0; e < cosmeticInts.Length; e++)
+                {
+                    ApplyCosmetics(classCosmetics[cosmeticInts[e]].prefab, t);
+                }
+
+            }
+            else
+            {
+                //Hide other classes
+                playerModels[i].SetActive(false);
+            }
+        }
+    }
+
+    void SetupCosmetics(ClassList currentClass, int[] classCosmetics)
+    {
+        List<Cosmetic> stockCosmetics = cosmetics.GetClassCosmetics(currentClass);
+        List<int> cosmeticIntList = cosmeticInts.ToList<int>();
+        for (int i = 0; i < classCosmetics.Length; i++)
+        {
+            if (classCosmetics[i] < stockCosmetics.Count)
+            {
+                Cosmetic cm = stockCosmetics[classCosmetics[i]];
+                bool isDupeEquipRegion = false;
+                for (int e = 0; e < cosmeticIntList.Count; e++)
+                {
+                    if (stockCosmetics[cosmeticIntList[e]].region == cm.region)
+                    {
+                        isDupeEquipRegion = true;
+                    }
+                }
+                if (!isDupeEquipRegion)
+                {
+                    cosmeticIntList.Add(classCosmetics[i]);
+                }
+            }
+        }
+        //Stock
+        for (int i = 0; i < stockCosmetics.Count; i++)
+        {
+            if (stockCosmetics[i].stock == StockCosmetic.stock)
+            {
+                bool isStockDupeEquipRegion = false;
+                for (int e = 0; e < cosmeticIntList.Count; e++)
+                {
+                    if (stockCosmetics[cosmeticIntList[e]].region == stockCosmetics[i].region)
+                    {
+                        isStockDupeEquipRegion = true;
+                    }
+                }
+                if (!isStockDupeEquipRegion)
+                {
+
+                    cosmeticIntList.Add(i);
+                }
+            }
+        }
+        cosmeticInts = cosmeticIntList.ToArray();
+    }
+
+    void ApplyCosmetics(GameObject prefab, Transform t)
+    {
+        GameObject g = new GameObject(prefab.name);
+        g.layer = 9;
+        g.transform.parent = t;
+        SkinnedMeshRenderer targetSkin = g.AddComponent<SkinnedMeshRenderer>();
+        SkinnedMeshRenderer originalSkin = prefab.GetComponentInChildren<SkinnedMeshRenderer>();
+        targetSkin.SetSharedMaterials(originalSkin.sharedMaterials.ToList<Material>());
+        targetSkin.sharedMesh = originalSkin.sharedMesh;
+        targetSkin.rootBone = t.Find("Armature").GetChild(0);
+        currentCharMeshes.Add(g);
+
+        Transform[] newBones = new Transform[originalSkin.bones.Length];
+
+        int a = 0;
+        foreach (var originalBone in originalSkin.bones)
+        {
+
+            foreach (var newBone in targetSkin.rootBone.GetComponentsInChildren<Transform>())
+            {
+                if (newBone.name == originalBone.name)
+                {
+                    newBones[a] = newBone;
+                    continue;
+                }
+            }
+            a++;
+        }
+        targetSkin.bones = newBones;
+    }
+
+    void SetMeshVis(Transform trans, string meshName, bool set, bool alwaysUpdate)
+    {
+        GameObject g = trans.Find(meshName).gameObject;
+        SkinnedMeshRenderer r = g.GetComponent<SkinnedMeshRenderer>();
+        if (r != null)
+        {
+            r.updateWhenOffscreen = alwaysUpdate;
+        }
+        g.SetActive(set);
+    }
+
+    void UpdateTeamColor()
+    {
+        //Player
+        float teamFinal = (float)currentCustTeam + 1;
+        Renderer[] meshes = customizeMenuCamera.GetComponentsInChildren<Renderer>();
+        for (int i = 0; i < meshes.Length; i++)
+        {
+            Material[] mats = meshes[i].materials;
+            for (int r = 0; r < mats.Length; r++)
+            {
+                mats[r].SetFloat("_Team_1", teamFinal);
+            }
+            meshes[i].materials = mats;
+        }
+
     }
 
     [System.Serializable]
