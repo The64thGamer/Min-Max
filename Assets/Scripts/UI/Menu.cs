@@ -31,6 +31,7 @@ public class Menu : MonoBehaviour
     [SerializeField] GameObject customizeMenuCamera;
     [SerializeField] Cosmetics cosmetics;
     [SerializeField] VisualTreeAsset cosmeticIconVTA;
+    [SerializeField] Texture2D noneTexture;
     List<GameObject> currentCharMeshes = new List<GameObject>();
 
     int[] cosmeticInts;
@@ -123,7 +124,7 @@ public class Menu : MonoBehaviour
                             currentCustLoadout = 0;
                             currentCustCosmType = -1;
                             currentCustCosmType = CheckCosmeticType(1);
-                            SetCharacterVisibility((ClassList)currentCustClass, new int[0]);
+                            SetCharacterVisibility();
                             SetPicture("TeamIcon", teamIcons[currentCustTeam], teamColors[currentCustTeam], false);
                             SetLabel("CosmeticTypeLabel", cosmeticTypes[currentCustCosmType].PadRight(10), false);
                             SetLabel("ClassLabel", "The " + System.Globalization.CultureInfo.CurrentCulture.TextInfo.ToTitleCase(Enum.GetName(typeof(ClassList), currentCustClass)), false);
@@ -155,15 +156,17 @@ public class Menu : MonoBehaviour
                         case "ClassLeft":
                             currentCustClass = Mathf.Max(currentCustClass - 1, 0);
                             SetLabel("ClassLabel", "The " + System.Globalization.CultureInfo.CurrentCulture.TextInfo.ToTitleCase(Enum.GetName(typeof(ClassList), currentCustClass)), false);
-                            SetCharacterVisibility((ClassList)currentCustClass, new int[0]);
-                            UpdateTeamColor();
+                            SetCharacterVisibility();
+                            currentCustCosmType--;
+                            currentCustCosmType = CheckCosmeticType(1);
                             CreateCosmeticPage();
                             break;
                         case "ClassRight":
                             currentCustClass = Mathf.Min(currentCustClass + 1, 9);
                             SetLabel("ClassLabel", "The " + System.Globalization.CultureInfo.CurrentCulture.TextInfo.ToTitleCase(Enum.GetName(typeof(ClassList), currentCustClass)), false);
-                            SetCharacterVisibility((ClassList)currentCustClass, new int[0]);
-                            UpdateTeamColor();
+                            SetCharacterVisibility();
+                            currentCustCosmType--;
+                            currentCustCosmType = CheckCosmeticType(1);
                             CreateCosmeticPage();
                             break;
                         case "TeamLeft":
@@ -181,23 +184,19 @@ public class Menu : MonoBehaviour
                         case "LoadoutLeft":
                             currentCustLoadout = Mathf.Max(currentCustLoadout - 1, 0);
                             SetLabel("LoadoutLabel", "Var " + (char)('A' + currentCustLoadout % 26), false);
-                            SetCharacterVisibility((ClassList)currentCustClass, new int[0]);
-                            UpdateTeamColor();
+                            SetCharacterVisibility();
                             break;
                         case "LoadoutRight":
                             currentCustLoadout = Mathf.Min(currentCustLoadout + 1, 25);
                             SetLabel("LoadoutLabel", "Var " + (char)('A' + currentCustLoadout % 26), false);
-                            SetCharacterVisibility((ClassList)currentCustClass, new int[0]);
-                            UpdateTeamColor();
+                            SetCharacterVisibility();
                             break;
                         case "CosmeticLeft":
                             currentCustCosmType = CheckCosmeticType(-1);
-                            SetLabel("CosmeticTypeLabel", cosmeticTypes[currentCustCosmType].PadRight(10), false);
                             CreateCosmeticPage();
                             break;
                         case "CosmeticRight":
                             currentCustCosmType = CheckCosmeticType(1);
-                            SetLabel("CosmeticTypeLabel", cosmeticTypes[currentCustCosmType].PadRight(10), false);
                             CreateCosmeticPage();
                             break;
                         case "PageLeft":
@@ -262,7 +261,7 @@ public class Menu : MonoBehaviour
         {
             if (neededValue < 0 || neededValue > 10)
             {
-                return currentCustCosmType;
+                return Mathf.Clamp(currentCustCosmType, 0, 10);
             }
             int cosmeticsInRegion = 0;
             for (int i = 0; i < currentCosmetics.Count; i++)
@@ -274,11 +273,17 @@ public class Menu : MonoBehaviour
             }
             if (cosmeticsInRegion > 0)
             {
-                return neededValue;
+                return Mathf.Clamp(neededValue, 0, 10);
             }
             neededValue += adjust;
         }
 
+    }
+
+    void InsertCosmetic(int cosmeticValue)
+    {
+        PlayerPrefs.SetInt("Loadout " + currentCustClass + " Var: " + currentCustLoadout + " Type: " + currentCustCosmType, cosmeticValue + 1);
+        SetCharacterVisibility();
     }
 
     void CreateCosmeticPage()
@@ -296,18 +301,39 @@ public class Menu : MonoBehaviour
             visList.Remove(children[i]);
         }
 
-        //Create new icons
+        //Create "None" Icon
         List<Cosmetic> currentCosmetics = cosmetics.GetClassCosmetics((ClassList)currentCustClass);
+        bool noneIcon = true;
+        for (int i = 0; i < currentCosmetics.Count; i++)
+        {
+            if (currentCosmetics[i].region == (EquipRegion)currentCustCosmType && currentCosmetics[i].stock == StockCosmetic.stock)
+            {
+                noneIcon = false;
+            }
+        }
+        if(noneIcon)
+        {
+            TemplateContainer myUI = cosmeticIconVTA.Instantiate();
+            myUI.Q<VisualElement>("Icon").style.backgroundImage = new StyleBackground(noneTexture);
+
+            myUI.Q<Button>("Button").clicked += () => InsertCosmetic(-1);
+            visList.Add(myUI);
+        }
+
+        //Create new icons
         for (int i = 0; i < currentCosmetics.Count; i++)
         {
             if (currentCosmetics[i].region == (EquipRegion)currentCustCosmType)
             {
                 TemplateContainer myUI = cosmeticIconVTA.Instantiate();
                 myUI.Q<VisualElement>("Icon").style.backgroundImage = new StyleBackground(currentCosmetics[i].icon);
+
+                int finalVal = i;
+                myUI.Q<Button>("Button").clicked += () => InsertCosmetic(finalVal);
                 visList.Add(myUI);
             }
         }
-
+        SetLabel("CosmeticTypeLabel", cosmeticTypes[currentCustCosmType].PadRight(10), false);
     }
 
     void SetLabel(string element, string text, bool isRightPage)
@@ -369,10 +395,21 @@ public class Menu : MonoBehaviour
     }
 
 
-    public void SetCharacterVisibility(ClassList currentClass, int[] newCosInts)
+    public void SetCharacterVisibility()
     {
-        cosmeticInts = newCosInts;
-        SetupCosmetics(currentClass, newCosInts);
+        List<int> newCosInts = new List<int>();
+
+        for (int i = 0; i < 11; i++)
+        {
+            int check = PlayerPrefs.GetInt("Loadout " + currentCustClass + " Var: " + currentCustLoadout + " Type: " + i) - 1;
+            if(check >= 0)
+            {
+                newCosInts.Add(check);
+            }
+        }
+
+        cosmeticInts = newCosInts.ToArray();
+        SetupCosmetics(cosmeticInts);
 
         while (currentCharMeshes.Count > 0)
         {
@@ -381,11 +418,11 @@ public class Menu : MonoBehaviour
         }
         for (int i = 0; i < playerModels.Length; i++)
         {
-            if (i == (int)currentClass)
+            if (i == (int)currentCustClass)
             {
-                Debug.Log(i + " a " + currentClass);
+                Debug.Log(i + " a " + currentCustClass);
 
-                List<Cosmetic> classCosmetics = cosmetics.GetClassCosmetics(currentClass);
+                List<Cosmetic> classCosmetics = cosmetics.GetClassCosmetics((ClassList)currentCustClass);
 
                 //Reveal class
                 playerModels[i].SetActive(true);
@@ -464,11 +501,12 @@ public class Menu : MonoBehaviour
                 playerModels[i].SetActive(false);
             }
         }
+        UpdateTeamColor();
     }
 
-    void SetupCosmetics(ClassList currentClass, int[] classCosmetics)
+    void SetupCosmetics(int[] classCosmetics)
     {
-        List<Cosmetic> stockCosmetics = cosmetics.GetClassCosmetics(currentClass);
+        List<Cosmetic> stockCosmetics = cosmetics.GetClassCosmetics((ClassList)currentCustClass);
         List<int> cosmeticIntList = cosmeticInts.ToList<int>();
         for (int i = 0; i < classCosmetics.Length; i++)
         {
