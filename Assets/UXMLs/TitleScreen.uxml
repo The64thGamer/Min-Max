@@ -8,7 +8,7 @@
         </ui:VisualElement>
         <ui:VisualElement name="MiddleBar" class="backdrop backdropTwo" style="flex-grow: 1; background-color: rgb(90, 76, 67); flex-direction: row; display: flex; min-width: auto; opacity: 1; border-left-width: 5px; border-right-width: 5px; border-top-width: 5px; border-bottom-width: 5px; margin-left: 5px; margin-right: 5px; margin-top: 5px; margin-bottom: 5px;">
             <ui:VisualElement name="TitleMenu" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0); background-image: url(&apos;project://database/Assets/Game%20Assets/UI/Logo/Logo%202k.png?fileID=2800000&amp;guid=fdc01551e637a304688508c7710467c2&amp;type=3#Logo 2k&apos;); -unity-background-scale-mode: scale-to-fit; opacity: 1; margin-left: 50px; margin-right: 50px; margin-top: 50px; margin-bottom: 50px; display: none;" />
-            <ui:VisualElement name="PlayMenu" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0); flex-direction: row; min-width: auto; min-height: auto; display: none; justify-content: space-evenly;">
+            <ui:VisualElement name="PlayMenu" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0); flex-direction: row; min-width: auto; min-height: auto; display: flex; justify-content: space-evenly;">
                 <ui:VisualElement name="PlayMenuCol1" class="downbackdrop backdrop" style="display: flex; overflow: visible; visibility: visible; -unity-text-align: upper-left; white-space: normal; margin-left: 0; margin-right: 5px; margin-top: 0; margin-bottom: 0; max-width: 200px;">
                     <ui:Button text="Join Server" display-tooltip-when-elided="true" name="PSJoinServer" class="button" style="display: flex;" />
                     <ui:Button text="Start Server" display-tooltip-when-elided="true" name="PSStartServer" class="button" style="display: flex;" />
@@ -16,7 +16,7 @@
                     <ui:Button text="Start Local" display-tooltip-when-elided="true" name="PSStartLocal" class="button" />
                 </ui:VisualElement>
                 <ui:VisualElement name="PlayMenuCol2" class="downbackdrop backdrop" style="display: flex; overflow: visible; visibility: visible; -unity-text-align: upper-left; white-space: normal; margin-left: 5px; margin-right: 5px; margin-top: 0; margin-bottom: 0; max-width: none; min-width: auto;">
-                    <ui:VisualElement name="ServerSettings" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0); display: none;">
+                    <ui:VisualElement name="ServerSettings" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0); display: flex;">
                         <ui:ScrollView name="ScrollView" horizontal-scroller-visibility="Hidden" vertical-scroller-visibility="Auto">
                             <ui:Label tabindex="-1" text="Players" display-tooltip-when-elided="true" style="margin-left: 0; margin-right: 0; margin-top: 0; margin-bottom: 0; padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0; border-left-width: 5px; border-right-width: 5px; border-top-width: 5px; border-bottom-width: 5px;" />
                             <ui:SliderInt picking-mode="Ignore" label="Max Players" value="24" high-value="32" low-value="1" show-input-field="true" name="MaxPlayers" class="dropdown" />
@@ -28,7 +28,7 @@
                             <ui:Toggle label="Spawn Spectators As Players" name="SpectatorAsPlayer" tooltip="Flatscreen spectators spawn in as actual players in the match. (They can&apos;t do anything)" style="display: none;" />
                         </ui:ScrollView>
                     </ui:VisualElement>
-                    <ui:VisualElement name="LocalServers" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0); display: flex; overflow: visible;">
+                    <ui:VisualElement name="LocalServers" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0); display: none; overflow: visible;">
                         <ui:Label tabindex="-1" text="Add New Server" display-tooltip-when-elided="true" style="margin-left: 0; margin-right: 0; margin-top: 0; margin-bottom: 0; padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0; border-left-width: 5px; border-right-width: 5px; border-top-width: 5px; border-bottom-width: 5px;" />
                         <ui:TextField picking-mode="Ignore" label="Port" value="7766" password="false" name="NewLocalServerPort" keyboard-type="NumberPad" class="dropdown">
                             <ui:Button text="Add Server" name="AddNewLocalServer" class="button" />
@@ -63,7 +63,7 @@
                     </ui:VisualElement>
                 </ui:VisualElement>
             </ui:VisualElement>
-            <ui:VisualElement name="SettingsMenu" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0); flex-direction: row; min-width: auto; min-height: auto; display: flex; justify-content: space-evenly;">
+            <ui:VisualElement name="SettingsMenu" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0); flex-direction: row; min-width: auto; min-height: auto; display: none; justify-content: space-evenly;">
                 <ui:VisualElement name="SettingsMenuCol1" class="downbackdrop backdrop" style="display: flex; overflow: visible; visibility: visible; -unity-text-align: upper-left; white-space: normal; margin-left: 5px; margin-right: 5px; margin-top: 0; margin-bottom: 0; max-width: none; min-width: auto;">
                     <ui:ScrollView name="ScrollView" horizontal-scroller-visibility="Hidden" vertical-scroller-visibility="Auto">
                         <ui:Label tabindex="-1" text="Online Play" display-tooltip-when-elided="true" style="margin-left: 0; margin-right: 0; margin-top: 0; margin-bottom: 0; padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0; border-left-width: 5px; border-right-width: 5px; border-top-width: 5px; border-bottom-width: 5px;" />
