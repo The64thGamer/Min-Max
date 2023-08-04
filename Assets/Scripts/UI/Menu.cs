@@ -7,7 +7,6 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UIElements;
 using UnityEngine.XR.Management;
-using static UnityEditor.Rendering.FilterWindow;
 
 public class Menu : MonoBehaviour
 {

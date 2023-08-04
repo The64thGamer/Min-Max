@@ -6,7 +6,6 @@ using Unity.Netcode;
 using Unity.XR.CoreUtils;
 using UnityEngine;
 using UnityEngine.InputSystem.XR;
-using UnityEngine.Rendering.Universal;
 using UnityEngine.XR.Interaction.Toolkit;
 
 [RequireComponent(typeof(NetworkObject))]
@@ -46,7 +45,7 @@ public class Player : NetworkBehaviour
         else
         {
             SetCharacterVisibility(true);
-            Destroy(this.GetComponentInChildren<UniversalAdditionalCameraData>());
+            //Destroy(this.GetComponentInChildren<UniversalAdditionalCameraData>());
             Destroy(this.GetComponentInChildren<Camera>());
             Destroy(this.GetComponentInChildren<AudioListener>());
             TrackedPoseDriver[] pd = this.GetComponentsInChildren<TrackedPoseDriver>();
