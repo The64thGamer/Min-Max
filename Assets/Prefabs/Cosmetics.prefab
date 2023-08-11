@@ -90,6 +90,12 @@ MonoBehaviour:
     region: 4
     hideBodyGroups: 2
     stock: 0
+  - name: On-Hold Holster
+    icon: {fileID: 2800000, guid: 51bc51773c72bfb4bb5976a7919640a5, type: 3}
+    prefab: {fileID: 919132149155446097, guid: 7f5301a0ae57f1d468161d05abea6302, type: 3}
+    region: 7
+    hideBodyGroups: 2
+    stock: 0
   computer:
   - name: Computer's Head
     icon: {fileID: 2800000, guid: f013b5dc3ec29c84fb0a457b49134986, type: 3}

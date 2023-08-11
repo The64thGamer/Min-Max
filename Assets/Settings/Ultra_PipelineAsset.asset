@@ -90,14 +90,34 @@ MonoBehaviour:
     bayerMatrixTex: {fileID: 2800000, guid: f9ee4ed84c1d10c49aabb9b210b0fc44, type: 3}
   apvScenesData:
     m_ObsoleteSerializedBakingSets: []
-    serializedBounds: []
-    serializedHasVolumes: []
+    serializedBounds:
+    - sceneGUID: b4afb4ee269afcf428e8364099b45161
+      bounds:
+        m_Center: {x: 0, y: 0, z: 0}
+        m_Extent: {x: 81, y: 81, z: 81}
+    - sceneGUID: b7248a0a181720f4dbad0677a6b925f6
+      bounds:
+        m_Center: {x: 0, y: 40.5, z: 0}
+        m_Extent: {x: 81, y: 40.5, z: 81}
+    - sceneGUID: 32abb4b46f3afb9459d70e6eea9709d0
+      bounds:
+        m_Center: {x: 0, y: 0, z: 0}
+        m_Extent: {x: 81, y: 81, z: 81}
+    serializedHasVolumes:
+    - sceneGUID: b4afb4ee269afcf428e8364099b45161
+      hasProbeVolumes: 1
+    - sceneGUID: b7248a0a181720f4dbad0677a6b925f6
+      hasProbeVolumes: 1
+    - sceneGUID: 32abb4b46f3afb9459d70e6eea9709d0
+      hasProbeVolumes: 1
     bakingSets:
+    - {fileID: 11400000, guid: 1be590c72cd93df4ba040e8f3372382f, type: 2}
     - {fileID: 11400000, guid: 4683078c91e7e1f4c8db08f5cf45b324, type: 2}
     - {fileID: 11400000, guid: 9270d4f33f5248949b907eaa601b848f, type: 2}
     - {fileID: 11400000, guid: 9bc93989d2155da4b879d8c1d6476110, type: 2}
     - {fileID: 11400000, guid: 80eab57fba1df2d43884ad060dd3f8d0, type: 2}
     - {fileID: 11400000, guid: 50a8d5925bcef23498c298e1e6c9fc1a, type: 2}
+    - {fileID: 11400000, guid: a7fd60d8e4d45d441b45c88eec51a3f2, type: 2}
     m_LightingScenario: Default
   m_PrefilteringModeMainLightShadows: 3
   m_PrefilteringModeAdditionalLight: 3
