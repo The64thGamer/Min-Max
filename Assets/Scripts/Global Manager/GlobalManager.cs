@@ -785,6 +785,10 @@ public class GlobalManager : NetworkBehaviour
         {
             if (clients[i].GetPlayerID() == id)
             {
+                if(clients[i].IsOwner)
+                {
+                    achievments.SaveAchievements();
+                }
                 //Refresh Stats
                 clients[i].ResetClassStats();
                 clients[i].GetTracker().ForceNewPosition(spawnPos);
