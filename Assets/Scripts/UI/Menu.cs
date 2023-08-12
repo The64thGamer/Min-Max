@@ -32,6 +32,7 @@ public class Menu : MonoBehaviour
     [SerializeField] Cosmetics cosmetics;
     [SerializeField] VisualTreeAsset cosmeticIconVTA;
     [SerializeField] Texture2D noneTexture;
+    [SerializeField] AudioSource aus;
     List<GameObject> currentCharMeshes = new List<GameObject>();
 
     int[] cosmeticInts;
@@ -77,20 +78,52 @@ public class Menu : MonoBehaviour
         {
             leftMenu.visualTreeAsset = pages[index].leftAsset;
             VisualElement root = leftMenu.rootVisualElement;
-            for (int i = 0; i < pages[index].leftButtons.Count; i++)
+            for (int i = 0; i < pages[index].leftInteractables.Count; i++)
             {
                 int indexCtx = index;
                 int iCtx = i;
-                root.Q<Button>(pages[indexCtx].leftButtons[iCtx]).clicked += () => ButtonPressed(pages[indexCtx].leftPageName, pages[indexCtx].leftButtons[iCtx]);
+                switch (pages[indexCtx].leftInteractables[iCtx].type)
+                {
+                    case MenuButtonType.button:
+                        root.Q<Button>(pages[indexCtx].leftInteractables[iCtx].name).clicked += () => ButtonPressed(pages[indexCtx].leftPageName, pages[indexCtx].leftInteractables[iCtx].name,"",false,0, pages[indexCtx].leftInteractables[iCtx].sound);
+                        break;
+                    case MenuButtonType.toggle:
+                        root.Q<Toggle>(pages[indexCtx].leftInteractables[iCtx].name).RegisterValueChangedCallback(evt=> ButtonPressed(pages[indexCtx].leftPageName, pages[indexCtx].leftInteractables[iCtx].name, "", evt.newValue, 0, pages[indexCtx].leftInteractables[iCtx].sound));
+                        break;
+                    case MenuButtonType.textField:
+                        root.Q<TextField>(pages[indexCtx].leftInteractables[iCtx].name).RegisterValueChangedCallback(evt => ButtonPressed(pages[indexCtx].leftPageName, pages[indexCtx].leftInteractables[iCtx].name, evt.newValue, false, 0, pages[indexCtx].leftInteractables[iCtx].sound));
+                        break;
+                    case MenuButtonType.slider:
+                        root.Q<Slider>(pages[indexCtx].leftInteractables[iCtx].name).RegisterValueChangedCallback(evt => ButtonPressed(pages[indexCtx].leftPageName, pages[indexCtx].leftInteractables[iCtx].name, "", false, evt.newValue, pages[indexCtx].leftInteractables[iCtx].sound));
+                        break;
+                    default:
+                        break;
+                }
             }
 
             rightMenu.visualTreeAsset = pages[index].rightAsset;
             root = rightMenu.rootVisualElement;
-            for (int i = 0; i < pages[index].rightButtons.Count; i++)
+            for (int i = 0; i < pages[index].rightInteractables.Count; i++)
             {
                 int indexCtx = index;
                 int iCtx = i;
-                root.Q<Button>(pages[indexCtx].rightButtons[iCtx]).clicked += () => ButtonPressed(pages[indexCtx].rightPageName, pages[indexCtx].rightButtons[iCtx]);
+                switch (pages[indexCtx].rightInteractables[iCtx].type)
+                {
+                    case MenuButtonType.button:
+                        root.Q<Button>(pages[indexCtx].rightInteractables[iCtx].name).clicked += () => ButtonPressed(pages[indexCtx].rightPageName, pages[indexCtx].rightInteractables[iCtx].name, "", false, 0, pages[indexCtx].rightInteractables[iCtx].sound);
+                        break;
+                    case MenuButtonType.toggle:
+                        root.Q<Toggle>(pages[indexCtx].rightInteractables[iCtx].name).RegisterValueChangedCallback(evt => ButtonPressed(pages[indexCtx].rightPageName, pages[indexCtx].rightInteractables[iCtx].name, "", evt.newValue, 0, pages[indexCtx].rightInteractables[iCtx].sound));
+                        break;
+                    case MenuButtonType.textField:
+                        root.Q<TextField>(pages[indexCtx].rightInteractables[iCtx].name).RegisterValueChangedCallback(evt => ButtonPressed(pages[indexCtx].rightPageName, pages[indexCtx].rightInteractables[iCtx].name, evt.newValue, false, 0, pages[indexCtx].rightInteractables[iCtx].sound));
+                        break;
+                    case MenuButtonType.slider:
+                        root.Q<Slider>(pages[indexCtx].rightInteractables[iCtx].name).RegisterValueChangedCallback(evt => ButtonPressed(pages[indexCtx].rightPageName, pages[indexCtx].rightInteractables[iCtx].name, "", false, evt.newValue, pages[indexCtx].rightInteractables[iCtx].sound));
+                        break;
+                    default:
+                        break;
+                }
             }
 
             flippingPage = true;
@@ -100,10 +133,22 @@ public class Menu : MonoBehaviour
         }
     }
 
-    void ButtonPressed(string page, string button)
+    void ButtonPressed(string page, string button, string valueString, bool valueBool, float valueFloat, MenuButtonSound sound)
     {
         if (!flippingPage)
         {
+            switch (sound)
+            {
+                case MenuButtonSound.penFlick:
+                    aus.PlayOneShot(Resources.Load<AudioClip>("Sounds/Menu/Page Flip"), 0.5f);
+
+                    break;
+                case MenuButtonSound.pageTurn:
+                    aus.PlayOneShot(Resources.Load<AudioClip>("Sounds/Menu/Pen Flick"), 0.5f);
+                    break;
+                default:
+                    break;
+            }
             Debug.Log("Button " + button + " of " + page + " pressed");
             switch (page)
             {
@@ -156,6 +201,15 @@ public class Menu : MonoBehaviour
                             break;
                         case "Settings":
                             SwitchPage(3);
+                            string finalName = PlayerPrefs.GetString("Settings: Player Name");
+                            if(finalName == "")
+                            {
+                                finalName = "Intern #" + UnityEngine.Random.Range(0, 1000000);
+                                PlayerPrefs.SetString("Settings: Player Name",finalName);
+                            }
+                            SetTextField("PlayerName", finalName, false);
+                            SetToggle("Vsync", Convert.ToBoolean(PlayerPrefs.GetInt("Settings: Vsync")), false);
+                            SetToggle("Windowed", Convert.ToBoolean(PlayerPrefs.GetInt("Settings: Windowed")), false);
                             break;
                         case "StartVR":
                             StartCoroutine(StartXR());
@@ -362,6 +416,29 @@ public class Menu : MonoBehaviour
         else
         {
             leftMenu.rootVisualElement.Q<Label>(element).text = text;
+        }
+    }
+
+    void SetToggle(string element, bool value, bool isRightPage)
+    {
+        if (isRightPage)
+        {
+            rightMenu.rootVisualElement.Q<Toggle>(element).SetValueWithoutNotify(value);
+        }
+        else
+        {
+            leftMenu.rootVisualElement.Q<Toggle>(element).SetValueWithoutNotify(value);
+        }
+    }
+    void SetTextField(string element, string value, bool isRightPage)
+    {
+        if (isRightPage)
+        {
+            rightMenu.rootVisualElement.Q<TextField>(element).SetValueWithoutNotify(value);
+        }
+        else
+        {
+            leftMenu.rootVisualElement.Q<TextField>(element).SetValueWithoutNotify(value);
         }
     }
 
@@ -633,7 +710,29 @@ public class Menu : MonoBehaviour
         public string rightPageName;
         public VisualTreeAsset leftAsset;
         public VisualTreeAsset rightAsset;
-        public List<string> leftButtons;
-        public List<string> rightButtons;
+        public List<MenuButtons> leftInteractables;
+        public List<MenuButtons> rightInteractables;
+    }
+
+    public enum MenuButtonType
+    {
+        button,
+        toggle,
+        textField,
+        slider,
+    }
+    public enum MenuButtonSound
+    {
+        penFlick,
+        pageTurn,
+        none,
+    }
+
+    [System.Serializable]
+    struct MenuButtons
+    {
+        public string name;
+        public MenuButtonType type;
+        public MenuButtonSound sound;
     }
 }
