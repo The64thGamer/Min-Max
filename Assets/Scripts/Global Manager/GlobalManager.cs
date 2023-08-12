@@ -21,6 +21,7 @@ public class GlobalManager : NetworkBehaviour
 
     [Header("Lists")]
     [SerializeField] Cosmetics co;
+    [SerializeField] Achievements achievments;
     [SerializeField] GameObject clientPrefab;
     List<Player> clients = new List<Player>();
     [SerializeField] List<Transform> teamSpawns;
@@ -364,6 +365,11 @@ public class GlobalManager : NetworkBehaviour
     public AllStats GetAllStats()
     {
         return al;
+    }
+
+    public Achievements GetAchievements()
+    {
+        return achievments;
     }
 
     public Cosmetics GetCosmetics()
@@ -879,11 +885,14 @@ public class GlobalManager : NetworkBehaviour
     [ClientRpc]
     public void PlayerTookDamageClientRpc(ulong id, int currentHealth, ulong idOfKiller, int idHash)
     {
+        int foundClient = 0;
 
+        //Search for client first
         for (int i = 0; i < clients.Count; i++)
         {
             if (clients[i].GetPlayerID() == id)
             {
+                foundClient = i;
                 if (currentHealth <= 0)
                 {
                     Debug.Log("Player " + id + " was killed (" + clients[i].GetHealth() + " -> " + currentHealth + " HP) by Player" + idOfKiller);
@@ -892,13 +901,25 @@ public class GlobalManager : NetworkBehaviour
                 {
                     Debug.Log("Player " + id + " took damage (" + clients[i].GetHealth() + " -> " + currentHealth + " HP) by Player" + idOfKiller);
                 }
-                clients[i].SetHealth(currentHealth);
-
             }
+        }
+
+        int damageTaken = clients[foundClient].GetHealth() - Mathf.Max(currentHealth,0);
+
+
+        for (int i = 0; i < clients.Count; i++)
+        {
             if (clients[i].GetPlayerID() == idOfKiller && clients[i].IsOwner && id != idOfKiller)
             {
+                if (damageTaken > 0)
+                {
+                    achievments.AddToValue("Achievement: Total Damage", damageTaken);
+                }
+
                 if (currentHealth <= 0)
                 {
+                    achievments.AddToValue("Achievement: Total Kills", 1);
+
                     //Ensures a gun firing 10 bullets doesn't play 10 hitsounds
                     bool isntDuplicate = true;
                     for (int e = 0; e < damageHashes.Count; e++)
@@ -920,6 +941,8 @@ public class GlobalManager : NetworkBehaviour
                 }
             }
         }
+
+        clients[foundClient].SetHealth(currentHealth);
     }
 }
 

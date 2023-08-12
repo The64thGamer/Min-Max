@@ -223,12 +223,28 @@ namespace StarterAssets
             // move the player
             Vector3 finalVelocity = (_speed * Time.deltaTime) + new Vector3(0.0f, _verticalVelocity, 0.0f) * Time.deltaTime;
 
+            Vector3 oldPos = transform.position;
+
             _controller.Move(finalVelocity);
 
             //Wire
             if (heldWire != null)
             {
                 heldWire.point = transform.position;
+            }
+
+            //Achievements
+            if (IsOwner)
+            {
+                if (_controller.isGrounded)
+                {
+                    gm.GetAchievements().AddToValue("Achievement: Total Walking Distance", Vector3.Distance(oldPos, transform.position));
+                }
+                else
+                {
+                    gm.GetAchievements().AddToValue("Achievement: Total Air Travel", Vector3.Distance(oldPos, transform.position));
+                    gm.GetAchievements().AddToValue("Achievement: Total Air-Time", Time.deltaTime);
+                }
             }
         }
 
