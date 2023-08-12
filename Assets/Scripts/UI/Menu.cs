@@ -139,9 +139,9 @@ public class Menu : MonoBehaviour
                             SetLabel("Statistics",
                                 "Total Damage: " + PlayerPrefs.GetFloat("Achievement: Total Damage") +
                                 "\nTotal Kills: " + PlayerPrefs.GetFloat("Achievement: Total Kills") +
-                                "\nTotal Distance Walked: " + PlayerPrefs.GetFloat("Achievement: Total Walking Distance") + " m" +
-                                "\nTotal Air Travel: " + PlayerPrefs.GetFloat("Achievement: Total Air Travel") + " m" +
-                                "\nTotal Air-Time: " + PlayerPrefs.GetFloat("Achievement: Total Air-Time") + " sec" +
+                                "\nTotal Distance Walked: " + (int)PlayerPrefs.GetFloat("Achievement: Total Walking Distance") + " m" +
+                                "\nTotal Air Travel: " + (int)PlayerPrefs.GetFloat("Achievement: Total Air Travel") + " m" +
+                                "\nTotal Air-Time: " + (int)PlayerPrefs.GetFloat("Achievement: Total Air-Time") + " sec" +
                                 "\nTotal Laborers Killed: " + PlayerPrefs.GetFloat("Achievement: Total Laborers Killed") +
                                 "\nTotal Wood Workers Killed: " + PlayerPrefs.GetFloat("Achievement: Total Wood Workers Killed") +
                                 "\nTotal Developers Killed: " + PlayerPrefs.GetFloat("Achievement: Total Developers Killed") +
