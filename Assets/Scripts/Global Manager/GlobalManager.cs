@@ -879,19 +879,21 @@ public class GlobalManager : NetworkBehaviour
     [ClientRpc]
     public void PlayerTookDamageClientRpc(ulong id, int currentHealth, ulong idOfKiller, int idHash)
     {
-        if (currentHealth <= 0)
-        {
-            Debug.Log("Player " + id + " was killed (" + currentHealth + " HP) by Player" + idOfKiller);
-        }
-        else
-        {
-            Debug.Log("Player " + id + " took damage (" + currentHealth + " HP) by Player" + idOfKiller);
-        }
+
         for (int i = 0; i < clients.Count; i++)
         {
             if (clients[i].GetPlayerID() == id)
             {
+                if (currentHealth <= 0)
+                {
+                    Debug.Log("Player " + id + " was killed (" + clients[i].GetHealth() + " -> " + currentHealth + " HP) by Player" + idOfKiller);
+                }
+                else
+                {
+                    Debug.Log("Player " + id + " took damage (" + clients[i].GetHealth() + " -> " + currentHealth + " HP) by Player" + idOfKiller);
+                }
                 clients[i].SetHealth(currentHealth);
+
             }
             if (clients[i].GetPlayerID() == idOfKiller && clients[i].IsOwner && id != idOfKiller)
             {
