@@ -46,6 +46,35 @@ public class Cosmetics : MonoBehaviour
                 return null;
         }
     }
+
+    public Cosmetic FindCosmetic(ClassList classes, int index)
+    {
+        switch (classes)
+        {
+            case ClassList.labourer:
+                return labourer[index];
+            case ClassList.woodworker:
+                return woodworker[index];
+            case ClassList.developer:
+                return developer[index];
+            case ClassList.programmer:
+                return programmer[index];
+            case ClassList.computer:
+                return computer[index];
+            case ClassList.fabricator:
+                return fabricator[index];
+            case ClassList.artist:
+                return artist[index];
+            case ClassList.freelancer:
+                return freelancer[index];
+            case ClassList.craftsman:
+                return craftsman[index];
+            case ClassList.manager:
+                return manager[index];
+            default:
+                return new Cosmetic();
+        }
+    }
 }
 
 [Flags]
@@ -85,6 +114,14 @@ public enum StockCosmetic
     stockOptional,
 }
 
+public enum CosmeticWeight
+{
+    small,
+    medium,
+    large,
+    huge,
+}
+
 [System.Serializable]
 public struct Cosmetic
 {
@@ -94,4 +131,5 @@ public struct Cosmetic
     public EquipRegion region;
     public BodyGroups hideBodyGroups;
     public StockCosmetic stock;
+    public CosmeticWeight weight;
 }

@@ -352,7 +352,26 @@ public class Menu : MonoBehaviour
 
     void InsertCosmetic(int cosmeticValue)
     {
-        aus.PlayOneShot(Resources.Load<AudioClip>("Sounds/Menu/Pen Flick"), 0.8f);
+        if (cosmeticValue != -1)
+        {
+            switch (cosmetics.FindCosmetic((ClassList)currentCustClass, cosmeticValue).weight)
+            {
+                case CosmeticWeight.small:
+                    aus.PlayOneShot(Resources.Load<AudioClip>("Sounds/Menu/Backpack_Small " + UnityEngine.Random.Range(0, 6)), 0.8f);
+                    break;
+                case CosmeticWeight.medium:
+                    aus.PlayOneShot(Resources.Load<AudioClip>("Sounds/Menu/Backpack_Medium " + UnityEngine.Random.Range(0, 4)), 0.8f);
+                    break;
+                case CosmeticWeight.large:
+                    aus.PlayOneShot(Resources.Load<AudioClip>("Sounds/Menu/Backpack_Large " + UnityEngine.Random.Range(0, 5)), 0.8f);
+                    break;
+                case CosmeticWeight.huge:
+                    aus.PlayOneShot(Resources.Load<AudioClip>("Sounds/Menu/Backpack_Huge 0"), 0.8f);
+                    break;
+                default:
+                    break;
+            }
+        }
         PlayerPrefs.SetInt("Loadout " + currentCustClass + " Var: " + currentCustLoadout + " Type: " + currentCustCosmType, cosmeticValue + 1);
         SetCharacterVisibility();
     }
