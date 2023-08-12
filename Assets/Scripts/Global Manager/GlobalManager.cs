@@ -923,6 +923,41 @@ public class GlobalManager : NetworkBehaviour
                 if (currentHealth <= 0)
                 {
                     achievments.AddToValue("Achievement: Total Kills", 1);
+                    switch (clients[foundClient].GetCurrentClass())
+                    {
+                        case ClassList.labourer:
+                            achievments.AddToValue("Achievement: Total Laborers Killed", 1);
+                            break;
+                        case ClassList.woodworker:
+                            achievments.AddToValue("Achievement: Total Wood Workers Killed", 1);
+                            break;
+                        case ClassList.developer:
+                            achievments.AddToValue("Achievement: Total Developers Killed", 1);
+                            break;
+                        case ClassList.programmer:
+                            achievments.AddToValue("Achievement: Total Programmers Killed", 1);
+                            break;
+                        case ClassList.computer:
+                            achievments.AddToValue("Achievement: Total Computers Killed", 1);
+                            break;
+                        case ClassList.fabricator:
+                            achievments.AddToValue("Achievement: Total Fabricators Killed", 1);
+                            break;
+                        case ClassList.artist:
+                            achievments.AddToValue("Achievement: Total Artists Killed", 1);
+                            break;
+                        case ClassList.freelancer:
+                            achievments.AddToValue("Achievement: Total Freelancers Killed", 1);
+                            break;
+                        case ClassList.craftsman:
+                            achievments.AddToValue("Achievement: Total Craftsmen Killed", 1);
+                            break;
+                        case ClassList.manager:
+                            achievments.AddToValue("Achievement: Total Managers Killed", 1);
+                            break;
+                        default:
+                            break;
+                    }
 
                     //Ensures a gun firing 10 bullets doesn't play 10 hitsounds
                     bool isntDuplicate = true;
