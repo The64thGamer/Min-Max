@@ -372,6 +372,10 @@ public class Menu : MonoBehaviour
                     break;
             }
         }
+        else
+        {
+            aus.PlayOneShot(Resources.Load<AudioClip>("Sounds/Menu/Pen Flick"), 0.8f);
+        }
         PlayerPrefs.SetInt("Loadout " + currentCustClass + " Var: " + currentCustLoadout + " Type: " + currentCustCosmType, cosmeticValue + 1);
         SetCharacterVisibility();
     }
@@ -406,7 +410,31 @@ public class Menu : MonoBehaviour
             TemplateContainer myUI = cosmeticIconVTA.Instantiate();
             myUI.Q<VisualElement>("Icon").style.backgroundImage = new StyleBackground(noneTexture);
 
-            myUI.Q<Button>("Button").clicked += () => InsertCosmetic(-1);
+            Button button = myUI.Q<Button>("Button");
+            button.clicked += () => InsertCosmetic(-1);
+            button.RegisterCallback<MouseOverEvent>((type) =>
+            {
+                button.style.borderTopWidth = 8;
+                button.style.borderLeftWidth = 8;
+                button.style.borderRightWidth = 8;
+                button.style.borderBottomWidth = 8;
+                button.style.paddingTop = 16;
+                button.style.paddingLeft = 16;
+                button.style.paddingRight = 16;
+                button.style.paddingBottom = 16;
+
+            });
+            button.RegisterCallback<MouseOutEvent>((type) =>
+            {
+                button.style.borderTopWidth = 4;
+                button.style.borderLeftWidth = 4;
+                button.style.borderRightWidth = 4;
+                button.style.borderBottomWidth = 4;
+                button.style.paddingTop = 20;
+                button.style.paddingLeft = 20;
+                button.style.paddingRight = 20;
+                button.style.paddingBottom = 20;
+            });
             visList.Add(myUI);
         }
 
@@ -419,7 +447,31 @@ public class Menu : MonoBehaviour
                 myUI.Q<VisualElement>("Icon").style.backgroundImage = new StyleBackground(currentCosmetics[i].icon);
 
                 int finalVal = i;
-                myUI.Q<Button>("Button").clicked += () => InsertCosmetic(finalVal);
+                Button button = myUI.Q<Button>("Button");
+                button.clicked += () => InsertCosmetic(finalVal);
+                button.RegisterCallback<MouseOverEvent>((type) =>
+                {
+                    button.style.borderTopWidth = 8;
+                    button.style.borderLeftWidth = 8;
+                    button.style.borderRightWidth = 8;
+                    button.style.borderBottomWidth = 8;
+                    button.style.paddingTop = 16;
+                    button.style.paddingLeft = 16;
+                    button.style.paddingRight = 16;
+                    button.style.paddingBottom = 16;
+
+                });
+                button.RegisterCallback<MouseOutEvent>((type) =>
+                {
+                    button.style.borderTopWidth = 4;
+                    button.style.borderLeftWidth = 4;
+                    button.style.borderRightWidth = 4;
+                    button.style.borderBottomWidth = 4;
+                    button.style.paddingTop = 20;
+                    button.style.paddingLeft = 20;
+                    button.style.paddingRight = 20;
+                    button.style.paddingBottom = 20;
+                });
                 visList.Add(myUI);
             }
         }
