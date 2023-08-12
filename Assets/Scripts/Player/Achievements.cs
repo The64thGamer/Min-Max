@@ -5,7 +5,7 @@ using UnityEngine;
 
 public class Achievements : MonoBehaviour
 {
-    [SerializeField]Dictionary<string, float> achievements;
+    [SerializeField] Dictionary<string, float> achievements = new Dictionary<string, float>();
 
     public void AddToValue(string key, float value)
     {

@@ -128,7 +128,7 @@ MonoBehaviour:
   ServerTickRate:
     m_InternalValue: 60
   co: {fileID: 2645215035361401876}
-  achievments: {fileID: 0}
+  achievments: {fileID: 4213602069014871988}
   clientPrefab: {fileID: 8093838907312818641, guid: 183b441558cd63c45bf2e7be831cfa21,
     type: 3}
   teamSpawns: []
