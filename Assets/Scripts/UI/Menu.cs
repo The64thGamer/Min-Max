@@ -5,6 +5,7 @@ using System.Linq;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.SocialPlatforms.Impl;
 using UnityEngine.UIElements;
 using UnityEngine.XR.Management;
 
@@ -135,6 +136,23 @@ public class Menu : MonoBehaviour
                             break;
                         case "Statistics":
                             SwitchPage(2);
+                            SetLabel("Statistics",
+                                "Total Damage: " + PlayerPrefs.GetFloat("Achievement: Total Damage") +
+                                "\nTotal Kills: " + PlayerPrefs.GetFloat("Achievement: Total Kills") +
+                                "\nTotal Distance Walked: " + PlayerPrefs.GetFloat("Achievement: Total Walking Distance") + " m" +
+                                "\nTotal Air Travel: " + PlayerPrefs.GetFloat("Achievement: Total Air Travel") + " m" +
+                                "\nTotal Air-Time: " + PlayerPrefs.GetFloat("Achievement: Total Air-Time") + " sec" +
+                                "\nTotal Laborers Killed: " + PlayerPrefs.GetFloat("Achievement: Total Laborers Killed") +
+                                "\nTotal Wood Workers Killed: " + PlayerPrefs.GetFloat("Achievement: Total Wood Workers Killed") +
+                                "\nTotal Developers Killed: " + PlayerPrefs.GetFloat("Achievement: Total Developers Killed") +
+                                "\nTotal Programmers Killed: " + PlayerPrefs.GetFloat("Achievement: Total Programmers Killed") +
+                                "\nTotal Computers Killed: " + PlayerPrefs.GetFloat("Achievement: Total Computers Killed") +
+                                "\nTotal Fabricators Killed: " + PlayerPrefs.GetFloat("Achievement: Total Fabricators Killed") +
+                                "\nTotal Artists Killed: " + PlayerPrefs.GetFloat("Achievement: Total Artists Killed") +
+                                "\nTotal Freelancers Killed: " + PlayerPrefs.GetFloat("Achievement: Total Freelancers Killed") +
+                                "\nTotal Craftsmen Killed: " + PlayerPrefs.GetFloat("Achievement: Total Craftsmen Killed") +
+                                "\nTotal Managers Killed: " + PlayerPrefs.GetFloat("Achievement: Total Managers Killed")
+                                ,false);
                             break;
                         case "Settings":
                             SwitchPage(3);
