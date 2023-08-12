@@ -140,11 +140,10 @@ public class Menu : MonoBehaviour
             switch (sound)
             {
                 case MenuButtonSound.penFlick:
-                    aus.PlayOneShot(Resources.Load<AudioClip>("Sounds/Menu/Page Flip"), 0.5f);
-
+                    aus.PlayOneShot(Resources.Load<AudioClip>("Sounds/Menu/Pen Flick"), 0.8f);
                     break;
                 case MenuButtonSound.pageTurn:
-                    aus.PlayOneShot(Resources.Load<AudioClip>("Sounds/Menu/Pen Flick"), 0.5f);
+                    aus.PlayOneShot(Resources.Load<AudioClip>("Sounds/Menu/Page Flip"), 0.5f);
                     break;
                 default:
                     break;
@@ -353,6 +352,7 @@ public class Menu : MonoBehaviour
 
     void InsertCosmetic(int cosmeticValue)
     {
+        aus.PlayOneShot(Resources.Load<AudioClip>("Sounds/Menu/Pen Flick"), 0.8f);
         PlayerPrefs.SetInt("Loadout " + currentCustClass + " Var: " + currentCustLoadout + " Type: " + currentCustCosmType, cosmeticValue + 1);
         SetCharacterVisibility();
     }
