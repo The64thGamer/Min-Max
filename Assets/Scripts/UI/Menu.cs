@@ -98,68 +98,94 @@ public class Menu : MonoBehaviour
         if (!flippingPage)
         {
             leftMenu.visualTreeAsset = pages[index].leftAsset;
-            VisualElement root = leftMenu.rootVisualElement;
-            for (int i = 0; i < pages[index].leftInteractables.Count; i++)
-            {
-                int indexCtx = index;
-                int iCtx = i;
-                switch (pages[indexCtx].leftInteractables[iCtx].type)
-                {
-                    case MenuButtonType.button:
-                        root.Q<Button>(pages[indexCtx].leftInteractables[iCtx].name).clicked += () => ButtonPressed(pages[indexCtx].leftPageName, pages[indexCtx].leftInteractables[iCtx].name, "", false, 0, pages[indexCtx].leftInteractables[iCtx].sound);
-                        break;
-                    case MenuButtonType.toggle:
-                        root.Q<Toggle>(pages[indexCtx].leftInteractables[iCtx].name).RegisterValueChangedCallback(evt => ButtonPressed(pages[indexCtx].leftPageName, pages[indexCtx].leftInteractables[iCtx].name, "", evt.newValue, 0, pages[indexCtx].leftInteractables[iCtx].sound));
-                        break;
-                    case MenuButtonType.textField:
-                        root.Q<TextField>(pages[indexCtx].leftInteractables[iCtx].name).RegisterValueChangedCallback(evt => ButtonPressed(pages[indexCtx].leftPageName, pages[indexCtx].leftInteractables[iCtx].name, evt.newValue, false, 0, pages[indexCtx].leftInteractables[iCtx].sound));
-                        break;
-                    case MenuButtonType.slider:
-                        root.Q<Slider>(pages[indexCtx].leftInteractables[iCtx].name).RegisterValueChangedCallback(evt => ButtonPressed(pages[indexCtx].leftPageName, pages[indexCtx].leftInteractables[iCtx].name, "", false, evt.newValue, pages[indexCtx].leftInteractables[iCtx].sound));
-                        break;
-                    case MenuButtonType.dropDown:
-                        DropdownField ddf = root.Q<DropdownField>(pages[indexCtx].leftInteractables[iCtx].name);
-                        ddf.RegisterValueChangedCallback(evt => ButtonPressed(pages[indexCtx].leftPageName, pages[indexCtx].leftInteractables[iCtx].name, "", false, ddf.index, pages[indexCtx].leftInteractables[iCtx].sound));
-                        break;
-                    default:
-                        break;
-                }
-            }
-
             rightMenu.visualTreeAsset = pages[index].rightAsset;
-            root = rightMenu.rootVisualElement;
-            for (int i = 0; i < pages[index].rightInteractables.Count; i++)
+
+            VisualElement root = leftMenu.rootVisualElement;
+            List<MenuButtons> interactables = pages[index].leftInteractables;
+            string pagename = pages[index].leftPageName;
+
+            for (int e = 0; e < 2; e++)
             {
-                int indexCtx = index;
-                int iCtx = i;
-                switch (pages[indexCtx].rightInteractables[iCtx].type)
+                if(e == 1)
                 {
-                    case MenuButtonType.button:
-                        root.Q<Button>(pages[indexCtx].rightInteractables[iCtx].name).clicked += () => ButtonPressed(pages[indexCtx].rightPageName, pages[indexCtx].rightInteractables[iCtx].name, "", false, 0, pages[indexCtx].rightInteractables[iCtx].sound);
-                        break;
-                    case MenuButtonType.toggle:
-                        root.Q<Toggle>(pages[indexCtx].rightInteractables[iCtx].name).RegisterValueChangedCallback(evt => ButtonPressed(pages[indexCtx].rightPageName, pages[indexCtx].rightInteractables[iCtx].name, "", evt.newValue, 0, pages[indexCtx].rightInteractables[iCtx].sound));
-                        break;
-                    case MenuButtonType.textField:
-                        TextField text = root.Q<TextField>(pages[indexCtx].rightInteractables[iCtx].name);
-                        text.RegisterValueChangedCallback(evt => ButtonPressed(pages[indexCtx].rightPageName, pages[indexCtx].rightInteractables[iCtx].name, evt.newValue, false, 0, pages[indexCtx].rightInteractables[iCtx].sound));
-                        text.RegisterCallback<KeyDownEvent>((type) =>
-                        {
-                            if (type.keyCode == KeyCode.Return)
+                    root = rightMenu.rootVisualElement;
+                    interactables = pages[index].rightInteractables;
+                    pagename = pages[index].rightPageName;
+                }
+                for (int i = 0; i < interactables.Count; i++)
+                {
+                    int iCtx = i;
+
+                    switch (interactables[iCtx].type)
+                    {
+                        case MenuButtonType.button:
+                            Button button = root.Q<Button>(interactables[iCtx].name);
+                            button.clicked += () => ButtonPressed(pagename, interactables[iCtx].name, "", false, 0, interactables[iCtx].sound);
+                            button.RegisterCallback<MouseOverEvent>((type) =>
                             {
-                                aus.PlayOneShot(Resources.Load<AudioClip>("Sounds/Menu/Bell Ding"), 0.8f);
-                            }
-                        });
-                        break;
-                    case MenuButtonType.slider:
-                        root.Q<Slider>(pages[indexCtx].rightInteractables[iCtx].name).RegisterValueChangedCallback(evt => ButtonPressed(pages[indexCtx].rightPageName, pages[indexCtx].rightInteractables[iCtx].name, "", false, evt.newValue, pages[indexCtx].rightInteractables[iCtx].sound));
-                        break;
-                    case MenuButtonType.dropDown:
-                        DropdownField ddf = root.Q<DropdownField>(pages[indexCtx].rightInteractables[iCtx].name);
-                        ddf.RegisterValueChangedCallback(evt => ButtonPressed(pages[indexCtx].rightPageName, pages[indexCtx].rightInteractables[iCtx].name, "", false, ddf.index, pages[indexCtx].rightInteractables[iCtx].sound)); ;
-                        break;
-                    default:
-                        break;
+                                SetBorders(button, 8, 16);
+
+                            });
+                            button.RegisterCallback<MouseOutEvent>((type) =>
+                            {
+                                SetBorders(button, 4, 20);
+                            });
+                            break;
+                        case MenuButtonType.toggle:
+                            Toggle toggle = root.Q<Toggle>(interactables[iCtx].name);
+                            toggle.RegisterValueChangedCallback(evt => ButtonPressed(pagename, interactables[iCtx].name, "", evt.newValue, 0, interactables[iCtx].sound));
+                            toggle.RegisterCallback<MouseOverEvent>((type) =>
+                            {
+                                SetBorders(toggle, 8, 16);
+
+                            });
+                            toggle.RegisterCallback<MouseOutEvent>((type) =>
+                            {
+                                SetBorders(toggle, 4, 20);
+                            });
+                            break;
+                        case MenuButtonType.textField:
+                            TextField field = root.Q<TextField>(interactables[iCtx].name);
+                            field.RegisterValueChangedCallback(evt => ButtonPressed(pagename, interactables[iCtx].name, evt.newValue, false, 0, interactables[iCtx].sound));
+                            field.RegisterCallback<MouseOverEvent>((type) =>
+                            {
+                                SetBorders(field, 8, 16);
+
+                            });
+                            field.RegisterCallback<MouseOutEvent>((type) =>
+                            {
+                                SetBorders(field, 4, 20);
+                            });
+                            break;
+                        case MenuButtonType.slider:
+                            SliderInt slider = root.Q<SliderInt>(interactables[iCtx].name);
+                            slider.RegisterValueChangedCallback(evt => ButtonPressed(pagename, interactables[iCtx].name, "", false, evt.newValue, interactables[iCtx].sound));
+                            slider.RegisterCallback<MouseOverEvent>((type) =>
+                            {
+                                SetBorders(slider, 8, 16);
+
+                            });
+                            slider.RegisterCallback<MouseOutEvent>((type) =>
+                            {
+                                SetBorders(slider, 4, 20);
+                            });
+                            break;
+                        case MenuButtonType.dropDown:
+                            DropdownField ddf = root.Q<DropdownField>(interactables[iCtx].name);
+                            ddf.RegisterValueChangedCallback(evt => ButtonPressed(pagename, interactables[iCtx].name, "", false, ddf.index, interactables[iCtx].sound));
+                            ddf.RegisterCallback<MouseOverEvent>((type) =>
+                            {
+                                SetBorders(ddf, 8, 16);
+
+                            });
+                            ddf.RegisterCallback<MouseOutEvent>((type) =>
+                            {
+                                SetBorders(ddf, 4, 20);
+                            });
+                            break;
+                        default:
+                            break;
+                    }
                 }
             }
 
@@ -168,6 +194,18 @@ public class Menu : MonoBehaviour
             Graphics.CopyTexture(menuLeftRT, fakeMenuLeftRT);
             Graphics.CopyTexture(menuRightRT, fakeMenuRightRT);
         }
+    }
+
+    void SetBorders(VisualElement e, int border, int margin)
+    {
+        e.style.borderTopWidth = border;
+        e.style.borderLeftWidth = border;
+        e.style.borderRightWidth = border;
+        e.style.borderBottomWidth = border;
+        e.style.paddingTop = margin;
+        e.style.paddingLeft = margin;
+        e.style.paddingRight = margin;
+        e.style.paddingBottom = margin;
     }
 
     void ButtonPressed(string page, string button, string valueString, bool valueBool, float valueFloat, MenuButtonSound sound)
