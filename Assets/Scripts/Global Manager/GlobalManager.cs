@@ -57,10 +57,9 @@ public class GlobalManager : NetworkBehaviour
         //Settings
         m_NetworkManager.GetComponent<UnityTransport>().ConnectionData.Port = (ushort)PlayerPrefs.GetInt("ServerPort");
 
-        switch (PlayerPrefs.GetInt("LoadMapMode"))
+        switch (PlayerPrefs.GetString("Connection Setting"))
         {
-            case 0:
-                //Start Local
+            case "Create LAN Server":
                 NetworkManager.Singleton.StartHost();
                 currentGamemode.SetTeams();
                 if (PlayerPrefs.GetInt("SpawnBotsInEmpty") > 0)
@@ -73,20 +72,18 @@ public class GlobalManager : NetworkBehaviour
                 }
                 Debug.Log("Started Local Host");
                 break;
-            case 1:
-                //Start Server
+            case "Create Online Server":
                 StartServer();
                 break;
-            case 2:
-                //Join Server
+            case "Join Online Server":
                 JoinServer(PlayerPrefs.GetString("JoinCode"));
                 break;
-            case 3:
-                //Join Local
+            case "Join LAN Server":
                 NetworkManager.Singleton.StartClient();
                 Debug.Log("Started Local Client");
                 break;
             default:
+                Debug.LogError("Unknown Server Setting");
                 break;
         }
 

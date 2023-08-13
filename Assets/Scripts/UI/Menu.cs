@@ -290,6 +290,22 @@ public class Menu : MonoBehaviour
                             SetLabel("MapName", maps[mapIndex].mapName, true);
                             SetLabel("Gamemode", "Gamemode: " + maps[mapIndex].gameMode, true);
                             SetPicture("MapBackground", maps[mapIndex].image, Color.white, true);
+                            SetTextField("ServerName", PlayerPrefs.GetString("ServerName"), false);
+                            SetTextField("SelectPort", PlayerPrefs.GetInt("ServerPort").ToString(), false);
+                            SetDropdown("SelectTeam1", null, PlayerPrefs.GetInt("Team1Setting"), false);
+                            SetDropdown("SelectTeam2", null, PlayerPrefs.GetInt("Team2Setting"), false);
+                            SetSlider("MaxPlayers", Mathf.Max(PlayerPrefs.GetInt("ServerMaxPlayers"), 1), false);
+                            SetToggle("CreateOnline", Convert.ToBoolean(PlayerPrefs.GetInt("CreateOnline")), false);
+                            SetToggle("SpawnBots", Convert.ToBoolean(PlayerPrefs.GetInt("SpawnBotsInEmpty")), false);
+
+                            if(PlayerPrefs.GetInt("CreateOnline") == 0)
+                            {
+                                PlayerPrefs.SetString("Connection Setting", "Create LAN Server");
+                            }
+                            else
+                            {
+                                PlayerPrefs.SetString("Connection Setting", "Create Online Server");
+                            }
                             break;
                         case "Customization":
                             SwitchPage(1);
@@ -479,11 +495,50 @@ public class Menu : MonoBehaviour
                 case "SvrSett Left":
                     switch (button)
                     {
+                        case "SelectName":
+                            PlayerPrefs.SetString("ServerName",valueString);
+                            break;
                         case "SelectMap":
                             PlayerPrefs.SetInt("ServerMapName", (int)valueFloat);
                             SetLabel("MapName", maps[(int)valueFloat].mapName, true);
                             SetLabel("Gamemode", "Gamemode: " + maps[(int)valueFloat].gameMode, true);
                             SetPicture("MapBackground", maps[(int)valueFloat].image, Color.white, true);
+                            break;
+                        case "SelectPort":
+                            int final;
+                            try
+                            {
+                                final = Convert.ToInt32(valueString);
+                            }
+                            catch (Exception)
+                            {
+                                final = 7777;
+                            }
+                            PlayerPrefs.SetInt("ServerPort", final);
+                            SetTextField("SelectPort", final.ToString(), false);
+                            break;
+                        case "CreateOnline":
+                            PlayerPrefs.SetInt("CreateOnline", Convert.ToInt32(valueBool));
+                            if (!valueBool)
+                            {
+                                PlayerPrefs.SetString("Connection Setting", "Create LAN Server");
+                            }
+                            else
+                            {
+                                PlayerPrefs.SetString("Connection Setting", "Create Online Server");
+                            }
+                            break;
+                        case "MaxPlayers":
+                            PlayerPrefs.SetInt("ServerMaxPlayers", (int)valueFloat);
+                            break;
+                        case "SelectTeam1":
+                            PlayerPrefs.SetInt("Team1Setting", (int)valueFloat);
+                            break;
+                        case "SelectTeam2":
+                            PlayerPrefs.SetInt("Team2Setting", (int)valueFloat);
+                            break;
+                        case "SpawnBots":
+                            PlayerPrefs.SetInt("SpawnBotsInEmpty", Convert.ToInt32(valueBool));
                             break;
                         case "Back":
                             SwitchPage(0);
@@ -680,8 +735,37 @@ public class Menu : MonoBehaviour
         {
             d = leftMenu.rootVisualElement.Q<DropdownField>(element);
         }
-        d.choices = value;
+        if (value != null)
+        {
+            d.choices = value;
+        }
         d.index = index;
+    }
+
+    void SetSlider (string element, int index, bool isRightPage)
+    {
+        Slider d;
+        if (isRightPage)
+        {
+            d = rightMenu.rootVisualElement.Q<Slider>(element);
+            if(d == null)
+            {
+                SliderInt di = rightMenu.rootVisualElement.Q<SliderInt>(element);
+                di.value = index;
+                return;
+            }
+        }
+        else
+        {
+            d = leftMenu.rootVisualElement.Q<Slider>(element);
+            if (d == null)
+            {
+                SliderInt di = leftMenu.rootVisualElement.Q<SliderInt>(element);
+                di.value = index;
+                return;
+            }
+        }
+        d.value = index;
     }
 
     void SetPicture(string element, Texture2D bgImage, Color color, bool isRightPage)
