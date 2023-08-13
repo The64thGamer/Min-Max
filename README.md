@@ -1,12 +1,5 @@
-# Description
-Min-Max is a VR Team-Based shooter in current development.
-https://minmax.miraheze.org/wiki/Main_Page
+![Logo](https://the64thgamer.com/Min-Max/Logo%20Newsprint%20512.png)
+# Min-Max
+Min-Max is a VR Team-Based multiplayer shooter running in Unity URP. The game is completely open and moddable, though the executable and game assets are only accesible for Patrons. The game is in current progress and plans to release on Steam upon completion.
 
-# Plugins
-A set of plugins are required for building properly, and are not included within the public codebase.
-
--TextMesh Pro
-
--UI Toolkit
-
--Steamworks.net
+https://the64thgamer.com/Min-Max
