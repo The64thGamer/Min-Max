@@ -130,7 +130,10 @@ public class Menu : MonoBehaviour
                     button.clicked += () => ButtonPressed(pagename, interactables[iCtx].name, "", false, 0, interactables[iCtx].sound);
                     button.RegisterCallback<MouseOverEvent>((type) =>
                     {
-                        aus.PlayOneShot(Resources.Load<AudioClip>("Sounds/Menu/Pencil Stroke " + UnityEngine.Random.Range(0, 21)), UnityEngine.Random.Range(0.2f, 0.3f));
+                        if (!flippingPage)
+                        {
+                            aus.PlayOneShot(Resources.Load<AudioClip>("Sounds/Menu/Pencil Stroke " + UnityEngine.Random.Range(0, 21)), UnityEngine.Random.Range(0.2f, 0.3f));
+                        }
                         SetBorders(button, 8, 16);
                     });
                     button.RegisterCallback<MouseOutEvent>((type) =>
@@ -143,7 +146,10 @@ public class Menu : MonoBehaviour
                     toggle.RegisterValueChangedCallback(evt => ButtonPressed(pagename, interactables[iCtx].name, "", evt.newValue, 0, interactables[iCtx].sound));
                     toggle.RegisterCallback<MouseOverEvent>((type) =>
                     {
-                        aus.PlayOneShot(Resources.Load<AudioClip>("Sounds/Menu/Pencil Stroke " + UnityEngine.Random.Range(0, 21)), UnityEngine.Random.Range(0.2f, 0.3f));
+                        if (!flippingPage)
+                        {
+                            aus.PlayOneShot(Resources.Load<AudioClip>("Sounds/Menu/Pencil Stroke " + UnityEngine.Random.Range(0, 21)), UnityEngine.Random.Range(0.2f, 0.3f));
+                        }
                         SetBorders(toggle, 8, 16);
 
                     });
@@ -157,7 +163,10 @@ public class Menu : MonoBehaviour
                     field.RegisterValueChangedCallback(evt => ButtonPressed(pagename, interactables[iCtx].name, evt.newValue, false, 0, interactables[iCtx].sound));
                     field.RegisterCallback<MouseOverEvent>((type) =>
                     {
-                        aus.PlayOneShot(Resources.Load<AudioClip>("Sounds/Menu/Pencil Stroke " + UnityEngine.Random.Range(0, 21)), UnityEngine.Random.Range(0.2f, 0.3f)); 
+                        if (!flippingPage)
+                        {
+                            aus.PlayOneShot(Resources.Load<AudioClip>("Sounds/Menu/Pencil Stroke " + UnityEngine.Random.Range(0, 21)), UnityEngine.Random.Range(0.2f, 0.3f));
+                        }
                         SetBorders(field, 8, 16);
 
                     });
@@ -174,7 +183,10 @@ public class Menu : MonoBehaviour
                         slider.RegisterValueChangedCallback(evt => ButtonPressed(pagename, interactables[iCtx].name, "", false, evt.newValue, interactables[iCtx].sound));
                         slider.RegisterCallback<MouseOverEvent>((type) =>
                         {
-                            aus.PlayOneShot(Resources.Load<AudioClip>("Sounds/Menu/Pencil Stroke " + UnityEngine.Random.Range(0, 21)), UnityEngine.Random.Range(0.2f, 0.3f)); 
+                            if (!flippingPage)
+                            {
+                                aus.PlayOneShot(Resources.Load<AudioClip>("Sounds/Menu/Pencil Stroke " + UnityEngine.Random.Range(0, 21)), UnityEngine.Random.Range(0.2f, 0.3f));
+                            } 
                             SetBorders(slider, 8, 16);
 
                         });
@@ -188,7 +200,10 @@ public class Menu : MonoBehaviour
                         sliderInt.RegisterValueChangedCallback(evt => ButtonPressed(pagename, interactables[iCtx].name, "", false, evt.newValue, interactables[iCtx].sound));
                         sliderInt.RegisterCallback<MouseOverEvent>((type) =>
                         {
-                            aus.PlayOneShot(Resources.Load<AudioClip>("Sounds/Menu/Pencil Stroke " + UnityEngine.Random.Range(0, 21)), UnityEngine.Random.Range(0.2f, 0.3f)); 
+                            if (!flippingPage)
+                            {
+                                aus.PlayOneShot(Resources.Load<AudioClip>("Sounds/Menu/Pencil Stroke " + UnityEngine.Random.Range(0, 21)), UnityEngine.Random.Range(0.2f, 0.3f));
+                            }
                             SetBorders(sliderInt, 8, 16);
 
                         });
@@ -203,7 +218,10 @@ public class Menu : MonoBehaviour
                     ddf.RegisterValueChangedCallback(evt => ButtonPressed(pagename, interactables[iCtx].name, "", false, ddf.index, interactables[iCtx].sound));
                     ddf.RegisterCallback<MouseOverEvent>((type) =>
                     {
-                        aus.PlayOneShot(Resources.Load<AudioClip>("Sounds/Menu/Pencil Stroke " + UnityEngine.Random.Range(0, 21)), UnityEngine.Random.Range(0.2f, 0.3f)); 
+                        if (!flippingPage)
+                        {
+                            aus.PlayOneShot(Resources.Load<AudioClip>("Sounds/Menu/Pencil Stroke " + UnityEngine.Random.Range(0, 21)), UnityEngine.Random.Range(0.2f, 0.3f));
+                        }
                         SetBorders(ddf, 8, 16);
 
                     });
