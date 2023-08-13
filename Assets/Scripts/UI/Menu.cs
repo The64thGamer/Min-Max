@@ -181,7 +181,7 @@ public class Menu : MonoBehaviour
                     aus.PlayOneShot(Resources.Load<AudioClip>("Sounds/Menu/Page Flip"), 0.5f);
                     break;
                 case MenuButtonSound.typewriter:
-                    aus.PlayOneShot(Resources.Load<AudioClip>("Sounds/Menu/Typewriter" + UnityEngine.Random.Range(0, 13)), UnityEngine.Random.Range(1.0f, 1.2f));
+                    aus.PlayOneShot(Resources.Load<AudioClip>("Sounds/Menu/Typewriter" + valueString[Mathf.Max(0,valueString.Length-1)] % 13), UnityEngine.Random.Range(1.0f, 1.2f));
                     break;
                 default:
                     break;
