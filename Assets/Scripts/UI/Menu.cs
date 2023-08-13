@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Unity.Netcode;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.SocialPlatforms.Impl;
@@ -116,7 +117,15 @@ public class Menu : MonoBehaviour
                         root.Q<Toggle>(pages[indexCtx].rightInteractables[iCtx].name).RegisterValueChangedCallback(evt => ButtonPressed(pages[indexCtx].rightPageName, pages[indexCtx].rightInteractables[iCtx].name, "", evt.newValue, 0, pages[indexCtx].rightInteractables[iCtx].sound));
                         break;
                     case MenuButtonType.textField:
-                        root.Q<TextField>(pages[indexCtx].rightInteractables[iCtx].name).RegisterValueChangedCallback(evt => ButtonPressed(pages[indexCtx].rightPageName, pages[indexCtx].rightInteractables[iCtx].name, evt.newValue, false, 0, pages[indexCtx].rightInteractables[iCtx].sound));
+                        TextField text = root.Q<TextField>(pages[indexCtx].rightInteractables[iCtx].name);
+                        text.RegisterValueChangedCallback(evt => ButtonPressed(pages[indexCtx].rightPageName, pages[indexCtx].rightInteractables[iCtx].name, evt.newValue, false, 0, pages[indexCtx].rightInteractables[iCtx].sound));
+                        text.RegisterCallback<KeyDownEvent>((type) =>
+                        {
+                            if (type.keyCode == KeyCode.Return)
+                            {
+                                aus.PlayOneShot(Resources.Load<AudioClip>("Sounds/Menu/Bell Ding"), 0.8f);
+                            }
+                        });
                         break;
                     case MenuButtonType.slider:
                         root.Q<Slider>(pages[indexCtx].rightInteractables[iCtx].name).RegisterValueChangedCallback(evt => ButtonPressed(pages[indexCtx].rightPageName, pages[indexCtx].rightInteractables[iCtx].name, "", false, evt.newValue, pages[indexCtx].rightInteractables[iCtx].sound));
@@ -144,6 +153,9 @@ public class Menu : MonoBehaviour
                     break;
                 case MenuButtonSound.pageTurn:
                     aus.PlayOneShot(Resources.Load<AudioClip>("Sounds/Menu/Page Flip"), 0.5f);
+                    break;
+                case MenuButtonSound.typewriter:
+                    aus.PlayOneShot(Resources.Load<AudioClip>("Sounds/Menu/Typewriter" + UnityEngine.Random.Range(0, 13)), UnityEngine.Random.Range(0.8f, 1));
                     break;
                 default:
                     break;
@@ -801,6 +813,7 @@ public class Menu : MonoBehaviour
         penFlick,
         pageTurn,
         none,
+        typewriter,
     }
 
     [System.Serializable]
