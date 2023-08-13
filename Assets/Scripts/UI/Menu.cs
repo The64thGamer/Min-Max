@@ -41,7 +41,6 @@ public class Menu : MonoBehaviour
     int[] cosmeticInts;
     NetworkManager m_NetworkManager;
     bool flippingPage;
-    float soundNoiseTimer;
 
     //Labels
     int currentCustClass;
@@ -83,7 +82,6 @@ public class Menu : MonoBehaviour
 
     private void Update()
     {
-        soundNoiseTimer = Mathf.Max(0, soundNoiseTimer - Time.deltaTime);
         if (flippingPage)
         {
             centerRing.eulerAngles = new Vector3(0, centerRing.eulerAngles.y + (Time.deltaTime * 750), 0);
@@ -255,13 +253,7 @@ public class Menu : MonoBehaviour
             switch (sound)
             {
                 case MenuButtonSound.penFlick:
-                    float volume = 0.6f;
-                    if(soundNoiseTimer > 0)
-                    {
-                        volume = 0.1f;
-                    }
-                    aus.PlayOneShot(Resources.Load<AudioClip>("Sounds/Menu/Pen Flick"), volume);
-                    soundNoiseTimer = 0.2f;
+                    aus.PlayOneShot(Resources.Load<AudioClip>("Sounds/Menu/Pen Flick"), 0.6f);
                     break;
                 case MenuButtonSound.pageTurn:
                     aus.PlayOneShot(Resources.Load<AudioClip>("Sounds/Menu/Page Flip"), 0.5f);
