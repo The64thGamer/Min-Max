@@ -57,6 +57,24 @@ public class Menu : MonoBehaviour
             m_NetworkManager.NetworkConfig.ConnectionData = System.Text.Encoding.ASCII.GetBytes("P");
         }
 
+        if (PlayerPrefs.GetInt("Settings: Vsync") == 1)
+        {
+            QualitySettings.vSyncCount = 1;
+        }
+        else
+        {
+            QualitySettings.vSyncCount = 0;
+        }
+
+        if (PlayerPrefs.GetInt("Settings: Windowed") == 1)
+        {
+            Screen.fullScreenMode = FullScreenMode.Windowed;
+        }
+        else
+        {
+            Screen.fullScreenMode = FullScreenMode.FullScreenWindow;
+        }
+
         SwitchPage(0);
     }
 
@@ -86,10 +104,10 @@ public class Menu : MonoBehaviour
                 switch (pages[indexCtx].leftInteractables[iCtx].type)
                 {
                     case MenuButtonType.button:
-                        root.Q<Button>(pages[indexCtx].leftInteractables[iCtx].name).clicked += () => ButtonPressed(pages[indexCtx].leftPageName, pages[indexCtx].leftInteractables[iCtx].name,"",false,0, pages[indexCtx].leftInteractables[iCtx].sound);
+                        root.Q<Button>(pages[indexCtx].leftInteractables[iCtx].name).clicked += () => ButtonPressed(pages[indexCtx].leftPageName, pages[indexCtx].leftInteractables[iCtx].name, "", false, 0, pages[indexCtx].leftInteractables[iCtx].sound);
                         break;
                     case MenuButtonType.toggle:
-                        root.Q<Toggle>(pages[indexCtx].leftInteractables[iCtx].name).RegisterValueChangedCallback(evt=> ButtonPressed(pages[indexCtx].leftPageName, pages[indexCtx].leftInteractables[iCtx].name, "", evt.newValue, 0, pages[indexCtx].leftInteractables[iCtx].sound));
+                        root.Q<Toggle>(pages[indexCtx].leftInteractables[iCtx].name).RegisterValueChangedCallback(evt => ButtonPressed(pages[indexCtx].leftPageName, pages[indexCtx].leftInteractables[iCtx].name, "", evt.newValue, 0, pages[indexCtx].leftInteractables[iCtx].sound));
                         break;
                     case MenuButtonType.textField:
                         root.Q<TextField>(pages[indexCtx].leftInteractables[iCtx].name).RegisterValueChangedCallback(evt => ButtonPressed(pages[indexCtx].leftPageName, pages[indexCtx].leftInteractables[iCtx].name, evt.newValue, false, 0, pages[indexCtx].leftInteractables[iCtx].sound));
@@ -208,15 +226,15 @@ public class Menu : MonoBehaviour
                                 "\nTotal Freelancers Killed: " + PlayerPrefs.GetFloat("Achievement: Total Freelancers Killed") +
                                 "\nTotal Craftsmen Killed: " + PlayerPrefs.GetFloat("Achievement: Total Craftsmen Killed") +
                                 "\nTotal Managers Killed: " + PlayerPrefs.GetFloat("Achievement: Total Managers Killed")
-                                ,false);
+                                , false);
                             break;
                         case "Settings":
                             SwitchPage(3);
                             string finalName = PlayerPrefs.GetString("Settings: Player Name");
-                            if(finalName == "")
+                            if (finalName == "")
                             {
                                 finalName = "Intern #" + UnityEngine.Random.Range(0, 1000000);
-                                PlayerPrefs.SetString("Settings: Player Name",finalName);
+                                PlayerPrefs.SetString("Settings: Player Name", finalName);
                             }
                             SetTextField("PlayerName", finalName, false);
                             SetToggle("Vsync", Convert.ToBoolean(PlayerPrefs.GetInt("Settings: Vsync")), false);
@@ -312,6 +330,31 @@ public class Menu : MonoBehaviour
                 case "Settings Left":
                     switch (button)
                     {
+                        case "PlayerName":
+                            PlayerPrefs.SetString("Settings: Player Name", valueString);
+                            break;
+                        case "Vsync":
+                            PlayerPrefs.SetInt("Settings: Vsync", Convert.ToInt32(valueBool));
+                            if (valueBool)
+                            {
+                                QualitySettings.vSyncCount = 1;
+                            }
+                            else
+                            {
+                                QualitySettings.vSyncCount = 0;
+                            }
+                            break;
+                        case "Windowed":
+                            PlayerPrefs.SetInt("Settings: Windowed", Convert.ToInt32(valueBool));
+                            if (valueBool)
+                            {
+                                Screen.fullScreenMode = FullScreenMode.Windowed;
+                            }
+                            else
+                            {
+                                Screen.fullScreenMode = FullScreenMode.FullScreenWindow;
+                            }
+                            break;
                         case "Back":
                             SwitchPage(0);
                             break;
@@ -421,7 +464,7 @@ public class Menu : MonoBehaviour
                 noneIcon = false;
             }
         }
-        if(noneIcon)
+        if (noneIcon)
         {
             TemplateContainer myUI = cosmeticIconVTA.Instantiate();
             myUI.Q<VisualElement>("Icon").style.backgroundImage = new StyleBackground(noneTexture);
@@ -583,7 +626,7 @@ public class Menu : MonoBehaviour
         for (int i = 0; i < 11; i++)
         {
             int check = PlayerPrefs.GetInt("Loadout " + currentCustClass + " Var: " + currentCustLoadout + " Type: " + i) - 1;
-            if(check >= 0)
+            if (check >= 0)
             {
                 newCosInts.Add(check);
             }
