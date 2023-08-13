@@ -26,7 +26,9 @@ public class Menu : MonoBehaviour
     [SerializeField] Texture2D[] teamIcons;
     [SerializeField] Color[] teamColors;
     [SerializeField] GameObject[] playerModels;
+    [SerializeField] Transform playerModelHolder;
     [SerializeField] string[] cosmeticTypes;
+    [SerializeField] MenuMaps[] maps;
 
     [Header("Objects")]
     [SerializeField] GameObject customizeMenuCamera;
@@ -154,7 +156,7 @@ public class Menu : MonoBehaviour
                         break;
                     case MenuButtonType.dropDown:
                         DropdownField ddf = root.Q<DropdownField>(pages[indexCtx].rightInteractables[iCtx].name);
-                        ddf.RegisterValueChangedCallback(evt => ButtonPressed(pages[indexCtx].rightPageName, pages[indexCtx].rightInteractables[iCtx].name, "", false, ddf.index, pages[indexCtx].rightInteractables[iCtx].sound));;
+                        ddf.RegisterValueChangedCallback(evt => ButtonPressed(pages[indexCtx].rightPageName, pages[indexCtx].rightInteractables[iCtx].name, "", false, ddf.index, pages[indexCtx].rightInteractables[iCtx].sound)); ;
                         break;
                     default:
                         break;
@@ -182,7 +184,7 @@ public class Menu : MonoBehaviour
                     break;
                 case MenuButtonSound.typewriter:
                     int num = 0;
-                    if(valueString != "")
+                    if (valueString != "")
                     {
                         num = valueString[valueString.Length - 1] % 13;
                     }
@@ -202,6 +204,16 @@ public class Menu : MonoBehaviour
                             break;
                         case "CreateGame":
                             SwitchPage(4);
+                            List<string> mapnames = new List<string>();
+                            for (int i = 0; i < maps.Length; i++)
+                            {
+                                mapnames.Add(maps[i].mapName);
+                            }
+                            int mapIndex = PlayerPrefs.GetInt("ServerMapName");
+                            SetDropdown("SelectMap", mapnames, mapIndex, false);
+                            SetLabel("MapName", maps[mapIndex].mapName, true);
+                            SetLabel("Gamemode", "Gamemode: " + maps[mapIndex].gameMode, true);
+                            SetPicture("MapBackground", maps[mapIndex].image, Color.white, true);
                             break;
                         case "Customization":
                             SwitchPage(1);
@@ -330,6 +342,19 @@ public class Menu : MonoBehaviour
                             break;
                     }
                     break;
+                case "Cust Right":
+                    switch (button)
+                    {
+                        case "CharacterRotate":
+                            for (int i = 0; i < playerModels.Length; i++)
+                            {
+                                playerModels[i].transform.localEulerAngles = new Vector3(0, valueFloat, 0);
+                            }
+                            break;
+                        default:
+                            break;
+                    }
+                    break;
                 case "Stats Left":
                     switch (button)
                     {
@@ -378,6 +403,12 @@ public class Menu : MonoBehaviour
                 case "SvrSett Left":
                     switch (button)
                     {
+                        case "SelectMap":
+                            PlayerPrefs.SetInt("ServerMapName", (int)valueFloat);
+                            SetLabel("MapName", maps[(int)valueFloat].mapName, true);
+                            SetLabel("Gamemode", "Gamemode: " + maps[(int)valueFloat].gameMode, true);
+                            SetPicture("MapBackground", maps[(int)valueFloat].image, Color.white, true);
+                            break;
                         case "Back":
                             SwitchPage(0);
                             break;
@@ -583,6 +614,22 @@ public class Menu : MonoBehaviour
         {
             leftMenu.rootVisualElement.Q<TextField>(element).SetValueWithoutNotify(value);
         }
+    }
+
+    void SetDropdown(string element, List<string> value, int index, bool isRightPage)
+    {
+        DropdownField d;
+        if (isRightPage)
+        {
+            d = rightMenu.rootVisualElement.Q<DropdownField>(element);
+
+        }
+        else
+        {
+            d = leftMenu.rootVisualElement.Q<DropdownField>(element);
+        }
+        d.choices = value;
+        d.index = index;
     }
 
     void SetPicture(string element, Texture2D bgImage, Color color, bool isRightPage)
@@ -855,6 +902,15 @@ public class Menu : MonoBehaviour
         public VisualTreeAsset rightAsset;
         public List<MenuButtons> leftInteractables;
         public List<MenuButtons> rightInteractables;
+    }
+
+    [System.Serializable]
+    struct MenuMaps
+    {
+        public string mapName;
+        public string sceneName;
+        public string gameMode;
+        public Texture2D image;
     }
 
     public enum MenuButtonType
