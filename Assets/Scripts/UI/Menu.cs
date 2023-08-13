@@ -149,13 +149,13 @@ public class Menu : MonoBehaviour
             switch (sound)
             {
                 case MenuButtonSound.penFlick:
-                    aus.PlayOneShot(Resources.Load<AudioClip>("Sounds/Menu/Pen Flick"), 0.8f);
+                    aus.PlayOneShot(Resources.Load<AudioClip>("Sounds/Menu/Pen Flick"), 0.7f);
                     break;
                 case MenuButtonSound.pageTurn:
                     aus.PlayOneShot(Resources.Load<AudioClip>("Sounds/Menu/Page Flip"), 0.5f);
                     break;
                 case MenuButtonSound.typewriter:
-                    aus.PlayOneShot(Resources.Load<AudioClip>("Sounds/Menu/Typewriter" + UnityEngine.Random.Range(0, 13)), UnityEngine.Random.Range(0.8f, 1));
+                    aus.PlayOneShot(Resources.Load<AudioClip>("Sounds/Menu/Typewriter" + UnityEngine.Random.Range(0, 13)), UnityEngine.Random.Range(1.0f, 1.2f));
                     break;
                 default:
                     break;
