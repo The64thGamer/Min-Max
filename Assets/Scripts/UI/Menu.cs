@@ -115,6 +115,10 @@ public class Menu : MonoBehaviour
                     case MenuButtonType.slider:
                         root.Q<Slider>(pages[indexCtx].leftInteractables[iCtx].name).RegisterValueChangedCallback(evt => ButtonPressed(pages[indexCtx].leftPageName, pages[indexCtx].leftInteractables[iCtx].name, "", false, evt.newValue, pages[indexCtx].leftInteractables[iCtx].sound));
                         break;
+                    case MenuButtonType.dropDown:
+                        DropdownField ddf = root.Q<DropdownField>(pages[indexCtx].leftInteractables[iCtx].name);
+                        ddf.RegisterValueChangedCallback(evt => ButtonPressed(pages[indexCtx].leftPageName, pages[indexCtx].leftInteractables[iCtx].name, "", false, ddf.index, pages[indexCtx].leftInteractables[iCtx].sound));
+                        break;
                     default:
                         break;
                 }
@@ -147,6 +151,10 @@ public class Menu : MonoBehaviour
                         break;
                     case MenuButtonType.slider:
                         root.Q<Slider>(pages[indexCtx].rightInteractables[iCtx].name).RegisterValueChangedCallback(evt => ButtonPressed(pages[indexCtx].rightPageName, pages[indexCtx].rightInteractables[iCtx].name, "", false, evt.newValue, pages[indexCtx].rightInteractables[iCtx].sound));
+                        break;
+                    case MenuButtonType.dropDown:
+                        DropdownField ddf = root.Q<DropdownField>(pages[indexCtx].rightInteractables[iCtx].name);
+                        ddf.RegisterValueChangedCallback(evt => ButtonPressed(pages[indexCtx].rightPageName, pages[indexCtx].rightInteractables[iCtx].name, "", false, ddf.index, pages[indexCtx].rightInteractables[iCtx].sound));;
                         break;
                     default:
                         break;
@@ -850,6 +858,7 @@ public class Menu : MonoBehaviour
         toggle,
         textField,
         slider,
+        dropDown,
     }
     public enum MenuButtonSound
     {
