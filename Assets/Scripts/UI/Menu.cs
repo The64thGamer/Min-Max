@@ -352,6 +352,10 @@ public class Menu : MonoBehaviour
 
     void InsertCosmetic(int cosmeticValue)
     {
+        if (PlayerPrefs.GetInt("Loadout " + currentCustClass + " Var: " + currentCustLoadout + " Type: " + currentCustCosmType) == cosmeticValue + 1)
+        {
+            return;
+        }
         if (cosmeticValue != -1)
         {
             switch (cosmetics.FindCosmetic((ClassList)currentCustClass, cosmeticValue).weight)
