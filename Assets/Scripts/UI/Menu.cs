@@ -100,99 +100,119 @@ public class Menu : MonoBehaviour
             leftMenu.visualTreeAsset = pages[index].leftAsset;
             rightMenu.visualTreeAsset = pages[index].rightAsset;
 
-            VisualElement root = leftMenu.rootVisualElement;
-            List<MenuButtons> interactables = pages[index].leftInteractables;
-            string pagename = pages[index].leftPageName;
-
-            for (int e = 0; e < 2; e++)
-            {
-                if(e == 1)
-                {
-                    root = rightMenu.rootVisualElement;
-                    interactables = pages[index].rightInteractables;
-                    pagename = pages[index].rightPageName;
-                }
-                for (int i = 0; i < interactables.Count; i++)
-                {
-                    int iCtx = i;
-
-                    switch (interactables[iCtx].type)
-                    {
-                        case MenuButtonType.button:
-                            Button button = root.Q<Button>(interactables[iCtx].name);
-                            button.clicked += () => ButtonPressed(pagename, interactables[iCtx].name, "", false, 0, interactables[iCtx].sound);
-                            button.RegisterCallback<MouseOverEvent>((type) =>
-                            {
-                                SetBorders(button, 8, 16);
-
-                            });
-                            button.RegisterCallback<MouseOutEvent>((type) =>
-                            {
-                                SetBorders(button, 4, 20);
-                            });
-                            break;
-                        case MenuButtonType.toggle:
-                            Toggle toggle = root.Q<Toggle>(interactables[iCtx].name);
-                            toggle.RegisterValueChangedCallback(evt => ButtonPressed(pagename, interactables[iCtx].name, "", evt.newValue, 0, interactables[iCtx].sound));
-                            toggle.RegisterCallback<MouseOverEvent>((type) =>
-                            {
-                                SetBorders(toggle, 8, 16);
-
-                            });
-                            toggle.RegisterCallback<MouseOutEvent>((type) =>
-                            {
-                                SetBorders(toggle, 4, 20);
-                            });
-                            break;
-                        case MenuButtonType.textField:
-                            TextField field = root.Q<TextField>(interactables[iCtx].name);
-                            field.RegisterValueChangedCallback(evt => ButtonPressed(pagename, interactables[iCtx].name, evt.newValue, false, 0, interactables[iCtx].sound));
-                            field.RegisterCallback<MouseOverEvent>((type) =>
-                            {
-                                SetBorders(field, 8, 16);
-
-                            });
-                            field.RegisterCallback<MouseOutEvent>((type) =>
-                            {
-                                SetBorders(field, 4, 20);
-                            });
-                            break;
-                        case MenuButtonType.slider:
-                            SliderInt slider = root.Q<SliderInt>(interactables[iCtx].name);
-                            slider.RegisterValueChangedCallback(evt => ButtonPressed(pagename, interactables[iCtx].name, "", false, evt.newValue, interactables[iCtx].sound));
-                            slider.RegisterCallback<MouseOverEvent>((type) =>
-                            {
-                                SetBorders(slider, 8, 16);
-
-                            });
-                            slider.RegisterCallback<MouseOutEvent>((type) =>
-                            {
-                                SetBorders(slider, 4, 20);
-                            });
-                            break;
-                        case MenuButtonType.dropDown:
-                            DropdownField ddf = root.Q<DropdownField>(interactables[iCtx].name);
-                            ddf.RegisterValueChangedCallback(evt => ButtonPressed(pagename, interactables[iCtx].name, "", false, ddf.index, interactables[iCtx].sound));
-                            ddf.RegisterCallback<MouseOverEvent>((type) =>
-                            {
-                                SetBorders(ddf, 8, 16);
-
-                            });
-                            ddf.RegisterCallback<MouseOutEvent>((type) =>
-                            {
-                                SetBorders(ddf, 4, 20);
-                            });
-                            break;
-                        default:
-                            break;
-                    }
-                }
-            }
+            SetButtons(leftMenu.rootVisualElement, pages[index].leftInteractables, pages[index].leftPageName);
+            SetButtons(rightMenu.rootVisualElement, pages[index].rightInteractables, pages[index].rightPageName);
 
             flippingPage = true;
             centerRing.eulerAngles = new Vector3(0, 180, 0);
             Graphics.CopyTexture(menuLeftRT, fakeMenuLeftRT);
             Graphics.CopyTexture(menuRightRT, fakeMenuRightRT);
+        }
+    }
+
+    void SetButtons(VisualElement root, List<MenuButtons> interactables, string pagename)
+    {
+        if(interactables == null || root == null)
+        {
+            return;
+        }
+        for (int i = 0; i < interactables.Count; i++)
+        {
+            int iCtx = i;
+
+            switch (interactables[iCtx].type)
+            {
+                case MenuButtonType.button:
+                    Button button = root.Q<Button>(interactables[iCtx].name);
+                    Debug.Log(i);
+                    button.clicked += () => ButtonPressed(pagename, interactables[iCtx].name, "", false, 0, interactables[iCtx].sound);
+                    button.RegisterCallback<MouseOverEvent>((type) =>
+                    {
+                        aus.PlayOneShot(Resources.Load<AudioClip>("Sounds/Menu/Pencil Stroke " + UnityEngine.Random.Range(0, 21)), UnityEngine.Random.Range(0.2f, 0.3f));
+                        SetBorders(button, 8, 16);
+                    });
+                    button.RegisterCallback<MouseOutEvent>((type) =>
+                    {
+                        SetBorders(button, 4, 20);
+                    });
+                    break;
+                case MenuButtonType.toggle:
+                    Toggle toggle = root.Q<Toggle>(interactables[iCtx].name);
+                    toggle.RegisterValueChangedCallback(evt => ButtonPressed(pagename, interactables[iCtx].name, "", evt.newValue, 0, interactables[iCtx].sound));
+                    toggle.RegisterCallback<MouseOverEvent>((type) =>
+                    {
+                        aus.PlayOneShot(Resources.Load<AudioClip>("Sounds/Menu/Pencil Stroke " + UnityEngine.Random.Range(0, 21)), UnityEngine.Random.Range(0.2f, 0.3f));
+                        SetBorders(toggle, 8, 16);
+
+                    });
+                    toggle.RegisterCallback<MouseOutEvent>((type) =>
+                    {
+                        SetBorders(toggle, 4, 20);
+                    });
+                    break;
+                case MenuButtonType.textField:
+                    TextField field = root.Q<TextField>(interactables[iCtx].name);
+                    field.RegisterValueChangedCallback(evt => ButtonPressed(pagename, interactables[iCtx].name, evt.newValue, false, 0, interactables[iCtx].sound));
+                    field.RegisterCallback<MouseOverEvent>((type) =>
+                    {
+                        aus.PlayOneShot(Resources.Load<AudioClip>("Sounds/Menu/Pencil Stroke " + UnityEngine.Random.Range(0, 21)), UnityEngine.Random.Range(0.2f, 0.3f)); 
+                        SetBorders(field, 8, 16);
+
+                    });
+                    field.RegisterCallback<MouseOutEvent>((type) =>
+                    {
+                        SetBorders(field, 4, 20);
+                    });
+                    break;
+                case MenuButtonType.slider:
+                    SliderInt sliderInt = root.Q<SliderInt>(interactables[iCtx].name);
+                    if(sliderInt == null)
+                    {
+                        Slider slider = root.Q<Slider>(interactables[iCtx].name);
+                        slider.RegisterValueChangedCallback(evt => ButtonPressed(pagename, interactables[iCtx].name, "", false, evt.newValue, interactables[iCtx].sound));
+                        slider.RegisterCallback<MouseOverEvent>((type) =>
+                        {
+                            aus.PlayOneShot(Resources.Load<AudioClip>("Sounds/Menu/Pencil Stroke " + UnityEngine.Random.Range(0, 21)), UnityEngine.Random.Range(0.2f, 0.3f)); 
+                            SetBorders(slider, 8, 16);
+
+                        });
+                        slider.RegisterCallback<MouseOutEvent>((type) =>
+                        {
+                            SetBorders(slider, 4, 20);
+                        });
+                    }
+                    else
+                    {
+                        sliderInt.RegisterValueChangedCallback(evt => ButtonPressed(pagename, interactables[iCtx].name, "", false, evt.newValue, interactables[iCtx].sound));
+                        sliderInt.RegisterCallback<MouseOverEvent>((type) =>
+                        {
+                            aus.PlayOneShot(Resources.Load<AudioClip>("Sounds/Menu/Pencil Stroke " + UnityEngine.Random.Range(0, 21)), UnityEngine.Random.Range(0.2f, 0.3f)); 
+                            SetBorders(sliderInt, 8, 16);
+
+                        });
+                        sliderInt.RegisterCallback<MouseOutEvent>((type) =>
+                        {
+                            SetBorders(sliderInt, 4, 20);
+                        });
+                    }
+                    break;
+                case MenuButtonType.dropDown:
+                    DropdownField ddf = root.Q<DropdownField>(interactables[iCtx].name);
+                    ddf.RegisterValueChangedCallback(evt => ButtonPressed(pagename, interactables[iCtx].name, "", false, ddf.index, interactables[iCtx].sound));
+                    ddf.RegisterCallback<MouseOverEvent>((type) =>
+                    {
+                        aus.PlayOneShot(Resources.Load<AudioClip>("Sounds/Menu/Pencil Stroke " + UnityEngine.Random.Range(0, 21)), UnityEngine.Random.Range(0.2f, 0.3f)); 
+                        SetBorders(ddf, 8, 16);
+
+                    });
+                    ddf.RegisterCallback<MouseOutEvent>((type) =>
+                    {
+                        SetBorders(ddf, 4, 20);
+                    });
+                    break;
+                default:
+                    break;
+            }
         }
     }
 
@@ -555,26 +575,15 @@ public class Menu : MonoBehaviour
             button.clicked += () => InsertCosmetic(-1);
             button.RegisterCallback<MouseOverEvent>((type) =>
             {
-                button.style.borderTopWidth = 8;
-                button.style.borderLeftWidth = 8;
-                button.style.borderRightWidth = 8;
-                button.style.borderBottomWidth = 8;
-                button.style.paddingTop = 16;
-                button.style.paddingLeft = 16;
-                button.style.paddingRight = 16;
-                button.style.paddingBottom = 16;
+                aus.PlayOneShot(Resources.Load<AudioClip>("Sounds/Menu/Pencil Stroke " + UnityEngine.Random.Range(0, 21)), UnityEngine.Random.Range(0.2f, 0.3f));
+                SetBorders(button, 8, 16);
+
 
             });
             button.RegisterCallback<MouseOutEvent>((type) =>
             {
-                button.style.borderTopWidth = 4;
-                button.style.borderLeftWidth = 4;
-                button.style.borderRightWidth = 4;
-                button.style.borderBottomWidth = 4;
-                button.style.paddingTop = 20;
-                button.style.paddingLeft = 20;
-                button.style.paddingRight = 20;
-                button.style.paddingBottom = 20;
+                SetBorders(button, 4, 20);
+
             });
             visList.Add(myUI);
         }
@@ -592,26 +601,13 @@ public class Menu : MonoBehaviour
                 button.clicked += () => InsertCosmetic(finalVal);
                 button.RegisterCallback<MouseOverEvent>((type) =>
                 {
-                    button.style.borderTopWidth = 8;
-                    button.style.borderLeftWidth = 8;
-                    button.style.borderRightWidth = 8;
-                    button.style.borderBottomWidth = 8;
-                    button.style.paddingTop = 16;
-                    button.style.paddingLeft = 16;
-                    button.style.paddingRight = 16;
-                    button.style.paddingBottom = 16;
+                    aus.PlayOneShot(Resources.Load<AudioClip>("Sounds/Menu/Pencil Stroke " + UnityEngine.Random.Range(0, 21)), UnityEngine.Random.Range(0.2f, 0.3f));
+                    SetBorders(button, 8, 16);
 
                 });
                 button.RegisterCallback<MouseOutEvent>((type) =>
                 {
-                    button.style.borderTopWidth = 4;
-                    button.style.borderLeftWidth = 4;
-                    button.style.borderRightWidth = 4;
-                    button.style.borderBottomWidth = 4;
-                    button.style.paddingTop = 20;
-                    button.style.paddingLeft = 20;
-                    button.style.paddingRight = 20;
-                    button.style.paddingBottom = 20;
+                    SetBorders(button, 4, 20);
                 });
                 visList.Add(myUI);
             }
