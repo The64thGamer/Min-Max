@@ -41,6 +41,7 @@ public class Menu : MonoBehaviour
     int[] cosmeticInts;
     NetworkManager m_NetworkManager;
     bool flippingPage;
+    float soundTimer;
 
     //Labels
     int currentCustClass;
@@ -82,6 +83,7 @@ public class Menu : MonoBehaviour
 
     private void Update()
     {
+        soundTimer = Mathf.Max(0, soundTimer - Time.deltaTime);
         if (flippingPage)
         {
             centerRing.eulerAngles = new Vector3(0, centerRing.eulerAngles.y + (Time.deltaTime * 750), 0);
@@ -112,7 +114,7 @@ public class Menu : MonoBehaviour
 
     void SetButtons(VisualElement root, List<MenuButtons> interactables, string pagename)
     {
-        if(interactables == null || root == null)
+        if (interactables == null || root == null)
         {
             return;
         }
@@ -128,11 +130,12 @@ public class Menu : MonoBehaviour
                     button.clicked += () => ButtonPressed(pagename, interactables[iCtx].name, "", false, 0, interactables[iCtx].sound);
                     button.RegisterCallback<MouseOverEvent>((type) =>
                     {
-                        if (!flippingPage)
+                        if (!flippingPage && soundTimer <= 0)
                         {
+                            soundTimer = 0.1f;
+                            SetBorders(button, 8, 16);
                             aus.PlayOneShot(Resources.Load<AudioClip>("Sounds/Menu/Pencil Stroke " + UnityEngine.Random.Range(0, 21)), UnityEngine.Random.Range(0.2f, 0.3f));
                         }
-                        SetBorders(button, 8, 16);
                     });
                     button.RegisterCallback<MouseOutEvent>((type) =>
                     {
@@ -144,11 +147,12 @@ public class Menu : MonoBehaviour
                     toggle.RegisterValueChangedCallback(evt => ButtonPressed(pagename, interactables[iCtx].name, "", evt.newValue, 0, interactables[iCtx].sound));
                     toggle.RegisterCallback<MouseOverEvent>((type) =>
                     {
-                        if (!flippingPage)
+                        if (!flippingPage && soundTimer <= 0)
                         {
+                            soundTimer = 0.1f;
+                            SetBorders(toggle, 8, 16);
                             aus.PlayOneShot(Resources.Load<AudioClip>("Sounds/Menu/Pencil Stroke " + UnityEngine.Random.Range(0, 21)), UnityEngine.Random.Range(0.2f, 0.3f));
                         }
-                        SetBorders(toggle, 8, 16);
 
                     });
                     toggle.RegisterCallback<MouseOutEvent>((type) =>
@@ -161,12 +165,12 @@ public class Menu : MonoBehaviour
                     field.RegisterValueChangedCallback(evt => ButtonPressed(pagename, interactables[iCtx].name, evt.newValue, false, 0, interactables[iCtx].sound));
                     field.RegisterCallback<MouseOverEvent>((type) =>
                     {
-                        if (!flippingPage)
+                        if (!flippingPage && soundTimer <= 0)
                         {
+                            soundTimer = 0.1f;
+                            SetBorders(field, 8, 16);
                             aus.PlayOneShot(Resources.Load<AudioClip>("Sounds/Menu/Pencil Stroke " + UnityEngine.Random.Range(0, 21)), UnityEngine.Random.Range(0.2f, 0.3f));
                         }
-                        SetBorders(field, 8, 16);
-
                     });
                     field.RegisterCallback<MouseOutEvent>((type) =>
                     {
@@ -175,18 +179,18 @@ public class Menu : MonoBehaviour
                     break;
                 case MenuButtonType.slider:
                     SliderInt sliderInt = root.Q<SliderInt>(interactables[iCtx].name);
-                    if(sliderInt == null)
+                    if (sliderInt == null)
                     {
                         Slider slider = root.Q<Slider>(interactables[iCtx].name);
                         slider.RegisterValueChangedCallback(evt => ButtonPressed(pagename, interactables[iCtx].name, "", false, evt.newValue, interactables[iCtx].sound));
                         slider.RegisterCallback<MouseOverEvent>((type) =>
                         {
-                            if (!flippingPage)
+                            if (!flippingPage && soundTimer <= 0)
                             {
+                                soundTimer = 0.1f;
+                                SetBorders(slider, 8, 16);
                                 aus.PlayOneShot(Resources.Load<AudioClip>("Sounds/Menu/Pencil Stroke " + UnityEngine.Random.Range(0, 21)), UnityEngine.Random.Range(0.2f, 0.3f));
-                            } 
-                            SetBorders(slider, 8, 16);
-
+                            }
                         });
                         slider.RegisterCallback<MouseOutEvent>((type) =>
                         {
@@ -198,12 +202,12 @@ public class Menu : MonoBehaviour
                         sliderInt.RegisterValueChangedCallback(evt => ButtonPressed(pagename, interactables[iCtx].name, "", false, evt.newValue, interactables[iCtx].sound));
                         sliderInt.RegisterCallback<MouseOverEvent>((type) =>
                         {
-                            if (!flippingPage)
+                            if (!flippingPage && soundTimer <= 0)
                             {
+                                soundTimer = 0.1f;
+                                SetBorders(sliderInt, 8, 16);
                                 aus.PlayOneShot(Resources.Load<AudioClip>("Sounds/Menu/Pencil Stroke " + UnityEngine.Random.Range(0, 21)), UnityEngine.Random.Range(0.2f, 0.3f));
                             }
-                            SetBorders(sliderInt, 8, 16);
-
                         });
                         sliderInt.RegisterCallback<MouseOutEvent>((type) =>
                         {
@@ -216,12 +220,12 @@ public class Menu : MonoBehaviour
                     ddf.RegisterValueChangedCallback(evt => ButtonPressed(pagename, interactables[iCtx].name, "", false, ddf.index, interactables[iCtx].sound));
                     ddf.RegisterCallback<MouseOverEvent>((type) =>
                     {
-                        if (!flippingPage)
+                        if (!flippingPage && soundTimer <= 0)
                         {
+                            soundTimer = 0.1f;
+                            SetBorders(ddf, 8, 16);
                             aus.PlayOneShot(Resources.Load<AudioClip>("Sounds/Menu/Pencil Stroke " + UnityEngine.Random.Range(0, 21)), UnityEngine.Random.Range(0.2f, 0.3f));
                         }
-                        SetBorders(ddf, 8, 16);
-
                     });
                     ddf.RegisterCallback<MouseOutEvent>((type) =>
                     {
@@ -298,13 +302,15 @@ public class Menu : MonoBehaviour
                             SetToggle("CreateOnline", Convert.ToBoolean(PlayerPrefs.GetInt("CreateOnline")), false);
                             SetToggle("SpawnBots", Convert.ToBoolean(PlayerPrefs.GetInt("SpawnBotsInEmpty")), false);
 
-                            if(PlayerPrefs.GetInt("CreateOnline") == 0)
+                            if (PlayerPrefs.GetInt("CreateOnline") == 0)
                             {
                                 PlayerPrefs.SetString("Connection Setting", "Create LAN Server");
+                                SetLabel("ButtonWarning", "LAN players can connect by server port", true);
                             }
                             else
                             {
                                 PlayerPrefs.SetString("Connection Setting", "Create Online Server");
+                                SetLabel("ButtonWarning", "An invite code will be copied to your clipboard upon start", true);
                             }
                             break;
                         case "Customization":
@@ -328,21 +334,23 @@ public class Menu : MonoBehaviour
                         case "Statistics":
                             SwitchPage(2);
                             SetLabel("Statistics",
-                                "Total Damage: " + PlayerPrefs.GetFloat("Achievement: Total Damage") +
-                                "\nTotal Kills: " + PlayerPrefs.GetFloat("Achievement: Total Kills") +
-                                "\nTotal Distance Walked: " + (int)PlayerPrefs.GetFloat("Achievement: Total Walking Distance") + " m" +
-                                "\nTotal Air Travel: " + (int)PlayerPrefs.GetFloat("Achievement: Total Air Travel") + " m" +
-                                "\nTotal Air-Time: " + (int)PlayerPrefs.GetFloat("Achievement: Total Air-Time") + " sec" +
-                                "\nTotal Laborers Killed: " + PlayerPrefs.GetFloat("Achievement: Total Laborers Killed") +
-                                "\nTotal Wood Workers Killed: " + PlayerPrefs.GetFloat("Achievement: Total Wood Workers Killed") +
-                                "\nTotal Developers Killed: " + PlayerPrefs.GetFloat("Achievement: Total Developers Killed") +
-                                "\nTotal Programmers Killed: " + PlayerPrefs.GetFloat("Achievement: Total Programmers Killed") +
-                                "\nTotal Computers Killed: " + PlayerPrefs.GetFloat("Achievement: Total Computers Killed") +
-                                "\nTotal Fabricators Killed: " + PlayerPrefs.GetFloat("Achievement: Total Fabricators Killed") +
-                                "\nTotal Artists Killed: " + PlayerPrefs.GetFloat("Achievement: Total Artists Killed") +
-                                "\nTotal Freelancers Killed: " + PlayerPrefs.GetFloat("Achievement: Total Freelancers Killed") +
-                                "\nTotal Craftsmen Killed: " + PlayerPrefs.GetFloat("Achievement: Total Craftsmen Killed") +
-                                "\nTotal Managers Killed: " + PlayerPrefs.GetFloat("Achievement: Total Managers Killed")
+                                "TOTAL STATS" +
+                                "\nDamage: " + PlayerPrefs.GetFloat("Achievement: Total Damage") +
+                                "\nKills: " + PlayerPrefs.GetFloat("Achievement: Total Kills") +
+                                "\nDistance Walked: " + (int)PlayerPrefs.GetFloat("Achievement: Total Walking Distance") + " m" +
+                                "\nAir Travel: " + (int)PlayerPrefs.GetFloat("Achievement: Total Air Travel") + " m" +
+                                "\nAir-Time: " + (int)PlayerPrefs.GetFloat("Achievement: Total Air-Time") + " sec" +
+                                "\n\nTOTAL KILLED" +
+                                "\nLaborers: " + PlayerPrefs.GetFloat("Achievement: Total Laborers Killed") +
+                                "\nWood Workers: " + PlayerPrefs.GetFloat("Achievement: Total Wood Workers Killed") +
+                                "\nDevelopers: " + PlayerPrefs.GetFloat("Achievement: Total Developers Killed") +
+                                "\nProgrammers: " + PlayerPrefs.GetFloat("Achievement: Total Programmers Killed") +
+                                "\nComputers: " + PlayerPrefs.GetFloat("Achievement: Total Computers Killed") +
+                                "\nFabricators: " + PlayerPrefs.GetFloat("Achievement: Total Fabricators Killed") +
+                                "\nArtists: " + PlayerPrefs.GetFloat("Achievement: Total Artists Killed") +
+                                "\nFreelancers: " + PlayerPrefs.GetFloat("Achievement: Total Freelancers Killed") +
+                                "\nCraftsmen: " + PlayerPrefs.GetFloat("Achievement: Total Craftsmen Killed") +
+                                "\nManagers: " + PlayerPrefs.GetFloat("Achievement: Total Managers Killed")
                                 , false);
                             break;
                         case "Settings":
@@ -487,7 +495,7 @@ public class Menu : MonoBehaviour
                             }
                             break;
                         case "PlayerHeight":
-                            PlayerPrefs.SetFloat("PlayerHeight",valueFloat);
+                            PlayerPrefs.SetFloat("PlayerHeight", valueFloat);
                             break;
                         case "Back":
                             SwitchPage(0);
@@ -500,7 +508,7 @@ public class Menu : MonoBehaviour
                     switch (button)
                     {
                         case "SelectName":
-                            PlayerPrefs.SetString("ServerName",valueString);
+                            PlayerPrefs.SetString("ServerName", valueString);
                             break;
                         case "SelectMap":
                             PlayerPrefs.SetInt("ServerMapName", (int)valueFloat);
@@ -525,10 +533,12 @@ public class Menu : MonoBehaviour
                             PlayerPrefs.SetInt("CreateOnline", Convert.ToInt32(valueBool));
                             if (!valueBool)
                             {
+                                SetLabel("ButtonWarning", "LAN players can connect by server port", true);
                                 PlayerPrefs.SetString("Connection Setting", "Create LAN Server");
                             }
                             else
                             {
+                                SetLabel("ButtonWarning", "An invite code will be copied to your clipboard upon start", true);
                                 PlayerPrefs.SetString("Connection Setting", "Create Online Server");
                             }
                             break;
@@ -746,13 +756,13 @@ public class Menu : MonoBehaviour
         d.index = index;
     }
 
-    void SetSlider (string element, float index, bool isRightPage)
+    void SetSlider(string element, float index, bool isRightPage)
     {
         Slider d;
         if (isRightPage)
         {
             d = rightMenu.rootVisualElement.Q<Slider>(element);
-            if(d == null)
+            if (d == null)
             {
                 SliderInt di = rightMenu.rootVisualElement.Q<SliderInt>(element);
                 di.value = (int)index;
