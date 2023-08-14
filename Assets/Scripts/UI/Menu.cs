@@ -692,7 +692,11 @@ public class Menu : MonoBehaviour
                 button.clicked += () => InsertCosmetic(finalVal);
                 button.RegisterCallback<MouseOverEvent>((type) =>
                 {
-                    aus.PlayOneShot(Resources.Load<AudioClip>("Sounds/Menu/Pencil Stroke " + UnityEngine.Random.Range(0, 21)), UnityEngine.Random.Range(0.2f, 0.3f));
+                    if (!flippingPage && soundTimer <= 0)
+                    {
+                        soundTimer = 0.1f;
+                        aus.PlayOneShot(Resources.Load<AudioClip>("Sounds/Menu/Pencil Stroke " + UnityEngine.Random.Range(0, 21)), UnityEngine.Random.Range(0.2f, 0.3f));
+                    }
                     SetBorders(button, 8, 16);
 
                 });
