@@ -356,6 +356,7 @@ public class Menu : MonoBehaviour
                             SetTextField("PlayerName", finalName, false);
                             SetToggle("Vsync", Convert.ToBoolean(PlayerPrefs.GetInt("Settings: Vsync")), false);
                             SetToggle("Windowed", Convert.ToBoolean(PlayerPrefs.GetInt("Settings: Windowed")), false);
+                            SetSlider("PlayerHeight", PlayerPrefs.GetFloat("PlayerHeight"), false);
                             break;
                         case "StartVR":
                             StartCoroutine(StartXR());
@@ -484,6 +485,9 @@ public class Menu : MonoBehaviour
                             {
                                 Screen.fullScreenMode = FullScreenMode.FullScreenWindow;
                             }
+                            break;
+                        case "PlayerHeight":
+                            PlayerPrefs.SetFloat("PlayerHeight",valueFloat);
                             break;
                         case "Back":
                             SwitchPage(0);
@@ -742,7 +746,7 @@ public class Menu : MonoBehaviour
         d.index = index;
     }
 
-    void SetSlider (string element, int index, bool isRightPage)
+    void SetSlider (string element, float index, bool isRightPage)
     {
         Slider d;
         if (isRightPage)
@@ -751,7 +755,7 @@ public class Menu : MonoBehaviour
             if(d == null)
             {
                 SliderInt di = rightMenu.rootVisualElement.Q<SliderInt>(element);
-                di.value = index;
+                di.value = (int)index;
                 return;
             }
         }
@@ -761,7 +765,7 @@ public class Menu : MonoBehaviour
             if (d == null)
             {
                 SliderInt di = leftMenu.rootVisualElement.Q<SliderInt>(element);
-                di.value = index;
+                di.value = (int)index;
                 return;
             }
         }
