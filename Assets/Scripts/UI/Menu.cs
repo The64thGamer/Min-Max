@@ -41,6 +41,7 @@ public class Menu : MonoBehaviour
     int[] cosmeticInts;
     NetworkManager m_NetworkManager;
     bool flippingPage;
+    bool loadingMap;
     float soundTimer;
 
     //Labels
@@ -537,6 +538,20 @@ public class Menu : MonoBehaviour
                             break;
                     }
                     break;
+                case "SvrSett Right":
+                    switch (button)
+                    {
+                        case "CreateServer":
+                            SwitchPage(5);
+                            SetLabel("MapName", maps[(int)valueFloat].mapName, true);
+                            SetLabel("Gamemode", "Gamemode: " + maps[(int)valueFloat].gameMode, true);
+                            SetPicture("MapBackground", maps[(int)valueFloat].image, Color.white, true);
+                            StartCoroutine(LoadMap());
+                            break;
+                        default:
+                            break;
+                    }
+                    break;
                 default:
                     break;
             }
@@ -1026,6 +1041,22 @@ public class Menu : MonoBehaviour
             meshes[i].materials = mats;
         }
 
+    }
+
+    IEnumerator LoadMap()
+    {
+        if (!loadingMap)
+        {
+            //Wait for page to turn
+            yield return new WaitForSeconds(0.25f);
+            loadingMap = true;
+            Application.backgroundLoadingPriority = ThreadPriority.Low;
+            AsyncOperation asyncLoad = SceneManager.LoadSceneAsync(maps[PlayerPrefs.GetInt("ServerMapName")].sceneName);
+            while (!asyncLoad.isDone)
+            {
+                yield return null;
+            }
+        }
     }
 
     [System.Serializable]
