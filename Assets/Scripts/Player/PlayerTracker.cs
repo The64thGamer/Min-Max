@@ -110,6 +110,9 @@ public class PlayerTracker : NetworkBehaviour
         //Animations
         if (animController != null)
         {
+            animController.SetFloat("VelX", headset.InverseTransformDirection(GetVelocity()).x);
+            animController.SetFloat("VelZ", headset.InverseTransformDirection(GetVelocity()).z);
+
             animController.SetFloat("HandX", CalcLerpVector3(centerPos.position, rightPos.position, rightController.position, false) - CalcLerpVector3(centerPos.position, leftPos.position, rightController.position, false));
             animController.SetFloat("HandY", CalcLerpVector3(centerPos.position, upPos.position, rightController.position, true) - CalcLerpVector3(centerPos.position, downPos.position, rightController.position, true));
             playerHead.rotation = headset.rotation;

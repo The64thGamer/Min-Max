@@ -54,6 +54,7 @@ public class Menu : MonoBehaviour
     private void OnEnable()
     {
         //Pinging
+        UnityEngine.Cursor.lockState = CursorLockMode.None;
         m_NetworkManager = GameObject.Find("Transport").GetComponent<NetworkManager>();
         if (m_NetworkManager != null)
         {
@@ -127,7 +128,6 @@ public class Menu : MonoBehaviour
             {
                 case MenuButtonType.button:
                     Button button = root.Q<Button>(interactables[iCtx].name);
-                    Debug.Log(i);
                     button.clicked += () => ButtonPressed(pagename, interactables[iCtx].name, "", false, 0, interactables[iCtx].sound);
                     button.RegisterCallback<MouseOverEvent>((type) =>
                     {
