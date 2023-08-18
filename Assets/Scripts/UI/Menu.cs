@@ -543,9 +543,10 @@ public class Menu : MonoBehaviour
                     {
                         case "CreateServer":
                             SwitchPage(5);
-                            SetLabel("MapName", maps[(int)valueFloat].mapName, true);
-                            SetLabel("Gamemode", "Gamemode: " + maps[(int)valueFloat].gameMode, true);
-                            SetPicture("MapBackground", maps[(int)valueFloat].image, Color.white, true);
+                            int final = PlayerPrefs.GetInt("ServerMapName");
+                            SetLabel("MapName", maps[final].mapName, true);
+                            SetLabel("Gamemode", "Gamemode: " + maps[final].gameMode, true);
+                            SetPicture("MapBackground", maps[final].image, Color.white, true);
                             StartCoroutine(LoadMap());
                             break;
                         default:
