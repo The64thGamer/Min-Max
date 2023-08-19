@@ -204,7 +204,7 @@ public class Wire : MonoBehaviour
         }
     }
 
-    public WirePoint FindClosestWireToGoal(Vector3 point)
+    public WirePoint FindClosestWireToGoal(List<Vector3> point)
     {
         WirePoint finalWire = RecursiveGoalSearch(point, float.PositiveInfinity, startingWire);
         WirePoint returnwire = finalWire;
@@ -226,7 +226,7 @@ public class Wire : MonoBehaviour
         return returnwire;
     }
 
-    WirePoint RecursiveGoalSearch(Vector3 point, float currentDistance, WirePoint parent)
+    WirePoint RecursiveGoalSearch(List<Vector3> point, float currentDistance, WirePoint parent)
     {
         UnityEngine.Color normalPalette = palette.GetPixel((int)currentTeam, 6);
         if (parent.lineRenderer != null)
@@ -263,23 +263,31 @@ public class Wire : MonoBehaviour
         return bestChoice;
     }
 
-    float CalculatePath(Vector3 start, Vector3 end)
+    float CalculatePath(Vector3 start, List<Vector3> end)
     {
-        float lng = 0;
+        float shortest = float.PositiveInfinity;
         NavMeshPath path = new NavMeshPath();
-        NavMesh.CalculatePath(start,end, NavMesh.AllAreas, path);
-        if (path.status != NavMeshPathStatus.PathInvalid)
+        for (int i = 0; i < end.Count; i++)
         {
-            for (int e = 1; e < path.corners.Length; ++e)
+            float lng = 0;
+            NavMesh.CalculatePath(start, end[i], NavMesh.AllAreas, path);
+            if (path.status != NavMeshPathStatus.PathInvalid)
             {
-                lng += Vector3.Distance(path.corners[e - 1], path.corners[e]);
+                for (int e = 1; e < path.corners.Length; ++e)
+                {
+                    lng += Vector3.Distance(path.corners[e - 1], path.corners[e]);
+                }
             }
-        }
-        else
-        {
-            lng = float.PositiveInfinity;
-        }
-        return lng;
+            else
+            {
+                lng = float.PositiveInfinity;
+            }
+            if(lng < shortest)
+            {
+                shortest = lng;
+            }
+        } 
+        return shortest;
     }
 
     public class WirePoint

@@ -34,42 +34,27 @@ public class Payload : GenericGamemode
 
     public override Vector3 GetCurrentMatchFocalPoint(int team)
     {
-        if(payloadTeams[team].goal != null)
+        List<Vector3> points = new List<Vector3>();
+
+        for (int i = 0; i < payloadTeams.Count; i++)
         {
-            Wire wire;
-            try
+            if (payloadTeams[i].goal != null && i != team)
             {
-                wire = gm.GetWire(gm.GetTeamColors(true)[team]);
+                points.Add(payloadTeams[i].goal.transform.position);
             }
-            catch (System.NullReferenceException)
-            {
-                return Vector3.zero;
-            }
-            Wire.WirePoint wp = wire.FindClosestWireToGoal(payloadTeams[team].goal.transform.position);
-            return wp.point;
         }
-        else
+
+        Wire wire;
+        try
         {
-            int randomTeam = Random.Range(0, payloadTeams.Count);
-            while (true)
-            {
-                if (payloadTeams[randomTeam].goal != null)
-                {
-                    break;
-                }
-                randomTeam = (randomTeam + 1) % payloadTeams.Count;
-            }
-            Wire wire;
-            try
-            {
-                wire = gm.GetWire(gm.GetTeamColors(true)[randomTeam]);
-            }
-            catch (System.NullReferenceException)
-            {
-                return Vector3.zero;
-            }
-            return wire.FindClosestWireToGoal(payloadTeams[randomTeam].goal.transform.position).point;
+            wire = gm.GetWire(gm.GetTeamColors(true)[team]);
         }
+        catch (System.NullReferenceException)
+        {
+            return Vector3.zero;
+        }
+        Wire.WirePoint wp = wire.FindClosestWireToGoal(points);
+        return wp.point;
     }
 
     void TeamChanger(List<TeamList> setTeams)
