@@ -2,8 +2,10 @@ using NUnit.Framework;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using Unity.VisualScripting;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine;
+using UnityEngine.AI;
 
 public class Payload : GenericGamemode
 {
@@ -44,17 +46,54 @@ public class Payload : GenericGamemode
             }
         }
 
-        Wire wire;
-        try
+        if (points.Count > 0)
         {
-            wire = gm.GetWire(gm.GetTeamColors(true)[team]);
+            try
+            {
+                return gm.GetWire(gm.GetTeamColors(true)[team]).FindClosestWireToGoal(points).point;
+            }
+            catch (System.NullReferenceException)
+            {
+                return Vector3.zero;
+            }
         }
-        catch (System.NullReferenceException)
+        else
         {
-            return Vector3.zero;
+            points = new List<Vector3>();
+            for (int i = 0; i < payloadTeams.Count; i++)
+            {
+                if (payloadTeams[i].goal == null)
+                {
+                    points.Add(gm.GetMatchFocalPoint(gm.GetTeamColors(true)[i]));
+                }
+            }
+
+            float shortest = float.PositiveInfinity;
+            Vector3 final = Vector3.zero;
+            NavMeshPath path = new NavMeshPath();
+            for (int i = 0; i < points.Count; i++)
+            {
+                float lng = 0;
+                NavMesh.CalculatePath(points[i], payloadTeams[i].goal.transform.position, NavMesh.AllAreas, path);
+                if (path.status != NavMeshPathStatus.PathInvalid)
+                {
+                    for (int e = 1; e < path.corners.Length; ++e)
+                    {
+                        lng += Vector3.Distance(path.corners[e - 1], path.corners[e]);
+                    }
+                }
+                else
+                {
+                    lng = float.PositiveInfinity;
+                }
+                if (lng < shortest)
+                {
+                    shortest = lng;
+                    final = points[i];
+                }
+            }
+            return final;
         }
-        Wire.WirePoint wp = wire.FindClosestWireToGoal(points);
-        return wp.point;
     }
 
     void TeamChanger(List<TeamList> setTeams)
