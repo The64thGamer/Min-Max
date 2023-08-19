@@ -74,7 +74,7 @@ public class Payload : GenericGamemode
             for (int i = 0; i < points.Count; i++)
             {
                 float lng = 0;
-                NavMesh.CalculatePath(points[i], payloadTeams[i].goal.transform.position, NavMesh.AllAreas, path);
+                NavMesh.CalculatePath(points[i], payloadTeams[team].goal.transform.position, NavMesh.AllAreas, path);
                 if (path.status != NavMeshPathStatus.PathInvalid)
                 {
                     for (int e = 1; e < path.corners.Length; ++e)
