@@ -6,11 +6,16 @@ using UnityEngine.Events;
 public class WireCheck : MonoBehaviour
 {
     [SerializeField] UnityEvent wireFound;
-    [SerializeField] int attackerTeam = 1;
+    int defenderTeam = 1;
     GlobalManager gm;
     private void Start()
     {
         gm = GameObject.Find("Global Manager").GetComponent<GlobalManager>();
+    }
+
+    public void SetDefendingTeam(int set)
+    {
+        defenderTeam = set;
     }
 
     private void OnTriggerEnter(Collider other)
@@ -21,7 +26,7 @@ public class WireCheck : MonoBehaviour
             Wire.WirePoint wire = player.GetWirePoint();
             if(wire != null)
             {
-                if (player.GetTeam() == gm.GetTeams()[attackerTeam].teamColor)
+                if (player.GetTeam() != gm.GetTeams()[defenderTeam].teamColor)
                 {
                     wireFound.Invoke();
                 }
