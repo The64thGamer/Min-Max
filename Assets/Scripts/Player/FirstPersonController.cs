@@ -86,6 +86,7 @@ namespace StarterAssets
                         heldWire = player.GetWirePoint();
                         if (heldWire != null)
                         {
+                            gm.UpdateMatchFocalPoint(player.GetTeam());
                             gm.GiveClientWireClientRpc(player.GetPlayerID(), heldWire.wireID, heldWire.parent.wireID, player.GetTeam());
                         }
                     }
@@ -98,6 +99,7 @@ namespace StarterAssets
                 {
                     if (IsHost && heldWire != null)
                     {
+                        gm.UpdateMatchFocalPoint(player.GetTeam());
                         gm.RemoveClientWireClientRpc(player.GetPlayerID(), heldWire.point, true);
                     }
                     hasBeenCrouched = false;
@@ -108,6 +110,7 @@ namespace StarterAssets
             {
                 if (IsHost && heldWire != null)
                 {
+                    gm.UpdateMatchFocalPoint(player.GetTeam());
                     gm.RemoveClientWireClientRpc(player.GetPlayerID(), heldWire.point, true);
                 }
             }
@@ -138,6 +141,7 @@ namespace StarterAssets
                         heldWire = player.GetWirePoint();
                         if (heldWire != null)
                         {
+                            gm.UpdateMatchFocalPoint(player.GetTeam());
                             gm.SegmentClientWireClientRpc(player.GetPlayerID(), heldWire.point, heldWire.wireID, heldWire.parent.wireID, player.GetTeam());
                         }
                     }

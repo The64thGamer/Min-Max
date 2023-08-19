@@ -37,6 +37,7 @@ public class GlobalManager : NetworkBehaviour
     float tickTimer;
     bool serverStarted;
     GenericGamemode currentGamemode;
+    List<Vector3> matchFocalPoint;
 
     //Const
     const ulong botID = 64646464646464;
@@ -204,6 +205,7 @@ public class GlobalManager : NetworkBehaviour
         {
             damageHashes = new List<int>();
         }
+
     }
 
 
@@ -277,6 +279,30 @@ public class GlobalManager : NetworkBehaviour
         }
     }
 
+    public Vector3 GetMatchFocalPoint(TeamList team)
+    {
+        for (int e = 0; e < teams.Count; e++)
+        {
+            if (teams[e].teamColor == team)
+            {
+                return matchFocalPoint[e];
+            }
+        }
+        return Vector3.zero;
+    }
+
+    public void UpdateMatchFocalPoint(TeamList team)
+    {
+        for (int e = 0; e < teams.Count; e++)
+        {
+            if (teams[e].teamColor == team)
+            {
+                matchFocalPoint[e] = currentGamemode.GetCurrentMatchFocalPoint(e);
+                return;
+            }
+        }
+    }
+
     public List<Transform> GetTeamSpawns()
     {
         return teamSpawns;
@@ -331,12 +357,14 @@ public class GlobalManager : NetworkBehaviour
     public void AddNewTeam(TeamInfo newTeam)
     {
         teams.Add(newTeam);
+        matchFocalPoint.Add(Vector3.zero);
         ModifyTeamsAcrossServer();
     }
 
     public void ClearTeams()
     {
         teams = new List<TeamInfo>();
+        matchFocalPoint = new List<Vector3>();
     }
 
     public List<TeamInfo> GetTeams()
@@ -789,6 +817,7 @@ public class GlobalManager : NetworkBehaviour
                 //Refresh Stats
                 clients[i].ResetClassStats();
                 clients[i].GetTracker().ForceNewPosition(spawnPos);
+                UpdateMatchFocalPoint(clients[i].GetTeam());
                 Debug.Log("Player " + id + " respawned in " + team.ToString() + " spawn room");
                 return;
             }
@@ -979,6 +1008,14 @@ public class GlobalManager : NetworkBehaviour
         }
 
         clients[foundClient].SetHealth(currentHealth);
+    }
+
+    private void OnDrawGizmosSelected()
+    {
+        for (int i = 0; i < matchFocalPoint.Count; i++)
+        {
+            Gizmos.DrawCube(matchFocalPoint[i], Vector3.one);
+        }
     }
 }
 

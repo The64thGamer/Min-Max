@@ -1,10 +1,8 @@
-using System;
-using System.Collections;
 using System.Collections.Generic;
+using System.Drawing;
 using Unity.Netcode;
-using Unity.VisualScripting;
 using UnityEngine;
-using UnityEngine.InputSystem.HID;
+using UnityEngine.AI;
 
 public class Wire : MonoBehaviour
 {
@@ -17,9 +15,11 @@ public class Wire : MonoBehaviour
     Vector3 raycastYOffset = new Vector3(0, 0.2f, 0);
     uint lastID = 0;
     List<LineRenderer> meshes = new List<LineRenderer>();
+    GlobalManager gm;
 
     private void Start()
     {
+        gm = GameObject.Find("Global Manager").GetComponent<GlobalManager>();
         startingWire.point = startPoint.position;
     }
 
@@ -100,13 +100,15 @@ public class Wire : MonoBehaviour
         bruh.name = "WirePoint";
         bruh.transform.parent = startPoint;
         LineRenderer lr = bruh.AddComponent<LineRenderer>();
+        UnityEngine.Color c = palette.GetPixel((int)currentTeam, 7);
         lr.material = wireMat;
-        lr.material.color = palette.GetPixel((int)currentTeam, 7);
-        lr.startColor = palette.GetPixel((int)currentTeam, 7);
-        lr.endColor = lr.startColor;
+        lr.material.color = c;
+        lr.startColor = c;
+        lr.endColor = c;
         lr.startWidth = 0.1f;
         lr.endWidth = lr.startWidth;
         lr.numCapVertices = 5;
+        point.lineRenderer = lr;
         meshes.Add(lr);
     }
 
@@ -117,7 +119,7 @@ public class Wire : MonoBehaviour
         index++;
         for (int i = 0; i < parent.children.Count; i++)
         {
-            index = RecursiveDraw(parent.children[i],index);
+            index = RecursiveDraw(parent.children[i], index);
         }
         return index;
     }
@@ -139,7 +141,7 @@ public class Wire : MonoBehaviour
             else
             {
                 bestChoice = RecursiveIDSearch(id, parent.children[i]);
-                if(bestChoice != null)
+                if (bestChoice != null)
                 {
                     break;
                 }
@@ -166,12 +168,12 @@ public class Wire : MonoBehaviour
     public void CreateNewClientWire(WirePointData data)
     {
         WirePoint parent = null;
-        if(data.parent != -1)
+        if (data.parent != -1)
         {
             parent = FindWireFromID((uint)data.parent);
         }
-        WirePoint final = new WirePoint() { parent = parent, isOn = true, wireID = data.wireID,point = data.point};
-        if(parent != null)
+        WirePoint final = new WirePoint() { parent = parent, isOn = true, wireID = data.wireID, point = data.point };
+        if (parent != null)
         {
             parent.children.Add(final);
         }
@@ -191,7 +193,7 @@ public class Wire : MonoBehaviour
     void RecursiveConvertWires(List<WirePointData> data, WirePoint parent, int teamNumber)
     {
         int parentID = -1;
-        if(parent.parent != null)
+        if (parent.parent != null)
         {
             parentID = (int)parent.parent.wireID;
         }
@@ -202,6 +204,84 @@ public class Wire : MonoBehaviour
         }
     }
 
+    public WirePoint FindClosestWireToGoal(Vector3 point)
+    {
+        WirePoint finalWire = RecursiveGoalSearch(point, float.PositiveInfinity, startingWire);
+        WirePoint returnwire = finalWire;
+        if (finalWire != null)
+        {
+            UnityEngine.Color brightPalette = palette.GetPixel((int)currentTeam, 2);
+            while (true)
+            {
+                if (finalWire.parent == null)
+                {
+                    break;
+                }
+                finalWire.lineRenderer.material.color = brightPalette;
+                finalWire.lineRenderer.startColor = brightPalette;
+                finalWire.lineRenderer.endColor = brightPalette;
+                finalWire = finalWire.parent;
+            }
+        }
+        return returnwire;
+    }
+
+    WirePoint RecursiveGoalSearch(Vector3 point, float currentDistance, WirePoint parent)
+    {
+        UnityEngine.Color normalPalette = palette.GetPixel((int)currentTeam, 6);
+        if (parent.lineRenderer != null)
+        {
+            parent.lineRenderer.material.color = normalPalette;
+            parent.lineRenderer.startColor = normalPalette;
+            parent.lineRenderer.endColor = normalPalette;
+        }
+        float lng = 0.0f;
+        WirePoint bestChoice = null;
+
+        lng = CalculatePath(parent.point, point);
+
+        if (lng < currentDistance)
+        {
+            bestChoice = parent;
+            currentDistance = lng;
+        }
+
+        for (int i = 0; i < parent.children.Count; i++)
+        {
+            WirePoint bestChild = RecursiveGoalSearch(point, currentDistance, parent.children[i]);
+            if (bestChild != null)
+            {
+                lng = CalculatePath(bestChild.point, point);
+
+                if (lng < currentDistance)
+                {
+                    bestChoice = bestChild;
+                    currentDistance = lng;
+                }
+            }
+        }
+        return bestChoice;
+    }
+
+    float CalculatePath(Vector3 start, Vector3 end)
+    {
+        float lng = 0;
+        NavMeshPath path = new NavMeshPath();
+        NavMesh.CalculatePath(start,end, NavMesh.AllAreas, path);
+        if (path.status != NavMeshPathStatus.PathInvalid)
+        {
+            for (int e = 1; e < path.corners.Length; ++e)
+            {
+                lng += Vector3.Distance(path.corners[e - 1], path.corners[e]);
+            }
+        }
+        else
+        {
+            lng = float.PositiveInfinity;
+        }
+        return lng;
+    }
+
     public class WirePoint
     {
         public bool isOn = true;
@@ -209,6 +289,7 @@ public class Wire : MonoBehaviour
         public List<WirePoint> children = new List<WirePoint>();
         public WirePoint parent;
         public uint wireID;
+        public LineRenderer lineRenderer;
     }
 
     [System.Serializable]
