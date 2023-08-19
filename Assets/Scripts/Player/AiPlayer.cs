@@ -31,7 +31,7 @@ public class AiPlayer : NetworkBehaviour
     int currentNavCorner = 0;
 
     //Const
-    const float maxNavRange = 10;
+    const float maxNavRange = 15;
     const float maxEnemyNavRange = 20;
     const ulong botID = 64646464646464;
 
