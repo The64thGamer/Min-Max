@@ -2,18 +2,24 @@ using NUnit.Framework;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 
 public class Payload : GenericGamemode
 {
     GlobalManager gm;
-    [UnityEngine.Range(2, 8)]
-    [SerializeField] uint noOfTeams = 2;
-    [SerializeField]
+    [SerializeField] List<PayLoadTeam> payloadTeams;
 
     private void Start()
     {
         gm = this.GetComponent<GlobalManager>();
+        for (int i = 0; i < payloadTeams.Count; i++)
+        {
+            if (payloadTeams[i].goal != null)
+            {
+                payloadTeams[i].goal.SetDefendingTeam(i);
+            }
+        }
     }
 
     public override void SetTeams()
@@ -24,6 +30,45 @@ public class Payload : GenericGamemode
     public override void SetTeams(List<TeamList> setTeams)
     {
         TeamChanger(setTeams);
+    }
+
+    public override Vector3 GetCurrentMatchFocalPoint(int team)
+    {
+        if(payloadTeams[team].goal == null)
+        {
+            Wire wire;
+            try
+            {
+                wire = gm.GetWire(gm.GetTeamColors(false)[team]);
+            }
+            catch (System.NullReferenceException)
+            {
+                return Vector3.zero;
+            }
+            return wire.FindClosestWireToGoal(payloadTeams[team].goal.transform.position).point;
+        }
+        else
+        {
+            int randomTeam = Random.Range(0, payloadTeams.Count);
+            while (true)
+            {
+                if (payloadTeams[randomTeam].goal != null)
+                {
+                    break;
+                }
+                randomTeam = (randomTeam + 1) % payloadTeams.Count;
+            }
+            Wire wire;
+            try
+            {
+                wire = gm.GetWire(gm.GetTeamColors(false)[randomTeam]);
+            }
+            catch (System.NullReferenceException)
+            {
+                return Vector3.zero;
+            }
+            return wire.FindClosestWireToGoal(payloadTeams[randomTeam].goal.transform.position).point;
+        }
     }
 
     void TeamChanger(List<TeamList> setTeams)
@@ -56,7 +101,7 @@ public class Payload : GenericGamemode
         TeamInfo grayTeam = new TeamInfo() { spawns = 0, teamColor = TeamList.gray };
         gm.AddNewTeam(grayTeam);
 
-        for (int i = 0; i < noOfTeams; i++)
+        for (int i = 0; i < payloadTeams.Count; i++)
         {
             TeamInfo nextTeam = new TeamInfo();
             nextTeam.spawns = i + 1;
@@ -107,5 +152,12 @@ public class Payload : GenericGamemode
             }
         }
         return teams[finalIndex];
+    }
+
+    [System.Serializable]
+    public struct PayLoadTeam
+    {
+        public string teamName;
+        public WireCheck goal;
     }
 }

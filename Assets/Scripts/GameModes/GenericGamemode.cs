@@ -11,6 +11,8 @@ public abstract class GenericGamemode : NetworkBehaviour
 
     public abstract TeamList DecideWhichPlayerTeam();
 
+    public abstract Vector3 GetCurrentMatchFocalPoint(int team);
+
     public void ResetMatch()
     {
         if (IsHost)
