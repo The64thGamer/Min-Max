@@ -31,8 +31,8 @@ public class AiPlayer : NetworkBehaviour
     int currentNavCorner = 0;
 
     //Const
-    const float maxNavRange = 40;
-    const float maxEnemyNavRange = 10;
+    const float maxNavRange = 10;
+    const float maxEnemyNavRange = 20;
     const ulong botID = 64646464646464;
 
 
@@ -80,11 +80,12 @@ public class AiPlayer : NetworkBehaviour
             }
             else
             {
+                //Slowly converges on parent wire of random enemy team by calculating halfway point and scrambling pos;
                 NavMeshHit hit;
-                if(NavMesh.SamplePosition((Random.insideUnitSphere * maxNavRange) + transform.position, out hit, maxNavRange, 1))
+
+                if(NavMesh.SamplePosition((Random.insideUnitSphere * maxNavRange) + gm.GetMatchFocalPoint(player.GetTeam()), out hit, maxNavRange, 1))
                 {
                     setDestination = hit.position;
-
                 }
             }
             if (setDestination != Vector3.zero)
