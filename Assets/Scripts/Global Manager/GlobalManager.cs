@@ -297,7 +297,7 @@ public class GlobalManager : NetworkBehaviour
         {
             if (teams[e].teamColor == team)
             {
-                matchFocalPoint[e] = currentGamemode.GetCurrentMatchFocalPoint(e);
+                matchFocalPoint[e] = currentGamemode.GetCurrentMatchFocalPoint(e-1);
                 return;
             }
         }

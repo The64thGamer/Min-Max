@@ -17,7 +17,7 @@ public class Payload : GenericGamemode
         {
             if (payloadTeams[i].goal != null)
             {
-                payloadTeams[i].goal.SetDefendingTeam(i);
+                payloadTeams[i].goal.SetDefendingTeam(i+1);
             }
         }
     }
@@ -34,18 +34,19 @@ public class Payload : GenericGamemode
 
     public override Vector3 GetCurrentMatchFocalPoint(int team)
     {
-        if(payloadTeams[team].goal == null)
+        if(payloadTeams[team].goal != null)
         {
             Wire wire;
             try
             {
-                wire = gm.GetWire(gm.GetTeamColors(false)[team]);
+                wire = gm.GetWire(gm.GetTeamColors(true)[team]);
             }
             catch (System.NullReferenceException)
             {
                 return Vector3.zero;
             }
-            return wire.FindClosestWireToGoal(payloadTeams[team].goal.transform.position).point;
+            Wire.WirePoint wp = wire.FindClosestWireToGoal(payloadTeams[team].goal.transform.position);
+            return wp.point;
         }
         else
         {
@@ -61,7 +62,7 @@ public class Payload : GenericGamemode
             Wire wire;
             try
             {
-                wire = gm.GetWire(gm.GetTeamColors(false)[randomTeam]);
+                wire = gm.GetWire(gm.GetTeamColors(true)[randomTeam]);
             }
             catch (System.NullReferenceException)
             {
