@@ -237,10 +237,13 @@ public class Menu : MonoBehaviour
         e.style.paddingBottom = margin;
     }
 
-    void RefreshServerList()
+    void RefreshServerList(bool clearRightPage)
     {
         VisualElement visList = leftMenu.rootVisualElement.Q<VisualElement>("IconHolder");
-
+        if (clearRightPage)
+        {
+            rightMenu.rootVisualElement.style.display = DisplayStyle.None;
+        }
         //Clear old children
         List<VisualElement> children = new List<VisualElement>();
         foreach (var child in visList.Children())
@@ -282,7 +285,15 @@ public class Menu : MonoBehaviour
                 myUI.Q<Label>("ServerName").text = serverFinalName;
                 if(onlineServerMenu)
                 {
-                    myUI.Q<Label>("ServerCode").text = "(Code: " + PlayerPrefs.GetString(codeOrPort + i)+ ") ";
+                    if (Convert.ToBoolean(PlayerPrefs.GetInt("Settings: ServerCode")))
+                    {
+                        myUI.Q<Label>("ServerCode").text = "";
+                    }
+                    else
+                    {
+                        myUI.Q<Label>("ServerCode").text = "(Code: " + PlayerPrefs.GetString(codeOrPort + i) + ") ";
+
+                    }
                 }
                 else
                 {
@@ -340,7 +351,7 @@ public class Menu : MonoBehaviour
                             onlineServerMenu = true;
                             currentServerSelected = -1;
                             currentServerPage = 0;
-                            RefreshServerList();
+                            RefreshServerList(true);
                             break;
                         case "CreateGame":
                             SwitchPage(4);
@@ -425,6 +436,7 @@ public class Menu : MonoBehaviour
                             SetToggle("Vsync", Convert.ToBoolean(PlayerPrefs.GetInt("Settings: Vsync")), false);
                             SetToggle("Windowed", Convert.ToBoolean(PlayerPrefs.GetInt("Settings: Windowed")), false);
                             SetSlider("PlayerHeight", PlayerPrefs.GetFloat("PlayerHeight"), false);
+                            SetToggle("ServerCode", Convert.ToBoolean(PlayerPrefs.GetInt("Settings: ServerCode")), false);
                             break;
                         case "StartVR":
                             StartCoroutine(StartXR());
@@ -521,12 +533,12 @@ public class Menu : MonoBehaviour
                     {
                         case "ServerTabLeft":
                             onlineServerMenu = !onlineServerMenu;
-                            RefreshServerList();
+                            RefreshServerList(true);
                             break;
                         case "ServerTabRight":
                             onlineServerMenu = !onlineServerMenu;
 
-                            RefreshServerList();
+                            RefreshServerList(true);
                             break;
                         case "PageLeft":
                             currentServerPage = Mathf.Max(0,currentServerPage-1);
@@ -535,7 +547,7 @@ public class Menu : MonoBehaviour
                             {
                                 addedR = "GlobalServersAdded";
                             }
-                            RefreshServerList();
+                            RefreshServerList(true);
                             break;
                         case "PageRight":
                             string addedL = "LocalServersAdded";
@@ -544,7 +556,7 @@ public class Menu : MonoBehaviour
                                 addedL = "GlobalServersAdded";
                             }
                             currentServerPage = Mathf.Min(Mathf.FloorToInt((float)PlayerPrefs.GetInt(addedL) / 4.0f), currentServerPage + 1);
-                            RefreshServerList();
+                            RefreshServerList(true);
                             break;
                         case "Back":
                             SwitchPage(0);
@@ -593,6 +605,9 @@ public class Menu : MonoBehaviour
                             break;
                         case "PlayerHeight":
                             PlayerPrefs.SetFloat("PlayerHeight", valueFloat);
+                            break;
+                        case "ServerCode":
+                            PlayerPrefs.SetInt("Settings: ServerCode", Convert.ToInt32(valueBool));
                             break;
                         case "Back":
                             SwitchPage(0);
