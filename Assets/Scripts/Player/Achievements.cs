@@ -26,5 +26,6 @@ public class Achievements : MonoBehaviour
         {
             PlayerPrefs.SetFloat(achievements.ElementAt(i).Key, PlayerPrefs.GetFloat(achievements.ElementAt(i).Key) + achievements.ElementAt(i).Value);
         }
+        achievements = new Dictionary<string, float>();
     }
 }
