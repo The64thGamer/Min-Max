@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using Unity.Netcode;
 using Unity.VisualScripting;
 using UnityEngine;
@@ -92,6 +93,7 @@ public class AiPlayer : NetworkBehaviour
             {
                 NavMesh.CalculatePath(transform.position, setDestination, NavMesh.AllAreas, path);
             }
+            currentNavCorner = 0;
         }
         timeToChangePos -= Time.deltaTime;
 
@@ -130,7 +132,7 @@ public class AiPlayer : NetworkBehaviour
             Vector3 currentPath = path.corners[currentNavCorner] - transform.position;
             Vector3 camForward = headset.forward;
             Vector3 camRight = headset.right;
-            if (currentPath.magnitude <= 0.1f)
+            if (currentPath.magnitude <= 0.25f)
             {
                 currentNavCorner = Mathf.Min(path.corners.Length, currentNavCorner + 1);
             }
@@ -149,7 +151,16 @@ public class AiPlayer : NetworkBehaviour
     {
         if (path != null)
         {
-            Gizmos.DrawLineList(path.corners);
+            List<Vector3> lines = path.corners.ToList();
+            if(lines.Count % 2 == 1)
+            {
+                lines.Insert(0,transform.position);
+            }
+            for (int i = 0; i < lines.Count; i++)
+            {
+                Gizmos.DrawLine(lines[i], lines[i + 1]);
+                i++;
+            }
         }
     }
 
