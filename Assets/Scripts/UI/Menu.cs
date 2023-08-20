@@ -9,6 +9,7 @@ using Unity.Services.Authentication;
 using Unity.Services.Core;
 using Unity.Services.Relay;
 using Unity.Services.Relay.Models;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UIElements;
@@ -263,10 +264,15 @@ public class Menu : MonoBehaviour
 
         if (PlayerPrefs.GetInt(added) > 0)
         {
-            for (int i = 0; i < PlayerPrefs.GetInt(added); i++)
+            for (int i = currentServerPage * 4; i < Mathf.Min(PlayerPrefs.GetInt(added), (currentServerPage * 4) + 4); i++)
             {
                 TemplateContainer myUI = serverIconVTA.Instantiate();
-                myUI.Q<Label>("ServerName").text = PlayerPrefs.GetString(serverName + i);
+                string serverFinalName = PlayerPrefs.GetString(serverName + i).Substring(0,30);
+                if(serverFinalName == "")
+                {
+                    serverFinalName = "Unloaded Server";
+                }
+                myUI.Q<Label>("ServerName").text = serverFinalName;
                 if(onlineServerMenu)
                 {
                     myUI.Q<Label>("ServerCode").text = "(Code: " + PlayerPrefs.GetInt(codeOrPort + i)+ ") ";
@@ -324,8 +330,9 @@ public class Menu : MonoBehaviour
                     {
                         case "JoinGame":
                             SwitchPage(6);
+                            onlineServerMenu = true;
                             currentServerSelected = -1;
-                             currentServerPage = 0;
+                            currentServerPage = 0;
                             RefreshServerList();
                             break;
                         case "CreateGame":
@@ -497,6 +504,62 @@ public class Menu : MonoBehaviour
                             {
                                 playerModels[i].transform.localEulerAngles = new Vector3(0, valueFloat, 0);
                             }
+                            break;
+                        default:
+                            break;
+                    }
+                    break;
+                case "Join Left":
+                    switch (button)
+                    {
+                        case "ServerTabLeft":
+                            onlineServerMenu = !onlineServerMenu;
+                            if(onlineServerMenu)
+                            {
+                                SetLabel("ServerTabLabel", "Online", false);
+                            }
+                            else
+                            {
+                                SetLabel("ServerTabLabel", "LAN", false);
+                            }
+                            RefreshServerList();
+                            break;
+                        case "ServerTabRight":
+                            onlineServerMenu = !onlineServerMenu;
+                            if (onlineServerMenu)
+                            {
+                                SetLabel("ServerTabLabel", "Online", false);
+                            }
+                            else
+                            {
+                                SetLabel("ServerTabLabel", "LAN", false);
+                            }
+                            RefreshServerList();
+                            break;
+                        case "PageLeft":
+                            currentServerPage = Mathf.Max(0,currentServerPage-1);
+                            string addedR = "LocalServersAdded";
+                            if (onlineServerMenu)
+                            {
+                                addedR = "GlobalServersAdded";
+                            }
+                            int maxPagesR = Mathf.FloorToInt((float)PlayerPrefs.GetInt(addedR) / 4.0f);
+                            SetLabel("PageLabel","Page " + currentServerPage + "/" + maxPagesR, false);
+                            RefreshServerList();
+                            break;
+                        case "PageRight":
+                            string addedL = "LocalServersAdded";
+                            if (onlineServerMenu)
+                            {
+                                addedL = "GlobalServersAdded";
+                            }
+                            int maxPagesL = Mathf.FloorToInt((float)PlayerPrefs.GetInt(addedL) / 4.0f);
+                            currentServerPage = Mathf.Min(maxPagesL, currentServerPage + 1);
+                            SetLabel("PageLabel", "Page " + currentServerPage + "/" + maxPagesL, false);
+                            RefreshServerList();
+                            break;
+                        case "Back":
+                            SwitchPage(0);
                             break;
                         default:
                             break;
