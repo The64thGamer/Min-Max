@@ -24,7 +24,7 @@ public class Achievements : MonoBehaviour
     {
         for (int i = 0; i < achievements.Count; i++)
         {
-            PlayerPrefs.SetFloat(achievements.ElementAt(i).Key, PlayerPrefs.GetInt(achievements.ElementAt(i).Key) + achievements.ElementAt(i).Value);
+            PlayerPrefs.SetFloat(achievements.ElementAt(i).Key, PlayerPrefs.GetFloat(achievements.ElementAt(i).Key) + achievements.ElementAt(i).Value);
         }
     }
 }
