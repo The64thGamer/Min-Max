@@ -20,7 +20,7 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: Computer
+  m_Name: Cubicle
   m_Shader: {fileID: -6465566751694194690, guid: 8d079c324c697114c82dbedbece05483,
     type: 3}
   m_Parent: {fileID: 0}
@@ -41,7 +41,7 @@ Material:
     serializedVersion: 3
     m_TexEnvs:
     - _Base:
-        m_Texture: {fileID: 2800000, guid: 8957a37a0d6faf145a01324d694ba101, type: 3}
+        m_Texture: {fileID: 2800000, guid: 988b53d7d8972f84a9b4fae2698d2573, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _BaseMap:
@@ -77,11 +77,11 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _MixMap:
-        m_Texture: {fileID: 2800000, guid: cef7968f7efe73942b6eb296a2e81752, type: 3}
+        m_Texture: {fileID: 2800000, guid: 9b8c291f3c214f3448b6c6c107cf3024, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _Normal:
-        m_Texture: {fileID: 2800000, guid: 0cee2cceb97932049b1b76a60a0ac8a6, type: 3}
+        m_Texture: {fileID: 2800000, guid: 4b8fe879673a4a648af185af0130701b, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _OcclusionMap:
@@ -89,7 +89,7 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _PaletteMap:
-        m_Texture: {fileID: 2800000, guid: 14adb64f36a44f741a15794cb42179bf, type: 3}
+        m_Texture: {fileID: 2800000, guid: 5a71fb31346d66549a8f7d5492619aff, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _ParallaxMap:
@@ -168,10 +168,10 @@ Material:
     - _Metallic: 0
     - _OcclusionStrength: 1
     - _PALETTE: 0
-    - _Palette1: 2
-    - _Palette2: 2.09
-    - _Palette3: 6
-    - _Palette4: 4
+    - _Palette1: 7
+    - _Palette2: 6
+    - _Palette3: 2
+    - _Palette4: 1
     - _Parallax: 0.005
     - _QueueControl: 0
     - _QueueOffset: 0
