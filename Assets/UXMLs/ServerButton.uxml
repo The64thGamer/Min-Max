@@ -1,7 +1,0 @@
-<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="False">
-    <Style src="project://database/Assets/USSs/StandardUIStyle.uss?fileID=7433441132597879392&amp;guid=67066f1d9b7d7574b905dc33f01d1cf0&amp;type=3#StandardUIStyle" />
-    <ui:VisualElement name="NewLocalButton" class="dropdown" style="flex-grow: 1; background-color: rgb(119, 101, 88); flex-direction: row; max-width: none; overflow: hidden; flex-wrap: wrap; min-width: auto; text-overflow: ellipsis; margin-bottom: 5px;">
-        <ui:Label tabindex="-1" text="???" display-tooltip-when-elided="true" name="ServerName" style="margin-left: 0; margin-right: 0; margin-top: 0; margin-bottom: 0; padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0; border-left-width: 5px; border-right-width: 5px; border-top-width: 5px; border-bottom-width: 5px; flex-grow: 1; white-space: nowrap; text-overflow: ellipsis; flex-shrink: 1; max-width: none; align-self: auto; align-items: stretch; min-width: auto; overflow: hidden; flex-wrap: nowrap; width: 0;" />
-        <ui:Button text="Select" name="Button" class="button" />
-    </ui:VisualElement>
-</ui:UXML>

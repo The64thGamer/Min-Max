@@ -3,10 +3,14 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Unity.Netcode;
-using Unity.VisualScripting;
+using Unity.Netcode.Transports.UTP;
+using Unity.Networking.Transport.Relay;
+using Unity.Services.Authentication;
+using Unity.Services.Core;
+using Unity.Services.Relay;
+using Unity.Services.Relay.Models;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using UnityEngine.SocialPlatforms.Impl;
 using UnityEngine.UIElements;
 using UnityEngine.XR.Management;
 
@@ -34,6 +38,7 @@ public class Menu : MonoBehaviour
     [SerializeField] GameObject customizeMenuCamera;
     [SerializeField] Cosmetics cosmetics;
     [SerializeField] VisualTreeAsset cosmeticIconVTA;
+    [SerializeField] VisualTreeAsset serverIconVTA;
     [SerializeField] Texture2D noneTexture;
     [SerializeField] AudioSource aus;
     List<GameObject> currentCharMeshes = new List<GameObject>();
@@ -50,6 +55,10 @@ public class Menu : MonoBehaviour
     int currentCustPage;
     int currentCustCosmType;
     int currentCustLoadout;
+
+    bool onlineServerMenu;
+    int currentServerSelected;
+    int currentServerPage;
 
     private void OnEnable()
     {
@@ -227,6 +236,63 @@ public class Menu : MonoBehaviour
         e.style.paddingBottom = margin;
     }
 
+    void RefreshServerList()
+    {
+        VisualElement visList = leftMenu.rootVisualElement.Q<VisualElement>("IconHolder");
+
+        //Clear old children
+        List<VisualElement> children = new List<VisualElement>();
+        foreach (var child in visList.Children())
+        {
+            children.Add(child);
+        }
+        for (int i = 0; i < children.Count; i++)
+        {
+            visList.Remove(children[i]);
+        }
+
+        string added = "LocalServersAdded";
+        string codeOrPort = "LocalServer";
+        string serverName = "LocalServerName";
+        if (onlineServerMenu)
+        {
+            added = "GlobalServersAdded";
+            codeOrPort = "GlobalServer";
+            serverName = "GlobalServerName";
+        }
+
+        if (PlayerPrefs.GetInt(added) > 0)
+        {
+            for (int i = 0; i < PlayerPrefs.GetInt(added); i++)
+            {
+                TemplateContainer myUI = serverIconVTA.Instantiate();
+                myUI.Q<Label>("ServerName").text = PlayerPrefs.GetString(serverName + i);
+                if(onlineServerMenu)
+                {
+                    myUI.Q<Label>("ServerCode").text = "(Code: " + PlayerPrefs.GetInt(codeOrPort + i)+ ") ";
+                }
+                else
+                {
+                    myUI.Q<Label>("ServerCode").text = "(Port: " + PlayerPrefs.GetInt(codeOrPort + i).ToString("00000") + ") ";
+                }
+                int e = i;
+
+                Button button = myUI.Q<Button>("Button");
+                button.clicked += () => currentServerSelected = e;
+                button.RegisterCallback<MouseOverEvent>((type) =>
+                {
+                    PencilStroke();
+                    SetBorders(button, 8, 16);
+                });
+                button.RegisterCallback<MouseOutEvent>((type) =>
+                {
+                    SetBorders(button, 4, 20);
+                });
+                visList.Add(myUI);
+            }
+        }
+    }
+
     void ButtonPressed(string page, string button, string valueString, bool valueBool, float valueFloat, MenuButtonSound sound)
     {
         if (!flippingPage)
@@ -257,7 +323,10 @@ public class Menu : MonoBehaviour
                     switch (button)
                     {
                         case "JoinGame":
-
+                            SwitchPage(6);
+                            currentServerSelected = -1;
+                             currentServerPage = 0;
+                            RefreshServerList();
                             break;
                         case "CreateGame":
                             SwitchPage(4);
