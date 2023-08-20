@@ -260,7 +260,13 @@ public class Menu : MonoBehaviour
             added = "GlobalServersAdded";
             codeOrPort = "GlobalServer";
             serverName = "GlobalServerName";
+            SetLabel("ServerTabLabel", "Online", false);
         }
+        else
+        {
+            SetLabel("ServerTabLabel", "LAN", false);
+        }
+        SetLabel("PageLabel", "Page " + currentServerPage + "/" + Mathf.FloorToInt((float)PlayerPrefs.GetInt(added) / 4.0f), false);
 
         if (PlayerPrefs.GetInt(added) > 0)
         {
@@ -276,7 +282,7 @@ public class Menu : MonoBehaviour
                 myUI.Q<Label>("ServerName").text = serverFinalName;
                 if(onlineServerMenu)
                 {
-                    myUI.Q<Label>("ServerCode").text = "(Code: " + PlayerPrefs.GetInt(codeOrPort + i)+ ") ";
+                    myUI.Q<Label>("ServerCode").text = "(Code: " + PlayerPrefs.GetString(codeOrPort + i)+ ") ";
                 }
                 else
                 {
@@ -515,26 +521,11 @@ public class Menu : MonoBehaviour
                     {
                         case "ServerTabLeft":
                             onlineServerMenu = !onlineServerMenu;
-                            if(onlineServerMenu)
-                            {
-                                SetLabel("ServerTabLabel", "Online", false);
-                            }
-                            else
-                            {
-                                SetLabel("ServerTabLabel", "LAN", false);
-                            }
                             RefreshServerList();
                             break;
                         case "ServerTabRight":
                             onlineServerMenu = !onlineServerMenu;
-                            if (onlineServerMenu)
-                            {
-                                SetLabel("ServerTabLabel", "Online", false);
-                            }
-                            else
-                            {
-                                SetLabel("ServerTabLabel", "LAN", false);
-                            }
+
                             RefreshServerList();
                             break;
                         case "PageLeft":
@@ -544,8 +535,6 @@ public class Menu : MonoBehaviour
                             {
                                 addedR = "GlobalServersAdded";
                             }
-                            int maxPagesR = Mathf.FloorToInt((float)PlayerPrefs.GetInt(addedR) / 4.0f);
-                            SetLabel("PageLabel","Page " + currentServerPage + "/" + maxPagesR, false);
                             RefreshServerList();
                             break;
                         case "PageRight":
@@ -554,9 +543,7 @@ public class Menu : MonoBehaviour
                             {
                                 addedL = "GlobalServersAdded";
                             }
-                            int maxPagesL = Mathf.FloorToInt((float)PlayerPrefs.GetInt(addedL) / 4.0f);
-                            currentServerPage = Mathf.Min(maxPagesL, currentServerPage + 1);
-                            SetLabel("PageLabel", "Page " + currentServerPage + "/" + maxPagesL, false);
+                            currentServerPage = Mathf.Min(Mathf.FloorToInt((float)PlayerPrefs.GetInt(addedL) / 4.0f), currentServerPage + 1);
                             RefreshServerList();
                             break;
                         case "Back":
