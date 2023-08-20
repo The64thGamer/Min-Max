@@ -406,8 +406,11 @@ public class Menu : MonoBehaviour
                             SwitchPage(2);
                             SetLabel("Statistics",
                                 "TOTAL STATS" +
+                                "\nTime Playing: " + PlayerPrefs.GetFloat("Achievement: Total Match Runtime") +
                                 "\nDamage: " + PlayerPrefs.GetFloat("Achievement: Total Damage") +
                                 "\nKills: " + PlayerPrefs.GetFloat("Achievement: Total Kills") +
+                                "\nHealing: " + PlayerPrefs.GetFloat("Achievement: Total Healing") +
+                                "\nSelf-Healing: " + PlayerPrefs.GetFloat("Achievement: Total Self-Healing") +
                                 "\nDistance Walked: " + (int)PlayerPrefs.GetFloat("Achievement: Total Walking Distance") + " m" +
                                 "\nAir Travel: " + (int)PlayerPrefs.GetFloat("Achievement: Total Air Travel") + " m" +
                                 "\nAir-Time: " + (int)PlayerPrefs.GetFloat("Achievement: Total Air-Time") + " sec" +

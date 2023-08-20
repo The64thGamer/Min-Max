@@ -38,6 +38,7 @@ public class GlobalManager : NetworkBehaviour
     bool serverStarted;
     GenericGamemode currentGamemode;
     List<Vector3> matchFocalPoint;
+    float timeStartedPlaying;
 
     //Const
     const ulong botID = 64646464646464;
@@ -54,6 +55,7 @@ public class GlobalManager : NetworkBehaviour
         al = GetComponent<AllStats>();
         au = GetComponent<AudioSource>();
         currentGamemode = GetComponent<GenericGamemode>();
+        timeStartedPlaying = Time.time;
 
         //Settings
         m_NetworkManager.GetComponent<UnityTransport>().ConnectionData.Port = (ushort)PlayerPrefs.GetInt("ServerPort");
@@ -87,12 +89,18 @@ public class GlobalManager : NetworkBehaviour
                 Debug.LogError("Unknown Server Setting");
                 break;
         }
+    }
 
-
+    private void OnApplicationQuit()
+    {
+        achievments.AddToValue("Achievement: Total Match Runtime", Mathf.Max(0, Time.time - timeStartedPlaying));
+        achievments.SaveAchievements();
     }
 
     public void DisconnectToTitleScreen(bool u)
     {
+        achievments.AddToValue("Achievement: Total Match Runtime", Mathf.Max(0, Time.time - timeStartedPlaying));
+        achievments.SaveAchievements();
         m_NetworkManager.Shutdown();
         if (PlayerPrefs.GetInt("IsVREnabled") == 1)
         {
@@ -939,12 +947,14 @@ public class GlobalManager : NetworkBehaviour
 
         for (int i = 0; i < clients.Count; i++)
         {
+            if (clients[i].GetPlayerID() == idOfKiller && clients[i].IsOwner && id == idOfKiller)
+            {
+                achievments.AddToValue("Achievement: Total Self-Healing", Mathf.Max(0, -damageTaken));
+            }
             if (clients[i].GetPlayerID() == idOfKiller && clients[i].IsOwner && id != idOfKiller)
             {
-                if (damageTaken > 0)
-                {
-                    achievments.AddToValue("Achievement: Total Damage", damageTaken);
-                }
+                achievments.AddToValue("Achievement: Total Damage", Mathf.Max(0, damageTaken));
+                achievments.AddToValue("Achievement: Total Healing", Mathf.Max(0, -damageTaken));
 
                 if (currentHealth <= 0)
                 {
