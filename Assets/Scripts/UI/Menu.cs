@@ -406,7 +406,7 @@ public class Menu : MonoBehaviour
                             SwitchPage(2);
                             SetLabel("Statistics",
                                 "TOTAL STATS" +
-                                "\nTime Playing: " + PlayerPrefs.GetFloat("Achievement: Total Match Runtime") +
+                                "\nTime Playing: " + PlayerPrefs.GetFloat("Achievement: Total Match Runtime") + " sec" +
                                 "\nDamage: " + PlayerPrefs.GetFloat("Achievement: Total Damage") +
                                 "\nKills: " + PlayerPrefs.GetFloat("Achievement: Total Kills") +
                                 "\nHealing: " + PlayerPrefs.GetFloat("Achievement: Total Healing") +
