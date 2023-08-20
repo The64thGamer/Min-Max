@@ -409,6 +409,8 @@ public class Menu : MonoBehaviour
                                 "\nTime Playing: " + PlayerPrefs.GetFloat("Achievement: Total Match Runtime") + " sec" +
                                 "\nDamage: " + PlayerPrefs.GetFloat("Achievement: Total Damage") +
                                 "\nKills: " + PlayerPrefs.GetFloat("Achievement: Total Kills") +
+                                "\nDeaths: " + PlayerPrefs.GetFloat("Achievement: Total Deaths") +
+                                "\nSuicides: " + PlayerPrefs.GetFloat("Achievement: Total Suicides") +
                                 "\nHealing: " + PlayerPrefs.GetFloat("Achievement: Total Healing") +
                                 "\nSelf-Healing: " + PlayerPrefs.GetFloat("Achievement: Total Self-Healing") +
                                 "\nDistance Walked: " + (int)PlayerPrefs.GetFloat("Achievement: Total Walking Distance") + " m" +

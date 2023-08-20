@@ -947,6 +947,14 @@ public class GlobalManager : NetworkBehaviour
 
         for (int i = 0; i < clients.Count; i++)
         {
+            if (clients[i].GetPlayerID() == id && clients[i].IsOwner && currentHealth <= 0)
+            {
+                achievments.AddToValue("Achievement: Total Deaths", 1);
+                if (id == idOfKiller)
+                {
+                    achievments.AddToValue("Achievement: Total Suicides", 1);
+                }
+            }
             if (clients[i].GetPlayerID() == idOfKiller && clients[i].IsOwner && id == idOfKiller)
             {
                 achievments.AddToValue("Achievement: Total Self-Healing", Mathf.Max(0, -damageTaken));
