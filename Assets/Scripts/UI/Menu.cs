@@ -267,7 +267,8 @@ public class Menu : MonoBehaviour
             for (int i = currentServerPage * 4; i < Mathf.Min(PlayerPrefs.GetInt(added), (currentServerPage * 4) + 4); i++)
             {
                 TemplateContainer myUI = serverIconVTA.Instantiate();
-                string serverFinalName = PlayerPrefs.GetString(serverName + i).Substring(0,30);
+                string serverFinalName = PlayerPrefs.GetString(serverName + i);
+                serverFinalName = serverFinalName.Substring(0, Math.Min(30, serverFinalName.Length));
                 if(serverFinalName == "")
                 {
                     serverFinalName = "Unloaded Server";
