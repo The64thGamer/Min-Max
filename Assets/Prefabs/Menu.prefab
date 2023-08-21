@@ -246,6 +246,29 @@ MonoBehaviour:
     - name: Play
       type: 0
       sound: 0
+  - leftPageName: Pause Left
+    rightPageName: Title Right
+    leftAsset: {fileID: 9197481963319205126, guid: 58300b8787918914181901e9a1981133,
+      type: 3}
+    rightAsset: {fileID: 9197481963319205126, guid: fa6b2c91e7ae5124884bd6f073b60add,
+      type: 3}
+    leftInteractables:
+    - name: ServerInfo
+      type: 0
+      sound: 1
+    - name: Customization
+      type: 0
+      sound: 1
+    - name: Statistics
+      type: 0
+      sound: 1
+    - name: Settings
+      type: 0
+      sound: 1
+    - name: Exit
+      type: 0
+      sound: 0
+    rightInteractables: []
   leftMenu: {fileID: 3350747855789932010}
   rightMenu: {fileID: 5728776292581873193}
   centerRing: {fileID: 850130842230671838}

@@ -114,6 +114,10 @@ public class Menu : MonoBehaviour
         }
 
         SwitchPage(0);
+        if(optionalPlayer != null)
+        {
+            centerRing.localEulerAngles = new Vector3(0, 180, 0);
+        }
     }
 
     private void Update()
@@ -132,6 +136,11 @@ public class Menu : MonoBehaviour
 
     void SwitchPage(int index)
     {
+        if(optionalPlayer != null && index == 0)
+        {
+            //Pause menu must be the last index in pages
+            index = pages.Length - 1;
+        }
         if (!flippingPage)
         {
             leftMenu.visualTreeAsset = pages[index].leftAsset;
@@ -659,70 +668,44 @@ public class Menu : MonoBehaviour
                             }
                             break;
                         case "Customization":
-                            SwitchPage(1);
-                            currentCustClass = 3;
-                            currentCustTeam = 0;
-                            currentCustPage = 0;
-                            currentCustLoadout = 0;
-                            currentCustCosmType = -1;
-                            currentCustCosmType = CheckCosmeticType(1);
-                            SetCharacterVisibility();
-                            SetPicture("TeamIcon", teamIcons[currentCustTeam], teamColors[currentCustTeam], false);
-                            SetLabel("CosmeticTypeLabel", cosmeticTypes[currentCustCosmType].PadRight(10), false);
-                            SetLabel("ClassLabel", "The " + System.Globalization.CultureInfo.CurrentCulture.TextInfo.ToTitleCase(Enum.GetName(typeof(ClassList), currentCustClass)), false);
-                            SetLabel("LoadoutLabel", "Var " + (char)('A' + currentCustLoadout % 26), false);
-                            SetLabel("PageLabel", "Page " + currentCustPage.ToString(), false);
-                            UpdateTeamColor();
-                            customizeMenuCamera.SetActive(true);
-                            CreateCosmeticPage();
+                            DisplayCustomization();
                             break;
                         case "Statistics":
-                            SwitchPage(2);
-                            SetLabel("Statistics",
-                                "TOTAL STATS" +
-                                "\nTime Playing: " + PlayerPrefs.GetFloat("Achievement: Total Match Runtime") + " sec" +
-                                "\nDamage: " + PlayerPrefs.GetFloat("Achievement: Total Damage") +
-                                "\nKills: " + PlayerPrefs.GetFloat("Achievement: Total Kills") +
-                                "\nDeaths: " + PlayerPrefs.GetFloat("Achievement: Total Deaths") +
-                                "\nSuicides: " + PlayerPrefs.GetFloat("Achievement: Total Suicides") +
-                                "\nHealing: " + PlayerPrefs.GetFloat("Achievement: Total Healing") +
-                                "\nSelf-Healing: " + PlayerPrefs.GetFloat("Achievement: Total Self-Healing") +
-                                "\nDistance Walked: " + (int)PlayerPrefs.GetFloat("Achievement: Total Walking Distance") + " m" +
-                                "\nAir Travel: " + (int)PlayerPrefs.GetFloat("Achievement: Total Air Travel") + " m" +
-                                "\nAir-Time: " + (int)PlayerPrefs.GetFloat("Achievement: Total Air-Time") + " sec" +
-                                "\n\nTOTAL KILLED" +
-                                "\nLaborers: " + PlayerPrefs.GetFloat("Achievement: Total Laborers Killed") +
-                                "\nWood Workers: " + PlayerPrefs.GetFloat("Achievement: Total Wood Workers Killed") +
-                                "\nDevelopers: " + PlayerPrefs.GetFloat("Achievement: Total Developers Killed") +
-                                "\nProgrammers: " + PlayerPrefs.GetFloat("Achievement: Total Programmers Killed") +
-                                "\nComputers: " + PlayerPrefs.GetFloat("Achievement: Total Computers Killed") +
-                                "\nFabricators: " + PlayerPrefs.GetFloat("Achievement: Total Fabricators Killed") +
-                                "\nArtists: " + PlayerPrefs.GetFloat("Achievement: Total Artists Killed") +
-                                "\nFreelancers: " + PlayerPrefs.GetFloat("Achievement: Total Freelancers Killed") +
-                                "\nCraftsmen: " + PlayerPrefs.GetFloat("Achievement: Total Craftsmen Killed") +
-                                "\nManagers: " + PlayerPrefs.GetFloat("Achievement: Total Managers Killed")
-                                , false);
+                            DisplayStatistics();
                             break;
                         case "Settings":
-                            SwitchPage(3);
-                            string finalName = PlayerPrefs.GetString("Settings: Player Name");
-                            if (finalName == "")
-                            {
-                                finalName = "Intern #" + UnityEngine.Random.Range(0, 1000000);
-                                PlayerPrefs.SetString("Settings: Player Name", finalName);
-                            }
-                            SetTextField("PlayerName", finalName, false);
-                            SetToggle("Vsync", Convert.ToBoolean(PlayerPrefs.GetInt("Settings: Vsync")), false);
-                            SetToggle("Windowed", Convert.ToBoolean(PlayerPrefs.GetInt("Settings: Windowed")), false);
-                            SetSlider("PlayerHeight", PlayerPrefs.GetFloat("Settings: PlayerHeight"), false);
-                            SetToggle("ServerCode", Convert.ToBoolean(PlayerPrefs.GetInt("Settings: ServerCode")), false);
-                            SetSlider("FOV", PlayerPrefs.GetFloat("Settings: FOV"), false);
+                            DisplaySettings();
                             break;
                         case "StartVR":
                             StartCoroutine(StartXR());
                             break;
                         case "Exit":
                             Application.Quit();
+                            break;
+                        default:
+                            break;
+                    }
+                    break;
+                case "Pause Left":
+                    switch (button)
+                    {
+                        case "ServerInfo":
+                            
+                            break;
+                        case "Customization":
+                            DisplayCustomization();
+                            break;
+                        case "Statistics":
+                            DisplayStatistics();
+                            break;
+                        case "Settings":
+                            DisplaySettings();
+                            break;
+                        case "StartVR":
+                            StartCoroutine(StartXR());
+                            break;
+                        case "Exit":
+                            cosmetics.transform.parent.GetComponent<GlobalManager>().DisconnectToTitleScreen(false);
                             break;
                         default:
                             break;
@@ -1033,6 +1016,72 @@ public class Menu : MonoBehaviour
             neededValue += adjust;
         }
 
+    }
+
+    void DisplayCustomization()
+    {
+        SwitchPage(1);
+        currentCustClass = 3;
+        currentCustTeam = 0;
+        currentCustPage = 0;
+        currentCustLoadout = 0;
+        currentCustCosmType = -1;
+        currentCustCosmType = CheckCosmeticType(1);
+        SetCharacterVisibility();
+        SetPicture("TeamIcon", teamIcons[currentCustTeam], teamColors[currentCustTeam], false);
+        SetLabel("CosmeticTypeLabel", cosmeticTypes[currentCustCosmType].PadRight(10), false);
+        SetLabel("ClassLabel", "The " + System.Globalization.CultureInfo.CurrentCulture.TextInfo.ToTitleCase(Enum.GetName(typeof(ClassList), currentCustClass)), false);
+        SetLabel("LoadoutLabel", "Var " + (char)('A' + currentCustLoadout % 26), false);
+        SetLabel("PageLabel", "Page " + currentCustPage.ToString(), false);
+        UpdateTeamColor();
+        customizeMenuCamera.SetActive(true);
+        CreateCosmeticPage();
+    }
+
+    void DisplaySettings()
+    {
+        SwitchPage(3);
+        string finalName = PlayerPrefs.GetString("Settings: Player Name");
+        if (finalName == "")
+        {
+            finalName = "Intern #" + UnityEngine.Random.Range(0, 1000000);
+            PlayerPrefs.SetString("Settings: Player Name", finalName);
+        }
+        SetTextField("PlayerName", finalName, false);
+        SetToggle("Vsync", Convert.ToBoolean(PlayerPrefs.GetInt("Settings: Vsync")), false);
+        SetToggle("Windowed", Convert.ToBoolean(PlayerPrefs.GetInt("Settings: Windowed")), false);
+        SetSlider("PlayerHeight", PlayerPrefs.GetFloat("Settings: PlayerHeight"), false);
+        SetToggle("ServerCode", Convert.ToBoolean(PlayerPrefs.GetInt("Settings: ServerCode")), false);
+        SetSlider("FOV", PlayerPrefs.GetFloat("Settings: FOV"), false);
+    }
+
+    void DisplayStatistics()
+    {
+        SwitchPage(2);
+        SetLabel("Statistics",
+                                "TOTAL STATS" +
+                                "\nTime Playing: " + PlayerPrefs.GetFloat("Achievement: Total Match Runtime") + " sec" +
+                                "\nDamage: " + PlayerPrefs.GetFloat("Achievement: Total Damage") +
+                                "\nKills: " + PlayerPrefs.GetFloat("Achievement: Total Kills") +
+                                "\nDeaths: " + PlayerPrefs.GetFloat("Achievement: Total Deaths") +
+                                "\nSuicides: " + PlayerPrefs.GetFloat("Achievement: Total Suicides") +
+                                "\nHealing: " + PlayerPrefs.GetFloat("Achievement: Total Healing") +
+                                "\nSelf-Healing: " + PlayerPrefs.GetFloat("Achievement: Total Self-Healing") +
+                                "\nDistance Walked: " + (int)PlayerPrefs.GetFloat("Achievement: Total Walking Distance") + " m" +
+                                "\nAir Travel: " + (int)PlayerPrefs.GetFloat("Achievement: Total Air Travel") + " m" +
+                                "\nAir-Time: " + (int)PlayerPrefs.GetFloat("Achievement: Total Air-Time") + " sec" +
+                                "\n\nTOTAL KILLED" +
+                                "\nLaborers: " + PlayerPrefs.GetFloat("Achievement: Total Laborers Killed") +
+                                "\nWood Workers: " + PlayerPrefs.GetFloat("Achievement: Total Wood Workers Killed") +
+                                "\nDevelopers: " + PlayerPrefs.GetFloat("Achievement: Total Developers Killed") +
+                                "\nProgrammers: " + PlayerPrefs.GetFloat("Achievement: Total Programmers Killed") +
+                                "\nComputers: " + PlayerPrefs.GetFloat("Achievement: Total Computers Killed") +
+                                "\nFabricators: " + PlayerPrefs.GetFloat("Achievement: Total Fabricators Killed") +
+                                "\nArtists: " + PlayerPrefs.GetFloat("Achievement: Total Artists Killed") +
+                                "\nFreelancers: " + PlayerPrefs.GetFloat("Achievement: Total Freelancers Killed") +
+                                "\nCraftsmen: " + PlayerPrefs.GetFloat("Achievement: Total Craftsmen Killed") +
+                                "\nManagers: " + PlayerPrefs.GetFloat("Achievement: Total Managers Killed")
+                                , false);
     }
 
     void InsertCosmetic(int cosmeticValue)

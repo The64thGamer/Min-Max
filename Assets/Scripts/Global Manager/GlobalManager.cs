@@ -50,7 +50,6 @@ public class GlobalManager : NetworkBehaviour
         m_NetworkManager.NetworkConfig.ConnectionData = System.Text.Encoding.ASCII.GetBytes("C");
         m_NetworkManager.ConnectionApprovalCallback = ApprovalCheck;
         NetworkManager.Singleton.OnServerStarted += ServerStarted;
-        NetworkManager.Singleton.OnServerStopped += DisconnectToTitleScreen;
         NetworkManager.Singleton.OnClientDisconnectCallback += DisconnectClient;
         al = GetComponent<AllStats>();
         au = GetComponent<AudioSource>();
@@ -102,18 +101,22 @@ public class GlobalManager : NetworkBehaviour
         achievments.SaveAchievements();
     }
 
-    public void DisconnectToTitleScreen(bool u)
+    public void DisconnectToTitleScreen(bool unused)
     {
-        achievments.AddToValue("Achievement: Total Match Runtime", Mathf.Max(0, Time.time - timeStartedPlaying));
-        achievments.SaveAchievements();
-        m_NetworkManager.Shutdown();
-        if (PlayerPrefs.GetInt("IsVREnabled") == 1)
+        if (serverStarted)
         {
-            SceneManager.LoadScene("VR Title Screen");
-        }
-        else
-        {
-            SceneManager.LoadScene("Title Screen");
+            Debug.Log("Disconnecting to Title Screen");
+            achievments.AddToValue("Achievement: Total Match Runtime", Mathf.Max(0, Time.time - timeStartedPlaying));
+            achievments.SaveAchievements();
+            m_NetworkManager.Shutdown();
+            if (PlayerPrefs.GetInt("IsVREnabled") == 1)
+            {
+                SceneManager.LoadScene("VR Title Screen");
+            }
+            else
+            {
+                SceneManager.LoadScene("Title Screen");
+            }
         }
     }
 
@@ -439,6 +442,10 @@ public class GlobalManager : NetworkBehaviour
                 {
                     playerPosRPCData.Add(new PlayerDataSentToClient());
                 }
+                if (clients[i].IsOwner && !IsHost)
+                {
+                    DisconnectToTitleScreen(false);
+                }
                 return;
             }
         }
@@ -455,6 +462,7 @@ public class GlobalManager : NetworkBehaviour
 
     void ServerStarted()
     {
+        Debug.Log("Server Started");
         serverStarted = true;
     }
 
