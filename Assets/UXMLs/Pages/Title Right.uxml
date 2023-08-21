@@ -1,0 +1,7 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="project://database/Assets/USSs/Paper.uss?fileID=7433441132597879392&amp;guid=be0d2f996b2ef1d49b7a2fea066c7168&amp;type=3#Paper" />
+    <ui:VisualElement name="Background" style="flex-grow: 0; background-color: rgba(0, 0, 0, 0); background-image: url(&apos;project://database/Assets/Game%20Assets/UI/Paper.png?fileID=2800000&amp;guid=d99fe9181ad4b394b93beaa3c5806739&amp;type=3#Paper&apos;); -unity-background-scale-mode: stretch-to-fill; width: 1146px; height: 1599px; min-width: 0; min-height: 0; flex-shrink: 0; scale: 1 1;" />
+    <ui:VisualElement name="Margins" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0); margin-left: 140px; margin-right: 80px; margin-top: 70px; margin-bottom: 60px; position: absolute; top: 0; left: 0; right: 0; bottom: 0; justify-content: flex-end; align-items: stretch; flex-wrap: nowrap; width: 922px; height: 1465px; align-self: center;">
+        <ui:VisualElement style="flex-grow: 1; background-image: url(&apos;project://database/Assets/Game%20Assets/UI/Renders/ComputerDrawing.png?fileID=2800000&amp;guid=03ccaa03241dc2046ab4cafc9d0bec56&amp;type=3#ComputerDrawing&apos;); max-width: 875px; align-items: center; justify-content: space-between; max-height: 1261px; translate: 33px -93px;" />
+    </ui:VisualElement>
+</ui:UXML>

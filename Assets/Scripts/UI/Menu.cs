@@ -2,6 +2,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection.Emit;
+using System.Xml.Linq;
 using Unity.Netcode;
 using Unity.Netcode.Transports.UTP;
 using Unity.Networking.Transport.Relay;
@@ -9,11 +11,11 @@ using Unity.Services.Authentication;
 using Unity.Services.Core;
 using Unity.Services.Relay;
 using Unity.Services.Relay.Models;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UIElements;
 using UnityEngine.XR.Management;
+using Label = UnityEngine.UIElements.Label;
 
 public class Menu : MonoBehaviour
 {
@@ -50,16 +52,19 @@ public class Menu : MonoBehaviour
     bool loadingMap;
     float soundTimer;
 
-    //Labels
+    //Customize Page
     int currentCustClass;
     int currentCustTeam;
     int currentCustPage;
     int currentCustCosmType;
     int currentCustLoadout;
 
+    //Join Game Page
     bool onlineServerMenu;
     int currentServerSelected;
     int currentServerPage;
+    ServerCheck serverCheck;
+    string serverFailMessage;
 
     private void OnEnable()
     {
@@ -69,7 +74,6 @@ public class Menu : MonoBehaviour
         if (m_NetworkManager != null)
         {
             m_NetworkManager.OnClientDisconnectCallback += OnClientDisconnectCallback;
-            m_NetworkManager.NetworkConfig.ConnectionData = System.Text.Encoding.ASCII.GetBytes("P");
         }
 
         if (PlayerPrefs.GetInt("Settings: Vsync") == 1)
@@ -242,7 +246,7 @@ public class Menu : MonoBehaviour
         VisualElement visList = leftMenu.rootVisualElement.Q<VisualElement>("IconHolder");
         if (clearRightPage)
         {
-            rightMenu.rootVisualElement.style.display = DisplayStyle.None;
+            rightMenu.rootVisualElement.Q<VisualElement>("Margins").style.display = DisplayStyle.None;
         }
         //Clear old children
         List<VisualElement> children = new List<VisualElement>();
@@ -278,12 +282,12 @@ public class Menu : MonoBehaviour
                 TemplateContainer myUI = serverIconVTA.Instantiate();
                 string serverFinalName = PlayerPrefs.GetString(serverName + i);
                 serverFinalName = serverFinalName.Substring(0, Math.Min(30, serverFinalName.Length));
-                if(serverFinalName == "")
+                if (serverFinalName == "")
                 {
                     serverFinalName = "Unloaded Server";
                 }
                 myUI.Q<Label>("ServerName").text = serverFinalName;
-                if(onlineServerMenu)
+                if (onlineServerMenu)
                 {
                     if (Convert.ToBoolean(PlayerPrefs.GetInt("Settings: ServerCode")))
                     {
@@ -302,7 +306,7 @@ public class Menu : MonoBehaviour
                 int e = i;
 
                 Button button = myUI.Q<Button>("Button");
-                button.clicked += () => currentServerSelected = e;
+                button.clicked += () => SelectAndPingServer(e);
                 button.RegisterCallback<MouseOverEvent>((type) =>
                 {
                     PencilStroke();
@@ -316,6 +320,195 @@ public class Menu : MonoBehaviour
             }
         }
     }
+
+    enum ServerCheck
+    {
+        none,
+        running,
+        fail,
+        pass,
+    }
+
+    void SelectAndPingServer(int index)
+    {
+        if (serverCheck == ServerCheck.none)
+        {
+            currentServerSelected = index;
+            rightMenu.rootVisualElement.Q<VisualElement>("Margins").style.display = DisplayStyle.Flex;
+            serverCheck = ServerCheck.running;
+            StartCoroutine(BeginServerPing(index));
+        }
+    }
+
+    IEnumerator BeginServerPing(int index)
+    {
+        SetLabel("ServerName", "Loading", true);
+        SetLabel("Gamemode", "Attempting Allocation", true);
+
+        m_NetworkManager.NetworkConfig.ConnectionData = System.Text.Encoding.ASCII.GetBytes("P");
+
+        if (onlineServerMenu)
+        {
+            PingOnlineServer(PlayerPrefs.GetString("GlobalServer" + index));
+        }
+        else
+        {
+            m_NetworkManager.GetComponent<UnityTransport>().ConnectionData.Port = (ushort)PlayerPrefs.GetInt("LocalServer" + index);
+            m_NetworkManager.StartClient();
+        }
+
+        int secondCount = 0;
+        while (true)
+        {
+            if (serverCheck == ServerCheck.pass || serverCheck == ServerCheck.fail)
+            {
+                break;
+            }
+            SetLabel("Gamemode", "Connecting To Server", true);
+            string label = "Loading ";
+            for (int i = 0; i < (secondCount + 1) % 4; i++)
+            {
+                label += ". ";
+            }
+            SetLabel("ServerName", label, true);
+
+            if (secondCount >= 30)
+            {
+                if (serverCheck == ServerCheck.running)
+                {
+                    serverCheck = ServerCheck.fail;
+                    serverFailMessage = "Could Not Connect To Server.";
+                }
+                break;
+            }
+            secondCount++;
+            yield return new WaitForSeconds(0.33333f);
+        }
+
+        if (serverCheck == ServerCheck.fail)
+        {
+            if (m_NetworkManager != null && m_NetworkManager.isActiveAndEnabled)
+            {
+                m_NetworkManager.Shutdown();
+            }
+            SetLabel("ServerName", "Error", true);
+            SetLabel("Gamemode", serverFailMessage, true);
+            //root.Q<VisualElement>("NewLocalDeleteGame").style.display = DisplayStyle.Flex;
+        }
+        if (serverCheck == ServerCheck.pass && onlineServerMenu)
+        {
+            PlayerPrefs.SetString("JoinCode", PlayerPrefs.GetString("GlobalServer" + index));
+        }
+        serverCheck = ServerCheck.none;
+    }
+
+    async void PingOnlineServer(string joinCode)
+    {
+        await UnityServices.InitializeAsync();
+        try
+        {
+            await AuthenticationService.Instance.SignInAnonymouslyAsync();
+        }
+        catch (Exception)
+        {
+            Debug.Log("Already Signed In");
+        }
+
+        try
+        {
+            JoinAllocation joinAllocation = await RelayService.Instance.JoinAllocationAsync(joinCode);
+
+            RelayServerData relayServerData = new RelayServerData(joinAllocation, "dtls");
+
+            m_NetworkManager.GetComponent<UnityTransport>().SetRelayServerData(relayServerData);
+
+            m_NetworkManager.StartClient();
+            serverCheck = ServerCheck.pass;
+        }
+        catch (RelayServiceException e)
+        {
+            serverCheck = ServerCheck.fail;
+            serverFailMessage = e.Message;
+        }
+    }
+
+
+    private void OnClientDisconnectCallback(ulong obj)
+    {
+        if (!m_NetworkManager.IsServer && m_NetworkManager.DisconnectReason != string.Empty)
+        {
+            serverCheck = ServerCheck.pass;
+            string payload = m_NetworkManager.DisconnectReason;
+
+            if (payload[0] == 'P')
+            {
+                string[] limiters = payload.Substring(1, payload.Length - 1).Split("😂", StringSplitOptions.None);
+                if (limiters.Length == 5)
+                {
+                    if (Convert.ToUInt16(limiters[4]) == m_NetworkManager.NetworkConfig.ProtocolVersion)
+                    {
+                        string description = limiters[0] + "/" + limiters[1];
+                        if (limiters[2] == "")
+                        {
+                            SetLabel("ServerName", "Unnamed Server", true);
+                        }
+                        else
+                        {
+                            string rename = limiters[2];
+                            if (rename.Length > 20)
+                            {
+                                rename = rename.Substring(0, 20);
+                            }
+                            rename = string.Join("", rename.ToCharArray().Where(x => ((int)x) < 127));
+                            SetLabel("ServerName", rename, true);
+                            PlayerPrefs.SetString("LocalServerName" + currentServerSelected, limiters[2]);
+                            RefreshServerList(false);
+                        }
+                        int currentMap = Convert.ToInt16(limiters[3]);
+                        string mapName = "Unknown Map";
+                        if (currentMap < maps.Count())
+                        {
+                            mapName = maps[currentMap].mapName;
+                        }
+                        description += '\n' + mapName;
+                        //root.Q<VisualElement>("NewLocalMapIcon").style.backgroundImage = new StyleBackground(mapIcons[currentMap]);
+                        PlayerPrefs.SetInt("ServerMapName", currentMap);
+                        //root.Q<VisualElement>("NewLocalStartGame").style.display = DisplayStyle.Flex;
+                    }
+                    else
+                    {
+                        if (Convert.ToUInt16(limiters[4]) > m_NetworkManager.NetworkConfig.ProtocolVersion)
+                        {
+                            SetLabel("ServerName", "Error", true);
+                            SetLabel("Gamemode", "Server is running a newer version.", true);
+                        }
+                        else
+                        {
+                            SetLabel("ServerName", "Error", true);
+                            SetLabel("Gamemode", "Server is running an older version.", true);
+                        }
+                    }
+                }
+                else
+                {
+                    SetLabel("ServerName", "Error", true);
+                    SetLabel("Gamemode", "Server information corrupted or not formatted correctly.", true);
+                }
+            }
+            else if (payload[0] == 'E')
+            {
+                SetLabel("ServerName", "Error", true);
+                SetLabel("Gamemode", payload.Substring(1, payload.Length - 1), true);
+            }
+            else
+            {
+                SetLabel("ServerName", "Error", true);
+                SetLabel("Gamemode", "Unknown Error: " + payload, true);
+            }
+            //root.Q<VisualElement>("NewLocalDeleteGame").style.display = DisplayStyle.Flex;
+        }
+    }
+
 
     void ButtonPressed(string page, string button, string valueString, bool valueBool, float valueFloat, MenuButtonSound sound)
     {
@@ -546,7 +739,7 @@ public class Menu : MonoBehaviour
                             RefreshServerList(true);
                             break;
                         case "PageLeft":
-                            currentServerPage = Mathf.Max(0,currentServerPage-1);
+                            currentServerPage = Mathf.Max(0, currentServerPage - 1);
                             string addedR = "LocalServersAdded";
                             if (onlineServerMenu)
                             {
@@ -936,12 +1129,6 @@ public class Menu : MonoBehaviour
             leftMenu.rootVisualElement.Q<VisualElement>(element).style.backgroundColor = color;
         }
     }
-
-    private void OnClientDisconnectCallback(ulong obj)
-    {
-
-    }
-
     IEnumerator StartXR()
     {
         IReadOnlyList<XRLoader> loaders = XRGeneralSettings.Instance.Manager.activeLoaders;

@@ -316,6 +316,7 @@ public class UI_Titlescreen : MonoBehaviour
             }
             else
             {
+                m_NetworkManager.StartClient();
                 StartCoroutine(LocalServerCheck(index));
             }
         }
