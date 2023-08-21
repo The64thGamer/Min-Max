@@ -716,6 +716,7 @@ public class Menu : MonoBehaviour
                             SetToggle("Windowed", Convert.ToBoolean(PlayerPrefs.GetInt("Settings: Windowed")), false);
                             SetSlider("PlayerHeight", PlayerPrefs.GetFloat("Settings: PlayerHeight"), false);
                             SetToggle("ServerCode", Convert.ToBoolean(PlayerPrefs.GetInt("Settings: ServerCode")), false);
+                            SetSlider("FOV", PlayerPrefs.GetFloat("Settings: FOV"), false);
                             break;
                         case "StartVR":
                             StartCoroutine(StartXR());
