@@ -78,6 +78,7 @@ public class PlayerTracker : NetworkBehaviour
     private void Start()
     {
         height = PlayerPrefs.GetFloat("Settings: PlayerHeight") - 0.127f;
+        UpdateFOV();
     }
 
     private void Update()
@@ -161,6 +162,11 @@ public class PlayerTracker : NetworkBehaviour
             menuAction.action.started += context => OpenMenu(context);
             menuAction.action.canceled += context => CloseMenu(context);
         }
+    }
+
+    public void UpdateFOV()
+    {
+        headset.GetComponent<Camera>().fieldOfView = PlayerPrefs.GetFloat("Settings: FOV");
     }
 
     public void SetNewClientPosition(Vector3 pos, Vector3 velocity, float rpcPredicitonTime)
@@ -358,12 +364,22 @@ public class PlayerTracker : NetworkBehaviour
 
     void OpenMenu(InputAction.CallbackContext ctx)
     {
-        player.GetMenu().gameObject.SetActive(true);
+        Menu menu = player.GetMenu();
+
+        if (menu != null)
+        {
+            menu.gameObject.SetActive(true);
+        }
     }
 
     void CloseMenu(InputAction.CallbackContext ctx)
     {
-        player.GetMenu().gameObject.SetActive(false);
+        Menu menu = player.GetMenu();
+
+        if (menu != null)
+        {
+            menu.gameObject.SetActive(false);
+        }
     }
 
 

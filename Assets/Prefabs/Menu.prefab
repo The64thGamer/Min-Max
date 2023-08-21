@@ -158,12 +158,12 @@ MonoBehaviour:
     - name: ServerCode
       type: 1
       sound: 0
-    - name: Back
-      type: 0
-      sound: 1
     - name: FOV
       type: 3
       sound: 2
+    - name: Back
+      type: 0
+      sound: 1
     rightInteractables: []
   - leftPageName: SvrSett Left
     rightPageName: SvrSett Right

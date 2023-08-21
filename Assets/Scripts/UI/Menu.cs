@@ -45,6 +45,7 @@ public class Menu : MonoBehaviour
     [SerializeField] Texture2D noneTexture;
     [SerializeField] Texture2D noMapTexture;
     [SerializeField] AudioSource aus;
+    [SerializeField] Player optionalPlayer;
     List<GameObject> currentCharMeshes = new List<GameObject>();
 
     int[] cosmeticInts;
@@ -93,6 +94,18 @@ public class Menu : MonoBehaviour
         else
         {
             Screen.fullScreenMode = FullScreenMode.FullScreenWindow;
+        }
+
+        float height = PlayerPrefs.GetFloat("Settings: PlayerHeight");
+        if (height < 0.9144f || height > 2.1336) //Value is 3 feet, 7 Feet
+        {
+            PlayerPrefs.SetFloat("Settings: PlayerHeight", 1.524f); //Value is 5 feet
+        }
+
+        float fov = PlayerPrefs.GetFloat("Settings: FOV");
+        if (fov < 70 || fov > 120)
+        {
+            PlayerPrefs.SetFloat("Settings: FOV", 90);
         }
 
         SwitchPage(0);
@@ -888,10 +901,15 @@ public class Menu : MonoBehaviour
                             }
                             break;
                         case "PlayerHeight":
+                            if (valueFloat < 0.9144f || valueFloat > 2.1336) //Value is 3 feet, 7 Feet
+                            {
+                                valueFloat = 1.524f; //Value is 5 feet
+                            }
                             PlayerPrefs.SetFloat("Settings: PlayerHeight", valueFloat);
                             break;
                         case "FOV":
                             PlayerPrefs.SetFloat("Settings: FOV", valueFloat);
+                            optionalPlayer.GetTracker().UpdateFOV();
                             break;
                         case "ServerCode":
                             PlayerPrefs.SetInt("Settings: ServerCode", Convert.ToInt32(valueBool));
