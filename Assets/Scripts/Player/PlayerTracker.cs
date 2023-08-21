@@ -34,6 +34,7 @@ public class PlayerTracker : NetworkBehaviour
     [SerializeField] InputActionProperty triggerRAction;
     [SerializeField] InputActionProperty triggerLAction;
     [SerializeField] InputActionProperty pressRStickAction;
+    [SerializeField] InputActionProperty menuAction;
     [SerializeField] Player player;
     [SerializeField] CharacterController charController;
 
@@ -49,6 +50,7 @@ public class PlayerTracker : NetworkBehaviour
     bool triggerL;
     bool rhandAButton;
     bool pressRstick;
+    bool pressMenu;
 
     //Wackness
     Vector3 prevRHandPos;
@@ -153,6 +155,12 @@ public class PlayerTracker : NetworkBehaviour
         if (triggerRAction.action != null) triggerRAction.action.Enable();
         if (triggerLAction.action != null) triggerLAction.action.Enable();
         if (pressRStickAction.action != null) pressRStickAction.action.Enable();
+        if (menuAction.action != null)
+        {
+            menuAction.action.Enable();
+            menuAction.action.started += context => OpenMenu(context);
+            menuAction.action.canceled += context => CloseMenu(context);
+        }
     }
 
     public void SetNewClientPosition(Vector3 pos, Vector3 velocity, float rpcPredicitonTime)
@@ -346,6 +354,16 @@ public class PlayerTracker : NetworkBehaviour
     public void ModifyPlayerHeight(float crouchHeight)
     {
         camOffset.localPosition = new Vector3(0, Mathf.Lerp(0,crouchMinHeight,crouchHeight), 0);
+    }
+
+    void OpenMenu(InputAction.CallbackContext ctx)
+    {
+        player.GetMenu().gameObject.SetActive(true);
+    }
+
+    void CloseMenu(InputAction.CallbackContext ctx)
+    {
+        player.GetMenu().gameObject.SetActive(false);
     }
 
 

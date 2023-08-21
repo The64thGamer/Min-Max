@@ -9,6 +9,7 @@
         <ui:Toggle label="Windowed" name="Windowed" tooltip="Flatscreen spectators spawn in as actual players in the match. (They can&apos;t do anything)" value="false" class="ButtonPaper" />
         <ui:Slider label="Player Height (m)" value="1.52" high-value="2.13" low-value="0.91" show-input-field="true" inverted="false" direction="Horizontal" name="PlayerHeight" class="ButtonPaper" />
         <ui:Toggle label="Hide Online Server Codes" name="ServerCode" tooltip="Flatscreen spectators spawn in as actual players in the match. (They can&apos;t do anything)" value="false" class="ButtonPaper" />
+        <ui:Slider label="FOV" value="90" high-value="120" low-value="70" show-input-field="true" inverted="false" direction="Horizontal" name="FOV" class="ButtonPaper" />
         <ui:VisualElement style="flex-grow: 1; background-color: rgba(0, 0, 0, 0); height: 649px;" />
         <ui:Button text="Back" name="Back" class="Button ButtonPaper" />
     </ui:VisualElement>

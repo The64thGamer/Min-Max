@@ -17,6 +17,7 @@ public class Player : NetworkBehaviour
     [SerializeField] ClassList currentClass;
     [SerializeField] ClassStats currentStats;
     [SerializeField] GameObject[] playerModels;
+    Menu menu;
     int[] cosmeticInts = new int[0];
     List<GameObject> currentCharMeshes = new List<GameObject>();
     WireSounds wireSounds;
@@ -28,6 +29,9 @@ public class Player : NetworkBehaviour
     Wire.WirePoint heldWire;
     int currentHealth;
 
+    //Const
+    const ulong botID = 64646464646464;
+
     public override void OnNetworkSpawn()
     {
         //Before
@@ -37,11 +41,16 @@ public class Player : NetworkBehaviour
         al = gm.GetComponent<AllStats>();
         gm.AddPlayerToClientList(this);
         wireSounds = transform.Find("WireSounds").GetComponent<WireSounds>();
+        menu = transform.Find("Menu").GetComponent<Menu>();
 
         //After
         if (IsOwner)
         {
             SetCharacterVisibility(false);
+            if (GetPlayerID() >= botID)
+            {
+                Destroy(menu.gameObject);
+            }
         }
         else
         {
@@ -49,6 +58,7 @@ public class Player : NetworkBehaviour
             Destroy(this.GetComponentInChildren<UniversalAdditionalCameraData>());
             Destroy(this.GetComponentInChildren<Camera>());
             Destroy(this.GetComponentInChildren<AudioListener>());
+            Destroy(menu.gameObject);
             TrackedPoseDriver[] pd = this.GetComponentsInChildren<TrackedPoseDriver>();
             for (int i = 0; i < pd.Length; i++)
             {
@@ -216,6 +226,11 @@ public class Player : NetworkBehaviour
     public ulong GetPlayerID()
     {
         return OwnerClientId;
+    }
+
+    public Menu GetMenu()
+    {
+        return menu;
     }
 
     public int[] GetCosmeticInts()

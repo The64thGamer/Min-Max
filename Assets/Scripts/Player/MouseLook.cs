@@ -48,9 +48,5 @@ public class MouseLook : NetworkBehaviour
         handR.localPosition = new Vector3(0, height - 0.5f, 0) +  (cam.right * 0.35f);
         handL.localPosition = new Vector3(0, height - 0.5f, 0) + (cam.right * -0.35f);
         cam.localPosition = new Vector3(0, height, 0);
-        if (Input.GetKey(KeyCode.Escape))
-        {
-            //GameObject.Find("Global Manager").GetComponent<GlobalManager>().DisconnectToTitleScreen(false);
-        }
     }
 }
