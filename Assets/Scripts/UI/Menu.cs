@@ -43,6 +43,7 @@ public class Menu : MonoBehaviour
     [SerializeField] VisualTreeAsset cosmeticIconVTA;
     [SerializeField] VisualTreeAsset serverIconVTA;
     [SerializeField] Texture2D noneTexture;
+    [SerializeField] Texture2D noMapTexture;
     [SerializeField] AudioSource aus;
     List<GameObject> currentCharMeshes = new List<GameObject>();
 
@@ -346,6 +347,7 @@ public class Menu : MonoBehaviour
     {
         SetLabel("ServerName", "Loading", true);
         SetLabel("Gamemode", "Attempting Allocation", true);
+        SetPicture("MapBackground", noMapTexture,Color.white, true);
         HideElement("Delete", true, true);
         HideElement("Play", true, true);
 
@@ -478,6 +480,7 @@ public class Menu : MonoBehaviour
                         if (currentMap < maps.Count())
                         {
                             mapName = maps[currentMap].mapName;
+                            SetPicture("MapBackground", maps[currentMap].image, Color.white, true);
                         }
                         description += '\n' + mapName;
                         PlayerPrefs.SetInt("ServerMapName", currentMap);
