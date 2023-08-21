@@ -1109,6 +1109,7 @@ public struct PlayerDataSentToServer : INetworkSerializable
     public bool jump;
     public bool shoot;
     public bool crouch;
+    public bool menu;
 
 
     public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter

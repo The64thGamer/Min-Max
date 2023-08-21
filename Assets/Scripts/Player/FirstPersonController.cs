@@ -3,6 +3,8 @@ using Unity.VisualScripting;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.InputSystem.XR;
+using UnityEngine.XR.Interaction.Toolkit;
 
 namespace StarterAssets
 {
@@ -49,6 +51,16 @@ namespace StarterAssets
         Vector3 wireCollisionVector;
         Wire.WirePoint heldWire;
 
+        //Menu
+        bool hasBeenMenu;
+
+        //Mouselook
+        bool usingMouse;
+        float height;
+        const float sensitivity = 10f;
+        const float maxYAngle = 80f;
+        Vector2 currentRotation;
+
 
         public override void OnNetworkSpawn()
         {
@@ -59,8 +71,18 @@ namespace StarterAssets
             menu = player.GetMenu();
 
             // reset our timeouts on start
-
             _fallTimeoutDelta = FallTimeout;
+
+            if (PlayerPrefs.GetInt("IsVREnabled") == 0 && IsOwner)
+            {
+                usingMouse = true;
+                height = PlayerPrefs.GetFloat("Settings: PlayerHeight") - 0.127f;
+                UnityEngine.Cursor.lockState = CursorLockMode.Locked;
+                UnityEngine.Cursor.visible = false;
+                Destroy(_mainCamera.GetComponent<TrackedPoseDriver>());
+                Destroy(tracker.GetRightHand().GetComponent<ActionBasedController>());
+                Destroy(tracker.GetLeftHand().GetComponent<ActionBasedController>());
+            }
         }
 
         public void MovePlayer()
@@ -72,6 +94,32 @@ namespace StarterAssets
             if(data.shoot)
             {
                 player.GetCurrentGun().Fire();
+            }
+
+            if(data.menu && !hasBeenMenu)
+            {
+                hasBeenMenu = true;
+                menu.gameObject.SetActive(!menu.gameObject.activeSelf);
+            }
+            if (!data.menu && hasBeenMenu)
+            {
+                hasBeenMenu = false;
+            }
+
+            if (usingMouse)
+            {
+                currentRotation.x += Input.GetAxis("Mouse X") * sensitivity;
+                currentRotation.y -= Input.GetAxis("Mouse Y") * sensitivity;
+                currentRotation.x = Mathf.Repeat(currentRotation.x, 360);
+                currentRotation.y = Mathf.Clamp(currentRotation.y, -maxYAngle, maxYAngle);
+                Quaternion rot = Quaternion.Euler(currentRotation.y, currentRotation.x, 0);
+                _mainCamera.transform.rotation = rot;
+                _mainCamera.transform.localPosition = Vector3.zero;
+                tracker.GetRightHand().rotation = rot;
+                tracker.GetLeftHand().rotation = rot;
+                tracker.GetRightHand().localPosition = new Vector3(0, height - 0.5f, 0) + (_mainCamera.transform.right * 0.35f);
+                tracker.GetLeftHand().localPosition = new Vector3(0, height - 0.5f, 0) + (_mainCamera.transform.right * -0.35f);
+                _mainCamera.transform.localPosition = new Vector3(0, height, 0);
             }
 
             Vector3 forward = _mainCamera.transform.forward;
@@ -301,22 +349,6 @@ namespace StarterAssets
             if (_verticalVelocity < _terminalVelocity)
             {
                 _verticalVelocity += Gravity * Time.deltaTime;
-            }
-        }
-
-        void OpenMenu(InputAction.CallbackContext ctx)
-        {
-            if (menu != null)
-            {
-                menu.gameObject.SetActive(!menu.gameObject.activeSelf);
-                if (this.GetComponent<MouseLook>() != null)
-                {
-
-                }
-                else
-                {
-
-                }
             }
         }
 

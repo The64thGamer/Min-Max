@@ -238,6 +238,7 @@ public class PlayerTracker : NetworkBehaviour
             lHandPos = leftController.localPosition,
             lHandRot = leftController.rotation,
             crouch = pressRstick,
+            menu = pressMenu,
         };
     }
 
