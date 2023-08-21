@@ -268,10 +268,12 @@ public class Menu : MonoBehaviour
             codeOrPort = "GlobalServer";
             serverName = "GlobalServerName";
             SetLabel("ServerTabLabel", "Online", false);
+            SetLabel("ServerAddCode", "Join Code", false);
         }
         else
         {
             SetLabel("ServerTabLabel", "LAN", false);
+            SetLabel("ServerAddCode", "Port #", false);
         }
         SetLabel("PageLabel", "Page " + currentServerPage + "/" + Mathf.FloorToInt((float)PlayerPrefs.GetInt(added) / 4.0f), false);
 
@@ -731,11 +733,12 @@ public class Menu : MonoBehaviour
                     {
                         case "ServerTabLeft":
                             onlineServerMenu = !onlineServerMenu;
+                            currentServerPage = 0;
                             RefreshServerList(true);
                             break;
                         case "ServerTabRight":
                             onlineServerMenu = !onlineServerMenu;
-
+                            currentServerPage = 0;
                             RefreshServerList(true);
                             break;
                         case "PageLeft":
