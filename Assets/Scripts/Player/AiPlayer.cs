@@ -51,7 +51,7 @@ public class AiPlayer : NetworkBehaviour
             headset = player.GetTracker().GetCamera();
             rhand = player.GetTracker().GetRightHand();
             tracker = player.GetTracker();
-            height = PlayerPrefs.GetFloat("PlayerHeight") - 0.127f;
+            height = PlayerPrefs.GetFloat("Settings: PlayerHeight") - 0.127f;
 
         }
     }

@@ -161,6 +161,9 @@ MonoBehaviour:
     - name: Back
       type: 0
       sound: 1
+    - name: FOV
+      type: 3
+      sound: 2
     rightInteractables: []
   - leftPageName: SvrSett Left
     rightPageName: SvrSett Right

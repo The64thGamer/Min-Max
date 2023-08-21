@@ -696,7 +696,7 @@ public class Menu : MonoBehaviour
                             SetTextField("PlayerName", finalName, false);
                             SetToggle("Vsync", Convert.ToBoolean(PlayerPrefs.GetInt("Settings: Vsync")), false);
                             SetToggle("Windowed", Convert.ToBoolean(PlayerPrefs.GetInt("Settings: Windowed")), false);
-                            SetSlider("PlayerHeight", PlayerPrefs.GetFloat("PlayerHeight"), false);
+                            SetSlider("PlayerHeight", PlayerPrefs.GetFloat("Settings: PlayerHeight"), false);
                             SetToggle("ServerCode", Convert.ToBoolean(PlayerPrefs.GetInt("Settings: ServerCode")), false);
                             break;
                         case "StartVR":
@@ -888,7 +888,10 @@ public class Menu : MonoBehaviour
                             }
                             break;
                         case "PlayerHeight":
-                            PlayerPrefs.SetFloat("PlayerHeight", valueFloat);
+                            PlayerPrefs.SetFloat("Settings: PlayerHeight", valueFloat);
+                            break;
+                        case "FOV":
+                            PlayerPrefs.SetFloat("Settings: FOV", valueFloat);
                             break;
                         case "ServerCode":
                             PlayerPrefs.SetInt("Settings: ServerCode", Convert.ToInt32(valueBool));

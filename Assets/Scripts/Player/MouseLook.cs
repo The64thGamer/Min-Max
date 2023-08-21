@@ -26,7 +26,7 @@ public class MouseLook : NetworkBehaviour
         }
         else
         {
-            height = PlayerPrefs.GetFloat("PlayerHeight") - 0.127f;
+            height = PlayerPrefs.GetFloat("Settings: PlayerHeight") - 0.127f;
             UnityEngine.Cursor.lockState = CursorLockMode.Locked;
             UnityEngine.Cursor.visible = false;
             Destroy(cam.GetComponent<TrackedPoseDriver>());

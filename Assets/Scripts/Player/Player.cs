@@ -81,7 +81,7 @@ public class Player : NetworkBehaviour
         SetupCosmetics(classCosmetics);
         SetCharacterVisibility(currentPlayerVisibility);
         UpdateTeamColor();
-        float height = PlayerPrefs.GetFloat("PlayerHeight") - 0.127f; //Height offset by 5 inches (Height from eyes to top of head)
+        float height = PlayerPrefs.GetFloat("Settings: PlayerHeight") - 0.127f; //Height offset by 5 inches (Height from eyes to top of head)
         tracker.GetForwardRoot().localScale = Vector3.one * (currentStats.classEyeHeight / height);
     }
 

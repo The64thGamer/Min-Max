@@ -77,7 +77,7 @@ public class PlayerTracker : NetworkBehaviour
 
     private void Start()
     {
-        height = PlayerPrefs.GetFloat("PlayerHeight") - 0.127f;
+        height = PlayerPrefs.GetFloat("Settings: PlayerHeight") - 0.127f;
     }
 
     private void Update()
