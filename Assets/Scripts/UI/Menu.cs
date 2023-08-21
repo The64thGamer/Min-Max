@@ -121,10 +121,10 @@ public class Menu : MonoBehaviour
         soundTimer = Mathf.Max(0, soundTimer - Time.deltaTime);
         if (flippingPage)
         {
-            centerRing.eulerAngles = new Vector3(0, centerRing.eulerAngles.y + (Time.deltaTime * 750), 0);
-            if (centerRing.eulerAngles.y > 359 || centerRing.eulerAngles.y < 180)
+            centerRing.localEulerAngles = new Vector3(0, centerRing.localEulerAngles.y + (Time.deltaTime * 750), 0);
+            if (centerRing.localEulerAngles.y >= 180)
             {
-                centerRing.eulerAngles = new Vector3(0, 0, 0);
+                centerRing.localEulerAngles = new Vector3(0, 180, 0);
                 flippingPage = false;
             }
         }
@@ -141,7 +141,7 @@ public class Menu : MonoBehaviour
             SetButtons(rightMenu.rootVisualElement, pages[index].rightInteractables, pages[index].rightPageName);
 
             flippingPage = true;
-            centerRing.eulerAngles = new Vector3(0, 180, 0);
+            centerRing.localEulerAngles = new Vector3(0, 0, 0);
             Graphics.CopyTexture(menuLeftRT, fakeMenuLeftRT);
             Graphics.CopyTexture(menuRightRT, fakeMenuRightRT);
         }
