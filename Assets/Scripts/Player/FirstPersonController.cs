@@ -59,6 +59,7 @@ namespace StarterAssets
         float height;
         const float sensitivity = 10f;
         const float maxYAngle = 80f;
+        const ulong botID = 64646464646464;
         Vector2 currentRotation;
 
 
@@ -73,7 +74,7 @@ namespace StarterAssets
             // reset our timeouts on start
             _fallTimeoutDelta = FallTimeout;
 
-            if (PlayerPrefs.GetInt("IsVREnabled") == 0 && IsOwner)
+            if (PlayerPrefs.GetInt("IsVREnabled") == 0 && IsOwner && player.GetPlayerID() < botID)
             {
                 usingMouse = true;
                 height = PlayerPrefs.GetFloat("Settings: PlayerHeight") - 0.127f;
@@ -96,30 +97,49 @@ namespace StarterAssets
                 player.GetCurrentGun().Fire();
             }
 
-            if(data.menu && !hasBeenMenu)
+            //Menu Stuff
+            if (menu != null)
             {
-                hasBeenMenu = true;
-                menu.gameObject.SetActive(!menu.gameObject.activeSelf);
-            }
-            if (!data.menu && hasBeenMenu)
-            {
-                hasBeenMenu = false;
-            }
+                if (data.menu && !hasBeenMenu)
+                {
+                    hasBeenMenu = true;
+                    menu.gameObject.SetActive(!menu.gameObject.activeSelf);
+                }
+                if (!data.menu && hasBeenMenu)
+                {
+                    hasBeenMenu = false;
+                }
 
-            if (usingMouse)
-            {
-                currentRotation.x += Input.GetAxis("Mouse X") * sensitivity;
-                currentRotation.y -= Input.GetAxis("Mouse Y") * sensitivity;
-                currentRotation.x = Mathf.Repeat(currentRotation.x, 360);
-                currentRotation.y = Mathf.Clamp(currentRotation.y, -maxYAngle, maxYAngle);
-                Quaternion rot = Quaternion.Euler(currentRotation.y, currentRotation.x, 0);
-                _mainCamera.transform.rotation = rot;
-                _mainCamera.transform.localPosition = Vector3.zero;
-                tracker.GetRightHand().rotation = rot;
-                tracker.GetLeftHand().rotation = rot;
-                tracker.GetRightHand().localPosition = new Vector3(0, height - 0.5f, 0) + (_mainCamera.transform.right * 0.35f);
-                tracker.GetLeftHand().localPosition = new Vector3(0, height - 0.5f, 0) + (_mainCamera.transform.right * -0.35f);
-                _mainCamera.transform.localPosition = new Vector3(0, height, 0);
+                if (menu.gameObject.activeSelf)
+                {
+                    if (usingMouse)
+                    {
+                        menu.transform.position = _mainCamera.transform.position + (_mainCamera.transform.forward * 0.1f);
+                        menu.transform.LookAt(_mainCamera.transform.position);
+                        menu.transform.localScale = 4 * Vector3.Distance(_mainCamera.transform.position, menu.transform.position) * Mathf.Tan((PlayerPrefs.GetFloat("Settings: FOV") * Mathf.Deg2Rad) / 2) * Vector3.one;
+                    }
+                    else
+                    {
+
+                    }
+                }
+
+                //Mouselook
+                if (usingMouse && !menu.gameObject.activeSelf)
+                {
+                    currentRotation.x += Input.GetAxis("Mouse X") * sensitivity;
+                    currentRotation.y -= Input.GetAxis("Mouse Y") * sensitivity;
+                    currentRotation.x = Mathf.Repeat(currentRotation.x, 360);
+                    currentRotation.y = Mathf.Clamp(currentRotation.y, -maxYAngle, maxYAngle);
+                    Quaternion rot = Quaternion.Euler(currentRotation.y, currentRotation.x, 0);
+                    _mainCamera.transform.rotation = rot;
+                    _mainCamera.transform.localPosition = Vector3.zero;
+                    tracker.GetRightHand().rotation = rot;
+                    tracker.GetLeftHand().rotation = rot;
+                    tracker.GetRightHand().localPosition = new Vector3(0, height - 0.5f, 0) + (_mainCamera.transform.right * 0.35f);
+                    tracker.GetLeftHand().localPosition = new Vector3(0, height - 0.5f, 0) + (_mainCamera.transform.right * -0.35f);
+                    _mainCamera.transform.localPosition = new Vector3(0, height, 0);
+                }
             }
 
             Vector3 forward = _mainCamera.transform.forward;
