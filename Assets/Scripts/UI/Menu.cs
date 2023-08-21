@@ -1022,7 +1022,7 @@ public class Menu : MonoBehaviour
     {
         SwitchPage(1);
         currentCustClass = 3;
-        currentCustTeam = 0;
+        currentCustTeam = UnityEngine.Random.Range(0,9);
         currentCustPage = 0;
         currentCustLoadout = 0;
         currentCustCosmType = -1;
