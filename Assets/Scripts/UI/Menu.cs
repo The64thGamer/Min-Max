@@ -909,7 +909,10 @@ public class Menu : MonoBehaviour
                             break;
                         case "FOV":
                             PlayerPrefs.SetFloat("Settings: FOV", valueFloat);
-                            optionalPlayer.GetTracker().UpdateFOV();
+                            if (optionalPlayer != null)
+                            {
+                                optionalPlayer.GetTracker().UpdateFOV();
+                            }
                             break;
                         case "ServerCode":
                             PlayerPrefs.SetInt("Settings: ServerCode", Convert.ToInt32(valueBool));

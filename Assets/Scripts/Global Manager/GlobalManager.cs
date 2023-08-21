@@ -182,13 +182,7 @@ public class GlobalManager : NetworkBehaviour
             }
 
             //Game Logic
-            if (clients[i].GetTracker().GetTriggerR())
-            {
-                clients[i].GetCurrentGun().Fire();
-            }
-
-            PlayerDataSentToServer inputs = clients[i].GetTracker().GetPlayerNetworkData();
-            clients[i].GetController().MovePlayer(inputs.rightJoystick, inputs.jump, inputs.crouch);
+            clients[i].GetController().MovePlayer();
         }
     }
 

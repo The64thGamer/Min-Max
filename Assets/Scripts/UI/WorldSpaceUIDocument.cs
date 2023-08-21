@@ -139,6 +139,10 @@ public class WorldSpaceUIDocument : MonoBehaviour
         }
         else
         {
+            if(mainCamera == null)
+            {
+                return Vector2.zero;
+            }
             screenPosition.y = Screen.height - screenPosition.y;
             ray = mainCamera.ScreenPointToRay(screenPosition);
         }

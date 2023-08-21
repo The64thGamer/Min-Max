@@ -58,7 +58,6 @@ public class PlayerTracker : NetworkBehaviour
     Vector3 prevRHandUp;
     Vector3 prevRHandRight;
 
-
     //Prediction Values
     float predictionTime;
     Vector3 predictedVelocity;
@@ -128,7 +127,6 @@ public class PlayerTracker : NetworkBehaviour
             if (isInFirstPerson)
             {
                 playerRHand.position = rightController.position + (rightController.up * -0.2f) + (rightController.forward * -0.2f);
-
                 playerLHand.position = leftController.position + (leftController.up * -0.2f) + (leftController.forward * -0.2f);
                 playerLHand.rotation = leftController.rotation;
                 playerLHand.Rotate(new Vector3(-90, 180, 0));
@@ -156,12 +154,7 @@ public class PlayerTracker : NetworkBehaviour
         if (triggerRAction.action != null) triggerRAction.action.Enable();
         if (triggerLAction.action != null) triggerLAction.action.Enable();
         if (pressRStickAction.action != null) pressRStickAction.action.Enable();
-        if (menuAction.action != null)
-        {
-            menuAction.action.Enable();
-            menuAction.action.started += context => OpenMenu(context);
-            menuAction.action.canceled += context => CloseMenu(context);
-        }
+        if (menuAction.action != null) {menuAction.action.Enable();}
     }
 
     public void UpdateFOV()
@@ -361,27 +354,6 @@ public class PlayerTracker : NetworkBehaviour
     {
         camOffset.localPosition = new Vector3(0, Mathf.Lerp(0,crouchMinHeight,crouchHeight), 0);
     }
-
-    void OpenMenu(InputAction.CallbackContext ctx)
-    {
-        Menu menu = player.GetMenu();
-
-        if (menu != null)
-        {
-            menu.gameObject.SetActive(true);
-        }
-    }
-
-    void CloseMenu(InputAction.CallbackContext ctx)
-    {
-        Menu menu = player.GetMenu();
-
-        if (menu != null)
-        {
-            menu.gameObject.SetActive(false);
-        }
-    }
-
 
     private void OnDrawGizmos()
     {

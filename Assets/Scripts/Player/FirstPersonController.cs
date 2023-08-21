@@ -1,6 +1,8 @@
 ﻿using Unity.Netcode;
 using Unity.VisualScripting;
+using UnityEditor;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 namespace StarterAssets
 {
@@ -14,6 +16,7 @@ namespace StarterAssets
         PlayerTracker tracker;
         GlobalManager gm;
         Player player;
+        Menu menu;
 
         //Consts
         const float crouchSpeed = 7;
@@ -53,15 +56,23 @@ namespace StarterAssets
             tracker = this.GetComponent<PlayerTracker>();
             _controller = GetComponent<CharacterController>();
             player = GetComponent<Player>();
+            menu = player.GetMenu();
 
             // reset our timeouts on start
 
             _fallTimeoutDelta = FallTimeout;
         }
 
-        public void MovePlayer(Vector2 _input, bool jump, bool crouch)
+        public void MovePlayer()
         {
             if (_controller == null) { return; }
+
+            PlayerDataSentToServer data = player.GetTracker().GetPlayerNetworkData();
+
+            if(data.shoot)
+            {
+                player.GetCurrentGun().Fire();
+            }
 
             Vector3 forward = _mainCamera.transform.forward;
             Vector3 right = _mainCamera.transform.right;
@@ -69,13 +80,13 @@ namespace StarterAssets
             right.y = 0f;
             forward.Normalize();
             right.Normalize();
-            Vector3 newAxis = forward * _input.y + right * _input.x;
+            Vector3 newAxis = forward * data.rightJoystick.y + right * data.rightJoystick.x;
             Vector3 targetSpeed = new Vector3(newAxis.x, 0.0f, newAxis.z).normalized * player.GetClassStats().baseSpeed / 25.0f;
 
             heldWire = player.GetWirePoint();
 
             //Crouch
-            if (crouch && _controller.isGrounded)
+            if (data.crouch && _controller.isGrounded)
             {
                 if (!hasBeenCrouched)
                 {
@@ -106,7 +117,7 @@ namespace StarterAssets
                 }
                 currentCrouchLerp = Mathf.Clamp01(currentCrouchLerp - (Time.deltaTime * crouchSpeed));
             }
-            if (jump)
+            if (data.jump)
             {
                 if (IsHost && heldWire != null)
                 {
@@ -154,7 +165,7 @@ namespace StarterAssets
                 if (!hasBeenGrounded)
                 {
                     oldAxis = newAxis;
-                    oldInput = _input;
+                    oldInput = data.rightJoystick;
                     hasBeenGrounded = true;
                 }
                 else
@@ -165,9 +176,9 @@ namespace StarterAssets
                         if (oldAxis == Vector3.zero)
                         {
                             oldAxis = newAxis;
-                            oldInput = _input;
+                            oldInput = data.rightJoystick;
                         }
-                        else if (Vector2.Dot(oldInput, _input) < -0.5f)
+                        else if (Vector2.Dot(oldInput, data.rightJoystick) < -0.5f)
                         {
                             //Stop Mid-air if holding opposite direction
                             newAxis = Vector3.zero;
@@ -212,9 +223,9 @@ namespace StarterAssets
             }
 
             //Jump
-            JumpAndGravity(jump);
+            JumpAndGravity(data.jump);
 
-            if (_input.magnitude == 0)
+            if (data.rightJoystick.magnitude == 0)
             {
                 _hasBeenMovingDelta = Mathf.Lerp(_hasBeenMovingDelta, 0, Time.deltaTime * hasMovedDeltaTimeout);
             }
@@ -290,6 +301,22 @@ namespace StarterAssets
             if (_verticalVelocity < _terminalVelocity)
             {
                 _verticalVelocity += Gravity * Time.deltaTime;
+            }
+        }
+
+        void OpenMenu(InputAction.CallbackContext ctx)
+        {
+            if (menu != null)
+            {
+                menu.gameObject.SetActive(!menu.gameObject.activeSelf);
+                if (this.GetComponent<MouseLook>() != null)
+                {
+
+                }
+                else
+                {
+
+                }
             }
         }
 
