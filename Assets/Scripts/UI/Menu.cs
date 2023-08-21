@@ -519,6 +519,60 @@ public class Menu : MonoBehaviour
     }
 
 
+    void AddServer(string port)
+    {
+        if (onlineServerMenu)
+        {
+            PlayerPrefs.SetInt("GlobalServersAdded", PlayerPrefs.GetInt("GlobalServersAdded") + 1);
+            try
+            {
+                PlayerPrefs.SetString("GlobalServer" + (PlayerPrefs.GetInt("GlobalServersAdded") - 1), port);
+                PlayerPrefs.SetString("GlobalServerName" + (PlayerPrefs.GetInt("GlobalServersAdded") - 1), "");
+            }
+            catch (Exception)
+            {
+                PlayerPrefs.SetInt("GlobalServersAdded", PlayerPrefs.GetInt("GlobalServersAdded") - 1);
+            }
+        }
+        else
+        {
+            PlayerPrefs.SetInt("LocalServersAdded", PlayerPrefs.GetInt("LocalServersAdded") + 1);
+            try
+            {
+                PlayerPrefs.SetInt("LocalServer" + (PlayerPrefs.GetInt("LocalServersAdded") - 1), (int)ushort.Parse(port));
+                PlayerPrefs.SetString("LocalServerName" + (PlayerPrefs.GetInt("LocalServersAdded") - 1), "");
+
+            }
+            catch (Exception)
+            {
+                PlayerPrefs.SetInt("LocalServersAdded", PlayerPrefs.GetInt("LocalServersAdded") - 1);
+            }
+        }
+        RefreshServerList(true);
+    }
+
+    void RemoveServer(int index)
+    {
+        if (!onlineServerMenu)
+        {
+            PlayerPrefs.SetInt("LocalServersAdded", PlayerPrefs.GetInt("LocalServersAdded") - 1);
+            for (int i = index; i < PlayerPrefs.GetInt("LocalServersAdded"); i++)
+            {
+                PlayerPrefs.SetInt("LocalServer" + i, PlayerPrefs.GetInt("LocalServer" + (i + 1)));
+            }
+        }
+        else
+        {
+            PlayerPrefs.SetInt("GlobalServersAdded", PlayerPrefs.GetInt("GlobalServersAdded") - 1);
+            for (int i = index; i < PlayerPrefs.GetInt("LocalServersAdded"); i++)
+            {
+                PlayerPrefs.SetString("GlobalServer" + i, PlayerPrefs.GetString("GlobalServer" + (i + 1)));
+            }
+        }
+        RefreshServerList(true);
+    }
+
+
     void ButtonPressed(string page, string button, string valueString, bool valueBool, float valueFloat, MenuButtonSound sound)
     {
         if (!flippingPage)
@@ -766,8 +820,30 @@ public class Menu : MonoBehaviour
                             currentServerPage = Mathf.Min(Mathf.FloorToInt((float)PlayerPrefs.GetInt(addedL) / 4.0f), currentServerPage + 1);
                             RefreshServerList(true);
                             break;
+                        case "ServerAdd":
+                            AddServer(leftMenu.rootVisualElement.Q<TextField>("ServerAddCode").value);
+                            break;
                         case "Back":
                             SwitchPage(0);
+                            break;
+                        default:
+                            break;
+                    }
+                    break;
+                case "Join Right":
+                    switch (button)
+                    {
+                        case "Delete":
+                            RemoveServer(currentServerSelected);
+                            RefreshServerList(true);
+                            break;
+                        case "Play":
+                            SwitchPage(5);
+                            int final = PlayerPrefs.GetInt("ServerMapName");
+                            SetLabel("MapName", maps[final].mapName, true);
+                            SetLabel("Gamemode", "Gamemode: " + maps[final].gameMode, true);
+                            SetPicture("MapBackground", maps[final].image, Color.white, true);
+                            StartCoroutine(LoadMap());
                             break;
                         default:
                             break;
