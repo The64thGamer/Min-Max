@@ -346,6 +346,8 @@ public class Menu : MonoBehaviour
     {
         SetLabel("ServerName", "Loading", true);
         SetLabel("Gamemode", "Attempting Allocation", true);
+        HideElement("Delete", true, true);
+        HideElement("Play", true, true);
 
         m_NetworkManager.NetworkConfig.ConnectionData = System.Text.Encoding.ASCII.GetBytes("P");
 
@@ -395,11 +397,16 @@ public class Menu : MonoBehaviour
             }
             SetLabel("ServerName", "Error", true);
             SetLabel("Gamemode", serverFailMessage, true);
-            //root.Q<VisualElement>("NewLocalDeleteGame").style.display = DisplayStyle.Flex;
+            HideElement("Delete",false,true);
         }
-        if (serverCheck == ServerCheck.pass && onlineServerMenu)
+        if (serverCheck == ServerCheck.pass)
         {
-            PlayerPrefs.SetString("JoinCode", PlayerPrefs.GetString("GlobalServer" + index));
+            if (onlineServerMenu)
+            {
+                PlayerPrefs.SetString("JoinCode", PlayerPrefs.GetString("GlobalServer" + index));
+            }
+            HideElement("Delete", false, true);
+            HideElement("Play", false, true);
         }
         serverCheck = ServerCheck.none;
     }
@@ -473,9 +480,7 @@ public class Menu : MonoBehaviour
                             mapName = maps[currentMap].mapName;
                         }
                         description += '\n' + mapName;
-                        //root.Q<VisualElement>("NewLocalMapIcon").style.backgroundImage = new StyleBackground(mapIcons[currentMap]);
                         PlayerPrefs.SetInt("ServerMapName", currentMap);
-                        //root.Q<VisualElement>("NewLocalStartGame").style.display = DisplayStyle.Flex;
                     }
                     else
                     {
@@ -507,7 +512,6 @@ public class Menu : MonoBehaviour
                 SetLabel("ServerName", "Error", true);
                 SetLabel("Gamemode", "Unknown Error: " + payload, true);
             }
-            //root.Q<VisualElement>("NewLocalDeleteGame").style.display = DisplayStyle.Flex;
         }
     }
 
@@ -1039,15 +1043,39 @@ public class Menu : MonoBehaviour
         }
     }
 
-    void SetLabel(string element, string text, bool isRightPage)
+    void HideElement(string element, bool hide, bool isRightPage)
     {
+        VisualElement v = leftMenu.rootVisualElement;
         if (isRightPage)
         {
-            rightMenu.rootVisualElement.Q<Label>(element).text = text;
+            v = rightMenu.rootVisualElement;
+        }
+        if(hide)
+        {
+            v.Q<VisualElement>(element).style.display = DisplayStyle.None;
+
         }
         else
         {
-            leftMenu.rootVisualElement.Q<Label>(element).text = text;
+            v.Q<VisualElement>(element).style.display = DisplayStyle.Flex;
+        }
+    }
+
+    void SetLabel(string element, string text, bool isRightPage)
+    {
+        VisualElement v = leftMenu.rootVisualElement;
+        if (isRightPage)
+        {
+            v = rightMenu.rootVisualElement;
+        }
+        Label r = v.Q<Label>(element);
+        if (r == null)
+        {
+            v.Q<TextField>(element).label = text;
+        }
+        else
+        {
+            r.text = text;
         }
     }
 

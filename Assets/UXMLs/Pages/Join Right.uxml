@@ -7,8 +7,8 @@
         <ui:Label text="Map: Nara&#10;Gamemode: Payload&#10;Players: 24/24" name="Gamemode" style="-unity-font-definition: url(&apos;project://database/Assets/Game%20Assets/UI/Fonts/PTMono-Regular.ttf?fileID=12800000&amp;guid=cc1735a3c585aba4480bc03c8d93b029&amp;type=3#PTMono-Regular&apos;); font-size: 40px; color: rgb(26, 28, 26); margin-left: 0; margin-right: 0; margin-top: 0; margin-bottom: 0; padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0; white-space: normal;" />
         <ui:VisualElement name="VisualElement" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0); min-height: 0;" />
         <ui:VisualElement style="flex-grow: 1; background-color: rgba(0, 0, 0, 0); flex-direction: row; flex-wrap: nowrap; align-items: flex-end; justify-content: flex-start; align-self: auto; width: auto;">
-            <ui:Button text="Delete" name="Settings" class="Button ButtonPaper" style="flex-grow: 1; border-right-width: 2px;" />
-            <ui:Button text="Play" name="Exit" class="Button ButtonPaper" style="flex-grow: 1; border-left-width: 2px;" />
+            <ui:Button text="Delete" name="Delete" class="Button ButtonPaper" style="flex-grow: 1; border-right-width: 2px;" />
+            <ui:Button text="Play" name="Play" class="Button ButtonPaper" style="flex-grow: 1; border-left-width: 2px;" />
         </ui:VisualElement>
     </ui:VisualElement>
 </ui:UXML>
