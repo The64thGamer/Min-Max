@@ -52,7 +52,7 @@ namespace StarterAssets
         Wire.WirePoint heldWire;
 
         //Menu
-        bool hasBeenMenu;
+        bool menuIsOpen;
 
         //Mouselook
         bool usingMouse;
@@ -92,7 +92,7 @@ namespace StarterAssets
 
             PlayerDataSentToServer data = player.GetTracker().GetPlayerNetworkData();
 
-            if(data.shoot)
+            if (data.shoot)
             {
                 player.GetCurrentGun().Fire();
             }
@@ -100,47 +100,53 @@ namespace StarterAssets
             //Menu Stuff
             if (menu != null)
             {
-                if (data.menu && !hasBeenMenu)
+                if (data.menu && !menuIsOpen)
                 {
-                    hasBeenMenu = true;
+                    menuIsOpen = true;
                     menu.gameObject.SetActive(!menu.gameObject.activeSelf);
                 }
-                if (!data.menu && hasBeenMenu)
+                if (!data.menu && menuIsOpen)
                 {
-                    hasBeenMenu = false;
-                }
-
-                if (menu.gameObject.activeSelf)
-                {
-                    if (usingMouse)
-                    {
-                        menu.transform.position = _mainCamera.transform.position + (_mainCamera.transform.forward * 0.1f);
-                        menu.transform.LookAt(_mainCamera.transform.position);
-                        menu.transform.localScale = 4 * Vector3.Distance(_mainCamera.transform.position, menu.transform.position) * Mathf.Tan((PlayerPrefs.GetFloat("Settings: FOV") * Mathf.Deg2Rad) / 2) * Vector3.one;
-                    }
-                    else
-                    {
-
-                    }
-                }
-
-                //Mouselook
-                if (usingMouse && !menu.gameObject.activeSelf)
-                {
-                    currentRotation.x += Input.GetAxis("Mouse X") * sensitivity;
-                    currentRotation.y -= Input.GetAxis("Mouse Y") * sensitivity;
-                    currentRotation.x = Mathf.Repeat(currentRotation.x, 360);
-                    currentRotation.y = Mathf.Clamp(currentRotation.y, -maxYAngle, maxYAngle);
-                    Quaternion rot = Quaternion.Euler(currentRotation.y, currentRotation.x, 0);
-                    _mainCamera.transform.rotation = rot;
-                    _mainCamera.transform.localPosition = Vector3.zero;
-                    tracker.GetRightHand().rotation = rot;
-                    tracker.GetLeftHand().rotation = rot;
-                    tracker.GetRightHand().localPosition = new Vector3(0, height - 0.5f, 0) + (_mainCamera.transform.right * 0.35f);
-                    tracker.GetLeftHand().localPosition = new Vector3(0, height - 0.5f, 0) + (_mainCamera.transform.right * -0.35f);
-                    _mainCamera.transform.localPosition = new Vector3(0, height, 0);
+                    menuIsOpen = false;
                 }
             }
+
+            if (menuIsOpen)
+            {
+                data.rightJoystick = Vector2.zero;
+                data.crouch = false;
+                data.shoot = false;
+                data.jump = false;
+                
+                if (usingMouse)
+                {
+                    menu.transform.position = _mainCamera.transform.position + (_mainCamera.transform.forward * 0.1f);
+                    menu.transform.LookAt(_mainCamera.transform.position);
+                    menu.transform.localScale = 4 * Vector3.Distance(_mainCamera.transform.position, menu.transform.position) * Mathf.Tan((PlayerPrefs.GetFloat("Settings: FOV") * Mathf.Deg2Rad) / 2) * Vector3.one;
+                }
+                else
+                {
+
+                }
+            }
+
+            //Mouselook
+            if (usingMouse && !menuIsOpen)
+            {
+                currentRotation.x += Input.GetAxis("Mouse X") * sensitivity;
+                currentRotation.y -= Input.GetAxis("Mouse Y") * sensitivity;
+                currentRotation.x = Mathf.Repeat(currentRotation.x, 360);
+                currentRotation.y = Mathf.Clamp(currentRotation.y, -maxYAngle, maxYAngle);
+                Quaternion rot = Quaternion.Euler(currentRotation.y, currentRotation.x, 0);
+                _mainCamera.transform.rotation = rot;
+                _mainCamera.transform.localPosition = Vector3.zero;
+                tracker.GetRightHand().rotation = rot;
+                tracker.GetLeftHand().rotation = rot;
+                tracker.GetRightHand().localPosition = new Vector3(0, height - 0.5f, 0) + (_mainCamera.transform.right * 0.35f);
+                tracker.GetLeftHand().localPosition = new Vector3(0, height - 0.5f, 0) + (_mainCamera.transform.right * -0.35f);
+                _mainCamera.transform.localPosition = new Vector3(0, height, 0);
+            }
+
 
             Vector3 forward = _mainCamera.transform.forward;
             Vector3 right = _mainCamera.transform.right;
@@ -205,14 +211,14 @@ namespace StarterAssets
                     directionDecided = true;
                     wireCollisionVector = (transform.position - heldWire.parent.point).normalized;
                 }
-                else if(distance < _controller.radius)
+                else if (distance < _controller.radius)
                 {
                     directionDecided = false;
                 }
-                if(directionDecided)
+                if (directionDecided)
                 {
                     //Extremely cheap and fast collision for wires, using the player's current hitbox
-                    if(Vector3.Distance((wireCollisionVector * distance) + heldWire.parent.point, transform.position) > _controller.radius)
+                    if (Vector3.Distance((wireCollisionVector * distance) + heldWire.parent.point, transform.position) > _controller.radius)
                     {
                         directionDecided = false;
 
