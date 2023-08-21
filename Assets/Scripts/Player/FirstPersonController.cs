@@ -52,6 +52,7 @@ namespace StarterAssets
         Wire.WirePoint heldWire;
 
         //Menu
+        bool holdingMenuButton;
         bool menuIsOpen;
 
         //Mouselook
@@ -92,22 +93,18 @@ namespace StarterAssets
 
             PlayerDataSentToServer data = player.GetTracker().GetPlayerNetworkData();
 
-            if (data.shoot)
-            {
-                player.GetCurrentGun().Fire();
-            }
-
             //Menu Stuff
             if (menu != null)
             {
-                if (data.menu && !menuIsOpen)
+                if (data.menu && !holdingMenuButton)
                 {
-                    menuIsOpen = true;
+                    holdingMenuButton = true;
                     menu.gameObject.SetActive(!menu.gameObject.activeSelf);
+                    menuIsOpen = menu.gameObject.activeSelf;
                 }
-                if (!data.menu && menuIsOpen)
+                if (!data.menu && holdingMenuButton)
                 {
-                    menuIsOpen = false;
+                    holdingMenuButton = false;
                 }
             }
 
@@ -122,7 +119,7 @@ namespace StarterAssets
                 {
                     menu.transform.position = _mainCamera.transform.position + (_mainCamera.transform.forward * 0.1f);
                     menu.transform.LookAt(_mainCamera.transform.position);
-                    menu.transform.localScale = 4 * Vector3.Distance(_mainCamera.transform.position, menu.transform.position) * Mathf.Tan((PlayerPrefs.GetFloat("Settings: FOV") * Mathf.Deg2Rad) / 2) * Vector3.one;
+                    menu.transform.localScale = 3.5f * Vector3.Distance(_mainCamera.transform.position, menu.transform.position) * Mathf.Tan((PlayerPrefs.GetFloat("Settings: FOV") * Mathf.Deg2Rad) / 2) * Vector3.one;
                 }
                 else
                 {
@@ -147,6 +144,10 @@ namespace StarterAssets
                 _mainCamera.transform.localPosition = new Vector3(0, height, 0);
             }
 
+            if (data.shoot)
+            {
+                player.GetCurrentGun().Fire();
+            }
 
             Vector3 forward = _mainCamera.transform.forward;
             Vector3 right = _mainCamera.transform.right;
