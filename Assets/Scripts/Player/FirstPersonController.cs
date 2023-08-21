@@ -104,6 +104,7 @@ namespace StarterAssets
                     if(menuIsOpen)
                     {
                         UnityEngine.Cursor.lockState = CursorLockMode.None;
+                        gm.SaveAchievements();
                     }
                     else
                     {

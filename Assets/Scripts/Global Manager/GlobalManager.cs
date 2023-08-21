@@ -97,6 +97,11 @@ public class GlobalManager : NetworkBehaviour
         achievments.SaveAchievements();
     }
 
+    public void SaveAchievements()
+    {
+        achievments.SaveAchievements();
+    }
+
     public void DisconnectToTitleScreen(bool u)
     {
         achievments.AddToValue("Achievement: Total Match Runtime", Mathf.Max(0, Time.time - timeStartedPlaying));
