@@ -101,6 +101,14 @@ namespace StarterAssets
                     holdingMenuButton = true;
                     menu.gameObject.SetActive(!menu.gameObject.activeSelf);
                     menuIsOpen = menu.gameObject.activeSelf;
+                    if(menuIsOpen)
+                    {
+                        UnityEngine.Cursor.lockState = CursorLockMode.None;
+                    }
+                    else
+                    {
+                        UnityEngine.Cursor.lockState = CursorLockMode.Locked;
+                    }
                 }
                 if (!data.menu && holdingMenuButton)
                 {
