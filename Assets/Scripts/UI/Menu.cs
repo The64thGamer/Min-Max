@@ -11,6 +11,7 @@ using Unity.Services.Authentication;
 using Unity.Services.Core;
 using Unity.Services.Relay;
 using Unity.Services.Relay.Models;
+using UnityEditor.ShaderGraph.Legacy;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UIElements;
@@ -67,6 +68,9 @@ public class Menu : MonoBehaviour
     int currentServerPage;
     ServerCheck serverCheck;
     string serverFailMessage;
+
+    //Const
+    const float pageFlipScaleReduction = 2.0f;
 
     private void OnEnable()
     {
@@ -126,9 +130,11 @@ public class Menu : MonoBehaviour
         if (flippingPage)
         {
             centerRing.localEulerAngles = new Vector3(0, centerRing.localEulerAngles.y + (Time.deltaTime * 750), 0);
+            centerRing.localScale = new Vector3(1 - (Mathf.Max(0, Vector3.Dot(transform.forward, -centerRing.right))/ pageFlipScaleReduction), 1, 1);
             if (centerRing.localEulerAngles.y >= 180)
             {
                 centerRing.localEulerAngles = new Vector3(0, 180, 0);
+                centerRing.localScale = Vector3.one;
                 flippingPage = false;
             }
         }
