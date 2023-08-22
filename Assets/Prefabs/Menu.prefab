@@ -126,10 +126,10 @@ MonoBehaviour:
       type: 3
       sound: 2
   - leftPageName: Stats Left
-    rightPageName: Blank Right
+    rightPageName: Stats Right
     leftAsset: {fileID: 9197481963319205126, guid: feeb9ef6f53429e4088b2a007b23c395,
       type: 3}
-    rightAsset: {fileID: 9197481963319205126, guid: 10690237ac8f1454f8306201a286e4f3,
+    rightAsset: {fileID: 9197481963319205126, guid: db59bfc0bdc60d647b86ddecc021c9fd,
       type: 3}
     leftInteractables:
     - name: Back
@@ -1339,7 +1339,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_PanelSettings: {fileID: 11400000, guid: 6a29e8e8ebf926a40add6f7eaf4722dd, type: 2}
   m_ParentUI: {fileID: 0}
-  sourceAsset: {fileID: 9197481963319205126, guid: 10690237ac8f1454f8306201a286e4f3,
+  sourceAsset: {fileID: 9197481963319205126, guid: fa6b2c91e7ae5124884bd6f073b60add,
     type: 3}
   m_SortingOrder: 0
 --- !u!64 &7994999997735307869
