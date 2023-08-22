@@ -74,7 +74,7 @@ public class AiPlayer : NetworkBehaviour
             if (target != null && isTargetEnemy)
             {
                 NavMeshHit hit;
-                if (NavMesh.SamplePosition(target.transform.position + (Random.insideUnitSphere * maxEnemyNavRange), out hit, maxNavRange, 1))
+                if (NavMesh.SamplePosition(target.transform.position + new Vector3(Random.Range(0, maxEnemyNavRange),0, Random.Range(0, maxEnemyNavRange)), out hit, maxNavRange, 1))
                 {
                     setDestination = hit.position;
                 }
