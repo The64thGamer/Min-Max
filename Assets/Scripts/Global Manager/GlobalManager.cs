@@ -396,8 +396,6 @@ public class GlobalManager : NetworkBehaviour
                 {
                     RemoveClientWireClientRpc(id, wireHeld.point, false);
                 }
-                Destroy(clients[i].gameObject);
-                clients.RemoveAt(i);
                 playerPosRPCData = new List<PlayerDataSentToClient>();
                 for (int e = 0; e < clients.Count; e++)
                 {
@@ -407,6 +405,8 @@ public class GlobalManager : NetworkBehaviour
                 {
                     DisconnectToTitleScreen(false);
                 }
+                Destroy(clients[i].gameObject);
+                clients.RemoveAt(i);
                 return;
             }
         }
