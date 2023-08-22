@@ -102,6 +102,11 @@ public class PlayerTracker : NetworkBehaviour
         }
     }
 
+    public void ResetInputs()
+    {
+        pressRstick = false;
+    }
+
     void LateUpdate()
     {
         //For proper syncing

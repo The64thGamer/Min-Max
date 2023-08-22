@@ -138,7 +138,7 @@ namespace StarterAssets
                 data.crouch = false;
                 data.shoot = false;
                 data.jump = false;
-                hasBeenCrouched = false;
+                tracker.ResetInputs();
             }
 
             //Mouselook
