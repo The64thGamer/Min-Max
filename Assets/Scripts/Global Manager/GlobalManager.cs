@@ -938,26 +938,28 @@ public class GlobalManager : NetworkBehaviour
         {
             if (currentHealth <= 0)
             {
-                Debug.Log("Player " + id + " was killed (" + clients[foundClient].GetHealth() + " -> " + currentHealth + " HP) by Player" + idOfKiller);
-                achievments.AddToValue("Achievement: Total Deaths", 1);
                 if (killerIsCurrentPC)
                 {
                     achievments.AddToValue("Achievement: Total Suicides", 1);
                     Debug.Log("Player " + id + " Suicided");
                 }
+                else
+                {
+                    Debug.Log("Player " + id + " was killed (" + clients[foundClient].GetHealth() + " -> " + currentHealth + " HP) by Player" + idOfKiller);
+                    achievments.AddToValue("Achievement: Total Deaths", 1);
+                }
             }
             else
             {
-                Debug.Log("Player " + id + " took " + damageTaken + " damage (" + clients[foundClient].GetHealth() + " -> " + currentHealth + " HP) by Player" + idOfKiller);
-
                 if (killerIsCurrentPC)
                 {
                     achievments.AddToValue("Achievement: Total Self-Healing", Mathf.Max(0, -damageTaken));
                 }
             }
         }
-        if (killerIsCurrentPC)
+        if (killerIsCurrentPC && !damagedIsCurrentPC)
         {
+            Debug.Log("Player " + id + " took " + damageTaken + " damage (" + clients[foundClient].GetHealth() + " -> " + currentHealth + " HP) by Player" + idOfKiller);
             achievments.AddToValue("Achievement: Total Damage", Mathf.Max(0, damageTaken));
             achievments.AddToValue("Achievement: Total Healing", Mathf.Max(0, -damageTaken));
 
