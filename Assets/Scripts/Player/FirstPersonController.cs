@@ -337,7 +337,7 @@ namespace StarterAssets
             }
 
             //Achievements
-            if (IsOwner)
+            if (IsOwner && player.GetPlayerID() < botID)
             {
                 if (_controller.isGrounded)
                 {
