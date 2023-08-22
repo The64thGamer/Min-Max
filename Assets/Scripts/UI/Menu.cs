@@ -112,7 +112,7 @@ public class Menu : MonoBehaviour
             PlayerPrefs.SetFloat("Settings: FOV", 90);
         }
 
-        if(cosmetics == null)
+        if (cosmetics == null)
         {
             cosmetics = GameObject.Find("Global Manager").transform.GetChild(0).GetComponent<Cosmetics>();
         }

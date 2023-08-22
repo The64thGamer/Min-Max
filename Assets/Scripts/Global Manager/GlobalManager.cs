@@ -929,7 +929,7 @@ public class GlobalManager : NetworkBehaviour
 
         //Keep this where it is
         int damageTaken = clients[foundClient].GetHealth() - Mathf.Max(currentHealth, 0);
-        if (damageTaken == 0)
+        if (clients[foundClient].GetHealth() <= 0 || damageTaken == 0)
         {
             return;
         }
