@@ -443,6 +443,12 @@ public class Menu : MonoBehaviour
             if (onlineServerMenu)
             {
                 PlayerPrefs.SetString("JoinCode", PlayerPrefs.GetString("GlobalServer" + index));
+                PlayerPrefs.SetString("Connection Setting", "Join Online Server");
+            }
+            else
+            {
+                PlayerPrefs.SetString("Connection Setting", "Join LAN Server");
+
             }
             HideElement("Delete", false, true);
             HideElement("Play", false, true);
