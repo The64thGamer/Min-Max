@@ -396,17 +396,18 @@ public class GlobalManager : NetworkBehaviour
                 {
                     RemoveClientWireClientRpc(id, wireHeld.point, false);
                 }
+                bool isowner = clients[i].IsOwner;
+                Destroy(clients[i].gameObject);
+                clients.RemoveAt(i);
                 playerPosRPCData = new List<PlayerDataSentToClient>();
                 for (int e = 0; e < clients.Count; e++)
                 {
                     playerPosRPCData.Add(new PlayerDataSentToClient());
                 }
-                if (clients[i].IsOwner && !IsHost)
+                if (isowner && !IsHost)
                 {
                     DisconnectToTitleScreen(false);
                 }
-                Destroy(clients[i].gameObject);
-                clients.RemoveAt(i);
                 return;
             }
         }
