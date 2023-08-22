@@ -466,7 +466,7 @@ public class GlobalManager : NetworkBehaviour
         serverStarted = true;
     }
 
-    public void RespawnPlayer(ulong id, TeamList team)
+    public void RespawnPlayer(ulong id, TeamList team, bool instant)
     {
         if (IsHost)
         {
@@ -476,7 +476,14 @@ public class GlobalManager : NetworkBehaviour
             {
                 if (clients[i].GetPlayerID() == id)
                 {
-                    timer = currentGamemode.RequestPlayerRespawnTimer(i);
+                    if (instant)
+                    {
+                        timer = currentGamemode.RequestPlayerRespawnTimer(i);
+                    }
+                    else
+                    {
+                        timer = 0;
+                    }
                     if (clients[i].GetWirePoint() != null)
                     {
                         Debug.Log("RemoveClientWire Sent to Clients");
@@ -684,7 +691,7 @@ public class GlobalManager : NetworkBehaviour
             gunName = autoGun,
         };
         AssignPlayerClassAndTeamClientRpc(pdstc);
-        RespawnPlayer(id, decidedTeam);
+        RespawnPlayer(id, decidedTeam,true);
 
         PlayerInfoSentToClient[] data = new PlayerInfoSentToClient[clients.Count];
         for (int i = 0; i < clients.Count; i++)

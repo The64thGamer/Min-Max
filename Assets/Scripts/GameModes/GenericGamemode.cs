@@ -117,7 +117,7 @@ public abstract class GenericGamemode : NetworkBehaviour
                     gunName = autoGun,
                 };
                 gm.AssignPlayerClassAndTeamClientRpc(pdstc);
-                gm.RespawnPlayer(clients[i].GetPlayerID(), clients[i].GetTeam());
+                gm.RespawnPlayer(clients[i].GetPlayerID(), clients[i].GetTeam(),true);
 
             }
         }

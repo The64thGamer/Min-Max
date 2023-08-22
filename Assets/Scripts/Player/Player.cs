@@ -77,7 +77,10 @@ public class Player : NetworkBehaviour
 
     public void RespawnPlayer(Vector3 spawnPos, float respawnTimer)
     {
-        StartCoroutine(RespawnTimed(spawnPos,respawnTimer));
+        if (!respawning)
+        {
+            StartCoroutine(RespawnTimed(spawnPos, respawnTimer));
+        }
     }
 
     IEnumerator RespawnTimed(Vector3 spawnPos, float respawnTimer)
@@ -86,6 +89,7 @@ public class Player : NetworkBehaviour
        yield return new WaitForSeconds(respawnTimer);
        ResetClassStats();
        GetTracker().ForceNewPosition(spawnPos);
+       respawning = false;
     }
 
     public void SetClass(ClassList setClass, int[] classCosmetics)
@@ -481,7 +485,7 @@ public class Player : NetworkBehaviour
             gm.PlayerTookDamageClientRpc(GetPlayerID(), finalHealth, id, idHash);
             if (currentHealth <= 0)
             {
-                gm.RespawnPlayer(GetPlayerID(), GetTeam());
+                gm.RespawnPlayer(GetPlayerID(), GetTeam(), false);
             }
             return finalHealth;
         }
