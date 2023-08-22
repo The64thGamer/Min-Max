@@ -14,7 +14,7 @@ public class AllStats : MonoBehaviour
         computer,
         fabricator,
         artist,
-        freelancer,
+        castmember,
         craftsman,
         manager;
     [Header("MM-Chips")]
@@ -52,8 +52,8 @@ public class AllStats : MonoBehaviour
                 return fabricator;
             case ClassList.artist:
                 return artist;
-            case ClassList.freelancer:
-                return freelancer;
+            case ClassList.castmember:
+                return castmember;
             case ClassList.craftsman:
                 return craftsman;
             case ClassList.manager:
@@ -74,7 +74,7 @@ public enum ClassList
     computer,
     fabricator,
     artist,
-    freelancer,
+    castmember,
     craftsman,
     manager
 }

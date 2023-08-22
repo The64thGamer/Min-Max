@@ -1088,7 +1088,7 @@ public class Menu : MonoBehaviour
                                 "\nComputers: " + PlayerPrefs.GetFloat("Achievement: Total Computers Killed") +
                                 "\nFabricators: " + PlayerPrefs.GetFloat("Achievement: Total Fabricators Killed") +
                                 "\nArtists: " + PlayerPrefs.GetFloat("Achievement: Total Artists Killed") +
-                                "\nFreelancers: " + PlayerPrefs.GetFloat("Achievement: Total Freelancers Killed") +
+                                "\nCast Members: " + PlayerPrefs.GetFloat("Achievement: Total Cast Members Killed") +
                                 "\nCraftsmen: " + PlayerPrefs.GetFloat("Achievement: Total Craftsmen Killed") +
                                 "\nManagers: " + PlayerPrefs.GetFloat("Achievement: Total Managers Killed")
                                 , false);

@@ -14,7 +14,7 @@ public class Cosmetics : MonoBehaviour
         computer,
         fabricator,
         artist,
-        freelancer,
+        castmember,
         craftsman,
         manager;
 
@@ -36,8 +36,8 @@ public class Cosmetics : MonoBehaviour
                 return fabricator;
             case ClassList.artist:
                 return artist;
-            case ClassList.freelancer:
-                return freelancer;
+            case ClassList.castmember:
+                return castmember;
             case ClassList.craftsman:
                 return craftsman;
             case ClassList.manager:
@@ -65,8 +65,8 @@ public class Cosmetics : MonoBehaviour
                 return fabricator[index];
             case ClassList.artist:
                 return artist[index];
-            case ClassList.freelancer:
-                return freelancer[index];
+            case ClassList.castmember:
+                return castmember[index];
             case ClassList.craftsman:
                 return craftsman[index];
             case ClassList.manager:

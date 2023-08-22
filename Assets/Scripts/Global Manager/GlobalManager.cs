@@ -989,8 +989,8 @@ public class GlobalManager : NetworkBehaviour
                     case ClassList.artist:
                         achievments.AddToValue("Achievement: Total Artists Killed", 1);
                         break;
-                    case ClassList.freelancer:
-                        achievments.AddToValue("Achievement: Total Freelancers Killed", 1);
+                    case ClassList.castmember:
+                        achievments.AddToValue("Achievement: Total Cast Members Killed", 1);
                         break;
                     case ClassList.craftsman:
                         achievments.AddToValue("Achievement: Total Craftsmen Killed", 1);
