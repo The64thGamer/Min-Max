@@ -85,12 +85,16 @@ public class Player : NetworkBehaviour
 
     IEnumerator RespawnTimed(Vector3 spawnPos, float respawnTimer)
     {
-       respawning = true;
-       Debug.Log("Player " + GetPlayerID() + " Respawning in " + respawnTimer + " sec");
-       yield return new WaitForSeconds(respawnTimer);
-       ResetClassStats();
-       GetTracker().ForceNewPosition(spawnPos);
-       respawning = false;
+        respawning = true;
+        SetLayer(19); //Dead Player
+        Debug.Log("Player " + GetPlayerID() + " Respawning in " + respawnTimer + " sec");
+
+        yield return new WaitForSeconds(respawnTimer);
+
+        ResetClassStats();
+        GetTracker().ForceNewPosition(spawnPos);
+        SetLayer(GetTeamLayer());
+        respawning = false;
     }
 
     public void SetClass(ClassList setClass, int[] classCosmetics)
@@ -109,13 +113,18 @@ public class Player : NetworkBehaviour
     public void SetTeam(TeamList team)
     {
         currentTeam = team;
+        SetLayer(GetTeamLayer());
+        UpdateTeamColor();
+    }
+
+    void SetLayer(int layer)
+    {
         Transform[] allBits = this.GetComponentsInChildren<Transform>();
         for (int i = 0; i < allBits.Length; i++)
         {
-            allBits[i].gameObject.layer = GetTeamLayer();
+            allBits[i].gameObject.layer = layer;
         }
-        this.gameObject.layer = GetTeamLayer();
-        UpdateTeamColor();
+        this.gameObject.layer = layer;
     }
 
     public void SetGun(GunProjectiles gun)

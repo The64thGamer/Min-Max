@@ -188,7 +188,7 @@ public class Payload : GenericGamemode
             if (tempTeams[i].teamColor == playerTeam)
             {
                 int respawnTime = payloadTeams[i - 1].respawnWaveTime;
-                return respawnTime - (Time.time % respawnTime) + respawnTime;
+                return respawnTime - ((Time.time + 5) % respawnTime) + respawnTime + 5;
             }
         }
         return 10;

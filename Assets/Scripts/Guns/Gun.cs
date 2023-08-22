@@ -152,6 +152,7 @@ public abstract class Gun : MonoBehaviour
         }
         mask = mask | 805306368; //VR Layermask
         mask = ~mask;
+        mask &= ~(1 << 19); //Dead Player Layermask
         return mask;
     }
 
