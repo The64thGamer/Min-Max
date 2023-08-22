@@ -491,6 +491,10 @@ public class Player : NetworkBehaviour
     {
         if (IsHost)
         {
+            if (currentHealth <= 0)
+            {
+                return 0;
+            }
             int finalHealth = Mathf.Min(currentHealth + amount, currentStats.baseHealth);
             gm.PlayerTookDamageClientRpc(GetPlayerID(), finalHealth, id, idHash);
             if (currentHealth <= 0)
