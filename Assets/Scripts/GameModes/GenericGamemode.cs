@@ -13,6 +13,8 @@ public abstract class GenericGamemode : NetworkBehaviour
 
     public abstract Vector3 GetCurrentMatchFocalPoint(int team);
 
+    public abstract float RequestPlayerRespawnTimer(int index);
+
     public void ResetMatch()
     {
         if (IsHost)

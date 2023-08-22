@@ -63,7 +63,6 @@ namespace StarterAssets
         const ulong botID = 64646464646464;
         Vector2 currentRotation;
 
-
         public override void OnNetworkSpawn()
         {
             gm = GameObject.Find("Global Manager").GetComponent<GlobalManager>();
@@ -119,10 +118,6 @@ namespace StarterAssets
 
             if (menuIsOpen)
             {
-                data.rightJoystick = Vector2.zero;
-                data.crouch = false;
-                data.shoot = false;
-                data.jump = false;
                 
                 if (usingMouse)
                 {
@@ -134,6 +129,15 @@ namespace StarterAssets
                 {
 
                 }
+            }
+
+            //Remove inputs in situations
+            if(menuIsOpen || player.GetHealth() <= 0)
+            {
+                data.rightJoystick = Vector2.zero;
+                data.crouch = false;
+                data.shoot = false;
+                data.jump = false;
             }
 
             //Mouselook

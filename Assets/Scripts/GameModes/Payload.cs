@@ -179,10 +179,26 @@ public class Payload : GenericGamemode
         return teams[finalIndex];
     }
 
+    public override float RequestPlayerRespawnTimer(int index)
+    {
+        List<TeamInfo> tempTeams = gm.GetTeams();
+        TeamList playerTeam = gm.GetClients()[index].GetTeam();
+        for (int i = 1; i < tempTeams.Count; i++)
+        {
+            if (tempTeams[i].teamColor == playerTeam)
+            {
+                int respawnTime = payloadTeams[i - 1].respawnWaveTime;
+                return respawnTime - (Time.time % respawnTime) + respawnTime;
+            }
+        }
+        return 10;
+    }
+
     [System.Serializable]
     public struct PayLoadTeam
     {
         public string teamName;
         public WireCheck goal;
+        public int respawnWaveTime;
     }
 }

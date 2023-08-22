@@ -470,12 +470,18 @@ public class GlobalManager : NetworkBehaviour
     {
         if (IsHost)
         {
+            float timer = 10;
+
             for (int i = 0; i < clients.Count; i++)
             {
-                if (clients[i].GetPlayerID() == id && clients[i].GetWirePoint() != null)
+                if (clients[i].GetPlayerID() == id)
                 {
-                    Debug.Log("RemoveClientWire Sent to Clients");
-                    RemoveClientWireClientRpc(clients[i].GetPlayerID(), clients[i].GetWirePoint().point, false);
+                    timer = currentGamemode.RequestPlayerRespawnTimer(i);
+                    if (clients[i].GetWirePoint() != null)
+                    {
+                        Debug.Log("RemoveClientWire Sent to Clients");
+                        RemoveClientWireClientRpc(clients[i].GetPlayerID(), clients[i].GetWirePoint().point, false);
+                    }
                 }
             }
 
@@ -491,7 +497,7 @@ public class GlobalManager : NetworkBehaviour
             }
 
             Debug.Log("RespawnPlayer Sent to Clients");
-            RespawnPlayerClientRpc(id, team, spawnPos);
+            RespawnPlayerClientRpc(id, team, spawnPos, timer);
         }
     }
 
@@ -818,20 +824,19 @@ public class GlobalManager : NetworkBehaviour
 
 
     [ClientRpc]
-    void RespawnPlayerClientRpc(ulong id, TeamList team, Vector3 spawnPos)
+    void RespawnPlayerClientRpc(ulong id, TeamList team, Vector3 spawnPos, float respawnTimer)
     {
         Debug.Log("RespawnPlayerClientRpc");
         for (int i = 0; i < clients.Count; i++)
         {
             if (clients[i].GetPlayerID() == id)
             {
-                if(clients[i].IsOwner)
+                if(clients[i].IsOwner && clients[i].GetPlayerID() < botID)
                 {
                     achievments.SaveAchievements();
                 }
                 //Refresh Stats
-                clients[i].ResetClassStats();
-                clients[i].GetTracker().ForceNewPosition(spawnPos);
+                clients[i].RespawnPlayer(spawnPos, respawnTimer);
                 UpdateMatchFocalPoint(clients[i].GetTeam());
                 Debug.Log("Player " + id + " respawned in " + team.ToString() + " spawn room");
                 return;

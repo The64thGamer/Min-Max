@@ -27,7 +27,10 @@ public class Player : NetworkBehaviour
     AllStats al;
     bool currentPlayerVisibility;
     Wire.WirePoint heldWire;
+
+    //Stats
     int currentHealth;
+    bool respawning;
 
     //Const
     const ulong botID = 64646464646464;
@@ -70,6 +73,19 @@ public class Player : NetworkBehaviour
                 Destroy(xd[i]);
             }
         }
+    }
+
+    public void RespawnPlayer(Vector3 spawnPos, float respawnTimer)
+    {
+        StartCoroutine(RespawnTimed(spawnPos,respawnTimer));
+    }
+
+    IEnumerator RespawnTimed(Vector3 spawnPos, float respawnTimer)
+    {
+       respawning = true;
+       yield return new WaitForSeconds(respawnTimer);
+       ResetClassStats();
+       GetTracker().ForceNewPosition(spawnPos);
     }
 
     public void SetClass(ClassList setClass, int[] classCosmetics)
