@@ -476,7 +476,7 @@ public class GlobalManager : NetworkBehaviour
             {
                 if (clients[i].GetPlayerID() == id)
                 {
-                    if (instant)
+                    if (!instant)
                     {
                         timer = currentGamemode.RequestPlayerRespawnTimer(i);
                     }

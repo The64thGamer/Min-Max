@@ -86,6 +86,7 @@ public class Player : NetworkBehaviour
     IEnumerator RespawnTimed(Vector3 spawnPos, float respawnTimer)
     {
        respawning = true;
+       Debug.Log("Player " + GetPlayerID() + " Respawning in " + respawnTimer + " sec");
        yield return new WaitForSeconds(respawnTimer);
        ResetClassStats();
        GetTracker().ForceNewPosition(spawnPos);
