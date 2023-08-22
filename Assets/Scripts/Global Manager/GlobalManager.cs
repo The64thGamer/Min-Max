@@ -307,7 +307,7 @@ public class GlobalManager : NetworkBehaviour
         {
             if (teams[e].teamColor == team)
             {
-                matchFocalPoint[e] = currentGamemode.GetCurrentMatchFocalPoint(e-1);
+                matchFocalPoint[e] = currentGamemode.GetCurrentMatchFocalPoint(e - 1);
                 return;
             }
         }
@@ -650,7 +650,7 @@ public class GlobalManager : NetworkBehaviour
             gunName = autoGun,
         };
         AssignPlayerClassAndTeamClientRpc(pdstc);
-        RespawnPlayer(id, decidedTeam,true);
+        RespawnPlayer(id, decidedTeam, true);
 
         PlayerInfoSentToClient[] data = new PlayerInfoSentToClient[clients.Count];
         for (int i = 0; i < clients.Count; i++)
@@ -797,7 +797,7 @@ public class GlobalManager : NetworkBehaviour
         {
             if (clients[i].GetPlayerID() == id)
             {
-                if(clients[i].IsOwner && clients[i].GetPlayerID() < botID)
+                if (clients[i].IsOwner && clients[i].GetPlayerID() < botID)
                 {
                     achievments.SaveAchievements();
                 }
@@ -902,6 +902,15 @@ public class GlobalManager : NetworkBehaviour
     public void PlayerTookDamageClientRpc(ulong id, int currentHealth, ulong idOfKiller, int idHash)
     {
         int foundClient = 0;
+        int foundKiller = 0;
+        bool damagedIsCurrentPC = false;
+        bool killerIsCurrentPC = false;
+
+        int damageTaken = clients[foundClient].GetHealth() - Mathf.Max(currentHealth, 0);
+        if (damageTaken == 0)
+        {
+            return;
+        }
 
         //Search for client first
         for (int i = 0; i < clients.Count; i++)
@@ -909,6 +918,10 @@ public class GlobalManager : NetworkBehaviour
             if (clients[i].GetPlayerID() == id)
             {
                 foundClient = i;
+                if (clients[foundClient].IsOwner && id < botID)
+                {
+                    damagedIsCurrentPC = true;
+                }
                 if (currentHealth <= 0)
                 {
                     Debug.Log("Player " + id + " was killed (" + clients[i].GetHealth() + " -> " + currentHealth + " HP) by Player" + idOfKiller);
@@ -918,100 +931,105 @@ public class GlobalManager : NetworkBehaviour
                     Debug.Log("Player " + id + " took damage (" + clients[i].GetHealth() + " -> " + currentHealth + " HP) by Player" + idOfKiller);
                 }
             }
-        }
-
-        int damageTaken = clients[foundClient].GetHealth() - Mathf.Max(currentHealth,0);
-
-
-        for (int i = 0; i < clients.Count; i++)
-        {
-            if (clients[i].IsOwner && id < botID)
+            if (clients[i].GetPlayerID() == idOfKiller)
             {
-                if (clients[i].GetPlayerID() == id && currentHealth <= 0)
+                foundKiller = i;
+                if (clients[foundKiller].IsOwner && idOfKiller < botID)
                 {
-                    achievments.AddToValue("Achievement: Total Deaths", 1);
-                    if (id == idOfKiller)
-                    {
-                        achievments.AddToValue("Achievement: Total Suicides", 1);
-                    }
-                }
-                if (clients[i].GetPlayerID() == idOfKiller && id == idOfKiller)
-                {
-                    if (id == idOfKiller)
-                    {
-                        achievments.AddToValue("Achievement: Total Self-Healing", Mathf.Max(0, -damageTaken));
-                    }
-                    else
-                    achievments.AddToValue("Achievement: Total Damage", Mathf.Max(0, damageTaken));
-                    achievments.AddToValue("Achievement: Total Healing", Mathf.Max(0, -damageTaken));
-
-                    if (currentHealth <= 0)
-                    {
-                        achievments.AddToValue("Achievement: Total Kills", 1);
-                        switch (clients[foundClient].GetCurrentClass())
-                        {
-                            case ClassList.labourer:
-                                achievments.AddToValue("Achievement: Total Laborers Killed", 1);
-                                break;
-                            case ClassList.woodworker:
-                                achievments.AddToValue("Achievement: Total Wood Workers Killed", 1);
-                                break;
-                            case ClassList.developer:
-                                achievments.AddToValue("Achievement: Total Developers Killed", 1);
-                                break;
-                            case ClassList.programmer:
-                                achievments.AddToValue("Achievement: Total Programmers Killed", 1);
-                                break;
-                            case ClassList.computer:
-                                achievments.AddToValue("Achievement: Total Computers Killed", 1);
-                                break;
-                            case ClassList.fabricator:
-                                achievments.AddToValue("Achievement: Total Fabricators Killed", 1);
-                                break;
-                            case ClassList.artist:
-                                achievments.AddToValue("Achievement: Total Artists Killed", 1);
-                                break;
-                            case ClassList.freelancer:
-                                achievments.AddToValue("Achievement: Total Freelancers Killed", 1);
-                                break;
-                            case ClassList.craftsman:
-                                achievments.AddToValue("Achievement: Total Craftsmen Killed", 1);
-                                break;
-                            case ClassList.manager:
-                                achievments.AddToValue("Achievement: Total Managers Killed", 1);
-                                break;
-                            default:
-                                break;
-                        }
-
-                    }
+                    killerIsCurrentPC = true;
                 }
             }
+        }
 
-            //Seperate from achievements
-            if (clients[i].GetPlayerID() == idOfKiller && clients[i].IsOwner && id != idOfKiller)
+
+        if (damagedIsCurrentPC)
+        {
+            if (currentHealth <= 0)
             {
-                if (currentHealth <= 0)
+                achievments.AddToValue("Achievement: Total Deaths", 1);
+                if (killerIsCurrentPC)
                 {
-                    //Ensures a gun firing 10 bullets doesn't play 10 hitsounds
-                    bool isntDuplicate = true;
-                    for (int e = 0; e < damageHashes.Count; e++)
+                    achievments.AddToValue("Achievement: Total Suicides", 1);
+                    Debug.Log("Player " + id + " Suicided");
+                }
+            }
+            else
+            {
+                if (killerIsCurrentPC)
+                {
+                    achievments.AddToValue("Achievement: Total Self-Healing", Mathf.Max(0, -damageTaken));
+                }
+            }
+        }
+        if (killerIsCurrentPC)
+        {
+            achievments.AddToValue("Achievement: Total Damage", Mathf.Max(0, damageTaken));
+            achievments.AddToValue("Achievement: Total Healing", Mathf.Max(0, -damageTaken));
+
+            if (currentHealth <= 0)
+            {
+                achievments.AddToValue("Achievement: Total Kills", 1);
+                switch (clients[foundClient].GetCurrentClass())
+                {
+                    case ClassList.labourer:
+                        achievments.AddToValue("Achievement: Total Laborers Killed", 1);
+                        break;
+                    case ClassList.woodworker:
+                        achievments.AddToValue("Achievement: Total Wood Workers Killed", 1);
+                        break;
+                    case ClassList.developer:
+                        achievments.AddToValue("Achievement: Total Developers Killed", 1);
+                        break;
+                    case ClassList.programmer:
+                        achievments.AddToValue("Achievement: Total Programmers Killed", 1);
+                        break;
+                    case ClassList.computer:
+                        achievments.AddToValue("Achievement: Total Computers Killed", 1);
+                        break;
+                    case ClassList.fabricator:
+                        achievments.AddToValue("Achievement: Total Fabricators Killed", 1);
+                        break;
+                    case ClassList.artist:
+                        achievments.AddToValue("Achievement: Total Artists Killed", 1);
+                        break;
+                    case ClassList.freelancer:
+                        achievments.AddToValue("Achievement: Total Freelancers Killed", 1);
+                        break;
+                    case ClassList.craftsman:
+                        achievments.AddToValue("Achievement: Total Craftsmen Killed", 1);
+                        break;
+                    case ClassList.manager:
+                        achievments.AddToValue("Achievement: Total Managers Killed", 1);
+                        break;
+                    default:
+                        break;
+                }
+            }
+        }
+
+        //Seperate from achievements
+        if (killerIsCurrentPC && !damagedIsCurrentPC)
+        {
+            if (currentHealth <= 0)
+            {
+                //Ensures a gun firing 10 bullets doesn't play 10 hitsounds
+                bool isntDuplicate = true;
+                for (int e = 0; e < damageHashes.Count; e++)
+                {
+                    if (damageHashes[e] == idHash)
                     {
-                        if (damageHashes[e] == idHash)
-                        {
-                            isntDuplicate = false;
-                        }
-                    }
-                    if (isntDuplicate)
-                    {
-                        au.PlayOneShot((AudioClip)Resources.Load("Sounds/Damage/killsound", typeof(AudioClip)));
-                        damageHashes.Add(idHash);
+                        isntDuplicate = false;
                     }
                 }
-                else
+                if (isntDuplicate)
                 {
-                    au.PlayOneShot((AudioClip)Resources.Load("Sounds/Damage/hitsound", typeof(AudioClip)));
+                    au.PlayOneShot((AudioClip)Resources.Load("Sounds/Damage/killsound", typeof(AudioClip)));
+                    damageHashes.Add(idHash);
                 }
+            }
+            else
+            {
+                au.PlayOneShot((AudioClip)Resources.Load("Sounds/Damage/hitsound", typeof(AudioClip)));
             }
         }
 
