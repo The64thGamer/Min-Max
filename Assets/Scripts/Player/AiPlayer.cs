@@ -204,11 +204,14 @@ public class AiPlayer : NetworkBehaviour
         }
         if (currentFind != null)
         {
-            target = currentFind;
-            targetHeadset = target.GetTracker().GetCamera();
-            isTargetEnemy = currentFind.GetTeam() != player.GetTeam();
-            timeToSwap = Random.Range(0.3f, 2f);
-            timeToChangePos = 0;
+            if (currentFind.GetHealth() > 0)
+            {
+                target = currentFind;
+                targetHeadset = target.GetTracker().GetCamera();
+                isTargetEnemy = currentFind.GetTeam() != player.GetTeam();
+                timeToSwap = Random.Range(0.3f, 2f);
+                timeToChangePos = 0;
+            }
         }
         else
         {
