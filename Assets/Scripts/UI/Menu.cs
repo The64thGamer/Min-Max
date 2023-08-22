@@ -493,7 +493,7 @@ public class Menu : MonoBehaviour
         {
             serverCheck = ServerCheck.pass;
             string payload = m_NetworkManager.DisconnectReason;
-
+            Debug.Log("Server Payload: " + payload);
             if (payload[0] == 'P')
             {
                 string[] limiters = payload.Substring(1, payload.Length - 1).Split("😂", StringSplitOptions.None);
@@ -932,7 +932,7 @@ public class Menu : MonoBehaviour
                 case "SvrSett Left":
                     switch (button)
                     {
-                        case "SelectName":
+                        case "ServerName":
                             PlayerPrefs.SetString("ServerName", valueString);
                             break;
                         case "SelectMap":
