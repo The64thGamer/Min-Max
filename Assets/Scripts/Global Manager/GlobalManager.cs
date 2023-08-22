@@ -318,47 +318,6 @@ public class GlobalManager : NetworkBehaviour
         return teamSpawns;
     }
 
-    public LayerMask GetIgnoreTeamAndVRLayerMask(Player player)
-    {
-        LayerMask mask;
-        switch (player.GetTeam())
-        {
-            case TeamList.orange:
-                mask = 1 << LayerMask.NameToLayer("OrangeTeam");
-                break;
-            case TeamList.yellow:
-                mask = 1 << LayerMask.NameToLayer("YellowTeam");
-                break;
-            case TeamList.green:
-                mask = 1 << LayerMask.NameToLayer("GreenTeam");
-                break;
-            case TeamList.lightBlue:
-                mask = 1 << LayerMask.NameToLayer("LightBlueTeam");
-                break;
-            case TeamList.blue:
-                mask = 1 << LayerMask.NameToLayer("BlueTeam");
-                break;
-            case TeamList.purple:
-                mask = 1 << LayerMask.NameToLayer("PurpleTeam");
-                break;
-            case TeamList.beige:
-                mask = 1 << LayerMask.NameToLayer("BeigeTeam");
-                break;
-            case TeamList.brown:
-                mask = 1 << LayerMask.NameToLayer("BrownTeam");
-                break;
-            case TeamList.gray:
-                mask = 1 << LayerMask.NameToLayer("GrayTeam");
-                break;
-            default:
-                mask = 1 << LayerMask.NameToLayer("GrayTeam");
-                break;
-        }
-        mask = mask | 805306368; //VR Layermask
-        mask = ~mask;
-        return mask;
-    }
-
     public List<Player> GetClients()
     {
         return clients;
