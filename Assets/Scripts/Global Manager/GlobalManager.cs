@@ -946,8 +946,8 @@ public class GlobalManager : NetworkBehaviour
                 else
                 {
                     Debug.Log("Player " + id + " was killed (" + clients[foundClient].GetHealth() + " -> " + currentHealth + " HP) by Player" + idOfKiller);
-                    achievments.AddToValue("Achievement: Total Deaths", 1);
                 }
+                achievments.AddToValue("Achievement: Total Deaths", 1);
             }
             else
             {
