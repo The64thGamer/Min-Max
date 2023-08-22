@@ -138,6 +138,7 @@ namespace StarterAssets
                 data.crouch = false;
                 data.shoot = false;
                 data.jump = false;
+                hasBeenCrouched = false;
             }
 
             //Mouselook
