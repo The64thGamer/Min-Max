@@ -93,6 +93,7 @@ public class GlobalManager : NetworkBehaviour
     private void OnApplicationQuit()
     {
         achievments.AddToValue("Achievement: Total Match Runtime", Mathf.Max(0, Time.time - timeStartedPlaying));
+        timeStartedPlaying = Time.time;
         achievments.SaveAchievements();
     }
 
@@ -107,6 +108,7 @@ public class GlobalManager : NetworkBehaviour
         {
             Debug.Log("Disconnecting to Title Screen");
             achievments.AddToValue("Achievement: Total Match Runtime", Mathf.Max(0, Time.time - timeStartedPlaying));
+            timeStartedPlaying = Time.time;
             achievments.SaveAchievements();
             m_NetworkManager.Shutdown();
             if (PlayerPrefs.GetInt("IsVREnabled") == 1)
