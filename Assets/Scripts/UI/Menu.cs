@@ -111,6 +111,10 @@ public class Menu : MonoBehaviour
         {
             PlayerPrefs.SetFloat("Settings: FOV", 90);
         }
+        if(PlayerPrefs.GetInt("ServerPort") == 0)
+        {
+            PlayerPrefs.SetInt("ServerPort", 7766);
+        }
 
         if (cosmetics == null)
         {
