@@ -256,6 +256,9 @@ MonoBehaviour:
     - name: ServerInfo
       type: 0
       sound: 1
+    - name: SwitchClass
+      type: 0
+      sound: 0
     - name: Customization
       type: 0
       sound: 1

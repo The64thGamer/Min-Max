@@ -8,6 +8,7 @@
         </ui:VisualElement>
         <ui:Label text="v0.12a" style="-unity-font-definition: url(&apos;project://database/Assets/Game%20Assets/UI/Fonts/PTMono-Regular.ttf?fileID=12800000&amp;guid=cc1735a3c585aba4480bc03c8d93b029&amp;type=3#PTMono-Regular&apos;); font-size: 40px; color: rgb(26, 28, 26); margin-left: 0; margin-right: 0; margin-top: 0; margin-bottom: 0; padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0;" />
         <ui:Button text="Server Info" name="ServerInfo" class="Button ButtonPaper" />
+        <ui:Button text="Switch Class" name="SwitchClass" class="Button ButtonPaper" />
         <ui:Button text="Customization" name="Customization" class="Button ButtonPaper" />
         <ui:Button text="Statistics" name="Statistics" class="Button ButtonPaper" />
         <ui:VisualElement style="flex-grow: 1; background-color: rgba(0, 0, 0, 0); height: 649px;" />
