@@ -906,12 +906,6 @@ public class GlobalManager : NetworkBehaviour
         bool damagedIsCurrentPC = false;
         bool killerIsCurrentPC = false;
 
-        int damageTaken = clients[foundClient].GetHealth() - Mathf.Max(currentHealth, 0);
-        if (damageTaken == 0)
-        {
-            return;
-        }
-
         //Search for client first
         for (int i = 0; i < clients.Count; i++)
         {
@@ -921,14 +915,6 @@ public class GlobalManager : NetworkBehaviour
                 if (clients[foundClient].IsOwner && id < botID)
                 {
                     damagedIsCurrentPC = true;
-                }
-                if (currentHealth <= 0)
-                {
-                    Debug.Log("Player " + id + " was killed (" + clients[i].GetHealth() + " -> " + currentHealth + " HP) by Player" + idOfKiller);
-                }
-                else
-                {
-                    Debug.Log("Player " + id + " took damage (" + clients[i].GetHealth() + " -> " + currentHealth + " HP) by Player" + idOfKiller);
                 }
             }
             if (clients[i].GetPlayerID() == idOfKiller)
@@ -941,11 +927,18 @@ public class GlobalManager : NetworkBehaviour
             }
         }
 
+        //Keep this where it is
+        int damageTaken = clients[foundClient].GetHealth() - Mathf.Max(currentHealth, 0);
+        if (damageTaken == 0)
+        {
+            return;
+        }
 
         if (damagedIsCurrentPC)
         {
             if (currentHealth <= 0)
             {
+                Debug.Log("Player " + id + " was killed (" + clients[foundClient].GetHealth() + " -> " + currentHealth + " HP) by Player" + idOfKiller);
                 achievments.AddToValue("Achievement: Total Deaths", 1);
                 if (killerIsCurrentPC)
                 {
@@ -955,6 +948,8 @@ public class GlobalManager : NetworkBehaviour
             }
             else
             {
+                Debug.Log("Player " + id + " took " + damageTaken + " damage (" + clients[foundClient].GetHealth() + " -> " + currentHealth + " HP) by Player" + idOfKiller);
+
                 if (killerIsCurrentPC)
                 {
                     achievments.AddToValue("Achievement: Total Self-Healing", Mathf.Max(0, -damageTaken));
