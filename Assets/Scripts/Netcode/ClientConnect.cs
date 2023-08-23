@@ -28,7 +28,7 @@ public class ClientConnect : NetworkBehaviour
         }
         if (IsOwner)
         {
-            netcodeManager.SpawnNewPlayerHostServerRpc();
+            netcodeManager.SpawnNewPlayerHostServerRpc(PlayerPrefs.GetString("Settings: Player Name"),default);
         }
         //Destroy(this.gameObject);
     }

@@ -17,6 +17,7 @@ public class Player : NetworkBehaviour
     [SerializeField] ClassList currentClass;
     [SerializeField] ClassStats currentStats;
     [SerializeField] GameObject[] playerModels;
+    [SerializeField] string playerName;
     Menu menu;
     int[] cosmeticInts = new int[0];
     List<GameObject> currentCharMeshes = new List<GameObject>();
@@ -95,6 +96,11 @@ public class Player : NetworkBehaviour
         GetTracker().ForceNewPosition(spawnPos);
         SetLayer(GetTeamLayer());
         respawning = false;
+    }
+
+    public void SetName(string name)
+    {
+        playerName = name;
     }
 
     public void SetClass(ClassList setClass, int[] classCosmetics)
@@ -256,6 +262,11 @@ public class Player : NetworkBehaviour
     public ulong GetPlayerID()
     {
         return OwnerClientId;
+    }
+
+    public string GetPlayerName()
+    {
+        return playerName;
     }
 
     public Menu GetMenu()

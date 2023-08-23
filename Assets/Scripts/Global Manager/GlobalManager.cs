@@ -71,7 +71,7 @@ public class GlobalManager : NetworkBehaviour
                     for (int i = 0; i < PlayerPrefs.GetInt("ServerMaxPlayers"); i++)
                     {
                         //Probably a bad idea for 24/7 servers, though what's a player gonna gain out of controlling bots?
-                        SpawnPlayer(botID + (uint)i);
+                        SpawnPlayer(botID + (uint)i, "Bot # " + i);
                     }
                 }
                 Debug.Log("Started Local Host");
@@ -142,7 +142,7 @@ public class GlobalManager : NetworkBehaviour
                 for (int i = 0; i < PlayerPrefs.GetInt("ServerMaxPlayers"); i++)
                 {
                     //Probably a bad idea for 24/7 servers, though what's a player gonna gain out of controlling bots?
-                    SpawnPlayer(botID + (uint)i);
+                    SpawnPlayer(botID + (uint)i, "Bot # " + i);
                 }
             }
             GUIUtility.systemCopyBuffer = joinCode;
@@ -510,12 +510,12 @@ public class GlobalManager : NetworkBehaviour
     }
 
     [ServerRpc(RequireOwnership = false)]
-    public void SpawnNewPlayerHostServerRpc(ServerRpcParams serverRpcParams = default)
+    public void SpawnNewPlayerHostServerRpc(string playerName, ServerRpcParams serverRpcParams = default)
     {
-        SpawnPlayer(serverRpcParams.Receive.SenderClientId);
+        SpawnPlayer(serverRpcParams.Receive.SenderClientId,playerName);
     }
 
-    void SpawnPlayer(ulong id)
+    void SpawnPlayer(ulong id, string playerName)
     {
         for (int i = 0; i < clients.Count; i++)
         {
@@ -632,6 +632,7 @@ public class GlobalManager : NetworkBehaviour
             currentTeam = decidedTeam,
             cosmetics = cos.ToArray(),
             gunName = autoGun,
+            playerName = playerName,
         };
         AssignPlayerClassAndTeamClientRpc(pdstc);
         RespawnPlayer(id, decidedTeam, true);
@@ -646,6 +647,7 @@ public class GlobalManager : NetworkBehaviour
                 currentClass = clients[i].GetCurrentClass(),
                 cosmetics = clients[i].GetCosmeticInts(),
                 gunName = clients[i].GetCurrentGun().name,
+                playerName = clients[i].GetPlayerName(),
             };
         }
         SendAllPlayerDataToNewPlayerClientRpc(data, id);
@@ -837,6 +839,7 @@ public class GlobalManager : NetworkBehaviour
         {
             if (clients[i].GetPlayerID() == data.id)
             {
+                clients[i].SetName(data.playerName);
                 clients[i].SetClass(data.currentClass, data.cosmetics);
                 clients[i].SetTeam(data.currentTeam);
                 clients[i].SetGun(al.SearchGuns(data.gunName));
@@ -872,6 +875,7 @@ public class GlobalManager : NetworkBehaviour
                     {
                         if (clients[e].GetPlayerID() == data[j].id)
                         {
+                            clients[e].SetName(data[j].playerName);
                             clients[e].SetClass(data[j].currentClass, data[j].cosmetics);
                             clients[e].SetTeam(data[j].currentTeam);
                             clients[e].SetGun(al.SearchGuns(data[j].gunName));
@@ -1111,6 +1115,7 @@ public struct PlayerInfoSentToClient : INetworkSerializable
     public TeamList currentTeam;
     public string gunName;
     public int[] cosmetics;
+    public string playerName;
 
     public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
     {
