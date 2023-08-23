@@ -10,6 +10,8 @@ using Unity.Services.Relay;
 using Unity.Services.Relay.Models;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.tvOS;
+using UnityEngine.UIElements;
 using UnityEngine.Windows;
 
 public class GlobalManager : NetworkBehaviour
@@ -50,7 +52,7 @@ public class GlobalManager : NetworkBehaviour
         m_NetworkManager.NetworkConfig.ConnectionData = System.Text.Encoding.ASCII.GetBytes("C");
         m_NetworkManager.ConnectionApprovalCallback = ApprovalCheck;
         NetworkManager.Singleton.OnServerStarted += ServerStarted;
-        NetworkManager.Singleton.OnClientDisconnectCallback += DisconnectClient;
+        NetworkManager.Singleton.OnClientDisconnectCallback += PlayerDisconnected;
         al = GetComponent<AllStats>();
         au = GetComponent<AudioSource>();
         currentGamemode = GetComponent<GenericGamemode>();
@@ -385,34 +387,6 @@ public class GlobalManager : NetworkBehaviour
         return null;
     }
 
-    public void DisconnectClient(ulong id)
-    {
-        for (int i = 0; i < clients.Count; i++)
-        {
-            if (clients[i].GetPlayerID() == id)
-            {
-                Wire.WirePoint wireHeld = clients[i].GetWirePoint();
-                if (wireHeld != null)
-                {
-                    RemoveClientWireClientRpc(id, wireHeld.point, false);
-                }
-                bool isowner = clients[i].IsOwner;
-                Destroy(clients[i].gameObject);
-                clients.RemoveAt(i);
-                playerPosRPCData = new List<PlayerDataSentToClient>();
-                for (int e = 0; e < clients.Count; e++)
-                {
-                    playerPosRPCData.Add(new PlayerDataSentToClient());
-                }
-                if (isowner && !IsHost)
-                {
-                    DisconnectToTitleScreen(false);
-                }
-                return;
-            }
-        }
-    }
-
     public AudioSource GetGlobalAudioSource()
     {
         return au;
@@ -473,6 +447,14 @@ public class GlobalManager : NetworkBehaviour
     public bool GetServerStatus()
     {
         return serverStarted;
+    }
+
+    void PlayerDisconnected(ulong id)
+    {
+        if(IsHost)
+        {
+            KickPlayerClientRpc(id, "Player " + id + " Left");
+        }
     }
 
     public void AddPlayerToClientList(Player player)
@@ -551,8 +533,7 @@ public class GlobalManager : NetworkBehaviour
             {
                 if (clients[i].GetPlayerID() >= botID)
                 {
-                    Debug.Log("Bot " + id + " removed from playerlist to make room for new player.");
-                    DisconnectClient(clients[i].GetPlayerID());
+                    KickPlayerClientRpc(clients[i].GetPlayerID(), "Bot " + clients[i].GetPlayerID() + " removed from player list to make room for new player)");
                     goodToGo = true;
                     break;
                 }
@@ -795,7 +776,6 @@ public class GlobalManager : NetworkBehaviour
     [ClientRpc]
     void RespawnPlayerClientRpc(ulong id, TeamList team, Vector3 spawnPos, float respawnTimer)
     {
-        Debug.Log("RespawnPlayerClientRpc");
         for (int i = 0; i < clients.Count; i++)
         {
             if (clients[i].GetPlayerID() == id)
@@ -809,6 +789,41 @@ public class GlobalManager : NetworkBehaviour
                 UpdateMatchFocalPoint(clients[i].GetTeam());
                 Debug.Log("Player " + id + " respawned in " + team.ToString() + " spawn room");
                 return;
+            }
+        }
+    }
+
+    [ClientRpc]
+    void KickPlayerClientRpc(ulong id, string reason)
+    {
+        Debug.Log("Disconnect: " + reason);
+        for (int i = 0; i < clients.Count; i++)
+        {
+            if (clients[i].GetPlayerID() == id)
+            {
+                if (clients[i].IsOwner && clients[i].GetPlayerID() < botID)
+                {
+                    PlayerPrefs.SetString("Disconnect Reason", reason);
+                }
+
+                Wire.WirePoint wireHeld = clients[i].GetWirePoint();
+                if (wireHeld != null && IsHost)
+                {
+                    RemoveClientWireClientRpc(id, wireHeld.point, false);
+                }
+
+                bool isowner = clients[i].IsOwner;
+                Destroy(clients[i].gameObject);
+                clients.RemoveAt(i);
+                playerPosRPCData = new List<PlayerDataSentToClient>();
+                for (int e = 0; e < clients.Count; e++)
+                {
+                    playerPosRPCData.Add(new PlayerDataSentToClient());
+                }
+                if (isowner && !IsHost)
+                {
+                    DisconnectToTitleScreen(false);
+                }
             }
         }
     }
