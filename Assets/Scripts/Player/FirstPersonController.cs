@@ -221,46 +221,6 @@ namespace StarterAssets
                     gm.RemoveClientWireClientRpc(player.GetPlayerID(), heldWire.point, true);
                 }
             }
-        }
-
-        Vector3 MovePlayer(PlayerDataSentToServer data)
-        {
-            Vector3 forward = _mainCamera.transform.forward;
-            Vector3 right = _mainCamera.transform.right;
-            forward.y = 0f;
-            right.y = 0f;
-            forward.Normalize();
-            right.Normalize();
-            Vector3 newAxis = forward * data.rightJoystick.y + right * data.rightJoystick.x;
-            Vector3 targetSpeed = new Vector3(newAxis.x, 0.0f, newAxis.z).normalized * player.GetClassStats().baseSpeed / 25.0f;
-
-            //Crouch
-            if (data.crouch && _controller.isGrounded)
-            {
-                if (!hasBeenCrouched)
-                {
-                    hasBeenCrouched = true;
-                }
-                currentCrouchLerp = Mathf.Clamp01(currentCrouchLerp + (Time.deltaTime * crouchSpeed));
-            }
-            else
-            {
-                if (hasBeenCrouched)
-                {
-                    hasBeenCrouched = false;
-                }
-                currentCrouchLerp = Mathf.Clamp01(currentCrouchLerp - (Time.deltaTime * crouchSpeed));
-            }
-            if (data.jump)
-            {
-                if (IsHost && heldWire != null)
-                {
-                    gm.UpdateMatchFocalPoint(player.GetTeam());
-                    gm.RemoveClientWireClientRpc(player.GetPlayerID(), heldWire.point, true);
-                }
-            }
-            targetSpeed *= ((1 - currentCrouchLerp) / 2.0f) + 0.5f;
-            tracker.ModifyPlayerHeight(currentCrouchLerp);
 
             //Holding Wire
             if (IsHost && heldWire != null)
@@ -292,6 +252,38 @@ namespace StarterAssets
                     }
                 }
             }
+        }
+
+        Vector3 MovePlayer(PlayerDataSentToServer data)
+        {
+            Vector3 forward = _mainCamera.transform.forward;
+            Vector3 right = _mainCamera.transform.right;
+            forward.y = 0f;
+            right.y = 0f;
+            forward.Normalize();
+            right.Normalize();
+            Vector3 newAxis = forward * data.rightJoystick.y + right * data.rightJoystick.x;
+            Vector3 targetSpeed = new Vector3(newAxis.x, 0.0f, newAxis.z).normalized * player.GetClassStats().baseSpeed / 25.0f;
+
+            //Crouch
+            if (data.crouch && _controller.isGrounded)
+            {
+                if (!hasBeenCrouched)
+                {
+                    hasBeenCrouched = true;
+                }
+                currentCrouchLerp = Mathf.Clamp01(currentCrouchLerp + (Time.deltaTime * crouchSpeed));
+            }
+            else
+            {
+                if (hasBeenCrouched)
+                {
+                    hasBeenCrouched = false;
+                }
+                currentCrouchLerp = Mathf.Clamp01(currentCrouchLerp - (Time.deltaTime * crouchSpeed));
+            }
+            targetSpeed *= ((1 - currentCrouchLerp) / 2.0f) + 0.5f;
+            tracker.ModifyPlayerHeight(currentCrouchLerp); 
 
             //Movement rotation halted in midair
             if (!_controller.isGrounded)
@@ -357,26 +349,6 @@ namespace StarterAssets
             }
 
             //Jump
-            JumpAndGravity(data.jump);
-
-            if (data.rightJoystick.magnitude == 0)
-            {
-                _hasBeenMovingDelta = Mathf.Lerp(_hasBeenMovingDelta, 0, Time.deltaTime * hasMovedDeltaTimeout);
-            }
-            else
-            {
-                _hasBeenMovingDelta = Mathf.Lerp(_hasBeenMovingDelta, 1, Time.deltaTime * hasMovedDeltaTimeout);
-            }
-
-
-            // move the player
-            Vector3 finalVelocity = (_speed * Time.deltaTime) + new Vector3(0.0f, _verticalVelocity, 0.0f) * Time.deltaTime;
-
-            return finalVelocity;
-        }
-
-        void JumpAndGravity(bool jump)
-        {
             if (_controller.isGrounded)
             {
                 // reset the fall timeout timer
@@ -389,7 +361,7 @@ namespace StarterAssets
                 }
 
                 // Jump
-                if (jump)
+                if (data.jump)
                 {
                     // the square root of H * -2 * G = how much velocity needed to reach desired height
                     _verticalVelocity = Mathf.Sqrt(JumpHeight * -2f * Gravity);
@@ -397,16 +369,11 @@ namespace StarterAssets
             }
             else
             {
-
-
                 // fall timeout
                 if (_fallTimeoutDelta >= 0.0f)
                 {
                     _fallTimeoutDelta -= Time.deltaTime;
                 }
-
-                // if we are not grounded, do not jump
-                jump = false;
             }
 
             // apply gravity over time if under terminal (multiply by delta time twice to linearly speed up over time)
@@ -414,7 +381,22 @@ namespace StarterAssets
             {
                 _verticalVelocity += Gravity * Time.deltaTime;
             }
+
+            if (data.rightJoystick.magnitude == 0)
+            {
+                _hasBeenMovingDelta = Mathf.Lerp(_hasBeenMovingDelta, 0, Time.deltaTime * hasMovedDeltaTimeout);
+            }
+            else
+            {
+                _hasBeenMovingDelta = Mathf.Lerp(_hasBeenMovingDelta, 1, Time.deltaTime * hasMovedDeltaTimeout);
+            }
+
+            // move the player
+            Vector3 finalVelocity = (_speed * Time.deltaTime) + new Vector3(0.0f, _verticalVelocity, 0.0f) * Time.deltaTime;
+
+            return finalVelocity;
         }
+
 
         private void OnDrawGizmos()
         {
