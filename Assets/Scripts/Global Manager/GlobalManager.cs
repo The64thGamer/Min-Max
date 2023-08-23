@@ -71,7 +71,7 @@ public class GlobalManager : NetworkBehaviour
                     for (int i = 0; i < PlayerPrefs.GetInt("ServerMaxPlayers"); i++)
                     {
                         //Probably a bad idea for 24/7 servers, though what's a player gonna gain out of controlling bots?
-                        SpawnPlayer(botID + (uint)i, "Bot # " + i);
+                        SpawnPlayer(botID + (uint)i, "Bot # " + i,UnityEngine.Random.Range(3,6));
                     }
                 }
                 Debug.Log("Started Local Host");
@@ -142,7 +142,7 @@ public class GlobalManager : NetworkBehaviour
                 for (int i = 0; i < PlayerPrefs.GetInt("ServerMaxPlayers"); i++)
                 {
                     //Probably a bad idea for 24/7 servers, though what's a player gonna gain out of controlling bots?
-                    SpawnPlayer(botID + (uint)i, "Bot # " + i);
+                    SpawnPlayer(botID + (uint)i, "Bot # " + i,UnityEngine.Random.Range(3, 6));
                 }
             }
             GUIUtility.systemCopyBuffer = joinCode;
@@ -510,13 +510,15 @@ public class GlobalManager : NetworkBehaviour
     }
 
     [ServerRpc(RequireOwnership = false)]
-    public void SpawnNewPlayerHostServerRpc(string playerName, ServerRpcParams serverRpcParams = default)
+    public void SpawnNewPlayerHostServerRpc(string playerName, int initialClass, ServerRpcParams serverRpcParams = default)
     {
-        SpawnPlayer(serverRpcParams.Receive.SenderClientId,playerName);
+        SpawnPlayer(serverRpcParams.Receive.SenderClientId,playerName,initialClass);
     }
 
-    void SpawnPlayer(ulong id, string playerName)
+    void SpawnPlayer(ulong id, string playerName, int initialClass)
     {
+        initialClass = Mathf.Clamp(initialClass,3, 5);  //Can only pick current classes
+
         for (int i = 0; i < clients.Count; i++)
         {
             ulong finalId = clients[i].GetPlayerID();
@@ -544,91 +546,86 @@ public class GlobalManager : NetworkBehaviour
                 return;
             }
         }
-        Debug.Log("Player Spawned On Host");
+
         GameObject client = GameObject.Instantiate(clientPrefab, Vector3.zero, Quaternion.identity);
-        client.name = "Client #" + id;
+        client.name = playerName;
         client.GetComponent<NetworkObject>().SpawnWithOwnership(id);
 
         //Client Object Spawning
         TeamList decidedTeam = currentGamemode.DecideWhichPlayerTeam();
 
-        //Auto Team
-        ClassList autoClass = ClassList.programmer;
+        //Auto Guns
         string autoGun = "W.I.P.";
-        int random = UnityEngine.Random.Range(0, 3);
-        switch (random)
+        switch ((ClassList)initialClass)
         {
-            case 0:
-                autoClass = ClassList.programmer;
+            case ClassList.programmer:
                 autoGun = "W.I.P.";
                 break;
-            case 1:
-                autoClass = ClassList.computer;
+            case ClassList.computer:
                 autoGun = "W.I.P.";
                 break;
-            case 2:
-                autoClass = ClassList.fabricator;
+            case ClassList.fabricator:
                 autoGun = "O-S F-O";
                 break;
             default:
                 break;
         }
 
-
-        Debug.Log("New Player Joined (#" + clients.Count + "), Team " + decidedTeam);
-
         //Random cosmetics
         List<int> cos = new List<int>();
-        switch (autoClass)
+        if (id >= botID)
         {
-            case ClassList.programmer:
-                int randoP = UnityEngine.Random.Range(0, 4);
-                switch (randoP)
-                {
-                    case 0:
-                        cos.Add(5);
-                        break;
-                    default:
-                        break;
-                }
-                break;
-            case ClassList.fabricator:
-                int randoF = UnityEngine.Random.Range(0, 4);
-                switch (randoF)
-                {
-                    case 0:
-                        cos.Add(0);
-                        cos.Add(1);
-                        break;
-                    case 1:
-                        cos.Add(0);
-                        cos.Add(6);
-                        break;
-                    case 2:
-                        cos.Add(1);
-                        cos.Add(5);
-                        break;
-                    case 3:
-                        cos.Add(0);
-                        cos.Add(5);
-                        break;
-                    default:
-                        break;
-                }
-                break;
-            case ClassList.computer:
-                cos.Add(0);
-                cos.Add(1);
-                cos.Add(2);
-                break;
-            default:
-                break;
+            switch ((ClassList)initialClass)
+            {
+                case ClassList.programmer:
+                    int randoP = UnityEngine.Random.Range(0, 4);
+                    switch (randoP)
+                    {
+                        case 0:
+                            cos.Add(5);
+                            break;
+                        default:
+                            break;
+                    }
+                    break;
+                case ClassList.fabricator:
+                    int randoF = UnityEngine.Random.Range(0, 4);
+                    switch (randoF)
+                    {
+                        case 0:
+                            cos.Add(0);
+                            cos.Add(1);
+                            break;
+                        case 1:
+                            cos.Add(0);
+                            cos.Add(6);
+                            break;
+                        case 2:
+                            cos.Add(1);
+                            cos.Add(5);
+                            break;
+                        case 3:
+                            cos.Add(0);
+                            cos.Add(5);
+                            break;
+                        default:
+                            break;
+                    }
+                    break;
+                case ClassList.computer:
+                    cos.Add(0);
+                    cos.Add(1);
+                    cos.Add(2);
+                    break;
+                default:
+                    break;
+            }
         }
 
         PlayerInfoSentToClient pdstc = new PlayerInfoSentToClient
         {
             id = id,
-            currentClass = autoClass,
+            currentClass = (ClassList)initialClass,
             currentTeam = decidedTeam,
             cosmetics = cos.ToArray(),
             gunName = autoGun,
@@ -665,6 +662,8 @@ public class GlobalManager : NetworkBehaviour
             }
         }
         UpdateClientMapDataClientRpc(teams.ToArray(), wireData.ToArray());
+
+        Debug.Log("New Player Joined (#" + clients.Count + "), Team " + decidedTeam);
     }
 
     /// <summary>

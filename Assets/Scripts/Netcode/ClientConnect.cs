@@ -28,7 +28,7 @@ public class ClientConnect : NetworkBehaviour
         }
         if (IsOwner)
         {
-            netcodeManager.SpawnNewPlayerHostServerRpc(PlayerPrefs.GetString("Settings: Player Name"),default);
+            netcodeManager.SpawnNewPlayerHostServerRpc(PlayerPrefs.GetString("Settings: Player Name"), PlayerPrefs.GetInt("Last Picked Class"), default);
         }
         //Destroy(this.gameObject);
     }
