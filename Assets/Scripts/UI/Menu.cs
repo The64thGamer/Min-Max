@@ -489,75 +489,90 @@ public class Menu : MonoBehaviour
 
     private void OnClientDisconnectCallback(ulong obj)
     {
-        if (!m_NetworkManager.IsServer && m_NetworkManager.DisconnectReason != string.Empty)
+        if (!m_NetworkManager.IsServer && m_NetworkManager.DisconnectReason != string.Empty && !optionalPlayer && this != null)
         {
-            serverCheck = ServerCheck.pass;
-            string payload = m_NetworkManager.DisconnectReason;
-            Debug.Log("Server Payload: " + payload);
-            if (payload[0] == 'P')
+            StartCoroutine(ExecuteServerCallback());
+        }
+    }
+
+    IEnumerator ExecuteServerCallback()
+    {
+        if(this == null)
+        {
+            yield break;
+        }
+        if(leftMenu == null || rightMenu == null)
+        {
+            yield return null;
+        }
+
+        serverCheck = ServerCheck.pass;
+        string payload = m_NetworkManager.DisconnectReason;
+        Debug.Log("Server Payload: " + payload);
+        if (payload[0] == 'P')
+        {
+            string[] limiters = payload.Substring(1, payload.Length - 1).Split("😂", StringSplitOptions.None);
+            if (limiters.Length == 5)
             {
-                string[] limiters = payload.Substring(1, payload.Length - 1).Split("😂", StringSplitOptions.None);
-                if (limiters.Length == 5)
+                if (Convert.ToUInt16(limiters[4]) == m_NetworkManager.NetworkConfig.ProtocolVersion)
                 {
-                    if (Convert.ToUInt16(limiters[4]) == m_NetworkManager.NetworkConfig.ProtocolVersion)
+                    string description = limiters[0] + "/" + limiters[1];
+                    if (limiters[2] == "")
                     {
-                        string description = limiters[0] + "/" + limiters[1];
-                        if (limiters[2] == "")
-                        {
-                            SetLabel("ServerName", "Unnamed Server", true);
-                        }
-                        else
-                        {
-                            string rename = limiters[2];
-                            if (rename.Length > 20)
-                            {
-                                rename = rename.Substring(0, 20);
-                            }
-                            rename = string.Join("", rename.ToCharArray().Where(x => ((int)x) < 127));
-                            SetLabel("ServerName", rename, true);
-                            PlayerPrefs.SetString("LocalServerName" + currentServerSelected, limiters[2]);
-                            RefreshServerList(false);
-                        }
-                        int currentMap = Convert.ToInt16(limiters[3]);
-                        string mapName = "Unknown Map";
-                        if (currentMap < maps.Count())
-                        {
-                            mapName = maps[currentMap].mapName;
-                            SetPicture("MapBackground", maps[currentMap].image, Color.white, true);
-                        }
-                        description += '\n' + mapName;
-                        PlayerPrefs.SetInt("ServerMapName", currentMap);
+                        SetLabel("ServerName", "Unnamed Server", true);
                     }
                     else
                     {
-                        if (Convert.ToUInt16(limiters[4]) > m_NetworkManager.NetworkConfig.ProtocolVersion)
+                        string rename = limiters[2];
+                        if (rename.Length > 20)
                         {
-                            SetLabel("ServerName", "Error", true);
-                            SetLabel("Gamemode", "Server is running a newer version.", true);
+                            rename = rename.Substring(0, 20);
                         }
-                        else
-                        {
-                            SetLabel("ServerName", "Error", true);
-                            SetLabel("Gamemode", "Server is running an older version.", true);
-                        }
+                        rename = string.Join("", rename.ToCharArray().Where(x => ((int)x) < 127));
+                        SetLabel("ServerName", rename, true);
+                        PlayerPrefs.SetString("LocalServerName" + currentServerSelected, limiters[2]);
+                        RefreshServerList(false);
                     }
+                    int currentMap = Convert.ToInt16(limiters[3]);
+                    string mapName = "Unknown Map";
+                    if (currentMap < maps.Count())
+                    {
+                        mapName = maps[currentMap].mapName;
+                        SetPicture("MapBackground", maps[currentMap].image, Color.white, true);
+                    }
+                    description += '\n' + mapName;
+                    SetLabel("Gamemode", description, true);
+                    PlayerPrefs.SetInt("ServerMapName", currentMap);
                 }
                 else
                 {
-                    SetLabel("ServerName", "Error", true);
-                    SetLabel("Gamemode", "Server information corrupted or not formatted correctly.", true);
+                    if (Convert.ToUInt16(limiters[4]) > m_NetworkManager.NetworkConfig.ProtocolVersion)
+                    {
+                        SetLabel("ServerName", "Error", true);
+                        SetLabel("Gamemode", "Server is running a newer version.", true);
+                    }
+                    else
+                    {
+                        SetLabel("ServerName", "Error", true);
+                        SetLabel("Gamemode", "Server is running an older version.", true);
+                    }
                 }
-            }
-            else if (payload[0] == 'E')
-            {
-                SetLabel("ServerName", "Error", true);
-                SetLabel("Gamemode", payload.Substring(1, payload.Length - 1), true);
             }
             else
             {
                 SetLabel("ServerName", "Error", true);
-                SetLabel("Gamemode", "Unknown Error: " + payload, true);
+                SetLabel("Gamemode", "Server information corrupted or not formatted correctly.", true);
             }
+        }
+        else if (payload[0] == 'E')
+        {
+            SetLabel("ServerName", "Error", true);
+            SetLabel("Gamemode", payload.Substring(1, payload.Length - 1), true);
+        }
+        else
+        {
+            SetLabel("ServerName", "Error", true);
+            SetLabel("Gamemode", "Unknown Error: " + payload, true);
         }
     }
 
