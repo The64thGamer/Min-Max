@@ -71,7 +71,7 @@ public class GlobalManager : NetworkBehaviour
                     for (int i = 0; i < PlayerPrefs.GetInt("ServerMaxPlayers"); i++)
                     {
                         //Probably a bad idea for 24/7 servers, though what's a player gonna gain out of controlling bots?
-                        SpawnPlayer(botID + (uint)i, "Bot # " + i,UnityEngine.Random.Range(3,6),new int[0]);
+                        SpawnPlayer(botID + (uint)i, "Bot # " + i, UnityEngine.Random.Range(3, 6), new int[0]);
                     }
                 }
                 Debug.Log("Started Local Host");
@@ -106,21 +106,22 @@ public class GlobalManager : NetworkBehaviour
 
     public void DisconnectToTitleScreen(bool unused)
     {
-        if (serverStarted)
+        if (IsHost && !serverStarted)
         {
-            Debug.Log("Disconnecting to Title Screen");
-            achievments.AddToValue("Achievement: Total Match Runtime", Mathf.Max(0, Time.time - timeStartedPlaying));
-            timeStartedPlaying = Time.time;
-            achievments.SaveAchievements();
-            m_NetworkManager.Shutdown();
-            if (PlayerPrefs.GetInt("IsVREnabled") == 1)
-            {
-                SceneManager.LoadScene("VR Title Screen");
-            }
-            else
-            {
-                SceneManager.LoadScene("Title Screen");
-            }
+            return;
+        }
+        Debug.Log("Disconnecting to Title Screen");
+        achievments.AddToValue("Achievement: Total Match Runtime", Mathf.Max(0, Time.time - timeStartedPlaying));
+        timeStartedPlaying = Time.time;
+        achievments.SaveAchievements();
+        m_NetworkManager.Shutdown();
+        if (PlayerPrefs.GetInt("IsVREnabled") == 1)
+        {
+            SceneManager.LoadScene("VR Title Screen");
+        }
+        else
+        {
+            SceneManager.LoadScene("Title Screen");
         }
     }
 
@@ -142,7 +143,7 @@ public class GlobalManager : NetworkBehaviour
                 for (int i = 0; i < PlayerPrefs.GetInt("ServerMaxPlayers"); i++)
                 {
                     //Probably a bad idea for 24/7 servers, though what's a player gonna gain out of controlling bots?
-                    SpawnPlayer(botID + (uint)i, "Bot # " + i,UnityEngine.Random.Range(3, 6), new int[0]);
+                    SpawnPlayer(botID + (uint)i, "Bot # " + i, UnityEngine.Random.Range(3, 6), new int[0]);
                 }
             }
             GUIUtility.systemCopyBuffer = joinCode;
@@ -451,7 +452,7 @@ public class GlobalManager : NetworkBehaviour
 
     void PlayerDisconnected(ulong id)
     {
-        if(IsHost)
+        if (IsHost)
         {
             KickPlayerClientRpc(id, "Player " + id + " Left");
         }
@@ -512,12 +513,12 @@ public class GlobalManager : NetworkBehaviour
     [ServerRpc(RequireOwnership = false)]
     public void SpawnNewPlayerHostServerRpc(string playerName, int initialClass, int[] cosmetics, ServerRpcParams serverRpcParams = default)
     {
-        SpawnPlayer(serverRpcParams.Receive.SenderClientId,playerName,initialClass,cosmetics);
+        SpawnPlayer(serverRpcParams.Receive.SenderClientId, playerName, initialClass, cosmetics);
     }
 
     void SpawnPlayer(ulong id, string playerName, int initialClass, int[] cosmetics)
     {
-        initialClass = Mathf.Clamp(initialClass,3, 5);  //Can only pick current classes
+        initialClass = Mathf.Clamp(initialClass, 3, 5);  //Can only pick current classes
 
         for (int i = 0; i < clients.Count; i++)
         {

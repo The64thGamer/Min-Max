@@ -2521,6 +2521,7 @@ MonoBehaviour:
   - {fileID: 5307819127951601842}
   - {fileID: 5307819127951601842}
   - {fileID: 5307819127951601842}
+  playerName: 
 --- !u!114 &7861903822883519718
 MonoBehaviour:
   m_ObjectHideFlags: 0
