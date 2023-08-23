@@ -71,7 +71,7 @@ public class GlobalManager : NetworkBehaviour
                     for (int i = 0; i < PlayerPrefs.GetInt("ServerMaxPlayers"); i++)
                     {
                         //Probably a bad idea for 24/7 servers, though what's a player gonna gain out of controlling bots?
-                        SpawnPlayer(botID + (uint)i, "Bot # " + i,UnityEngine.Random.Range(3,6));
+                        SpawnPlayer(botID + (uint)i, "Bot # " + i,UnityEngine.Random.Range(3,6),new int[0]);
                     }
                 }
                 Debug.Log("Started Local Host");
@@ -142,7 +142,7 @@ public class GlobalManager : NetworkBehaviour
                 for (int i = 0; i < PlayerPrefs.GetInt("ServerMaxPlayers"); i++)
                 {
                     //Probably a bad idea for 24/7 servers, though what's a player gonna gain out of controlling bots?
-                    SpawnPlayer(botID + (uint)i, "Bot # " + i,UnityEngine.Random.Range(3, 6));
+                    SpawnPlayer(botID + (uint)i, "Bot # " + i,UnityEngine.Random.Range(3, 6), new int[0]);
                 }
             }
             GUIUtility.systemCopyBuffer = joinCode;
@@ -510,12 +510,12 @@ public class GlobalManager : NetworkBehaviour
     }
 
     [ServerRpc(RequireOwnership = false)]
-    public void SpawnNewPlayerHostServerRpc(string playerName, int initialClass, ServerRpcParams serverRpcParams = default)
+    public void SpawnNewPlayerHostServerRpc(string playerName, int initialClass, int[] cosmetics, ServerRpcParams serverRpcParams = default)
     {
-        SpawnPlayer(serverRpcParams.Receive.SenderClientId,playerName,initialClass);
+        SpawnPlayer(serverRpcParams.Receive.SenderClientId,playerName,initialClass,cosmetics);
     }
 
-    void SpawnPlayer(ulong id, string playerName, int initialClass)
+    void SpawnPlayer(ulong id, string playerName, int initialClass, int[] cosmetics)
     {
         initialClass = Mathf.Clamp(initialClass,3, 5);  //Can only pick current classes
 
@@ -572,9 +572,9 @@ public class GlobalManager : NetworkBehaviour
         }
 
         //Random cosmetics
-        List<int> cos = new List<int>();
         if (id >= botID)
         {
+            List<int> cos = new List<int>();
             int rando = UnityEngine.Random.Range(0, 6);
 
             switch ((ClassList)initialClass)
@@ -632,6 +632,7 @@ public class GlobalManager : NetworkBehaviour
                 default:
                     break;
             }
+            cosmetics = cos.ToArray();
         }
 
         PlayerInfoSentToClient pdstc = new PlayerInfoSentToClient
@@ -639,7 +640,7 @@ public class GlobalManager : NetworkBehaviour
             id = id,
             currentClass = (ClassList)initialClass,
             currentTeam = decidedTeam,
-            cosmetics = cos.ToArray(),
+            cosmetics = cosmetics,
             gunName = autoGun,
             playerName = playerName,
         };

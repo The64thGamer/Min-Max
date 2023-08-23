@@ -732,6 +732,7 @@ public class Menu : MonoBehaviour
                     {
                         case "ClassLeft":
                             currentCustClass = Mathf.Max(currentCustClass - 1, 0);
+                            PlayerPrefs.SetInt("Selected Class", currentCustClass);
                             SetLabel("ClassLabel", "The " + System.Globalization.CultureInfo.CurrentCulture.TextInfo.ToTitleCase(Enum.GetName(typeof(ClassList), currentCustClass)), false);
                             SetCharacterVisibility();
                             currentCustCosmType--;
@@ -740,6 +741,7 @@ public class Menu : MonoBehaviour
                             break;
                         case "ClassRight":
                             currentCustClass = Mathf.Min(currentCustClass + 1, 9);
+                            PlayerPrefs.SetInt("Selected Class", currentCustClass);
                             SetLabel("ClassLabel", "The " + System.Globalization.CultureInfo.CurrentCulture.TextInfo.ToTitleCase(Enum.GetName(typeof(ClassList), currentCustClass)), false);
                             SetCharacterVisibility();
                             currentCustCosmType--;
@@ -760,11 +762,13 @@ public class Menu : MonoBehaviour
                             break;
                         case "LoadoutLeft":
                             currentCustLoadout = Mathf.Max(currentCustLoadout - 1, 0);
+                            PlayerPrefs.SetInt("Selected Loadout", currentCustLoadout);
                             SetLabel("LoadoutLabel", "Var " + (char)('A' + currentCustLoadout % 26), false);
                             SetCharacterVisibility();
                             break;
                         case "LoadoutRight":
                             currentCustLoadout = Mathf.Min(currentCustLoadout + 1, 25);
+                            PlayerPrefs.SetInt("Selected Loadout", currentCustLoadout);
                             SetLabel("LoadoutLabel", "Var " + (char)('A' + currentCustLoadout % 26), false);
                             SetCharacterVisibility();
                             break;
@@ -1037,10 +1041,10 @@ public class Menu : MonoBehaviour
     void DisplayCustomization()
     {
         SwitchPage(1);
-        currentCustClass = 3;
+        currentCustClass = Mathf.Clamp(PlayerPrefs.GetInt("Selected Class"),3,5); //Current class selection only
         currentCustTeam = UnityEngine.Random.Range(0,9);
         currentCustPage = 0;
-        currentCustLoadout = 0;
+        currentCustLoadout = Mathf.Clamp(PlayerPrefs.GetInt("Selected Loadout"), 0, 25); //Only variants A-Z
         currentCustCosmType = -1;
         currentCustCosmType = CheckCosmeticType(1);
         SetCharacterVisibility();

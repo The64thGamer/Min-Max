@@ -28,7 +28,18 @@ public class ClientConnect : NetworkBehaviour
         }
         if (IsOwner)
         {
-            netcodeManager.SpawnNewPlayerHostServerRpc(PlayerPrefs.GetString("Settings: Player Name"), PlayerPrefs.GetInt("Last Picked Class"), default);
+            List<int> newCosInts = new List<int>();
+
+            for (int i = 0; i < 11; i++)
+            {
+                int check = PlayerPrefs.GetInt("Loadout " + PlayerPrefs.GetInt("Selected Class") + " Var: " + PlayerPrefs.GetInt("Selected Loadout") + " Type: " + i) - 1;
+                if (check >= 0)
+                {
+                    newCosInts.Add(check);
+                }
+            }
+
+            netcodeManager.SpawnNewPlayerHostServerRpc(PlayerPrefs.GetString("Settings: Player Name"), PlayerPrefs.GetInt("Selected Class"), newCosInts.ToArray(), default);
         }
         //Destroy(this.gameObject);
     }
