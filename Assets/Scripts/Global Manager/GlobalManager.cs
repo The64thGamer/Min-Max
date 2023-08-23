@@ -575,22 +575,29 @@ public class GlobalManager : NetworkBehaviour
         List<int> cos = new List<int>();
         if (id >= botID)
         {
+            int rando = UnityEngine.Random.Range(0, 6);
+
             switch ((ClassList)initialClass)
             {
                 case ClassList.programmer:
-                    int randoP = UnityEngine.Random.Range(0, 4);
-                    switch (randoP)
+                    switch (rando)
                     {
                         case 0:
                             cos.Add(5);
+                            break;
+                        case 1:
+                            cos.Add(6);
+                            cos.Add(7);
+                            break;
+                        case 2:
+                            cos.Add(7);
                             break;
                         default:
                             break;
                     }
                     break;
                 case ClassList.fabricator:
-                    int randoF = UnityEngine.Random.Range(0, 4);
-                    switch (randoF)
+                    switch (rando)
                     {
                         case 0:
                             cos.Add(0);
@@ -613,9 +620,14 @@ public class GlobalManager : NetworkBehaviour
                     }
                     break;
                 case ClassList.computer:
-                    cos.Add(0);
-                    cos.Add(1);
-                    cos.Add(2);
+                    switch (rando)
+                    {
+                        case 0:
+                            cos.Add(3);
+                            break;
+                        default:
+                            break;
+                    }
                     break;
                 default:
                     break;
