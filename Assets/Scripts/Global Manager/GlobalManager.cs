@@ -193,9 +193,6 @@ public class GlobalManager : NetworkBehaviour
             {
                 SendJoystickServerRpc(clients[i].GetTracker().GetPlayerNetworkData());
             }
-
-            //Game Logic
-            clients[i].GetController().MovePlayer();
         }
     }
 

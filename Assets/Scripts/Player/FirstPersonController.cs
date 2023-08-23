@@ -86,53 +86,14 @@ namespace StarterAssets
             }
         }
 
-        public void MovePlayer()
+        public void Update()
         {
             if (_controller == null) { return; }
 
             PlayerDataSentToServer data = player.GetTracker().GetPlayerNetworkData();
 
-            //Menu Stuff
-            if (menu != null)
-            {
-                if (data.menu && !holdingMenuButton)
-                {
-                    holdingMenuButton = true;
-                    menu.gameObject.SetActive(!menu.gameObject.activeSelf);
-                    menuIsOpen = menu.gameObject.activeSelf;
-                    if(menuIsOpen)
-                    {
-                        UnityEngine.Cursor.lockState = CursorLockMode.None;
-                        gm.SaveAchievements();
-                    }
-                    else
-                    {
-                        UnityEngine.Cursor.lockState = CursorLockMode.Locked;
-                    }
-                }
-                if (!data.menu && holdingMenuButton)
-                {
-                    holdingMenuButton = false;
-                }
-            }
-
-            if (menuIsOpen)
-            {
-                
-                if (usingMouse)
-                {
-                    menu.transform.position = _mainCamera.transform.position + (_mainCamera.transform.forward * 0.1f);
-                    menu.transform.LookAt(_mainCamera.transform.position);
-                    menu.transform.localScale = 3.5f * Vector3.Distance(_mainCamera.transform.position, menu.transform.position) * Mathf.Tan((PlayerPrefs.GetFloat("Settings: FOV") * Mathf.Deg2Rad) / 2) * Vector3.one;
-                }
-                else
-                {
-
-                }
-            }
-
             //Remove inputs in situations
-            if(menuIsOpen || player.GetHealth() <= 0)
+            if (menuIsOpen || player.GetHealth() <= 0)
             {
                 data.rightJoystick = Vector2.zero;
                 data.crouch = false;
@@ -158,23 +119,71 @@ namespace StarterAssets
                 _mainCamera.transform.localPosition = new Vector3(0, height, 0);
             }
 
+            Vector3 oldPos = transform.position;
+
+            _controller.Move(MovePlayer(data));
+
+
+            //Wire
+            heldWire = player.GetWirePoint();
+            if (heldWire != null)
+            {
+                heldWire.point = transform.position;
+            }
+
+            //Achievements
+            if (IsOwner && player.GetPlayerID() < botID)
+            {
+                if (_controller.isGrounded)
+                {
+                    gm.GetAchievements().AddToValue("Achievement: Total Walking Distance", Vector3.Distance(oldPos, transform.position));
+                }
+                else
+                {
+                    gm.GetAchievements().AddToValue("Achievement: Total Air Travel", Vector3.Distance(oldPos, transform.position));
+                    gm.GetAchievements().AddToValue("Achievement: Total Air-Time", Time.deltaTime);
+                }
+            }
+
+            //Menu Stuff
+            if (menu != null)
+            {
+                if (data.menu && !holdingMenuButton)
+                {
+                    holdingMenuButton = true;
+                    menu.gameObject.SetActive(!menu.gameObject.activeSelf);
+                    menuIsOpen = menu.gameObject.activeSelf;
+                    if (menuIsOpen)
+                    {
+                        UnityEngine.Cursor.lockState = CursorLockMode.None;
+                        gm.SaveAchievements();
+                    }
+                    else
+                    {
+                        UnityEngine.Cursor.lockState = CursorLockMode.Locked;
+                    }
+                }
+                if (!data.menu && holdingMenuButton)
+                {
+                    holdingMenuButton = false;
+                }
+            }
+
+            if (menuIsOpen)
+            {
+                if (usingMouse)
+                {
+                    menu.transform.position = _mainCamera.transform.position + (_mainCamera.transform.forward * 0.1f);
+                    menu.transform.LookAt(_mainCamera.transform.position);
+                    menu.transform.localScale = 3.5f * Vector3.Distance(_mainCamera.transform.position, menu.transform.position) * Mathf.Tan((PlayerPrefs.GetFloat("Settings: FOV") * Mathf.Deg2Rad) / 2) * Vector3.one;
+                }
+            }
+
             if (data.shoot)
             {
                 player.GetCurrentGun().Fire();
             }
 
-            Vector3 forward = _mainCamera.transform.forward;
-            Vector3 right = _mainCamera.transform.right;
-            forward.y = 0f;
-            right.y = 0f;
-            forward.Normalize();
-            right.Normalize();
-            Vector3 newAxis = forward * data.rightJoystick.y + right * data.rightJoystick.x;
-            Vector3 targetSpeed = new Vector3(newAxis.x, 0.0f, newAxis.z).normalized * player.GetClassStats().baseSpeed / 25.0f;
-
-            heldWire = player.GetWirePoint();
-
-            //Crouch
             if (data.crouch && _controller.isGrounded)
             {
                 if (!hasBeenCrouched)
@@ -191,7 +200,6 @@ namespace StarterAssets
                         }
                     }
                 }
-                currentCrouchLerp = Mathf.Clamp01(currentCrouchLerp + (Time.deltaTime * crouchSpeed));
             }
             else
             {
@@ -202,6 +210,43 @@ namespace StarterAssets
                         gm.UpdateMatchFocalPoint(player.GetTeam());
                         gm.RemoveClientWireClientRpc(player.GetPlayerID(), heldWire.point, true);
                     }
+                    hasBeenCrouched = false;
+                }
+            }
+            if (data.jump)
+            {
+                if (IsHost && heldWire != null)
+                {
+                    gm.UpdateMatchFocalPoint(player.GetTeam());
+                    gm.RemoveClientWireClientRpc(player.GetPlayerID(), heldWire.point, true);
+                }
+            }
+        }
+
+        Vector3 MovePlayer(PlayerDataSentToServer data)
+        {
+            Vector3 forward = _mainCamera.transform.forward;
+            Vector3 right = _mainCamera.transform.right;
+            forward.y = 0f;
+            right.y = 0f;
+            forward.Normalize();
+            right.Normalize();
+            Vector3 newAxis = forward * data.rightJoystick.y + right * data.rightJoystick.x;
+            Vector3 targetSpeed = new Vector3(newAxis.x, 0.0f, newAxis.z).normalized * player.GetClassStats().baseSpeed / 25.0f;
+
+            //Crouch
+            if (data.crouch && _controller.isGrounded)
+            {
+                if (!hasBeenCrouched)
+                {
+                    hasBeenCrouched = true;
+                }
+                currentCrouchLerp = Mathf.Clamp01(currentCrouchLerp + (Time.deltaTime * crouchSpeed));
+            }
+            else
+            {
+                if (hasBeenCrouched)
+                {
                     hasBeenCrouched = false;
                 }
                 currentCrouchLerp = Mathf.Clamp01(currentCrouchLerp - (Time.deltaTime * crouchSpeed));
@@ -327,29 +372,7 @@ namespace StarterAssets
             // move the player
             Vector3 finalVelocity = (_speed * Time.deltaTime) + new Vector3(0.0f, _verticalVelocity, 0.0f) * Time.deltaTime;
 
-            Vector3 oldPos = transform.position;
-
-            _controller.Move(finalVelocity);
-
-            //Wire
-            if (heldWire != null)
-            {
-                heldWire.point = transform.position;
-            }
-
-            //Achievements
-            if (IsOwner && player.GetPlayerID() < botID)
-            {
-                if (_controller.isGrounded)
-                {
-                    gm.GetAchievements().AddToValue("Achievement: Total Walking Distance", Vector3.Distance(oldPos, transform.position));
-                }
-                else
-                {
-                    gm.GetAchievements().AddToValue("Achievement: Total Air Travel", Vector3.Distance(oldPos, transform.position));
-                    gm.GetAchievements().AddToValue("Achievement: Total Air-Time", Time.deltaTime);
-                }
-            }
+            return finalVelocity;
         }
 
         void JumpAndGravity(bool jump)
