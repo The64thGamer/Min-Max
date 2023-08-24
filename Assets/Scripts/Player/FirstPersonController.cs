@@ -409,28 +409,18 @@ namespace StarterAssets
             //Rollback Netcode
             for (int i = 0; i < oldTicksServer.Count; i++)
             {
+                currentTick = oldTicksServer[i];
                 if(i == 0)
                 {
-                    currentTick.inputs.rightJoystick = data.rightJoystick;
-                    currentTick.inputs.jump = data.jump;
-                    currentTick.inputs.shoot = data.shoot;
-                    currentTick.inputs.crouch = data.crouch;
-                    currentTick.inputs.menu = data.menu;
-                    tracker.ForceNewPosition(oldTicksServer[0].pos);
-                    _controller.SimpleMove(oldTicksServer[0].velocity);
-                    tracker.ForceNewPosition(oldTicksServer[0].pos);
+                    tracker.ForceNewPosition(oldTicksServer[i].pos);
+                    _controller.SimpleMove(oldTicksServer[i].velocity);
+                    tracker.ForceNewPosition(oldTicksServer[i].pos);
                 }
-                currentTick.inputs.deltaTime = oldTicksServer[i].inputs.deltaTime;
-                currentTick._speed = oldTicksServer[i]._speed;
-                currentTick._verticalVelocity = oldTicksServer[i]._verticalVelocity;
-                currentTick._fallTimeoutDelta = oldTicksServer[i]._fallTimeoutDelta;
-                currentTick._hasBeenMovingDelta = oldTicksServer[i]._hasBeenMovingDelta;
-                currentTick.oldAxis = oldTicksServer[i].oldAxis;
-                currentTick.oldInput = oldTicksServer[i].oldInput;
-                currentTick.hasBeenGrounded = oldTicksServer[i].hasBeenGrounded;
-                currentTick.hasBeenStopped = oldTicksServer[i].hasBeenStopped;
-                currentTick.currentCrouchLerp = oldTicksServer[i].currentCrouchLerp;
-                currentTick.hasBeenCrouched = oldTicksServer[i].hasBeenCrouched;
+                currentTick.inputs.rightJoystick = data.rightJoystick;
+                currentTick.inputs.jump = data.jump;
+                currentTick.inputs.shoot = data.shoot;
+                currentTick.inputs.crouch = data.crouch;
+                currentTick.inputs.menu = data.menu;
                 _controller.Move(MovePlayer());
             }
             oldTicksServer = new List<TickValues>();
