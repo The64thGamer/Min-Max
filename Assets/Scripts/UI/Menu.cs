@@ -818,7 +818,7 @@ public class Menu : MonoBehaviour
                             {
                                 SwitchPage(0);
                             }
-                            goBackToSwitchClass = true;
+                            goBackToSwitchClass = false;
                             customizeMenuCamera.SetActive(false);
                             break;
                         default:
