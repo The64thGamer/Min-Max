@@ -153,29 +153,19 @@ namespace StarterAssets
                 {
                     holdingMenuButton = true;
                     menu.CloseOpen(!menu.GetOpenState());
-                    if (menu.GetOpenState())
-                    {
-                        UnityEngine.Cursor.lockState = CursorLockMode.None;
-                        gm.SaveAchievements();
-                    }
-                    else
-                    {
-                        UnityEngine.Cursor.lockState = CursorLockMode.Locked;
-                    }
                 }
                 if (!currentTick.inputs.menu && holdingMenuButton)
                 {
                     holdingMenuButton = false;
                 }
-            }
-
-            if (menu.GetOpenState())
-            {
-                if (usingMouse)
+                if (menu.GetOpenState())
                 {
-                    menu.transform.position = _mainCamera.transform.position + (_mainCamera.transform.forward * 0.1f);
-                    menu.transform.LookAt(_mainCamera.transform.position);
-                    menu.transform.localScale = 3.5f * Vector3.Distance(_mainCamera.transform.position, menu.transform.position) * Mathf.Tan((PlayerPrefs.GetFloat("Settings: FOV") * Mathf.Deg2Rad) / 2) * Vector3.one;
+                    if (usingMouse)
+                    {
+                        menu.transform.position = _mainCamera.transform.position + (_mainCamera.transform.forward * 0.1f);
+                        menu.transform.LookAt(_mainCamera.transform.position);
+                        menu.transform.localScale = 3.5f * Vector3.Distance(_mainCamera.transform.position, menu.transform.position) * Mathf.Tan((PlayerPrefs.GetFloat("Settings: FOV") * Mathf.Deg2Rad) / 2) * Vector3.one;
+                    }
                 }
             }
 
