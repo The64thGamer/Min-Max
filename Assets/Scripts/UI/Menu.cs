@@ -58,7 +58,6 @@ public class Menu : MonoBehaviour
     bool loadingMap;
     bool isOpen = true;
     float soundTimer;
-    int currentMenuPage;
 
     //Customize Page
     int currentCustClass;
@@ -121,13 +120,11 @@ public class Menu : MonoBehaviour
         {
             PlayerPrefs.SetInt("ServerPort", 7766);
         }
-
         if (cosmetics == null)
         {
+            CloseOpen(true);
             cosmetics = GameObject.Find("Global Manager").transform.GetChild(0).GetComponent<Cosmetics>();
         }
-
-        SwitchPage(0);
         if(optionalPlayer != null)
         {
             centerRing.localEulerAngles = new Vector3(0, 180, 0);
@@ -153,7 +150,6 @@ public class Menu : MonoBehaviour
 
     void SwitchPage(int index)
     {
-        currentMenuPage = index;
         if(optionalPlayer != null && index == 0)
         {
             //Pause menu must be the last index in pages
@@ -1479,7 +1475,7 @@ public class Menu : MonoBehaviour
         }
         else
         {
-            SwitchPage(currentMenuPage);
+            SwitchPage(0);
             menuMesh.SetActive(true);
             fakeMenuLMesh.SetActive(true);
             fakeMenuRMesh.SetActive(true);
