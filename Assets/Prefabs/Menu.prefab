@@ -382,6 +382,9 @@ MonoBehaviour:
   noMapTexture: {fileID: 2800000, guid: 30c08eebd63016c4fa4eb4637bbc8637, type: 3}
   aus: {fileID: 3162549120934898799}
   optionalPlayer: {fileID: 0}
+  menuMesh: {fileID: 725409517335969960}
+  fakeMenuRMesh: {fileID: 8119759532084586618}
+  fakeMenuLMesh: {fileID: 7391011363476724416}
 --- !u!82 &3162549120934898799
 AudioSource:
   m_ObjectHideFlags: 0
@@ -2518,6 +2521,12 @@ PrefabInstance:
 --- !u!4 &97668176125352466 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 1138079f919f15a4bb256173530a527e,
+    type: 3}
+  m_PrefabInstance: {fileID: 490969106983599609}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &725409517335969960 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: 1138079f919f15a4bb256173530a527e,
     type: 3}
   m_PrefabInstance: {fileID: 490969106983599609}
   m_PrefabAsset: {fileID: 0}

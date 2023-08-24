@@ -47,12 +47,16 @@ public class Menu : MonoBehaviour
     [SerializeField] Texture2D noMapTexture;
     [SerializeField] AudioSource aus;
     [SerializeField] Player optionalPlayer;
+    [SerializeField] GameObject menuMesh;
+    [SerializeField] GameObject fakeMenuRMesh;
+    [SerializeField] GameObject fakeMenuLMesh;
     List<GameObject> currentCharMeshes = new List<GameObject>();
 
     int[] cosmeticInts;
     NetworkManager m_NetworkManager;
     bool flippingPage;
     bool loadingMap;
+    bool isOpen = true;
     float soundTimer;
 
     //Customize Page
@@ -126,6 +130,7 @@ public class Menu : MonoBehaviour
         if(optionalPlayer != null)
         {
             centerRing.localEulerAngles = new Vector3(0, 180, 0);
+            CloseOpen(false);
         }
     }
 
@@ -810,7 +815,8 @@ public class Menu : MonoBehaviour
                             SetLabel("PageLabel", "Page " + currentCustPage.ToString(), false);
                             break;
                         case "Back":
-                            if(optionalPlayer != null && goBackToSwitchClass)
+                            customizeMenuCamera.SetActive(false);
+                            if (optionalPlayer != null && goBackToSwitchClass)
                             {
                                 DisplaySwitchClass();
                             }
@@ -819,7 +825,6 @@ public class Menu : MonoBehaviour
                                 SwitchPage(0);
                             }
                             goBackToSwitchClass = false;
-                            customizeMenuCamera.SetActive(false);
                             break;
                         default:
                             break;
@@ -1446,6 +1451,41 @@ public class Menu : MonoBehaviour
             {
                 yield return null;
             }
+        }
+    }
+
+    public bool GetOpenState()
+    {
+        return isOpen;
+    }
+
+    public void CloseOpen(bool open)
+    {
+        isOpen = open;
+        if(!open)
+        {
+            menuMesh.SetActive(false);
+            fakeMenuLMesh.SetActive(false);
+            fakeMenuRMesh.SetActive(false);
+            customizeMenuCamera.SetActive(false);
+            leftMenu.rootVisualElement.style.display = DisplayStyle.None;
+            rightMenu.rootVisualElement.style.display = DisplayStyle.None;
+            leftMenu.gameObject.GetComponent<MeshRenderer>().enabled = false;
+            leftMenu.gameObject.GetComponent<MeshCollider>().enabled = false;
+            rightMenu.gameObject.GetComponent<MeshRenderer>().enabled = false;
+            rightMenu.gameObject.GetComponent<MeshCollider>().enabled = false;
+        }
+        else
+        {
+            menuMesh.SetActive(true);
+            fakeMenuLMesh.SetActive(true);
+            fakeMenuRMesh.SetActive(true);
+            leftMenu.rootVisualElement.style.display = DisplayStyle.Flex;
+            rightMenu.rootVisualElement.style.display = DisplayStyle.Flex;
+            leftMenu.gameObject.GetComponent<MeshRenderer>().enabled = true;
+            leftMenu.gameObject.GetComponent<MeshCollider>().enabled = true;
+            rightMenu.gameObject.GetComponent<MeshRenderer>().enabled = true;
+            rightMenu.gameObject.GetComponent<MeshCollider>().enabled = true;
         }
     }
 

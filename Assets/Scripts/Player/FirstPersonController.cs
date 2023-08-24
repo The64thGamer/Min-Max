@@ -38,7 +38,6 @@ namespace StarterAssets
 
         //Menu
         bool holdingMenuButton;
-        bool menuIsOpen;
 
         //Mouselook
         bool usingMouse;
@@ -87,7 +86,7 @@ namespace StarterAssets
             currentTick.inputs.deltaTime = Time.deltaTime;
 
             //Remove inputs in situations
-            if (menuIsOpen || player.GetHealth() <= 0)
+            if (menu.GetOpenState() || player.GetHealth() <= 0)
             {
                 currentTick.inputs.rightJoystick = Vector2.zero;
                 currentTick.inputs.crouch = false;
@@ -97,7 +96,7 @@ namespace StarterAssets
             }
 
             //Mouselook
-            if (usingMouse && !menuIsOpen)
+            if (usingMouse && !menu.GetOpenState())
             {
                 currentRotation.x += Input.GetAxis("Mouse X") * sensitivity;
                 currentRotation.y -= Input.GetAxis("Mouse Y") * sensitivity;
@@ -153,9 +152,8 @@ namespace StarterAssets
                 if (currentTick.inputs.menu && !holdingMenuButton)
                 {
                     holdingMenuButton = true;
-                    menu.gameObject.SetActive(!menu.gameObject.activeSelf);
-                    menuIsOpen = menu.gameObject.activeSelf;
-                    if (menuIsOpen)
+                    menu.CloseOpen(!menu.GetOpenState());
+                    if (menu.GetOpenState())
                     {
                         UnityEngine.Cursor.lockState = CursorLockMode.None;
                         gm.SaveAchievements();
@@ -171,7 +169,7 @@ namespace StarterAssets
                 }
             }
 
-            if (menuIsOpen)
+            if (menu.GetOpenState())
             {
                 if (usingMouse)
                 {
@@ -472,8 +470,7 @@ namespace StarterAssets
 
         public void ForceCloseMenu()
         {
-            menu.gameObject.SetActive(false);
-            menuIsOpen = false;
+            menu.CloseOpen(false);
             UnityEngine.Cursor.lockState = CursorLockMode.Locked;
         }
 
