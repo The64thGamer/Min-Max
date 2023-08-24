@@ -694,7 +694,7 @@ public class GlobalManager : NetworkBehaviour
                 //Check run incase of player disconnect+reconnect inside same tick.
                 if (clients[e].GetPlayerID() == playerPosRPCData[i].id)
                 {
-                    clients[e].GetTracker().SetNewClientPosition(playerPosRPCData[i].pos, playerPosRPCData[i].velocity, playerPosRPCData[i].predictionTime);
+                    clients[e].GetController().RecalculateClientPosition(playerPosRPCData[i].pos, playerPosRPCData[i].velocity);
                     if (!IsOwner)
                     {
                         clients[e].GetTracker().ClientSyncPlayerInputs(playerPosRPCData[i]);
@@ -1078,7 +1078,6 @@ public class GlobalManager : NetworkBehaviour
 public struct PlayerDataSentToClient : INetworkSerializable
 {
     public ulong id;
-    public float predictionTime;
     public Vector3 headsetPos;
     public Quaternion headsetRot;
     public Vector3 rHandPos;
@@ -1091,7 +1090,6 @@ public struct PlayerDataSentToClient : INetworkSerializable
     public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
     {
         serializer.SerializeValue(ref id);
-        serializer.SerializeValue(ref predictionTime);
         serializer.SerializeValue(ref headsetPos);
         serializer.SerializeValue(ref headsetRot);
         serializer.SerializeValue(ref rHandPos);
@@ -1140,7 +1138,6 @@ public struct PlayerInfoSentToClient : INetworkSerializable
 [System.Serializable]
 public struct PlayerDataSentToServer : INetworkSerializable
 {
-    public float predictionTime;
     public Vector3 headsetPos;
     public Quaternion headsetRot;
     public Vector3 rHandPos;
@@ -1158,7 +1155,6 @@ public struct PlayerDataSentToServer : INetworkSerializable
 
     public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
     {
-        serializer.SerializeValue(ref predictionTime);
         serializer.SerializeValue(ref headsetPos);
         serializer.SerializeValue(ref headsetRot);
         serializer.SerializeValue(ref rHandPos);

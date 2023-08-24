@@ -58,11 +58,6 @@ public class PlayerTracker : NetworkBehaviour
     Vector3 prevRHandUp;
     Vector3 prevRHandRight;
 
-    //Prediction Values
-    float predictionTime;
-    Vector3 predictedVelocity;
-    Vector3 predictedPos;
-
     //Const
     const float crouchMinHeight = -0.3f;
 
@@ -139,19 +134,6 @@ public class PlayerTracker : NetworkBehaviour
                 playerLHand.Rotate(new Vector3(9.99f, 27.48f, 0));
             }
         }
-
-        if (!IsHost)
-        {
-            if(IsOwner)
-            {
-                //Lerping client-side movement with server positions for a smoother experience
-                transform.position = Vector3.Lerp(transform.position, predictedPos, Mathf.Clamp01((Vector3.Distance(transform.position, predictedPos) - 1) - charController.velocity.magnitude));
-            }
-            else
-            {
-                transform.position = predictedPos;
-            }
-        }
     }
     void OnEnable()
     {
@@ -168,14 +150,6 @@ public class PlayerTracker : NetworkBehaviour
         headset.GetComponent<Camera>().fieldOfView = PlayerPrefs.GetFloat("Settings: FOV");
     }
 
-    public void SetNewClientPosition(Vector3 pos, Vector3 velocity, float rpcPredicitonTime)
-    {
-        charController.enabled = false;
-        predictedPos = pos;
-        charController.enabled = true;
-        predictedVelocity = velocity;
-        predictionTime = rpcPredicitonTime;
-    }
 
     public void ForceNewPosition(Vector3 pos)
     {
@@ -199,7 +173,6 @@ public class PlayerTracker : NetworkBehaviour
 
     public void ServerSyncPlayerInputs(PlayerDataSentToServer data)
     {
-        if (data.predictionTime < predictionTime) { return; }
         headset.localPosition = data.headsetPos;
         headset.rotation = data.headsetRot;
         rightController.localPosition = data.rHandPos;
@@ -219,7 +192,6 @@ public class PlayerTracker : NetworkBehaviour
             id = player.GetPlayerID(),
             pos = GetPosition(),
             velocity = GetVelocity(),
-            predictionTime = NetworkManager.Singleton.LocalTime.TimeAsFloat,
             headsetPos = headset.localPosition,
             headsetRot = headset.rotation,
             rHandPos = rightController.localPosition,
@@ -233,7 +205,6 @@ public class PlayerTracker : NetworkBehaviour
     {
         return new PlayerDataSentToServer()
         {
-            predictionTime = NetworkManager.Singleton.LocalTime.TimeAsFloat,
             rightJoystick = movementAxis,
             jump = rhandAButton,
             shoot = triggerR,
@@ -310,16 +281,6 @@ public class PlayerTracker : NetworkBehaviour
     public Vector3 GetVelocity()
     {
         return charController.velocity;
-    }
-
-    public Vector3 GetPredictionVelocity()
-    {
-        return predictedVelocity;
-    }
-
-    public float GetPredictionVelocityTime()
-    {
-        return predictionTime;
     }
 
     public Transform GetForwardRoot()
