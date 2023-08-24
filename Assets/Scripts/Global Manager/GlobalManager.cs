@@ -694,7 +694,7 @@ public class GlobalManager : NetworkBehaviour
                 //Check run incase of player disconnect+reconnect inside same tick.
                 if (clients[e].GetPlayerID() == playerPosRPCData[i].id)
                 {
-                    clients[e].GetController().RecalculateClientPosition(playerPosRPCData[i].pos, playerPosRPCData[i].velocity);
+                    clients[e].GetController().RecalculateClientPosition(playerPosRPCData[i]);
                     if (!IsOwner)
                     {
                         clients[e].GetTracker().ClientSyncPlayerInputs(playerPosRPCData[i]);
@@ -1086,6 +1086,22 @@ public struct PlayerDataSentToClient : INetworkSerializable
     public Quaternion lHandRot;
     public Vector3 pos;
     public Vector3 velocity;
+
+    //Movement
+    public Vector3 _speed;
+    public float _verticalVelocity;
+    public float _fallTimeoutDelta;
+    public float _hasBeenMovingDelta;
+
+    //Midair Movement
+    public Vector3 oldAxis;
+    public Vector2 oldInput;
+    public bool hasBeenGrounded;
+    public bool hasBeenStopped;
+
+    //Crouch
+    public float currentCrouchLerp;
+    public bool hasBeenCrouched;
 
     public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
     {

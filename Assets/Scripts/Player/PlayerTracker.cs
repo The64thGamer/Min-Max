@@ -1,3 +1,4 @@
+using StarterAssets;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -187,6 +188,7 @@ public class PlayerTracker : NetworkBehaviour
 
     public PlayerDataSentToClient GetPlayerPosData()
     {
+        FirstPersonController.TickValues t = player.GetController().GetCurrentTick();
         return new PlayerDataSentToClient()
         {
             id = player.GetPlayerID(),
@@ -198,7 +200,17 @@ public class PlayerTracker : NetworkBehaviour
             rHandRot = rightController.rotation,
             lHandPos = leftController.localPosition,
             lHandRot = leftController.rotation,
-        };
+        _speed = t._speed,
+        _verticalVelocity = t._verticalVelocity,
+        _fallTimeoutDelta = t._fallTimeoutDelta,
+        _hasBeenMovingDelta = t._hasBeenMovingDelta,
+        oldAxis = t.oldAxis,
+        oldInput = t.oldInput,
+        hasBeenGrounded = t.hasBeenGrounded,
+        hasBeenStopped = t.hasBeenStopped,
+        currentCrouchLerp = t.currentCrouchLerp,
+        hasBeenCrouched = t.hasBeenCrouched,
+};
     }
 
     public PlayerDataSentToServer GetPlayerNetworkData()

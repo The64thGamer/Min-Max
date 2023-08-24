@@ -1,4 +1,5 @@
-﻿using Unity.Netcode;
+﻿using System.Collections.Generic;
+using Unity.Netcode;
 using Unity.VisualScripting;
 using UnityEditor;
 using UnityEngine;
@@ -28,23 +29,7 @@ namespace StarterAssets
         const float JumpHeight = 1.0f;
         const float Gravity = -15.0f;
         const float FallTimeout = 0.15f;
-
-        // player
-        Vector3 _speed;
-        float _verticalVelocity;
-        float _terminalVelocity = 53.0f;
-        float _fallTimeoutDelta;
-        float _hasBeenMovingDelta;
-
-        //Midair Movement
-        Vector3 oldAxis;
-        Vector2 oldInput;
-        bool hasBeenGrounded;
-        bool hasBeenStopped;
-
-        //Crouch
-        float currentCrouchLerp;
-        bool hasBeenCrouched;
+        const float _terminalVelocity = 53.0f;
 
         //Wire
         bool directionDecided;
@@ -63,6 +48,32 @@ namespace StarterAssets
         const ulong botID = 64646464646464;
         Vector2 currentRotation;
 
+        //Prediction Values
+        TickValues currentTick;
+        List<PlayerDataSentToServer> oldTicks;
+
+        public struct TickValues
+        {
+            //Input
+            public PlayerDataSentToServer inputs;
+
+            //Movement
+            public Vector3 _speed;
+            public float _verticalVelocity;
+            public float _fallTimeoutDelta;
+            public float _hasBeenMovingDelta;
+
+            //Midair Movement
+            public Vector3 oldAxis;
+            public Vector2 oldInput;
+            public bool hasBeenGrounded;
+            public bool hasBeenStopped;
+
+            //Crouch
+            public float currentCrouchLerp;
+            public bool hasBeenCrouched;
+        }
+
         public override void OnNetworkSpawn()
         {
             gm = GameObject.Find("Global Manager").GetComponent<GlobalManager>();
@@ -70,9 +81,10 @@ namespace StarterAssets
             _controller = GetComponent<CharacterController>();
             player = GetComponent<Player>();
             menu = player.GetMenu();
+            oldTicks = new List<PlayerDataSentToServer>();
 
             // reset our timeouts on start
-            _fallTimeoutDelta = FallTimeout;
+            currentTick._fallTimeoutDelta = FallTimeout;
 
             if (PlayerPrefs.GetInt("IsVREnabled") == 0 && IsOwner && player.GetPlayerID() < botID)
             {
@@ -119,10 +131,10 @@ namespace StarterAssets
                 _mainCamera.transform.localPosition = new Vector3(0, height, 0);
             }
 
+            //Execute Movement
             Vector3 oldPos = transform.position;
-
-            _controller.Move(MovePlayer(data));
-
+            _controller.Move(MovePlayer());
+            oldTicks.Add(data);
 
             //Wire
             heldWire = player.GetWirePoint();
@@ -186,9 +198,9 @@ namespace StarterAssets
 
             if (data.crouch && _controller.isGrounded)
             {
-                if (!hasBeenCrouched)
+                if (!currentTick.hasBeenCrouched)
                 {
-                    hasBeenCrouched = true;
+                    currentTick.hasBeenCrouched = true;
                     if (IsHost)
                     {
                         player.SetWirePoint(gm.GetWire(player.GetTeam()).RequestForWire(transform.position), true);
@@ -203,14 +215,14 @@ namespace StarterAssets
             }
             else
             {
-                if (hasBeenCrouched)
+                if (currentTick.hasBeenCrouched)
                 {
                     if (IsHost && heldWire != null)
                     {
                         gm.UpdateMatchFocalPoint(player.GetTeam());
                         gm.RemoveClientWireClientRpc(player.GetPlayerID(), heldWire.point, true);
                     }
-                    hasBeenCrouched = false;
+                    currentTick.hasBeenCrouched = false;
                 }
             }
             if (data.jump)
@@ -254,7 +266,7 @@ namespace StarterAssets
             }
         }
 
-        Vector3 MovePlayer(PlayerDataSentToServer data)
+        Vector3 MovePlayer()
         {
             Vector3 forward = _mainCamera.transform.forward;
             Vector3 right = _mainCamera.transform.right;
@@ -262,57 +274,57 @@ namespace StarterAssets
             right.y = 0f;
             forward.Normalize();
             right.Normalize();
-            Vector3 newAxis = forward * data.rightJoystick.y + right * data.rightJoystick.x;
+            Vector3 newAxis = forward * currentTick.inputs.rightJoystick.y + right * currentTick.inputs.rightJoystick.x;
             Vector3 targetSpeed = new Vector3(newAxis.x, 0.0f, newAxis.z).normalized * player.GetClassStats().baseSpeed / 25.0f;
 
             //Crouch
-            if (data.crouch && _controller.isGrounded)
+            if (currentTick.inputs.crouch && _controller.isGrounded)
             {
-                if (!hasBeenCrouched)
+                if (!currentTick.hasBeenCrouched)
                 {
-                    hasBeenCrouched = true;
+                    currentTick.hasBeenCrouched = true;
                 }
-                currentCrouchLerp = Mathf.Clamp01(currentCrouchLerp + (Time.deltaTime * crouchSpeed));
+                currentTick.currentCrouchLerp = Mathf.Clamp01(currentTick.currentCrouchLerp + (Time.deltaTime * crouchSpeed));
             }
             else
             {
-                if (hasBeenCrouched)
+                if (currentTick.hasBeenCrouched)
                 {
-                    hasBeenCrouched = false;
+                    currentTick.hasBeenCrouched = false;
                 }
-                currentCrouchLerp = Mathf.Clamp01(currentCrouchLerp - (Time.deltaTime * crouchSpeed));
+                currentTick.currentCrouchLerp = Mathf.Clamp01(currentTick.currentCrouchLerp - (Time.deltaTime * crouchSpeed));
             }
-            targetSpeed *= ((1 - currentCrouchLerp) / 2.0f) + 0.5f;
-            tracker.ModifyPlayerHeight(currentCrouchLerp); 
+            targetSpeed *= ((1 - currentTick.currentCrouchLerp) / 2.0f) + 0.5f;
+            tracker.ModifyPlayerHeight(currentTick.currentCrouchLerp); 
 
             //Movement rotation halted in midair
             if (!_controller.isGrounded)
             {
-                if (!hasBeenGrounded)
+                if (!currentTick.hasBeenGrounded)
                 {
-                    oldAxis = newAxis;
-                    oldInput = data.rightJoystick;
-                    hasBeenGrounded = true;
+                    currentTick.oldAxis = newAxis;
+                    currentTick.oldInput = currentTick.inputs.rightJoystick;
+                    currentTick.hasBeenGrounded = true;
                 }
                 else
                 {
-                    if (!hasBeenStopped)
+                    if (!currentTick.hasBeenStopped)
                     {
                         //No Starting Input In Air
-                        if (oldAxis == Vector3.zero)
+                        if (currentTick.oldAxis == Vector3.zero)
                         {
-                            oldAxis = newAxis;
-                            oldInput = data.rightJoystick;
+                            currentTick.oldAxis = newAxis;
+                            currentTick.oldInput = currentTick.inputs.rightJoystick;
                         }
-                        else if (Vector2.Dot(oldInput, data.rightJoystick) < -0.5f)
+                        else if (Vector2.Dot(currentTick.oldInput, currentTick.inputs.rightJoystick) < -0.5f)
                         {
                             //Stop Mid-air if holding opposite direction
                             newAxis = Vector3.zero;
-                            hasBeenStopped = true;
+                            currentTick.hasBeenStopped = true;
                         }
                         else
                         {
-                            newAxis = oldAxis;
+                            newAxis = currentTick.oldAxis;
                         }
                     }
                     else
@@ -323,28 +335,28 @@ namespace StarterAssets
             }
             else
             {
-                hasBeenGrounded = false;
-                hasBeenStopped = false;
+                currentTick.hasBeenGrounded = false;
+                currentTick.hasBeenStopped = false;
                 // accelerate or decelerate to target speed
                 if (newAxis == Vector3.zero) targetSpeed = Vector2.zero;
 
 
                 if (targetSpeed != Vector3.zero)
                 {
-                    if (_hasBeenMovingDelta > 0.01f)
+                    if (currentTick._hasBeenMovingDelta > 0.01f)
                     {
-                        _speed.x = Mathf.Lerp(_controller.velocity.x, targetSpeed.x, Time.deltaTime * acceleration);
-                        _speed.z = Mathf.Lerp(_controller.velocity.z, targetSpeed.z, Time.deltaTime * acceleration);
+                        currentTick._speed.x = Mathf.Lerp(_controller.velocity.x, targetSpeed.x, Time.deltaTime * acceleration);
+                        currentTick._speed.z = Mathf.Lerp(_controller.velocity.z, targetSpeed.z, Time.deltaTime * acceleration);
                     }
                     else
                     {
-                        _speed = targetSpeed;
+                        currentTick._speed = targetSpeed;
                     }
                 }
                 else
                 {
-                    _speed.x = Mathf.Lerp(_controller.velocity.x, targetSpeed.x, Time.deltaTime * deceleration);
-                    _speed.z = Mathf.Lerp(_controller.velocity.z, targetSpeed.z, Time.deltaTime * deceleration);
+                    currentTick._speed.x = Mathf.Lerp(_controller.velocity.x, targetSpeed.x, Time.deltaTime * deceleration);
+                    currentTick._speed.z = Mathf.Lerp(_controller.velocity.z, targetSpeed.z, Time.deltaTime * deceleration);
                 }
             }
 
@@ -352,51 +364,79 @@ namespace StarterAssets
             if (_controller.isGrounded)
             {
                 // reset the fall timeout timer
-                _fallTimeoutDelta = FallTimeout;
+                currentTick._fallTimeoutDelta = FallTimeout;
 
                 // stop our velocity dropping infinitely when grounded
-                if (_verticalVelocity < 0.0f)
+                if (currentTick._verticalVelocity < 0.0f)
                 {
-                    _verticalVelocity = -2f;
+                    currentTick._verticalVelocity = -2f;
                 }
 
                 // Jump
-                if (data.jump)
+                if (currentTick.inputs.jump)
                 {
                     // the square root of H * -2 * G = how much velocity needed to reach desired height
-                    _verticalVelocity = Mathf.Sqrt(JumpHeight * -2f * Gravity);
+                    currentTick._verticalVelocity = Mathf.Sqrt(JumpHeight * -2f * Gravity);
                 }
             }
             else
             {
                 // fall timeout
-                if (_fallTimeoutDelta >= 0.0f)
+                if (currentTick._fallTimeoutDelta >= 0.0f)
                 {
-                    _fallTimeoutDelta -= Time.deltaTime;
+                    currentTick._fallTimeoutDelta -= Time.deltaTime;
                 }
             }
 
             // apply gravity over time if under terminal (multiply by delta time twice to linearly speed up over time)
-            if (_verticalVelocity < _terminalVelocity)
+            if (currentTick._verticalVelocity < _terminalVelocity)
             {
-                _verticalVelocity += Gravity * Time.deltaTime;
+                currentTick._verticalVelocity += Gravity * Time.deltaTime;
             }
 
-            if (data.rightJoystick.magnitude == 0)
+            if (currentTick.inputs.rightJoystick.magnitude == 0)
             {
-                _hasBeenMovingDelta = Mathf.Lerp(_hasBeenMovingDelta, 0, Time.deltaTime * hasMovedDeltaTimeout);
+                currentTick._hasBeenMovingDelta = Mathf.Lerp(currentTick._hasBeenMovingDelta, 0, Time.deltaTime * hasMovedDeltaTimeout);
             }
             else
             {
-                _hasBeenMovingDelta = Mathf.Lerp(_hasBeenMovingDelta, 1, Time.deltaTime * hasMovedDeltaTimeout);
+                currentTick._hasBeenMovingDelta = Mathf.Lerp(currentTick._hasBeenMovingDelta, 1, Time.deltaTime * hasMovedDeltaTimeout);
             }
 
             // move the player
-            Vector3 finalVelocity = (_speed * Time.deltaTime) + new Vector3(0.0f, _verticalVelocity, 0.0f) * Time.deltaTime;
+            Vector3 finalVelocity = (currentTick._speed * Time.deltaTime) + new Vector3(0.0f, currentTick._verticalVelocity, 0.0f) * Time.deltaTime;
 
             return finalVelocity;
         }
 
+
+        public void RecalculateClientPosition(PlayerDataSentToClient data)
+        {
+            currentTick._speed = data._speed;
+            currentTick._verticalVelocity = data._verticalVelocity;
+            currentTick._fallTimeoutDelta = data._fallTimeoutDelta;
+            currentTick._hasBeenMovingDelta = data._hasBeenMovingDelta;
+            currentTick.oldAxis = data.oldAxis;
+            currentTick.oldInput = data.oldInput;
+            currentTick.hasBeenGrounded = data.hasBeenGrounded;
+            currentTick.hasBeenStopped = data.hasBeenStopped;
+            currentTick.currentCrouchLerp = data.currentCrouchLerp;
+            currentTick.hasBeenCrouched = data.hasBeenCrouched;
+
+            transform.position = data.pos;
+
+            for (int i = 0; i < oldTicks.Count; i++)
+            {
+                currentTick.inputs = oldTicks[i];
+                _controller.Move(MovePlayer());
+            }
+            oldTicks = new List<PlayerDataSentToServer>();
+        }
+
+        public TickValues GetCurrentTick()
+        {
+            return currentTick;
+        }
 
         private void OnDrawGizmos()
         {
