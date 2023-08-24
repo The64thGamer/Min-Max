@@ -372,9 +372,9 @@ namespace StarterAssets
             currentTick.hasBeenCrouched = data.hasBeenCrouched;
 
             //Achieve original Pos and Vel
-            transform.position = data.pos;
+            tracker.ForceNewPosition(data.pos);
             _controller.SimpleMove(data.velocity);
-            transform.position = data.pos;
+            tracker.ForceNewPosition(data.pos);
 
             //Rollback Netcode
             for (int i = 0; i < oldTicks.Count; i++)
