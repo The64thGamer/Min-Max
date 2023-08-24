@@ -1161,6 +1161,9 @@ public struct PlayerDataSentToServer : INetworkSerializable
     public Vector3 lHandPos;
     public Quaternion lHandRot;
 
+    //Prediction
+    public float deltaTime; 
+
     //Controls
     public Vector2 rightJoystick;
     public bool jump;
@@ -1171,6 +1174,7 @@ public struct PlayerDataSentToServer : INetworkSerializable
 
     public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
     {
+        serializer.SerializeValue(ref deltaTime);
         serializer.SerializeValue(ref headsetPos);
         serializer.SerializeValue(ref headsetRot);
         serializer.SerializeValue(ref rHandPos);

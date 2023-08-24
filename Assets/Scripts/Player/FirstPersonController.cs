@@ -81,6 +81,7 @@ namespace StarterAssets
             if (_controller == null) { return; }
 
             currentTick.inputs = player.GetTracker().GetPlayerNetworkData();
+            currentTick.inputs.deltaTime = Time.deltaTime;
 
             //Remove inputs in situations
             if (menuIsOpen || player.GetHealth() <= 0)
@@ -232,7 +233,7 @@ namespace StarterAssets
                 {
                     currentTick.hasBeenCrouched = true;
                 }
-                currentTick.currentCrouchLerp = Mathf.Clamp01(currentTick.currentCrouchLerp + (Time.deltaTime * crouchSpeed));
+                currentTick.currentCrouchLerp = Mathf.Clamp01(currentTick.currentCrouchLerp + (currentTick.inputs.deltaTime * crouchSpeed));
             }
             else
             {
@@ -240,7 +241,7 @@ namespace StarterAssets
                 {
                     currentTick.hasBeenCrouched = false;
                 }
-                currentTick.currentCrouchLerp = Mathf.Clamp01(currentTick.currentCrouchLerp - (Time.deltaTime * crouchSpeed));
+                currentTick.currentCrouchLerp = Mathf.Clamp01(currentTick.currentCrouchLerp - (currentTick.inputs.deltaTime * crouchSpeed));
             }
             targetSpeed *= ((1 - currentTick.currentCrouchLerp) / 2.0f) + 0.5f;
             tracker.ModifyPlayerHeight(currentTick.currentCrouchLerp);
@@ -293,8 +294,8 @@ namespace StarterAssets
                 {
                     if (currentTick._hasBeenMovingDelta > 0.01f)
                     {
-                        currentTick._speed.x = Mathf.Lerp(_controller.velocity.x, targetSpeed.x, Time.deltaTime * acceleration);
-                        currentTick._speed.z = Mathf.Lerp(_controller.velocity.z, targetSpeed.z, Time.deltaTime * acceleration);
+                        currentTick._speed.x = Mathf.Lerp(_controller.velocity.x, targetSpeed.x, currentTick.inputs.deltaTime * acceleration);
+                        currentTick._speed.z = Mathf.Lerp(_controller.velocity.z, targetSpeed.z, currentTick.inputs.deltaTime * acceleration);
                     }
                     else
                     {
@@ -303,8 +304,8 @@ namespace StarterAssets
                 }
                 else
                 {
-                    currentTick._speed.x = Mathf.Lerp(_controller.velocity.x, targetSpeed.x, Time.deltaTime * deceleration);
-                    currentTick._speed.z = Mathf.Lerp(_controller.velocity.z, targetSpeed.z, Time.deltaTime * deceleration);
+                    currentTick._speed.x = Mathf.Lerp(_controller.velocity.x, targetSpeed.x, currentTick.inputs.deltaTime * deceleration);
+                    currentTick._speed.z = Mathf.Lerp(_controller.velocity.z, targetSpeed.z, currentTick.inputs.deltaTime * deceleration);
                 }
             }
 
@@ -332,27 +333,27 @@ namespace StarterAssets
                 // fall timeout
                 if (currentTick._fallTimeoutDelta >= 0.0f)
                 {
-                    currentTick._fallTimeoutDelta -= Time.deltaTime;
+                    currentTick._fallTimeoutDelta -= currentTick.inputs.deltaTime;
                 }
             }
 
             // apply gravity over time if under terminal (multiply by delta time twice to linearly speed up over time)
             if (currentTick._verticalVelocity < _terminalVelocity)
             {
-                currentTick._verticalVelocity += Gravity * Time.deltaTime;
+                currentTick._verticalVelocity += Gravity * currentTick.inputs.deltaTime;
             }
 
             if (currentTick.inputs.rightJoystick.magnitude == 0)
             {
-                currentTick._hasBeenMovingDelta = Mathf.Lerp(currentTick._hasBeenMovingDelta, 0, Time.deltaTime * hasMovedDeltaTimeout);
+                currentTick._hasBeenMovingDelta = Mathf.Lerp(currentTick._hasBeenMovingDelta, 0, currentTick.inputs.deltaTime * hasMovedDeltaTimeout);
             }
             else
             {
-                currentTick._hasBeenMovingDelta = Mathf.Lerp(currentTick._hasBeenMovingDelta, 1, Time.deltaTime * hasMovedDeltaTimeout);
+                currentTick._hasBeenMovingDelta = Mathf.Lerp(currentTick._hasBeenMovingDelta, 1, currentTick.inputs.deltaTime * hasMovedDeltaTimeout);
             }
 
             // move the player
-            Vector3 finalVelocity = (currentTick._speed * Time.deltaTime) + new Vector3(0.0f, currentTick._verticalVelocity, 0.0f) * Time.deltaTime;
+            Vector3 finalVelocity = (currentTick._speed * currentTick.inputs.deltaTime) + new Vector3(0.0f, currentTick._verticalVelocity, 0.0f) * currentTick.inputs.deltaTime;
 
             return finalVelocity;
         }
