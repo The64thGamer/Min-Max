@@ -158,6 +158,7 @@ public class PlayerTracker : NetworkBehaviour
         charController.enabled = false;
         transform.position = pos;
         charController.enabled = true;
+        player.GetController().ResetStateBuffers();
     }
 
     public void ClientSyncPlayerInputs(PlayerDataSentToClient data)

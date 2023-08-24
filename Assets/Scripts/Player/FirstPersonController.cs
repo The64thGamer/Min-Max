@@ -382,9 +382,13 @@ namespace StarterAssets
             currentTick.hasBeenCrouched = data.hasBeenCrouched;
 
             //Achieve original Pos and Vel
-            tracker.ForceNewPosition(data.pos);
+            _controller.enabled = false;
+            transform.position = data.pos;
+            _controller.enabled = true;
             _controller.SimpleMove(data.velocity);
-            tracker.ForceNewPosition(data.pos);
+            _controller.enabled = false;
+            transform.position = data.pos;
+            _controller.enabled = true;
 
             //Rollback Netcode
             for (int i = 0; i < oldTicksClient.Count; i++)
@@ -406,23 +410,34 @@ namespace StarterAssets
 
         public void RecalculateServerPosition(PlayerDataSentToServer data)
         {
-            //Rollback Netcode
-            for (int i = 0; i < oldTicksServer.Count; i++)
+            if (oldTicksServer.Count > 0)
             {
-                currentTick = oldTicksServer[i];
-                if(i == 0)
-                {
-                    tracker.ForceNewPosition(oldTicksServer[i].pos);
-                    _controller.SimpleMove(oldTicksServer[i].velocity);
-                    tracker.ForceNewPosition(oldTicksServer[i].pos);
-                }
+                _controller.enabled = false;
+                transform.position = oldTicksServer[0].pos;
+                _controller.enabled = true;
+                _controller.SimpleMove(oldTicksServer[0].velocity);
+                _controller.enabled = false;
+                transform.position = oldTicksServer[0].pos;
+                _controller.enabled = true;
+                currentTick = oldTicksServer[0];
                 currentTick.inputs.rightJoystick = data.rightJoystick;
                 currentTick.inputs.jump = data.jump;
                 currentTick.inputs.shoot = data.shoot;
                 currentTick.inputs.crouch = data.crouch;
                 currentTick.inputs.menu = data.menu;
+            }
+            //Player Input Compensation
+            for (int i = 0; i < oldTicksServer.Count; i++)
+            {
+                currentTick.inputs.deltaTime = oldTicksServer[i].inputs.deltaTime;
                 _controller.Move(MovePlayer());
             }
+            oldTicksServer = new List<TickValues>();
+        }
+
+        public void ResetStateBuffers()
+        {
+            oldTicksClient = new List<PlayerDataSentToServer>();
             oldTicksServer = new List<TickValues>();
         }
 
@@ -468,7 +483,7 @@ namespace StarterAssets
         }
 
         [System.Serializable]
-        public struct TickValues
+        public class TickValues
         {
             //Input
             public PlayerDataSentToServer inputs;
