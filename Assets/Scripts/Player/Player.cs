@@ -78,7 +78,10 @@ public class Player : NetworkBehaviour
 
     private new void OnDestroy()
     {
-        gm.DisconnectToTitleScreen(false);
+        if (IsOwner && !IsHost)
+        {
+            gm.DisconnectToTitleScreen(false);
+        }
     }
 
     public void RespawnPlayer(Vector3 spawnPos, float respawnTimer)
