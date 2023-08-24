@@ -1119,7 +1119,14 @@ public class Menu : MonoBehaviour
     {
         SwitchPage(1);
         currentCustClass = Mathf.Clamp(PlayerPrefs.GetInt("Selected Class"),3,5); //Current class selection only
-        currentCustTeam = UnityEngine.Random.Range(0,9);
+        if (optionalPlayer == null)
+        {
+            currentCustTeam = UnityEngine.Random.Range(0, 9);
+        }
+        else
+        {
+            currentCustTeam = (int)optionalPlayer.GetTeam();
+        }
         currentCustPage = 0;
         currentCustLoadout = Mathf.Clamp(PlayerPrefs.GetInt("Selected Loadout"), 0, 25); //Only variants A-Z
         currentCustCosmType = -1;
