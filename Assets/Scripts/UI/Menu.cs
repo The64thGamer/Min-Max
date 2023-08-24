@@ -122,13 +122,16 @@ public class Menu : MonoBehaviour
         }
         if (cosmetics == null)
         {
-            CloseOpen(true);
             cosmetics = GameObject.Find("Global Manager").transform.GetChild(0).GetComponent<Cosmetics>();
         }
         if(optionalPlayer != null)
         {
             centerRing.localEulerAngles = new Vector3(0, 180, 0);
             CloseOpen(false);
+        }
+        else
+        {
+            CloseOpen(true);
         }
     }
 
