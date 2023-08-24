@@ -61,6 +61,7 @@ public class PlayerTracker : NetworkBehaviour
 
     //Const
     const float crouchMinHeight = -0.3f;
+    const ulong botID = 64646464646464;
 
     public enum ButtonState
     {
@@ -78,7 +79,7 @@ public class PlayerTracker : NetworkBehaviour
 
     private void Update()
     {
-        if (IsOwner)
+        if (IsOwner && player.GetPlayerID() < botID)
         {
             movementAxis = moveAxis.action.ReadValue<Vector2>();
             rhandAButton = jump.action.IsPressed();
