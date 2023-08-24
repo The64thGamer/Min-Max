@@ -246,6 +246,38 @@ MonoBehaviour:
     - name: Play
       type: 0
       sound: 0
+  - leftPageName: Switch Left
+    rightPageName: Cust Right
+    leftAsset: {fileID: 9197481963319205126, guid: d9e2107e4a7659545a0f61a8c5cc993c,
+      type: 3}
+    rightAsset: {fileID: 9197481963319205126, guid: e9b92fdec8dc6f143a51ec8d7aaaea30,
+      type: 3}
+    leftInteractables:
+    - name: Head3
+      type: 0
+      sound: 0
+    - name: Head4
+      type: 0
+      sound: 0
+    - name: Head5
+      type: 0
+      sound: 0
+    - name: VarLeft
+      type: 0
+      sound: 0
+    - name: VarRight
+      type: 0
+      sound: 0
+    - name: EditLoadout
+      type: 0
+      sound: 0
+    - name: Back
+      type: 0
+      sound: 0
+    rightInteractables:
+    - name: CharacterRotate
+      type: 3
+      sound: 2
   - leftPageName: Pause Left
     rightPageName: Title Right
     leftAsset: {fileID: 9197481963319205126, guid: 58300b8787918914181901e9a1981133,

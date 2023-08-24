@@ -61,6 +61,7 @@ public class Menu : MonoBehaviour
     int currentCustPage;
     int currentCustCosmType;
     int currentCustLoadout;
+    bool goBackToSwitchClass;
 
     //Join Game Page
     bool onlineServerMenu;
@@ -723,6 +724,9 @@ public class Menu : MonoBehaviour
                         case "ServerInfo":
                             
                             break;
+                        case "SwitchClass":
+                            DisplaySwitchClass();
+                            break;
                         case "Customization":
                             DisplayCustomization();
                             break;
@@ -806,7 +810,15 @@ public class Menu : MonoBehaviour
                             SetLabel("PageLabel", "Page " + currentCustPage.ToString(), false);
                             break;
                         case "Back":
-                            SwitchPage(0);
+                            if(optionalPlayer != null && goBackToSwitchClass)
+                            {
+                                DisplaySwitchClass();
+                            }
+                            else
+                            {
+                                SwitchPage(0);
+                            }
+                            goBackToSwitchClass = true;
                             customizeMenuCamera.SetActive(false);
                             break;
                         default:
@@ -821,6 +833,40 @@ public class Menu : MonoBehaviour
                             {
                                 playerModels[i].transform.localEulerAngles = new Vector3(0, valueFloat, 0);
                             }
+                            break;
+                        default:
+                            break;
+                    }
+                    break;
+                case "Switch Left":
+                    switch (button)
+                    {
+                        case "Head3":
+                            optionalPlayer.GetController().ForceCloseMenu();
+                            break;
+                        case "Head4":
+                            optionalPlayer.GetController().ForceCloseMenu();
+                            break;
+                        case "Head5":
+                            optionalPlayer.GetController().ForceCloseMenu();
+                            break;
+                        case "EditLoadout":
+                            DisplayCustomization();
+                            goBackToSwitchClass = true;
+                            break;
+                        case "VarLeft":
+                            PlayerPrefs.SetInt("Selected Loadout", Mathf.Max(PlayerPrefs.GetInt("Selected Loadout") - 1, 0));
+                            SetLabel("VarLabel", "Var " + (char)('A' + PlayerPrefs.GetInt("Selected Loadout") % 26), false);
+                            SetCharacterVisibility();
+                            break;
+                        case "VarRight":
+                            PlayerPrefs.SetInt("Selected Loadout", Mathf.Min(PlayerPrefs.GetInt("Selected Loadout") + 1, 25));
+                            SetLabel("VarLabel", "Var " + (char)('A' + PlayerPrefs.GetInt("Selected Loadout") % 26), false);
+                            SetCharacterVisibility();
+                            break;
+                        case "Back":
+                            SwitchPage(0);
+                            customizeMenuCamera.SetActive(false);
                             break;
                         default:
                             break;
@@ -1047,7 +1093,28 @@ public class Menu : MonoBehaviour
         }
 
     }
+    void DisplaySwitchClass()
+    {
+        SwitchPage(7);
+        SetLabel("BigLabel", "The " + System.Globalization.CultureInfo.CurrentCulture.TextInfo.ToTitleCase(Enum.GetName(typeof(ClassList), PlayerPrefs.GetInt("Selected Class"))), false);
+        SetLabel("VarLabel", "Var " + (char)('A' + PlayerPrefs.GetInt("Selected Loadout") % 26), false);
 
+        for (int i = 3; i < 6; i++)
+        {
+            int value = i;
+            leftMenu.rootVisualElement.Q<Button>("Head" + i).RegisterCallback<MouseOverEvent>((type) =>
+            {
+                PlayerPrefs.SetInt("Selected Class", value);
+                SetLabel("BigLabel", "The " + System.Globalization.CultureInfo.CurrentCulture.TextInfo.ToTitleCase(Enum.GetName(typeof(ClassList), PlayerPrefs.GetInt("Selected Class"))), false);
+                SetCharacterVisibility();
+            });
+        }
+
+        currentCustTeam = (int)optionalPlayer.GetTeam();
+        SetCharacterVisibility();
+        UpdateTeamColor();
+        customizeMenuCamera.SetActive(true);
+    }
     void DisplayCustomization()
     {
         SwitchPage(1);
@@ -1382,7 +1449,7 @@ public class Menu : MonoBehaviour
 
         for (int i = 0; i < 11; i++)
         {
-            int check = PlayerPrefs.GetInt("Loadout " + currentCustClass + " Var: " + currentCustLoadout + " Type: " + i) - 1;
+            int check = PlayerPrefs.GetInt("Loadout " + PlayerPrefs.GetInt("Selected Class") + " Var: " + PlayerPrefs.GetInt("Selected Loadout") + " Type: " + i) - 1;
             if (check >= 0)
             {
                 newCosInts.Add(check);
@@ -1399,11 +1466,9 @@ public class Menu : MonoBehaviour
         }
         for (int i = 0; i < playerModels.Length; i++)
         {
-            if (i == (int)currentCustClass)
+            if (i == (int)PlayerPrefs.GetInt("Selected Class"))
             {
-                Debug.Log(i + " a " + currentCustClass);
-
-                List<Cosmetic> classCosmetics = cosmetics.GetClassCosmetics((ClassList)currentCustClass);
+                List<Cosmetic> classCosmetics = cosmetics.GetClassCosmetics((ClassList)PlayerPrefs.GetInt("Selected Class"));
 
                 //Reveal class
                 playerModels[i].SetActive(true);
@@ -1487,7 +1552,7 @@ public class Menu : MonoBehaviour
 
     void SetupCosmetics(int[] classCosmetics)
     {
-        List<Cosmetic> stockCosmetics = cosmetics.GetClassCosmetics((ClassList)currentCustClass);
+        List<Cosmetic> stockCosmetics = cosmetics.GetClassCosmetics((ClassList)PlayerPrefs.GetInt("Selected Class"));
         List<int> cosmeticIntList = cosmeticInts.ToList<int>();
         for (int i = 0; i < classCosmetics.Length; i++)
         {

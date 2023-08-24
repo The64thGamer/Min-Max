@@ -121,29 +121,28 @@ namespace StarterAssets
             }
 
             //Execute Movement
-            Vector3 oldPos = transform.position;
-            _controller.Move(MovePlayer());
+            currentTick.pos = transform.position;
+            currentTick.velocity = _controller.velocity;
+            if (IsHost && !IsOwner)
+            {
+                //oldTicksServer.Add(currentTick);
+            }
             if (!IsHost)
             {
                 oldTicksClient.Add(currentTick.inputs);
             }
-            if(IsHost && !IsOwner)
-            {
-                currentTick.pos = transform.position;
-                currentTick.velocity = _controller.velocity;
-                oldTicksServer.Add(currentTick);
-            }
+            _controller.Move(MovePlayer());
 
             //Achievements
             if (IsOwner && player.GetPlayerID() < botID)
             {
                 if (_controller.isGrounded)
                 {
-                    gm.GetAchievements().AddToValue("Achievement: Total Walking Distance", Vector3.Distance(oldPos, transform.position));
+                    gm.GetAchievements().AddToValue("Achievement: Total Walking Distance", Vector3.Distance(currentTick.pos, transform.position));
                 }
                 else
                 {
-                    gm.GetAchievements().AddToValue("Achievement: Total Air Travel", Vector3.Distance(oldPos, transform.position));
+                    gm.GetAchievements().AddToValue("Achievement: Total Air Travel", Vector3.Distance(currentTick.pos, transform.position));
                     gm.GetAchievements().AddToValue("Achievement: Total Air-Time", Time.deltaTime);
                 }
             }
@@ -303,8 +302,8 @@ namespace StarterAssets
                 {
                     if (currentTick._hasBeenMovingDelta > 0.01f)
                     {
-                        currentTick._speed.x = Mathf.Lerp(_controller.velocity.x, targetSpeed.x, currentTick.inputs.deltaTime * acceleration);
-                        currentTick._speed.z = Mathf.Lerp(_controller.velocity.z, targetSpeed.z, currentTick.inputs.deltaTime * acceleration);
+                        currentTick._speed.x = Mathf.Lerp(currentTick.velocity.x, targetSpeed.x, currentTick.inputs.deltaTime * acceleration);
+                        currentTick._speed.z = Mathf.Lerp(currentTick.velocity.z, targetSpeed.z, currentTick.inputs.deltaTime * acceleration);
                     }
                     else
                     {
@@ -313,8 +312,8 @@ namespace StarterAssets
                 }
                 else
                 {
-                    currentTick._speed.x = Mathf.Lerp(_controller.velocity.x, targetSpeed.x, currentTick.inputs.deltaTime * deceleration);
-                    currentTick._speed.z = Mathf.Lerp(_controller.velocity.z, targetSpeed.z, currentTick.inputs.deltaTime * deceleration);
+                    currentTick._speed.x = Mathf.Lerp(currentTick.velocity.x, targetSpeed.x, currentTick.inputs.deltaTime * deceleration);
+                    currentTick._speed.z = Mathf.Lerp(currentTick.velocity.z, targetSpeed.z, currentTick.inputs.deltaTime * deceleration);
                 }
             }
 
@@ -364,6 +363,7 @@ namespace StarterAssets
             // move the player
             Vector3 finalVelocity = (currentTick._speed * currentTick.inputs.deltaTime) + new Vector3(0.0f, currentTick._verticalVelocity, 0.0f) * currentTick.inputs.deltaTime;
 
+            currentTick.velocity = finalVelocity;
             return finalVelocity;
         }
 
@@ -380,12 +380,13 @@ namespace StarterAssets
             currentTick.hasBeenStopped = data.hasBeenStopped;
             currentTick.currentCrouchLerp = data.currentCrouchLerp;
             currentTick.hasBeenCrouched = data.hasBeenCrouched;
+            currentTick.velocity = data.velocity;
 
             //Achieve original Pos and Vel
             _controller.enabled = false;
             transform.position = data.pos;
             _controller.enabled = true;
-            _controller.SimpleMove(data.velocity);
+            _controller.SimpleMove(Vector3.zero);
             _controller.enabled = false;
             transform.position = data.pos;
             _controller.enabled = true;
@@ -415,7 +416,7 @@ namespace StarterAssets
                 _controller.enabled = false;
                 transform.position = oldTicksServer[0].pos;
                 _controller.enabled = true;
-                _controller.SimpleMove(oldTicksServer[0].velocity);
+                _controller.SimpleMove(Vector3.zero);
                 _controller.enabled = false;
                 transform.position = oldTicksServer[0].pos;
                 _controller.enabled = true;
@@ -469,6 +470,13 @@ namespace StarterAssets
             }
         }
 
+        public void ForceCloseMenu()
+        {
+            menu.gameObject.SetActive(false);
+            menuIsOpen = false;
+            UnityEngine.Cursor.lockState = CursorLockMode.Locked;
+        }
+
         public TickValues GetCurrentTick()
         {
             return currentTick;
@@ -483,7 +491,7 @@ namespace StarterAssets
         }
 
         [System.Serializable]
-        public class TickValues
+        public struct TickValues
         {
             //Input
             public PlayerDataSentToServer inputs;
@@ -507,6 +515,7 @@ namespace StarterAssets
             //Server Only
             public Vector3 pos;
             public Vector3 velocity;
+
         }
     }
 }
