@@ -52,28 +52,6 @@ namespace StarterAssets
         TickValues currentTick;
         List<PlayerDataSentToServer> oldTicks;
 
-        public struct TickValues
-        {
-            //Input
-            public PlayerDataSentToServer inputs;
-
-            //Movement
-            public Vector3 _speed;
-            public float _verticalVelocity;
-            public float _fallTimeoutDelta;
-            public float _hasBeenMovingDelta;
-
-            //Midair Movement
-            public Vector3 oldAxis;
-            public Vector2 oldInput;
-            public bool hasBeenGrounded;
-            public bool hasBeenStopped;
-
-            //Crouch
-            public float currentCrouchLerp;
-            public bool hasBeenCrouched;
-        }
-
         public override void OnNetworkSpawn()
         {
             gm = GameObject.Find("Global Manager").GetComponent<GlobalManager>();
@@ -423,8 +401,12 @@ namespace StarterAssets
             currentTick.currentCrouchLerp = data.currentCrouchLerp;
             currentTick.hasBeenCrouched = data.hasBeenCrouched;
 
+            //Achieve original Pos and Vel
+            transform.position = data.pos;
+            _controller.SimpleMove(data.velocity);
             transform.position = data.pos;
 
+            //Rollback Netcode
             for (int i = 0; i < oldTicks.Count; i++)
             {
                 currentTick.inputs = oldTicks[i];
@@ -444,6 +426,28 @@ namespace StarterAssets
             {
                 Gizmos.DrawLine((wireCollisionVector * Vector3.Distance(heldWire.parent.point, transform.position)) + heldWire.parent.point, transform.position);
             }
+        }
+
+        public struct TickValues
+        {
+            //Input
+            public PlayerDataSentToServer inputs;
+
+            //Movement
+            public Vector3 _speed;
+            public float _verticalVelocity;
+            public float _fallTimeoutDelta;
+            public float _hasBeenMovingDelta;
+
+            //Midair Movement
+            public Vector3 oldAxis;
+            public Vector2 oldInput;
+            public bool hasBeenGrounded;
+            public bool hasBeenStopped;
+
+            //Crouch
+            public float currentCrouchLerp;
+            public bool hasBeenCrouched;
         }
     }
 }
