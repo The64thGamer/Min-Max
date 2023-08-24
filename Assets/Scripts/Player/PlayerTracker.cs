@@ -91,7 +91,7 @@ public class PlayerTracker : NetworkBehaviour
                 alreadyPressed = true;
                 pressRstick = !pressRstick;
             }
-            if(!pressRStickAction.action.IsPressed())
+            if (!pressRStickAction.action.IsPressed())
             {
                 alreadyPressed = false;
             }
@@ -143,7 +143,7 @@ public class PlayerTracker : NetworkBehaviour
         if (triggerRAction.action != null) triggerRAction.action.Enable();
         if (triggerLAction.action != null) triggerLAction.action.Enable();
         if (pressRStickAction.action != null) pressRStickAction.action.Enable();
-        if (menuAction.action != null) {menuAction.action.Enable();}
+        if (menuAction.action != null) { menuAction.action.Enable(); }
     }
 
     public void UpdateFOV()
@@ -200,17 +200,17 @@ public class PlayerTracker : NetworkBehaviour
             rHandRot = rightController.rotation,
             lHandPos = leftController.localPosition,
             lHandRot = leftController.rotation,
-        _speed = t._speed,
-        _verticalVelocity = t._verticalVelocity,
-        _fallTimeoutDelta = t._fallTimeoutDelta,
-        _hasBeenMovingDelta = t._hasBeenMovingDelta,
-        oldAxis = t.oldAxis,
-        oldInput = t.oldInput,
-        hasBeenGrounded = t.hasBeenGrounded,
-        hasBeenStopped = t.hasBeenStopped,
-        currentCrouchLerp = t.currentCrouchLerp,
-        hasBeenCrouched = t.hasBeenCrouched,
-};
+            _speed = t._speed,
+            _verticalVelocity = t._verticalVelocity,
+            _fallTimeoutDelta = t._fallTimeoutDelta,
+            _hasBeenMovingDelta = t._hasBeenMovingDelta,
+            oldAxis = t.oldAxis,
+            oldInput = t.oldInput,
+            hasBeenGrounded = t.hasBeenGrounded,
+            hasBeenStopped = t.hasBeenStopped,
+            currentCrouchLerp = t.currentCrouchLerp,
+            hasBeenCrouched = t.hasBeenCrouched,
+        };
     }
 
     public PlayerDataSentToServer GetPlayerNetworkData()
@@ -332,7 +332,7 @@ public class PlayerTracker : NetworkBehaviour
 
     public void ModifyPlayerHeight(float crouchHeight)
     {
-        camOffset.localPosition = new Vector3(0, Mathf.Lerp(0,crouchMinHeight,crouchHeight), 0);
+        camOffset.localPosition = new Vector3(0, Mathf.Lerp(0, crouchMinHeight, crouchHeight), 0);
     }
 
     private void OnDrawGizmos()

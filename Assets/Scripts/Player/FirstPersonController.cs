@@ -80,15 +80,15 @@ namespace StarterAssets
         {
             if (_controller == null) { return; }
 
-            PlayerDataSentToServer data = player.GetTracker().GetPlayerNetworkData();
+            currentTick.inputs = player.GetTracker().GetPlayerNetworkData();
 
             //Remove inputs in situations
             if (menuIsOpen || player.GetHealth() <= 0)
             {
-                data.rightJoystick = Vector2.zero;
-                data.crouch = false;
-                data.shoot = false;
-                data.jump = false;
+                currentTick.inputs.rightJoystick = Vector2.zero;
+                currentTick.inputs.crouch = false;
+                currentTick.inputs.shoot = false;
+                currentTick.inputs.jump = false;
                 tracker.ResetInputs();
             }
 
@@ -109,16 +109,19 @@ namespace StarterAssets
                 _mainCamera.transform.localPosition = new Vector3(0, height, 0);
             }
 
+            //Wire
+            heldWire = player.GetWirePoint();
+            if (IsHost)
+            {
+                HostWireChecking();
+            }
+
             //Execute Movement
             Vector3 oldPos = transform.position;
             _controller.Move(MovePlayer());
-            oldTicks.Add(data);
-
-            //Wire
-            heldWire = player.GetWirePoint();
-            if (heldWire != null)
+            if (!IsHost)
             {
-                heldWire.point = transform.position;
+                oldTicks.Add(currentTick.inputs);
             }
 
             //Achievements
@@ -138,7 +141,7 @@ namespace StarterAssets
             //Menu Stuff
             if (menu != null)
             {
-                if (data.menu && !holdingMenuButton)
+                if (currentTick.inputs.menu && !holdingMenuButton)
                 {
                     holdingMenuButton = true;
                     menu.gameObject.SetActive(!menu.gameObject.activeSelf);
@@ -153,7 +156,7 @@ namespace StarterAssets
                         UnityEngine.Cursor.lockState = CursorLockMode.Locked;
                     }
                 }
-                if (!data.menu && holdingMenuButton)
+                if (!currentTick.inputs.menu && holdingMenuButton)
                 {
                     holdingMenuButton = false;
                 }
@@ -169,75 +172,42 @@ namespace StarterAssets
                 }
             }
 
-            if (data.shoot)
+            if (currentTick.inputs.shoot)
             {
                 player.GetCurrentGun().Fire();
             }
 
-            if (data.crouch && _controller.isGrounded)
-            {
-                if (!currentTick.hasBeenCrouched)
-                {
-                    currentTick.hasBeenCrouched = true;
-                    if (IsHost)
-                    {
-                        player.SetWirePoint(gm.GetWire(player.GetTeam()).RequestForWire(transform.position), true);
-                        heldWire = player.GetWirePoint();
-                        if (heldWire != null)
-                        {
-                            gm.UpdateMatchFocalPoint(player.GetTeam());
-                            gm.GiveClientWireClientRpc(player.GetPlayerID(), heldWire.wireID, heldWire.parent.wireID, player.GetTeam());
-                        }
-                    }
-                }
-            }
-            else
-            {
-                if (currentTick.hasBeenCrouched)
-                {
-                    if (IsHost && heldWire != null)
-                    {
-                        gm.UpdateMatchFocalPoint(player.GetTeam());
-                        gm.RemoveClientWireClientRpc(player.GetPlayerID(), heldWire.point, true);
-                    }
-                    currentTick.hasBeenCrouched = false;
-                }
-            }
-            if (data.jump)
-            {
-                if (IsHost && heldWire != null)
-                {
-                    gm.UpdateMatchFocalPoint(player.GetTeam());
-                    gm.RemoveClientWireClientRpc(player.GetPlayerID(), heldWire.point, true);
-                }
-            }
 
             //Holding Wire
-            if (IsHost && heldWire != null)
+            if (heldWire != null)
             {
-                float distance = Vector3.Distance(heldWire.parent.point, transform.position);
-                if (distance > _controller.radius && !directionDecided)
+                heldWire.point = transform.position;
+                if (IsHost)
                 {
-                    directionDecided = true;
-                    wireCollisionVector = (transform.position - heldWire.parent.point).normalized;
-                }
-                else if (distance < _controller.radius)
-                {
-                    directionDecided = false;
-                }
-                if (directionDecided)
-                {
-                    //Extremely cheap and fast collision for wires, using the player's current hitbox
-                    if (Vector3.Distance((wireCollisionVector * distance) + heldWire.parent.point, transform.position) > _controller.radius)
+                    float distance = Vector3.Distance(heldWire.parent.point, transform.position);
+                    if (distance > _controller.radius && !directionDecided)
+                    {
+                        directionDecided = true;
+                        wireCollisionVector = (transform.position - heldWire.parent.point).normalized;
+                    }
+                    else if (distance < _controller.radius)
                     {
                         directionDecided = false;
-
-                        player.SetWirePoint(gm.GetWire(player.GetTeam()).RequestForWire(transform.position), false);
-                        heldWire = player.GetWirePoint();
-                        if (heldWire != null)
+                    }
+                    if (directionDecided)
+                    {
+                        //Extremely cheap and fast collision for wires, using the player's current hitbox
+                        if (Vector3.Distance((wireCollisionVector * distance) + heldWire.parent.point, transform.position) > _controller.radius)
                         {
-                            gm.UpdateMatchFocalPoint(player.GetTeam());
-                            gm.SegmentClientWireClientRpc(player.GetPlayerID(), heldWire.point, heldWire.wireID, heldWire.parent.wireID, player.GetTeam());
+                            directionDecided = false;
+
+                            player.SetWirePoint(gm.GetWire(player.GetTeam()).RequestForWire(transform.position), false);
+                            heldWire = player.GetWirePoint();
+                            if (heldWire != null)
+                            {
+                                gm.UpdateMatchFocalPoint(player.GetTeam());
+                                gm.SegmentClientWireClientRpc(player.GetPlayerID(), heldWire.point, heldWire.wireID, heldWire.parent.wireID, player.GetTeam());
+                            }
                         }
                     }
                 }
@@ -273,7 +243,7 @@ namespace StarterAssets
                 currentTick.currentCrouchLerp = Mathf.Clamp01(currentTick.currentCrouchLerp - (Time.deltaTime * crouchSpeed));
             }
             targetSpeed *= ((1 - currentTick.currentCrouchLerp) / 2.0f) + 0.5f;
-            tracker.ModifyPlayerHeight(currentTick.currentCrouchLerp); 
+            tracker.ModifyPlayerHeight(currentTick.currentCrouchLerp);
 
             //Movement rotation halted in midair
             if (!_controller.isGrounded)
@@ -415,6 +385,34 @@ namespace StarterAssets
             oldTicks = new List<PlayerDataSentToServer>();
         }
 
+        void HostWireChecking()
+        {
+            if (currentTick.inputs.crouch && _controller.isGrounded)
+            {
+                if (!currentTick.hasBeenCrouched)
+                {
+                    player.SetWirePoint(gm.GetWire(player.GetTeam()).RequestForWire(transform.position), true);
+                    heldWire = player.GetWirePoint();
+                    if (heldWire != null)
+                    {
+                        gm.UpdateMatchFocalPoint(player.GetTeam());
+                        gm.GiveClientWireClientRpc(player.GetPlayerID(), heldWire.wireID, heldWire.parent.wireID, player.GetTeam());
+                    }
+                }
+            }
+            else if (currentTick.hasBeenCrouched && heldWire != null)
+            {
+                gm.UpdateMatchFocalPoint(player.GetTeam());
+                gm.RemoveClientWireClientRpc(player.GetPlayerID(), heldWire.point, true);
+            }
+
+            if (currentTick.inputs.jump && heldWire != null)
+            {
+                gm.UpdateMatchFocalPoint(player.GetTeam());
+                gm.RemoveClientWireClientRpc(player.GetPlayerID(), heldWire.point, true);
+            }
+        }
+
         public TickValues GetCurrentTick()
         {
             return currentTick;
@@ -428,6 +426,7 @@ namespace StarterAssets
             }
         }
 
+        [System.Serializable]
         public struct TickValues
         {
             //Input
