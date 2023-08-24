@@ -1465,6 +1465,7 @@ public class Menu : MonoBehaviour
         isOpen = open;
         if(!open)
         {
+            UnityEngine.Cursor.lockState = CursorLockMode.None;
             menuMesh.SetActive(false);
             fakeMenuLMesh.SetActive(false);
             fakeMenuRMesh.SetActive(false);
@@ -1478,6 +1479,7 @@ public class Menu : MonoBehaviour
         }
         else
         {
+            UnityEngine.Cursor.lockState = CursorLockMode.Locked;
             SwitchPage(0);
             menuMesh.SetActive(true);
             fakeMenuLMesh.SetActive(true);

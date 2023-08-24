@@ -468,12 +468,6 @@ namespace StarterAssets
             }
         }
 
-        public void ForceCloseMenu()
-        {
-            menu.CloseOpen(false);
-            UnityEngine.Cursor.lockState = CursorLockMode.Locked;
-        }
-
         public TickValues GetCurrentTick()
         {
             return currentTick;
