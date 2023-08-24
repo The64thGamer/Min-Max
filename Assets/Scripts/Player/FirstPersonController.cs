@@ -377,6 +377,16 @@ namespace StarterAssets
             _controller.SimpleMove(data.velocity);
             tracker.ForceNewPosition(data.pos);
 
+            //For non-owned clients
+            if(!IsOwner && !IsHost)
+            {
+                currentTick.inputs.rightJoystick = data.rightJoystick;
+                currentTick.inputs.jump = data.jump;
+                currentTick.inputs.shoot = data.shoot;
+                currentTick.inputs.crouch = data.crouch;
+                currentTick.inputs.menu = data.menu;
+            }
+
             //Rollback Netcode
             for (int i = 0; i < oldTicks.Count; i++)
             {

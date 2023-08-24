@@ -1087,6 +1087,13 @@ public struct PlayerDataSentToClient : INetworkSerializable
     public Vector3 pos;
     public Vector3 velocity;
 
+    //Controls
+    public Vector2 rightJoystick;
+    public bool jump;
+    public bool shoot;
+    public bool crouch;
+    public bool menu;
+
     //Movement
     public Vector3 _speed;
     public float _verticalVelocity;
@@ -1114,6 +1121,11 @@ public struct PlayerDataSentToClient : INetworkSerializable
         serializer.SerializeValue(ref lHandRot);
         serializer.SerializeValue(ref pos);
         serializer.SerializeValue(ref velocity);
+        serializer.SerializeValue(ref rightJoystick);
+        serializer.SerializeValue(ref jump);
+        serializer.SerializeValue(ref shoot);
+        serializer.SerializeValue(ref crouch);
+        serializer.SerializeValue(ref menu);
     }
 }
 
@@ -1185,5 +1197,7 @@ public struct PlayerDataSentToServer : INetworkSerializable
         serializer.SerializeValue(ref jump);
         serializer.SerializeValue(ref shoot);
         serializer.SerializeValue(ref crouch);
+        serializer.SerializeValue(ref menu);
+
     }
 }
