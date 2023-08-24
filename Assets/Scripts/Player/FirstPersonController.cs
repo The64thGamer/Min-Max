@@ -410,13 +410,15 @@ namespace StarterAssets
             currentTick.inputs.crouch = data.crouch;
             currentTick.inputs.menu = data.menu;
 
-            tracker.ForceNewPosition(oldTicksServer[0].pos);
-            _controller.SimpleMove(oldTicksServer[0].velocity);
-            tracker.ForceNewPosition(oldTicksServer[0].pos);
-
             //Rollback Netcode
             for (int i = 0; i < oldTicksServer.Count; i++)
             {
+                if(i == 0)
+                {
+                    tracker.ForceNewPosition(oldTicksServer[0].pos);
+                    _controller.SimpleMove(oldTicksServer[0].velocity);
+                    tracker.ForceNewPosition(oldTicksServer[0].pos);
+                }
                 currentTick._speed = oldTicksServer[i]._speed;
                 currentTick._verticalVelocity = oldTicksServer[i]._verticalVelocity;
                 currentTick._fallTimeoutDelta = oldTicksServer[i]._fallTimeoutDelta;
