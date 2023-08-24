@@ -420,6 +420,7 @@ namespace StarterAssets
                     _controller.SimpleMove(oldTicksServer[0].velocity);
                     tracker.ForceNewPosition(oldTicksServer[0].pos);
                 }
+                currentTick.inputs.deltaTime = oldTicksServer[i].inputs.deltaTime;
                 currentTick._speed = oldTicksServer[i]._speed;
                 currentTick._verticalVelocity = oldTicksServer[i]._verticalVelocity;
                 currentTick._fallTimeoutDelta = oldTicksServer[i]._fallTimeoutDelta;
