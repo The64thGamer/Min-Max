@@ -136,7 +136,7 @@ public abstract class GenericGamemode : NetworkBehaviour
                     switch (teamRef[i])
                     {
                         case TeamList.orange:
-                            otherOptions = new TeamList[] { TeamList.green, TeamList.lightBlue, TeamList.blue, TeamList.purple, TeamList.brown };
+                            otherOptions = new TeamList[] { TeamList.green, TeamList.lightBlue, TeamList.blue, TeamList.purple};
                             break;
                         case TeamList.yellow:
                             otherOptions = new TeamList[] { TeamList.green, TeamList.lightBlue, TeamList.blue, TeamList.purple, TeamList.brown };
