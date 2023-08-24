@@ -87,7 +87,6 @@ public abstract class Gun : MonoBehaviour
     protected Vector3 CalculateFireAngle(Player player)
     {
         Transform cam = player.GetTracker().GetCamera();
-        RaycastHit hit;
         Vector3 fpForward = player.GetTracker().GetRightHandSafeForward();
 
         float dotAngle = Vector3.Dot(fpForward, cam.forward);

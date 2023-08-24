@@ -841,11 +841,6 @@ public class Menu : MonoBehaviour
                             break;
                         case "PageLeft":
                             currentServerPage = Mathf.Max(0, currentServerPage - 1);
-                            string addedR = "LocalServersAdded";
-                            if (onlineServerMenu)
-                            {
-                                addedR = "GlobalServersAdded";
-                            }
                             RefreshServerList(true);
                             break;
                         case "PageRight":
