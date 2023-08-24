@@ -50,16 +50,19 @@ namespace StarterAssets
 
         //Prediction Values
         TickValues currentTick;
-        List<PlayerDataSentToServer> oldTicks;
+        List<PlayerDataSentToServer> oldTicksClient;
+        List<TickValues> oldTicksServer;
 
         public override void OnNetworkSpawn()
         {
+            currentTick = new TickValues();
             gm = GameObject.Find("Global Manager").GetComponent<GlobalManager>();
             tracker = this.GetComponent<PlayerTracker>();
             _controller = GetComponent<CharacterController>();
             player = GetComponent<Player>();
             menu = player.GetMenu();
-            oldTicks = new List<PlayerDataSentToServer>();
+            oldTicksClient = new List<PlayerDataSentToServer>();
+            oldTicksServer = new List<TickValues>();
 
             // reset our timeouts on start
             currentTick._fallTimeoutDelta = FallTimeout;
@@ -122,7 +125,11 @@ namespace StarterAssets
             _controller.Move(MovePlayer());
             if (!IsHost)
             {
-                oldTicks.Add(currentTick.inputs);
+                oldTicksClient.Add(currentTick.inputs);
+            }
+            if(IsHost && !IsOwner)
+            {
+                oldTicksServer.Add(currentTick);
             }
 
             //Achievements
@@ -377,23 +384,52 @@ namespace StarterAssets
             _controller.SimpleMove(data.velocity);
             tracker.ForceNewPosition(data.pos);
 
-            //For non-owned clients
-            if(!IsOwner && !IsHost)
-            {
-                currentTick.inputs.rightJoystick = data.rightJoystick;
-                currentTick.inputs.jump = data.jump;
-                currentTick.inputs.shoot = data.shoot;
-                currentTick.inputs.crouch = data.crouch;
-                currentTick.inputs.menu = data.menu;
-            }
-
             //Rollback Netcode
-            for (int i = 0; i < oldTicks.Count; i++)
+            for (int i = 0; i < oldTicksClient.Count; i++)
             {
-                currentTick.inputs = oldTicks[i];
+                currentTick.inputs = oldTicksClient[i];
+                //For non-owned clients
+                if (!IsOwner && !IsHost)
+                {
+                    currentTick.inputs.rightJoystick = data.rightJoystick;
+                    currentTick.inputs.jump = data.jump;
+                    currentTick.inputs.shoot = data.shoot;
+                    currentTick.inputs.crouch = data.crouch;
+                    currentTick.inputs.menu = data.menu;
+                }
                 _controller.Move(MovePlayer());
             }
-            oldTicks = new List<PlayerDataSentToServer>();
+            oldTicksClient = new List<PlayerDataSentToServer>();
+        }
+
+        public void RecalculateServerPosition(PlayerDataSentToServer data)
+        {
+            currentTick.inputs.rightJoystick = data.rightJoystick;
+            currentTick.inputs.jump = data.jump;
+            currentTick.inputs.shoot = data.shoot;
+            currentTick.inputs.crouch = data.crouch;
+            currentTick.inputs.menu = data.menu;
+
+            tracker.ForceNewPosition(oldTicksServer[0].pos);
+            _controller.SimpleMove(oldTicksServer[0].velocity);
+            tracker.ForceNewPosition(oldTicksServer[0].pos);
+
+            //Rollback Netcode
+            for (int i = 0; i < oldTicksServer.Count; i++)
+            {
+                currentTick._speed = oldTicksServer[i]._speed;
+                currentTick._verticalVelocity = oldTicksServer[i]._verticalVelocity;
+                currentTick._fallTimeoutDelta = oldTicksServer[i]._fallTimeoutDelta;
+                currentTick._hasBeenMovingDelta = oldTicksServer[i]._hasBeenMovingDelta;
+                currentTick.oldAxis = oldTicksServer[i].oldAxis;
+                currentTick.oldInput = oldTicksServer[i].oldInput;
+                currentTick.hasBeenGrounded = oldTicksServer[i].hasBeenGrounded;
+                currentTick.hasBeenStopped = oldTicksServer[i].hasBeenStopped;
+                currentTick.currentCrouchLerp = oldTicksServer[i].currentCrouchLerp;
+                currentTick.hasBeenCrouched = oldTicksServer[i].hasBeenCrouched;
+                _controller.Move(MovePlayer());
+            }
+            oldTicksServer = new List<TickValues>();
         }
 
         void HostWireChecking()
@@ -458,6 +494,10 @@ namespace StarterAssets
             //Crouch
             public float currentCrouchLerp;
             public bool hasBeenCrouched;
+
+            //Server Only
+            public Vector3 pos;
+            public Vector3 velocity;
         }
     }
 }

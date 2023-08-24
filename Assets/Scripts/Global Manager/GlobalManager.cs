@@ -502,6 +502,7 @@ public class GlobalManager : NetworkBehaviour
             if (clients[i].GetPlayerID() == serverRpcParams.Receive.SenderClientId && !clients[i].IsOwner)
             {
                 clients[i].GetTracker().ServerSyncPlayerInputs(serverData);
+                clients[i].GetController().RecalculateServerPosition(serverData);
                 return;
             }
         }
