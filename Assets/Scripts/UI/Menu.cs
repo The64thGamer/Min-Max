@@ -58,6 +58,7 @@ public class Menu : MonoBehaviour
     bool loadingMap;
     bool isOpen = true;
     float soundTimer;
+    int currentMenuPage;
 
     //Customize Page
     int currentCustClass;
@@ -152,6 +153,7 @@ public class Menu : MonoBehaviour
 
     void SwitchPage(int index)
     {
+        currentMenuPage = index;
         if(optionalPlayer != null && index == 0)
         {
             //Pause menu must be the last index in pages
@@ -847,13 +849,13 @@ public class Menu : MonoBehaviour
                     switch (button)
                     {
                         case "Head3":
-                            optionalPlayer.GetController().ForceCloseMenu();
+                            CloseOpen(false);
                             break;
                         case "Head4":
-                            optionalPlayer.GetController().ForceCloseMenu();
+                            CloseOpen(false);
                             break;
                         case "Head5":
-                            optionalPlayer.GetController().ForceCloseMenu();
+                            CloseOpen(false);
                             break;
                         case "EditLoadout":
                             DisplayCustomization();
@@ -1477,6 +1479,7 @@ public class Menu : MonoBehaviour
         }
         else
         {
+            SwitchPage(currentMenuPage);
             menuMesh.SetActive(true);
             fakeMenuLMesh.SetActive(true);
             fakeMenuRMesh.SetActive(true);
