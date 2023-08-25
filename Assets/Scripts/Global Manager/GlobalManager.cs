@@ -192,21 +192,6 @@ public class GlobalManager : NetworkBehaviour
 
     void LateUpdate()
     {
-        //Server Networking
-        if (tickTimer > 1.0f / (float)ServerTickRate.Value)
-        {
-            tickTimer = 0;
-            if (IsHost)
-            {
-                for (int i = 0; i < clients.Count; i++)
-                {
-                    playerPosRPCData[i] = clients[i].GetTracker().GetPlayerPosData();
-                }
-                SendPosClientRpc(playerPosRPCData.ToArray());
-            }
-        }
-        tickTimer += Time.deltaTime;
-
         if (damageHashes.Count > 0)
         {
             damageHashes = new List<int>();
@@ -696,7 +681,7 @@ public class GlobalManager : NetworkBehaviour
                 }
                 else
                 {
-                    if(clients[i].SendPlayerSwitchClassStatus())
+                    if (clients[i].SendPlayerSwitchClassStatus())
                     {
                         PlayerInfoSentToClient pdstc = new PlayerInfoSentToClient
                         {
@@ -724,7 +709,7 @@ public class GlobalManager : NetworkBehaviour
             {
                 if (clients[i].IsOwner && clients[i].GetPlayerID() < botID)
                 {
-                    if(Convert.ToBoolean(PlayerPrefs.GetInt("SendToServerSwitchClass")))
+                    if (Convert.ToBoolean(PlayerPrefs.GetInt("SendToServerSwitchClass")))
                     {
                         PlayerPrefs.SetInt("SendToServerSwitchClass", 0);
                         List<int> newCosInts = new List<int>();
@@ -742,7 +727,7 @@ public class GlobalManager : NetworkBehaviour
                     }
                     else
                     {
-                        SendPlayerStatusOnSwitchedClassesServerRpc(false,0,new int[0]);
+                        SendPlayerStatusOnSwitchedClassesServerRpc(false, 0, new int[0]);
                     }
                 }
                 return;
@@ -755,26 +740,20 @@ public class GlobalManager : NetworkBehaviour
     /// </summary>
     /// <param name="data"></param>
     [ClientRpc]
-    private void SendPosClientRpc(PlayerDataSentToClient[] data)
+    public void SendPosClientRpc(PlayerDataSentToClient data)
     {
         if (IsHost) { return; }
 
-        playerPosRPCData = data.ToList<PlayerDataSentToClient>();
         for (int e = 0; e < clients.Count; e++)
         {
-            for (int i = 0; i < playerPosRPCData.Count; i++)
+            if (clients[e].GetPlayerID() == data.id)
             {
-                //Check run incase of player disconnect+reconnect inside same tick.
-                if (clients[e].GetPlayerID() == playerPosRPCData[i].id)
+                clients[e].GetController().RecalculateClientPosition(data);
+                if (!IsOwner)
                 {
-                    clients[e].GetController().RecalculateClientPosition(playerPosRPCData[i]);
-                    if (!IsOwner)
-                    {
-                        clients[e].GetTracker().ClientSyncPlayerInputs(playerPosRPCData[i]);
-                    }
+                    clients[e].GetTracker().ClientSyncPlayerInputs(data);
                 }
             }
-
         }
     }
 
@@ -880,7 +859,7 @@ public class GlobalManager : NetworkBehaviour
     [ClientRpc]
     void KickPlayerClientRpc(ulong id, string reason)
     {
-        if(reason == null)
+        if (reason == null)
         {
             return;
         }
@@ -1187,6 +1166,7 @@ public struct PlayerDataSentToClient : INetworkSerializable
     public Vector3 velocity;
     public Vector3 mainCamforward;
     public Vector3 mainCamRight;
+    public float serverTime;
 
     public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
     {
@@ -1216,6 +1196,7 @@ public struct PlayerDataSentToClient : INetworkSerializable
         serializer.SerializeValue(ref velocity);
         serializer.SerializeValue(ref mainCamforward);
         serializer.SerializeValue(ref mainCamRight);
+        serializer.SerializeValue(ref serverTime);
     }
 }
 
@@ -1265,7 +1246,8 @@ public struct PlayerDataSentToServer : INetworkSerializable
     public Quaternion lHandRot;
 
     //Prediction
-    public float deltaTime; 
+    public float localTime;
+    public float deltaTime;
 
     //Controls
     public Vector2 rightJoystick;
@@ -1277,7 +1259,6 @@ public struct PlayerDataSentToServer : INetworkSerializable
 
     public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
     {
-        serializer.SerializeValue(ref deltaTime);
         serializer.SerializeValue(ref headsetPos);
         serializer.SerializeValue(ref headsetRot);
         serializer.SerializeValue(ref rHandPos);
@@ -1288,7 +1269,8 @@ public struct PlayerDataSentToServer : INetworkSerializable
         serializer.SerializeValue(ref jump);
         serializer.SerializeValue(ref shoot);
         serializer.SerializeValue(ref crouch);
-        serializer.SerializeValue(ref menu);
+        serializer.SerializeValue(ref localTime);
+        serializer.SerializeValue(ref deltaTime);
 
     }
 }

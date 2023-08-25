@@ -51,6 +51,7 @@ namespace StarterAssets
         TickValues currentTick;
         List<PlayerDataSentToServer> oldTicksClient;
         List<TickValues> oldTicksServer;
+        bool nowSendServerValues;
 
         public override void OnNetworkSpawn()
         {
@@ -101,11 +102,19 @@ namespace StarterAssets
 
             //CurrentTick
             currentTick.inputs = player.GetTracker().GetPlayerNetworkData();
-            currentTick.inputs.deltaTime = Time.deltaTime;
             currentTick.pos = transform.position;
             currentTick.velocity = _controller.velocity;
             currentTick.mainCamforward = _mainCamera.transform.forward;
             currentTick.mainCamRight = _mainCamera.transform.right;
+            currentTick.inputs.deltaTime = Time.deltaTime;
+            if (IsHost)
+            {
+                currentTick.inputs.localTime = NetworkManager.ServerTime.TimeAsFloat;
+            }
+            else
+            {
+                currentTick.inputs.localTime = NetworkManager.LocalTime.TimeAsFloat;
+            }
 
             //Wire
             heldWire = player.GetWirePoint();
@@ -124,6 +133,19 @@ namespace StarterAssets
                 oldTicksClient.Add(currentTick.inputs);
             }
             _controller.Move(MovePlayer());
+
+            if(IsHost)
+            {
+                if(IsOwner)
+                {
+                    gm.SendPosClientRpc(tracker.GetPlayerPosData());
+                }
+                else if(nowSendServerValues)
+                {
+                    nowSendServerValues = false;
+                    gm.SendPosClientRpc(tracker.GetPlayerPosData());
+                }
+            }
 
             //Achievements
             if (IsOwner && player.GetPlayerID() < botID)
@@ -363,6 +385,7 @@ namespace StarterAssets
 
         public void RecalculateClientPosition(PlayerDataSentToClient data)
         {
+            //Initial Pass
             currentTick._speed = data._speed;
             currentTick._verticalVelocity = data._verticalVelocity;
             currentTick._fallTimeoutDelta = data._fallTimeoutDelta;
@@ -377,7 +400,6 @@ namespace StarterAssets
             currentTick.mainCamforward = data.mainCamforward;
             currentTick.mainCamRight = data.mainCamRight;
 
-            //Achieve original Pos and Vel
             _controller.enabled = false;
             transform.position = data.pos;
             _controller.enabled = true;
@@ -387,29 +409,55 @@ namespace StarterAssets
             _controller.enabled = true;
 
             //Rollback Netcode
+            int deleteBehindThis = 0;
+            float deltaTime = data.serverTime;
+
             for (int i = 0; i < oldTicksClient.Count; i++)
             {
-                currentTick.inputs = oldTicksClient[i];
-                //For non-owned clients
-                if (!IsOwner && !IsHost)
+                if (oldTicksClient[i].localTime > data.serverTime)
                 {
-                    currentTick.inputs.rightJoystick = data.rightJoystick;
-                    currentTick.inputs.jump = data.jump;
-                    currentTick.inputs.shoot = data.shoot;
-                    currentTick.inputs.crouch = data.crouch;
-                    currentTick.inputs.menu = data.menu;
+                    if(i - 1 < 0)
+                    {
+                        currentTick.inputs = oldTicksClient[i];
+                    }
+                    else
+                    {
+                        currentTick.inputs = oldTicksClient[i-1];
+                    }
+                    currentTick.inputs.deltaTime = oldTicksClient[i].localTime - deltaTime;
+                    deltaTime = oldTicksClient[i].localTime;
+                    //For non-owned clients
+                    if (!IsOwner && !IsHost)
+                    {
+                        currentTick.inputs.rightJoystick = data.rightJoystick;
+                        currentTick.inputs.jump = data.jump;
+                        currentTick.inputs.shoot = data.shoot;
+                        currentTick.inputs.crouch = data.crouch;
+                        currentTick.inputs.menu = data.menu;
+                    }
+                    _controller.Move(MovePlayer());
                 }
-                _controller.Move(MovePlayer());
+                else
+                {
+                    deleteBehindThis++;
+                }
             }
-            oldTicksClient = new List<PlayerDataSentToServer>();
+            //Debug
+            Debug.Log("CT: " + NetworkManager.LocalTime.TimeAsFloat);
+            Debug.Log("ST: " + data.serverTime);
+            if (oldTicksClient.Count > 0)
+            {
+                Debug.Log("OT: " + oldTicksClient[0].localTime);
+            }
+            Debug.Log("DT: " + (data.serverTime - deltaTime));
+
+            oldTicksClient.RemoveRange(0, deleteBehindThis);
+
         }
 
         public void RecalculateServerPosition(PlayerDataSentToServer data)
         {
-            if(oldTicksServer.Count < 5)
-            {
-                return;
-            }
+            nowSendServerValues = true;
             if (oldTicksServer.Count > 0)
             {
                 _controller.enabled = false;

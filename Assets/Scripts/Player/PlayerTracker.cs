@@ -214,6 +214,7 @@ public class PlayerTracker : NetworkBehaviour
             velocity = t.velocity,
             mainCamforward = t.mainCamforward,
             mainCamRight = t.mainCamRight,
+            serverTime = t.inputs.localTime,
         };
     }
 
