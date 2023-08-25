@@ -449,7 +449,7 @@ public class Menu : MonoBehaviour
         {
             if (onlineServerMenu)
             {
-                PlayerPrefs.SetString("JoinCode", PlayerPrefs.GetString("GlobalServer" + index));
+                PlayerPrefs.SetString("JoinCode", PlayerPrefs.GetString("GlobalServer" + index).PadRight(6).Substring(0, 6));
                 PlayerPrefs.SetString("Connection Setting", "Join Online Server");
             }
             else
@@ -477,7 +477,7 @@ public class Menu : MonoBehaviour
 
         try
         {
-            JoinAllocation joinAllocation = await RelayService.Instance.JoinAllocationAsync(joinCode);
+            JoinAllocation joinAllocation = await RelayService.Instance.JoinAllocationAsync(joinCode.PadRight(6).Substring(0, 6));
 
             RelayServerData relayServerData = new RelayServerData(joinAllocation, "dtls");
 
