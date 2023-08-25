@@ -85,16 +85,6 @@ namespace StarterAssets
             currentTick.inputs = player.GetTracker().GetPlayerNetworkData();
             currentTick.inputs.deltaTime = Time.deltaTime;
 
-            //Remove inputs in situations
-            if (menu.GetOpenState() || player.GetHealth() <= 0)
-            {
-                currentTick.inputs.rightJoystick = Vector2.zero;
-                currentTick.inputs.crouch = false;
-                currentTick.inputs.shoot = false;
-                currentTick.inputs.jump = false;
-                tracker.ResetInputs();
-            }
-
             //Mouselook
             if (usingMouse && !menu.GetOpenState())
             {
@@ -124,7 +114,7 @@ namespace StarterAssets
             currentTick.velocity = _controller.velocity;
             if (IsHost && !IsOwner)
             {
-                //oldTicksServer.Add(currentTick);
+                oldTicksServer.Add(currentTick);
             }
             if (!IsHost)
             {
@@ -221,6 +211,16 @@ namespace StarterAssets
             right.Normalize();
             Vector3 newAxis = forward * currentTick.inputs.rightJoystick.y + right * currentTick.inputs.rightJoystick.x;
             Vector3 targetSpeed = new Vector3(newAxis.x, 0.0f, newAxis.z).normalized * player.GetClassStats().baseSpeed / 25.0f;
+
+            //Remove inputs in situations
+            if (menu.GetOpenState() || player.GetHealth() <= 0)
+            {
+                currentTick.inputs.rightJoystick = Vector2.zero;
+                currentTick.inputs.crouch = false;
+                currentTick.inputs.shoot = false;
+                currentTick.inputs.jump = false;
+                tracker.ResetInputs();
+            }
 
             //Crouch
             if (currentTick.inputs.crouch && _controller.isGrounded)
