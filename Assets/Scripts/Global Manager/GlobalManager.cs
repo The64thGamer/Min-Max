@@ -10,10 +10,6 @@ using Unity.Services.Relay;
 using Unity.Services.Relay.Models;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using UnityEngine.tvOS;
-using UnityEngine.UIElements;
-using UnityEngine.Windows;
-using static UnityEngine.Rendering.DebugUI;
 
 public class GlobalManager : NetworkBehaviour
 {
@@ -564,8 +560,8 @@ public class GlobalManager : NetworkBehaviour
                 return;
             }
         }
+        Debug.Log("Client name: " + playerName);
         GameObject client = GameObject.Instantiate(clientPrefab, Vector3.zero, Quaternion.identity);
-        client.name = playerName;
         client.GetComponent<NetworkObject>().SpawnWithOwnership(id);
 
         //Client Object Spawning
@@ -1200,6 +1196,16 @@ public struct PlayerDataSentToClient : INetworkSerializable
         serializer.SerializeValue(ref shoot);
         serializer.SerializeValue(ref crouch);
         serializer.SerializeValue(ref menu);
+        serializer.SerializeValue(ref _speed);
+        serializer.SerializeValue(ref _verticalVelocity);
+        serializer.SerializeValue(ref _fallTimeoutDelta);
+        serializer.SerializeValue(ref _hasBeenMovingDelta);
+        serializer.SerializeValue(ref oldAxis);
+        serializer.SerializeValue(ref oldInput);
+        serializer.SerializeValue(ref hasBeenGrounded);
+        serializer.SerializeValue(ref hasBeenStopped);
+        serializer.SerializeValue(ref currentCrouchLerp);
+        serializer.SerializeValue(ref hasBeenCrouched);
     }
 }
 
@@ -1234,6 +1240,7 @@ public struct PlayerInfoSentToClient : INetworkSerializable
         serializer.SerializeValue(ref currentTeam);
         serializer.SerializeValue(ref cosmetics);
         serializer.SerializeValue(ref gunName);
+        serializer.SerializeValue(ref playerName);
     }
 }
 
