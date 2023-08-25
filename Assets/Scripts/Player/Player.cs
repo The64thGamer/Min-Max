@@ -31,10 +31,10 @@ public class Player : NetworkBehaviour
 
     //Stats
     int currentHealth;
-    RespawnState respawnState;
+    RespawnState respawnState = RespawnState.notRespawning;
     public enum RespawnState
     {
-        alive,
+        notRespawning,
         respawning,
         waitingForResponse,
     }
@@ -92,7 +92,7 @@ public class Player : NetworkBehaviour
 
     public void RespawnPlayer(Vector3 spawnPos, float respawnTimer)
     {
-        if (respawnState != RespawnState.alive)
+        if (respawnState == RespawnState.notRespawning)
         {
             StartCoroutine(RespawnTimed(spawnPos, respawnTimer));
         }
@@ -102,20 +102,21 @@ public class Player : NetworkBehaviour
     {
         respawnState = RespawnState.respawning;
         SetLayer(19); //Dead Player
-        Debug.Log("Player " + GetPlayerID() + " Respawning in " + respawnTimer + " sec");
+        Debug.Log("Player " + GetPlayerID() + " Died. Respawning in " + respawnTimer + " sec");
         yield return new WaitForSeconds(respawnTimer);
-        if (IsHost)
+        if (IsHost && GetPlayerID() < botID)
         {
             //Check if the player wants to update their class
             //Or Cosmetics before respawning
             respawnState = RespawnState.waitingForResponse;
             gm.RequestPlayerStatusOnSwitchedClassesClientRpc(GetPlayerID());
 
-            while (respawnState != RespawnState.alive)
+            while (respawnState != RespawnState.notRespawning)
             {
                 yield return null;
             }
         }
+        Debug.Log("Player " + GetPlayerID() + " respawned in " + currentTeam.ToString() + " spawn room");
         ResetClassStats();
         GetTracker().ForceNewPosition(spawnPos);
         SetLayer(GetTeamLayer());
@@ -125,7 +126,7 @@ public class Player : NetworkBehaviour
     {
         if (respawnState == RespawnState.waitingForResponse)
         {
-            respawnState = RespawnState.alive;
+            respawnState = RespawnState.notRespawning;
             return true;
         }
         return false;
@@ -135,7 +136,7 @@ public class Player : NetworkBehaviour
     {
         if(respawnState == RespawnState.waitingForResponse)
         {
-            respawnState = RespawnState.alive;
+            respawnState = RespawnState.notRespawning;
         }
     }
 

@@ -877,7 +877,6 @@ public class GlobalManager : NetworkBehaviour
                 //Refresh Stats
                 clients[i].RespawnPlayer(spawnPos, respawnTimer);
                 UpdateMatchFocalPoint(clients[i].GetTeam());
-                Debug.Log("Player " + id + " respawned in " + team.ToString() + " spawn room");
                 return;
             }
         }
