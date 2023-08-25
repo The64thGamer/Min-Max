@@ -107,7 +107,6 @@ namespace StarterAssets
             currentTick.mainCamforward = _mainCamera.transform.forward;
             currentTick.mainCamRight = _mainCamera.transform.right;
 
-
             //Wire
             heldWire = player.GetWirePoint();
             if (IsHost)
@@ -118,7 +117,7 @@ namespace StarterAssets
             //Execute Movement
             if (IsHost && !IsOwner)
             {
-                oldTicksServer.Add(currentTick);
+                //oldTicksServer.Add(currentTick);
             }
             if (!IsHost)
             {
@@ -407,6 +406,10 @@ namespace StarterAssets
 
         public void RecalculateServerPosition(PlayerDataSentToServer data)
         {
+            if(oldTicksServer.Count < 5)
+            {
+                return;
+            }
             if (oldTicksServer.Count > 0)
             {
                 _controller.enabled = false;
