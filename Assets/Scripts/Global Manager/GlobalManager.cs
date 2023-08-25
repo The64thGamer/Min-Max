@@ -564,7 +564,6 @@ public class GlobalManager : NetworkBehaviour
                 return;
             }
         }
-
         GameObject client = GameObject.Instantiate(clientPrefab, Vector3.zero, Quaternion.identity);
         client.name = playerName;
         client.GetComponent<NetworkObject>().SpawnWithOwnership(id);

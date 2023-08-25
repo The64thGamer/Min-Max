@@ -39,82 +39,14 @@ public abstract class GenericGamemode : NetworkBehaviour
                     team = team1;
                 }
 
-                //Auto Team
-                ClassList autoClass = ClassList.programmer;
-                string autoGun = "W.I.P.";
-                int random = UnityEngine.Random.Range(0, 3);
-                switch (random)
-                {
-                    case 0:
-                        autoClass = ClassList.programmer;
-                        autoGun = "W.I.P.";
-                        break;
-                    case 1:
-                        autoClass = ClassList.computer;
-                        autoGun = "W.I.P.";
-                        break;
-                    case 2:
-                        autoClass = ClassList.fabricator;
-                        autoGun = "O-S F-O";
-                        break;
-                    default:
-                        break;
-                }
-
-                //Random cosmetics
-                List<int> cos = new List<int>();
-                switch (autoClass)
-                {
-                    case ClassList.programmer:
-                        int randoP = UnityEngine.Random.Range(0, 4);
-                        switch (randoP)
-                        {
-                            case 0:
-                                cos.Add(5);
-                                break;
-                            default:
-                                break;
-                        }
-                        break;
-                    case ClassList.fabricator:
-                        int randoF = UnityEngine.Random.Range(0, 4);
-                        switch (randoF)
-                        {
-                            case 0:
-                                cos.Add(0);
-                                cos.Add(1);
-                                break;
-                            case 1:
-                                cos.Add(0);
-                                cos.Add(6);
-                                break;
-                            case 2:
-                                cos.Add(1);
-                                cos.Add(5);
-                                break;
-                            case 3:
-                                cos.Add(0);
-                                cos.Add(5);
-                                break;
-                            default:
-                                break;
-                        }
-                        break;
-                    case ClassList.computer:
-                        cos.Add(0);
-                        cos.Add(1);
-                        cos.Add(2);
-                        break;
-                    default:
-                        break;
-                }
                 PlayerInfoSentToClient pdstc = new PlayerInfoSentToClient
                 {
                     id = clients[i].GetPlayerID(),
-                    currentClass = autoClass,
+                    currentClass = clients[i].GetCurrentClass(),
                     currentTeam = team,
-                    cosmetics = cos.ToArray(),
-                    gunName = autoGun,
+                    cosmetics = clients[i].GetCosmeticInts(),
+                    gunName = clients[i].GetCurrentGun().name,
+                    playerName = clients[i].GetPlayerName(),
                 };
                 gm.AssignPlayerClassAndTeamClientRpc(pdstc);
                 gm.RespawnPlayer(clients[i].GetPlayerID(), clients[i].GetTeam(),true);

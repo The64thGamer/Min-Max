@@ -7,7 +7,7 @@
             <ui:Label text="Min-Max" style="-unity-font-definition: url(&apos;project://database/Assets/Game%20Assets/UI/Fonts/256%20bytes.otf?fileID=12800000&amp;guid=3da65d8dec80e0048a336d733ed50505&amp;type=3#256 bytes&apos;); font-size: 160px; color: rgb(189, 77, 22); margin-left: 0; margin-right: 0; margin-top: 0; margin-bottom: 0; padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0;" />
         </ui:VisualElement>
         <ui:Label text="v0.12a" style="-unity-font-definition: url(&apos;project://database/Assets/Game%20Assets/UI/Fonts/PTMono-Regular.ttf?fileID=12800000&amp;guid=cc1735a3c585aba4480bc03c8d93b029&amp;type=3#PTMono-Regular&apos;); font-size: 40px; color: rgb(26, 28, 26); margin-left: 0; margin-right: 0; margin-top: 0; margin-bottom: 0; padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0;" />
-        <ui:Button text="Server Info" name="ServerInfo" class="Button ButtonPaper" />
+        <ui:Button text="Server Info" name="ServerInfo" class="Button ButtonPaper" style="display: none;" />
         <ui:Button text="Switch Class" name="SwitchClass" class="Button ButtonPaper" />
         <ui:Button text="Customization" name="Customization" class="Button ButtonPaper" />
         <ui:Button text="Statistics" name="Statistics" class="Button ButtonPaper" />

@@ -147,6 +147,7 @@ public class Player : NetworkBehaviour
     public void SetName(string name)
     {
         playerName = name;
+        Debug.Log("Client name: " + playerName);
         this.name = name;
     }
 
