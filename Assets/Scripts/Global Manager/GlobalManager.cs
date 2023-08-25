@@ -491,6 +491,27 @@ public class GlobalManager : NetworkBehaviour
         }
     }
 
+    string AutoGun(ClassList currentClassSelected)
+    {
+        //Auto Guns
+        string autoGun = "W.I.P.";
+        switch (currentClassSelected)
+        {
+            case ClassList.programmer:
+                autoGun = "W.I.P.";
+                break;
+            case ClassList.computer:
+                autoGun = "W.I.P.";
+                break;
+            case ClassList.fabricator:
+                autoGun = "O-S F-O";
+                break;
+            default:
+                break;
+        }
+        return autoGun;
+    }
+
     [ServerRpc(RequireOwnership = false)]
     void SendJoystickServerRpc(PlayerDataSentToServer serverData, ServerRpcParams serverRpcParams = default)
     {
@@ -551,21 +572,7 @@ public class GlobalManager : NetworkBehaviour
         TeamList decidedTeam = currentGamemode.DecideWhichPlayerTeam();
 
         //Auto Guns
-        string autoGun = "W.I.P.";
-        switch ((ClassList)initialClass)
-        {
-            case ClassList.programmer:
-                autoGun = "W.I.P.";
-                break;
-            case ClassList.computer:
-                autoGun = "W.I.P.";
-                break;
-            case ClassList.fabricator:
-                autoGun = "O-S F-O";
-                break;
-            default:
-                break;
-        }
+        string autoGun = AutoGun((ClassList)initialClass);
 
         //Random cosmetics
         if (id >= botID)
@@ -673,6 +680,59 @@ public class GlobalManager : NetworkBehaviour
         UpdateClientMapDataClientRpc(teams.ToArray(), wireData.ToArray());
 
         Debug.Log("New Player Joined (#" + clients.Count + "), Team " + decidedTeam);
+    }
+
+
+    [ServerRpc(RequireOwnership = false)]
+    public void SendPlayerStatusOnSwitchedClassesServerRpc(bool yesChangeClass, int initialClass, int[] cosmetics, ServerRpcParams serverRpcParams = default)
+    {
+
+        initialClass = Mathf.Clamp(initialClass, 3, 5);  //Can only pick current classes
+
+        for (int i = 0; i < clients.Count; i++)
+        {
+            if (clients[i].GetPlayerID() == serverRpcParams.Receive.SenderClientId)
+            {
+                if (!yesChangeClass)
+                {
+                    clients[i].SendPlayerSwitchClassStatusRejection();
+                    return;
+                }
+                else
+                {
+                    if(clients[i].SendPlayerSwitchClassStatus())
+                    {
+                        PlayerInfoSentToClient pdstc = new PlayerInfoSentToClient
+                        {
+                            id = serverRpcParams.Receive.SenderClientId,
+                            currentClass = (ClassList)initialClass,
+                            currentTeam = clients[i].GetTeam(),
+                            cosmetics = cosmetics,
+                            gunName = AutoGun((ClassList)initialClass),
+                            playerName = clients[i].GetPlayerName(),
+                        };
+                        AssignPlayerClassAndTeamClientRpc(pdstc);
+                    }
+                }
+                return;
+            }
+        }
+    }
+
+    [ClientRpc]
+    void RequestPlayerStatusOnSwitchedClassesClientRpc(ulong id)
+    {
+        for (int i = 0; i < clients.Count; i++)
+        {
+            if (clients[i].GetPlayerID() == id)
+            {
+                if (clients[i].IsOwner && clients[i].GetPlayerID() < botID)
+                {
+
+                }
+                return;
+            }
+        }
     }
 
     /// <summary>
@@ -837,8 +897,6 @@ public class GlobalManager : NetworkBehaviour
             }
         }
     }
-
-
 
     [ClientRpc]
     public void AssignPlayerClassAndTeamClientRpc(PlayerInfoSentToClient data)

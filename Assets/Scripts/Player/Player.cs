@@ -31,7 +31,13 @@ public class Player : NetworkBehaviour
 
     //Stats
     int currentHealth;
-    bool respawning;
+    RespawnState respawnState;
+    public enum RespawnState
+    {
+        alive,
+        respawning,
+        waitingForResponse,
+    }
 
     //Const
     const ulong botID = 64646464646464;
@@ -86,7 +92,7 @@ public class Player : NetworkBehaviour
 
     public void RespawnPlayer(Vector3 spawnPos, float respawnTimer)
     {
-        if (!respawning)
+        if (respawnState != RespawnState.alive)
         {
             StartCoroutine(RespawnTimed(spawnPos, respawnTimer));
         }
@@ -94,16 +100,39 @@ public class Player : NetworkBehaviour
 
     IEnumerator RespawnTimed(Vector3 spawnPos, float respawnTimer)
     {
-        respawning = true;
+        respawnState = RespawnState.respawning;
         SetLayer(19); //Dead Player
         Debug.Log("Player " + GetPlayerID() + " Respawning in " + respawnTimer + " sec");
-
         yield return new WaitForSeconds(respawnTimer);
+        respawnState = RespawnState.waitingForResponse;
 
+        gm.
+
+        while (respawnState != RespawnState.alive)
+        {
+            yield return null;
+        }
         ResetClassStats();
         GetTracker().ForceNewPosition(spawnPos);
         SetLayer(GetTeamLayer());
-        respawning = false;
+    }
+
+    public bool SendPlayerSwitchClassStatus()
+    {
+        if (respawnState == RespawnState.waitingForResponse)
+        {
+            respawnState = RespawnState.alive;
+            return true;
+        }
+        return false;
+    }
+
+    public void SendPlayerSwitchClassStatusRejection()
+    {
+        if(respawnState == RespawnState.waitingForResponse)
+        {
+            respawnState = RespawnState.alive;
+        }
     }
 
     public void SetName(string name)
