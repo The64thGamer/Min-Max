@@ -484,7 +484,6 @@ public class Menu : MonoBehaviour
             m_NetworkManager.GetComponent<UnityTransport>().SetRelayServerData(relayServerData);
 
             m_NetworkManager.StartClient();
-            serverCheck = ServerCheck.pass;
         }
         catch (RelayServiceException e)
         {

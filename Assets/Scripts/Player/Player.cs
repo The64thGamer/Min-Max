@@ -17,7 +17,9 @@ public class Player : NetworkBehaviour
     [SerializeField] ClassList currentClass;
     [SerializeField] ClassStats currentStats;
     [SerializeField] GameObject[] playerModels;
-    [SerializeField] string playerName;
+    string playerName;
+    [SerializeField] TextMesh nameMesh;
+
     Menu menu;
     int[] cosmeticInts = new int[0];
     List<GameObject> currentCharMeshes = new List<GameObject>();
@@ -149,6 +151,7 @@ public class Player : NetworkBehaviour
         playerName = name;
         Debug.Log("Client name: " + playerName);
         this.name = name;
+        nameMesh.text = name;
     }
 
     public void SetClass(ClassList setClass, int[] classCosmetics)
