@@ -484,7 +484,7 @@ namespace StarterAssets
         {
             if (currentTick.inputs.crouch && _controller.isGrounded)
             {
-                if (!currentTick.hasBeenCrouched)
+                if (!currentTick.hasBeenCrouched && player.GetHealth() > 0)
                 {
                     player.SetWirePoint(gm.GetWire(player.GetTeam()).RequestForWire(transform.position), true);
                     heldWire = player.GetWirePoint();
