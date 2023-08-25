@@ -4,12 +4,13 @@ using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.AI;
 
-public class Wire : MonoBehaviour
+public class Wire : NetworkBehaviour
 {
     TeamList currentTeam;
     [SerializeField] Texture2D palette;
     [SerializeField] Material wireMat;
     [SerializeField] Transform startPoint;
+    [SerializeField] Transform parentPoint;
     WirePoint startingWire = new WirePoint();
     const float minWireGrabDistance = 0.5f;
     Vector3 raycastYOffset = new Vector3(0, 0.2f, 0);
@@ -20,11 +21,24 @@ public class Wire : MonoBehaviour
     private void Start()
     {
         gm = GameObject.Find("Global Manager").GetComponent<GlobalManager>();
-        startingWire.point = startPoint.position;
+        startingWire.point = parentPoint.position;
+        if(IsHost)
+        {
+            WirePoint final = new WirePoint() { parent = startingWire, point = startPoint.position, wireID = lastID + 1 };
+            lastID++;
+            startingWire.children.Add(final);
+            AddNewLineRenderer(final);
+        }
     }
 
     private void Update()
     {
+        //Wait isn't this like super ineffecient?
+        //I have to do this for the constantly updating wires but
+        //This doesn't check if points have changed.
+        //Then again, would caching all previous points work?
+        //Maybe have moved wires ping this script to change a bool hmmmm
+        //Later, gotta get this update out first.
         int index = 0;
         for (int i = 0; i < startingWire.children.Count; i++)
         {
@@ -50,13 +64,17 @@ public class Wire : MonoBehaviour
     {
         //This should only be called by the host
         WirePoint closest = RecursiveWireSearch(playerPos, startingWire, float.PositiveInfinity);
+        if (closest == startingWire)
+        {
+            return null;
+        }
         if (closest != null)
         {
             if (Vector3.Distance(playerPos, closest.point) <= minWireGrabDistance
                 //&& !Physics.Raycast(playerPos + raycastYOffset, (closest.point + raycastYOffset) - (playerPos + raycastYOffset))
                 )
             {
-                WirePoint final = new WirePoint() { parent = closest, isOn = true, point = playerPos, wireID = lastID + 1 };
+                WirePoint final = new WirePoint() { parent = closest, point = playerPos, wireID = lastID + 1 };
                 lastID++;
                 closest.children.Add(final);
                 AddNewLineRenderer(final);
@@ -159,7 +177,7 @@ public class Wire : MonoBehaviour
     public WirePoint CreateNewClientWire(uint id, uint parentId)
     {
         WirePoint parent = FindWireFromID(parentId);
-        WirePoint final = new WirePoint() { parent = parent, isOn = true, wireID = id };
+        WirePoint final = new WirePoint() { parent = parent, wireID = id };
         parent.children.Add(final);
         AddNewLineRenderer(final);
         return final;
@@ -172,7 +190,7 @@ public class Wire : MonoBehaviour
         {
             parent = FindWireFromID((uint)data.parent);
         }
-        WirePoint final = new WirePoint() { parent = parent, isOn = true, wireID = data.wireID, point = data.point };
+        WirePoint final = new WirePoint() { parent = parent, wireID = data.wireID, point = data.point };
         if (parent != null)
         {
             parent.children.Add(final);
@@ -197,7 +215,7 @@ public class Wire : MonoBehaviour
         {
             parentID = (int)parent.parent.wireID;
         }
-        data.Add(new WirePointData() { isOn = parent.isOn, parent = parentID, wireID = parent.wireID, point = parent.point, teamNum = teamNumber });
+        data.Add(new WirePointData() {parent = parentID, wireID = parent.wireID, point = parent.point, teamNum = teamNumber });
         for (int i = 0; i < parent.children.Count; i++)
         {
             RecursiveConvertWires(data, parent.children[i], teamNumber);
@@ -292,7 +310,6 @@ public class Wire : MonoBehaviour
 
     public class WirePoint
     {
-        public bool isOn = true;
         public Vector3 point;
         public List<WirePoint> children = new List<WirePoint>();
         public WirePoint parent;

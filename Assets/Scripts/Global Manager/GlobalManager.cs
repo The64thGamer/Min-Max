@@ -94,13 +94,9 @@ public class GlobalManager : NetworkBehaviour
 
     private void OnApplicationQuit()
     {
+        Debug.Log("Runtime: " + Mathf.Max(0, Time.time - timeStartedPlaying) + " sec");
         achievments.AddToValue("Achievement: Total Match Runtime", Mathf.Max(0, Time.time - timeStartedPlaying));
         timeStartedPlaying = Time.time;
-        achievments.SaveAchievements();
-    }
-
-    public void SaveAchievements()
-    {
         achievments.SaveAchievements();
     }
 
@@ -111,6 +107,7 @@ public class GlobalManager : NetworkBehaviour
             return;
         }
         Debug.Log("Disconnecting to Title Screen");
+        Debug.Log("Runtime: " + Mathf.Max(0, Time.time - timeStartedPlaying) + " sec");
         achievments.AddToValue("Achievement: Total Match Runtime", Mathf.Max(0, Time.time - timeStartedPlaying));
         timeStartedPlaying = Time.time;
         achievments.SaveAchievements();
