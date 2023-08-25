@@ -382,7 +382,7 @@ namespace StarterAssets
             _controller.enabled = false;
             transform.position = data.pos;
             _controller.enabled = true;
-            _controller.SimpleMove(currentTick.velocity);
+            _controller.SimpleMove(data.velocity);
             _controller.enabled = false;
             transform.position = data.pos;
             _controller.enabled = true;
@@ -412,7 +412,7 @@ namespace StarterAssets
                 _controller.enabled = false;
                 transform.position = oldTicksServer[0].pos;
                 _controller.enabled = true;
-                _controller.SimpleMove(currentTick.velocity);
+                _controller.SimpleMove(oldTicksServer[0].velocity);
                 _controller.enabled = false;
                 transform.position = oldTicksServer[0].pos;
                 _controller.enabled = true;
