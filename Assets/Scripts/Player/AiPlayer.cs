@@ -46,13 +46,14 @@ public class AiPlayer : NetworkBehaviour
         }
         else
         {
+            timeToSwap = Random.Range(1,5);
+            timeToChangePos = Random.Range(1, 5);
             path = new NavMeshPath();
             gm = GameObject.Find("Global Manager").GetComponent<GlobalManager>();
             headset = player.GetTracker().GetCamera();
             rhand = player.GetTracker().GetRightHand();
             tracker = player.GetTracker();
             height = PlayerPrefs.GetFloat("Settings: PlayerHeight") - 0.127f;
-
         }
     }
 
