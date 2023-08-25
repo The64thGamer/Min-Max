@@ -13,6 +13,7 @@ using UnityEngine.SceneManagement;
 using UnityEngine.tvOS;
 using UnityEngine.UIElements;
 using UnityEngine.Windows;
+using static UnityEngine.Rendering.DebugUI;
 
 public class GlobalManager : NetworkBehaviour
 {
@@ -720,7 +721,7 @@ public class GlobalManager : NetworkBehaviour
     }
 
     [ClientRpc]
-    void RequestPlayerStatusOnSwitchedClassesClientRpc(ulong id)
+    public void RequestPlayerStatusOnSwitchedClassesClientRpc(ulong id)
     {
         for (int i = 0; i < clients.Count; i++)
         {
@@ -728,7 +729,26 @@ public class GlobalManager : NetworkBehaviour
             {
                 if (clients[i].IsOwner && clients[i].GetPlayerID() < botID)
                 {
+                    if(Convert.ToBoolean(PlayerPrefs.GetInt("SendToServerSwitchClass")))
+                    {
+                        PlayerPrefs.SetInt("SendToServerSwitchClass", 0);
+                        List<int> newCosInts = new List<int>();
 
+                        for (int e = 0; e < 11; e++)
+                        {
+                            int check = PlayerPrefs.GetInt("Loadout " + PlayerPrefs.GetInt("Selected Class") + " Var: " + PlayerPrefs.GetInt("Selected Loadout") + " Type: " + e) - 1;
+                            if (check >= 0)
+                            {
+                                newCosInts.Add(check);
+                            }
+                        }
+
+                        SendPlayerStatusOnSwitchedClassesServerRpc(true, PlayerPrefs.GetInt("Selected Class"), newCosInts.ToArray());
+                    }
+                    else
+                    {
+                        SendPlayerStatusOnSwitchedClassesServerRpc(false,0,new int[0]);
+                    }
                 }
                 return;
             }

@@ -848,12 +848,15 @@ public class Menu : MonoBehaviour
                     switch (button)
                     {
                         case "Head3":
+                            PlayerPrefs.SetInt("SendToServerSwitchClass", 1);
                             CloseOpen(false);
                             break;
                         case "Head4":
+                            PlayerPrefs.SetInt("SendToServerSwitchClass", 1);
                             CloseOpen(false);
                             break;
                         case "Head5":
+                            PlayerPrefs.SetInt("SendToServerSwitchClass", 1);
                             CloseOpen(false);
                             break;
                         case "EditLoadout":

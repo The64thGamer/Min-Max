@@ -104,13 +104,17 @@ public class Player : NetworkBehaviour
         SetLayer(19); //Dead Player
         Debug.Log("Player " + GetPlayerID() + " Respawning in " + respawnTimer + " sec");
         yield return new WaitForSeconds(respawnTimer);
-        respawnState = RespawnState.waitingForResponse;
-
-        gm.
-
-        while (respawnState != RespawnState.alive)
+        if (IsHost)
         {
-            yield return null;
+            //Check if the player wants to update their class
+            //Or Cosmetics before respawning
+            respawnState = RespawnState.waitingForResponse;
+            gm.RequestPlayerStatusOnSwitchedClassesClientRpc(GetPlayerID());
+
+            while (respawnState != RespawnState.alive)
+            {
+                yield return null;
+            }
         }
         ResetClassStats();
         GetTracker().ForceNewPosition(spawnPos);
