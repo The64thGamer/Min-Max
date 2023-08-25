@@ -10,8 +10,8 @@ GameObject:
   m_Component:
   - component: {fileID: 588499620265613325}
   - component: {fileID: 412915730458406212}
-  - component: {fileID: 2311010754740203584}
-  - component: {fileID: 3843271505324373193}
+  - component: {fileID: 1462961959432592316}
+  - component: {fileID: 3050808586305213210}
   m_Layer: 0
   m_Name: Healing Pack 2
   m_TagString: Untagged
@@ -56,7 +56,7 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 0.6, y: 0.5, z: 0.6}
   m_Center: {x: 0, y: 0.25, z: 0}
---- !u!114 &2311010754740203584
+--- !u!114 &1462961959432592316
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -74,7 +74,7 @@ MonoBehaviour:
   looptime: 0
   healthIsPercent: 1
   spinObject: 1
---- !u!114 &3843271505324373193
+--- !u!114 &3050808586305213210
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -91,6 +91,7 @@ MonoBehaviour:
   SynchronizeTransform: 1
   ActiveSceneSynchronization: 0
   SceneMigrationSynchronization: 1
+  SpawnWithObservers: 1
   DontDestroyWithOwner: 0
   AutoObjectParentSync: 1
 --- !u!1001 &7311677126606469562

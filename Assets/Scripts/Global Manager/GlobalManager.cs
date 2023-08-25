@@ -880,6 +880,10 @@ public class GlobalManager : NetworkBehaviour
     [ClientRpc]
     void KickPlayerClientRpc(ulong id, string reason)
     {
+        if(reason == null)
+        {
+            return;
+        }
         Debug.Log("Disconnect: " + reason);
         for (int i = 0; i < clients.Count; i++)
         {
