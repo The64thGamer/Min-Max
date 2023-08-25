@@ -194,8 +194,6 @@ public class PlayerTracker : NetworkBehaviour
         return new PlayerDataSentToClient()
         {
             id = player.GetPlayerID(),
-            pos = GetPosition(),
-            velocity = GetVelocity(),
             headsetPos = headset.localPosition,
             headsetRot = headset.rotation,
             rHandPos = rightController.localPosition,
@@ -212,6 +210,10 @@ public class PlayerTracker : NetworkBehaviour
             hasBeenStopped = t.hasBeenStopped,
             currentCrouchLerp = t.currentCrouchLerp,
             hasBeenCrouched = t.hasBeenCrouched,
+            pos = t.pos,
+            velocity = t.velocity,
+            mainCamforward = t.mainCamforward,
+            mainCamRight = t.mainCamRight,
         };
     }
 

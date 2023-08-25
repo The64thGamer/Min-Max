@@ -82,9 +82,6 @@ namespace StarterAssets
         {
             if (_controller == null) { return; }
 
-            currentTick.inputs = player.GetTracker().GetPlayerNetworkData();
-            currentTick.inputs.deltaTime = Time.deltaTime;
-
             //Mouselook
             if (usingMouse && !menu.GetOpenState())
             {
@@ -102,6 +99,15 @@ namespace StarterAssets
                 _mainCamera.transform.localPosition = new Vector3(0, height, 0);
             }
 
+            //CurrentTick
+            currentTick.inputs = player.GetTracker().GetPlayerNetworkData();
+            currentTick.inputs.deltaTime = Time.deltaTime;
+            currentTick.pos = transform.position;
+            currentTick.velocity = _controller.velocity;
+            currentTick.mainCamforward = _mainCamera.transform.forward;
+            currentTick.mainCamRight = _mainCamera.transform.right;
+
+
             //Wire
             heldWire = player.GetWirePoint();
             if (IsHost)
@@ -110,8 +116,6 @@ namespace StarterAssets
             }
 
             //Execute Movement
-            currentTick.pos = transform.position;
-            currentTick.velocity = _controller.velocity;
             if (IsHost && !IsOwner)
             {
                 oldTicksServer.Add(currentTick);
@@ -202,16 +206,7 @@ namespace StarterAssets
         }
 
         Vector3 MovePlayer()
-        {
-            Vector3 forward = _mainCamera.transform.forward;
-            Vector3 right = _mainCamera.transform.right;
-            forward.y = 0f;
-            right.y = 0f;
-            forward.Normalize();
-            right.Normalize();
-            Vector3 newAxis = forward * currentTick.inputs.rightJoystick.y + right * currentTick.inputs.rightJoystick.x;
-            Vector3 targetSpeed = new Vector3(newAxis.x, 0.0f, newAxis.z).normalized * player.GetClassStats().baseSpeed / 25.0f;
-
+        {            
             //Remove inputs in situations
             if (menu.GetOpenState() || player.GetHealth() <= 0)
             {
@@ -221,6 +216,17 @@ namespace StarterAssets
                 currentTick.inputs.jump = false;
                 tracker.ResetInputs();
             }
+
+            Vector3 forward = currentTick.mainCamforward;
+            Vector3 right = currentTick.mainCamRight;
+            forward.y = 0f;
+            right.y = 0f;
+            forward.Normalize();
+            right.Normalize();
+            Vector3 newAxis = forward * currentTick.inputs.rightJoystick.y + right * currentTick.inputs.rightJoystick.x;
+            Vector3 targetSpeed = new Vector3(newAxis.x, 0.0f, newAxis.z).normalized * player.GetClassStats().baseSpeed / 25.0f;
+
+
 
             //Crouch
             if (currentTick.inputs.crouch && _controller.isGrounded)
@@ -369,12 +375,14 @@ namespace StarterAssets
             currentTick.currentCrouchLerp = data.currentCrouchLerp;
             currentTick.hasBeenCrouched = data.hasBeenCrouched;
             currentTick.velocity = data.velocity;
+            currentTick.mainCamforward = data.mainCamforward;
+            currentTick.mainCamRight = data.mainCamRight;
 
             //Achieve original Pos and Vel
             _controller.enabled = false;
             transform.position = data.pos;
             _controller.enabled = true;
-            _controller.SimpleMove(Vector3.zero);
+            _controller.SimpleMove(currentTick.velocity);
             _controller.enabled = false;
             transform.position = data.pos;
             _controller.enabled = true;
@@ -404,7 +412,7 @@ namespace StarterAssets
                 _controller.enabled = false;
                 transform.position = oldTicksServer[0].pos;
                 _controller.enabled = true;
-                _controller.SimpleMove(Vector3.zero);
+                _controller.SimpleMove(currentTick.velocity);
                 _controller.enabled = false;
                 transform.position = oldTicksServer[0].pos;
                 _controller.enabled = true;
@@ -496,6 +504,8 @@ namespace StarterAssets
             //Server Only
             public Vector3 pos;
             public Vector3 velocity;
+            public Vector3 mainCamforward;
+            public Vector3 mainCamRight;
 
         }
     }

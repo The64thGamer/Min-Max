@@ -1158,8 +1158,6 @@ public struct PlayerDataSentToClient : INetworkSerializable
     public Quaternion rHandRot;
     public Vector3 lHandPos;
     public Quaternion lHandRot;
-    public Vector3 pos;
-    public Vector3 velocity;
 
     //Controls
     public Vector2 rightJoystick;
@@ -1184,6 +1182,12 @@ public struct PlayerDataSentToClient : INetworkSerializable
     public float currentCrouchLerp;
     public bool hasBeenCrouched;
 
+    //Server
+    public Vector3 pos;
+    public Vector3 velocity;
+    public Vector3 mainCamforward;
+    public Vector3 mainCamRight;
+
     public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
     {
         serializer.SerializeValue(ref id);
@@ -1193,8 +1197,6 @@ public struct PlayerDataSentToClient : INetworkSerializable
         serializer.SerializeValue(ref rHandRot);
         serializer.SerializeValue(ref lHandPos);
         serializer.SerializeValue(ref lHandRot);
-        serializer.SerializeValue(ref pos);
-        serializer.SerializeValue(ref velocity);
         serializer.SerializeValue(ref rightJoystick);
         serializer.SerializeValue(ref jump);
         serializer.SerializeValue(ref shoot);
@@ -1210,6 +1212,10 @@ public struct PlayerDataSentToClient : INetworkSerializable
         serializer.SerializeValue(ref hasBeenStopped);
         serializer.SerializeValue(ref currentCrouchLerp);
         serializer.SerializeValue(ref hasBeenCrouched);
+        serializer.SerializeValue(ref pos);
+        serializer.SerializeValue(ref velocity);
+        serializer.SerializeValue(ref mainCamforward);
+        serializer.SerializeValue(ref mainCamRight);
     }
 }
 
