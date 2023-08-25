@@ -140,7 +140,7 @@ namespace StarterAssets
                 {
                     gm.SendPosClientRpc(tracker.GetPlayerPosData());
                 }
-                else if(nowSendServerValues)
+                else if(nowSendServerValues || player.GetPlayerID() >= botID)
                 {
                     nowSendServerValues = false;
                     gm.SendPosClientRpc(tracker.GetPlayerPosData());
@@ -442,15 +442,6 @@ namespace StarterAssets
                     deleteBehindThis++;
                 }
             }
-            //Debug
-            Debug.Log("CT: " + NetworkManager.LocalTime.TimeAsFloat);
-            Debug.Log("ST: " + data.serverTime);
-            if (oldTicksClient.Count > 0)
-            {
-                Debug.Log("OT: " + oldTicksClient[0].localTime);
-            }
-            Debug.Log("DT: " + (data.serverTime - deltaTime));
-
             oldTicksClient.RemoveRange(0, deleteBehindThis);
 
         }
