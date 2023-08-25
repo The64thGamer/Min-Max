@@ -116,6 +116,10 @@ public class Player : NetworkBehaviour
                 yield return null;
             }
         }
+        else
+        {
+            respawnState = RespawnState.notRespawning;
+        }
         Debug.Log("Player " + GetPlayerID() + " respawned in " + currentTeam.ToString() + " spawn room");
         ResetClassStats();
         GetTracker().ForceNewPosition(spawnPos);
