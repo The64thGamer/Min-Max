@@ -138,6 +138,7 @@ public class Player : NetworkBehaviour
     public void SetName(string name)
     {
         playerName = name;
+        this.name = name;
     }
 
     public void SetClass(ClassList setClass, int[] classCosmetics)
