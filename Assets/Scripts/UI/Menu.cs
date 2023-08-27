@@ -11,6 +11,7 @@ using Unity.Services.Authentication;
 using Unity.Services.Core;
 using Unity.Services.Relay;
 using Unity.Services.Relay.Models;
+using Unity.VisualScripting;
 using UnityEditor.ShaderGraph.Legacy;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -410,6 +411,10 @@ public class Menu : MonoBehaviour
         int secondCount = 0;
         while (true)
         {
+            if(serverCheck == ServerCheck.none)
+            {
+                yield break;
+            }
             if (serverCheck == ServerCheck.pass || serverCheck == ServerCheck.fail)
             {
                 break;
@@ -433,6 +438,10 @@ public class Menu : MonoBehaviour
             }
             secondCount++;
             yield return new WaitForSeconds(0.33333f);
+        }
+        if (serverCheck == ServerCheck.none)
+        {
+            yield break;
         }
 
         if (serverCheck == ServerCheck.fail)
@@ -884,20 +893,24 @@ public class Menu : MonoBehaviour
                     switch (button)
                     {
                         case "ServerTabLeft":
+                            serverCheck = ServerCheck.none;
                             onlineServerMenu = !onlineServerMenu;
                             currentServerPage = 0;
                             RefreshServerList(true);
                             break;
                         case "ServerTabRight":
+                            serverCheck = ServerCheck.none;
                             onlineServerMenu = !onlineServerMenu;
                             currentServerPage = 0;
                             RefreshServerList(true);
                             break;
                         case "PageLeft":
+                            serverCheck = ServerCheck.none;
                             currentServerPage = Mathf.Max(0, currentServerPage - 1);
                             RefreshServerList(true);
                             break;
                         case "PageRight":
+                            serverCheck = ServerCheck.none;
                             string addedL = "LocalServersAdded";
                             if (onlineServerMenu)
                             {
@@ -910,6 +923,7 @@ public class Menu : MonoBehaviour
                             AddServer(leftMenu.rootVisualElement.Q<TextField>("ServerAddCode").value);
                             break;
                         case "Back":
+                            serverCheck = ServerCheck.none;
                             SwitchPage(0);
                             break;
                         default:
