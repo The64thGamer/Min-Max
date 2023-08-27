@@ -18,7 +18,7 @@ public class Wire : NetworkBehaviour
     List<LineRenderer> meshes = new List<LineRenderer>();
     GlobalManager gm;
 
-    private void Start()
+    public override void OnNetworkSpawn()
     {
         gm = GameObject.Find("Global Manager").GetComponent<GlobalManager>();
         startingWire.point = parentPoint.position;
