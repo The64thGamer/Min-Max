@@ -152,6 +152,10 @@ public class Player : NetworkBehaviour
         Debug.Log("Client name: " + playerName);
         this.name = name;
         nameMesh.text = name;
+        if(IsOwner && GetPlayerID() < botID)
+        {
+            nameMesh.gameObject.SetActive(false);
+        }
     }
 
     public void SetClass(ClassList setClass, int[] classCosmetics)
