@@ -21,13 +21,10 @@ public class WorldSpaceUIDocument : MonoBehaviour
     [SerializeField] private MeshCollider meshCollider;
     [SerializeField] Transform finger;
     [SerializeField] Transform screenDot;
-
+    [SerializeField] bool debugTestInputs;
 
     private const string AssetsFolderName = "WorldSpaceUI";
     private static readonly Vector2Int DefaultResolution = new(1000, 700);
-
-    private MeshFilter _meshFilter;
-    private MeshRenderer _meshRenderer;
     private RenderTexture _targetRenderTexture;
 
 
@@ -141,12 +138,20 @@ public class WorldSpaceUIDocument : MonoBehaviour
         {
             if(mainCamera == null)
             {
+                Debug.Log("No Camera Found");
                 return Vector2.zero;
             }
             screenPosition.y = Screen.height - screenPosition.y;
             ray = mainCamera.ScreenPointToRay(screenPosition);
         }
-        if (!meshCollider.Raycast(ray, out var hit, Mathf.Infinity)) return new Vector2(float.NaN, float.NaN);
+        if (!meshCollider.Raycast(ray, out var hit, Mathf.Infinity))
+        {
+            if(debugTestInputs)
+            {
+                Debug.Log("Not receiving input");
+            }
+            return new Vector2(float.NaN, float.NaN);
+        }
 
         var targetTexture = uiDocument.panelSettings.targetTexture;
         var textureCoord = hit.textureCoord;
@@ -154,6 +159,7 @@ public class WorldSpaceUIDocument : MonoBehaviour
         textureCoord.y = 1 - textureCoord.y;
         textureCoord *= new Vector2(targetTexture.width, targetTexture.height);
 
+        Debug.Log("Recieving input: " + textureCoord);
         return textureCoord;
     }
 }
