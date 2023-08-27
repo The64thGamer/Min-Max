@@ -73,6 +73,11 @@ public class WorldSpaceUIDocument : MonoBehaviour
         }
     }
 
+    public void SetFinger(Transform fingerNew)
+    {
+        finger = fingerNew;
+    }
+
     private void InitializeMeshComponents()
     {
         meshCollider = GetComponent<MeshCollider>();

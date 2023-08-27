@@ -399,7 +399,6 @@ public class GlobalManager : NetworkBehaviour
                     }
                     if (clients[i].GetWirePoint() != null)
                     {
-                        Debug.Log("RemoveClientWire Sent to Clients");
                         RemoveClientWireClientRpc(clients[i].GetPlayerID(), clients[i].GetWirePoint().point, false);
                     }
                 }
@@ -416,7 +415,6 @@ public class GlobalManager : NetworkBehaviour
                 }
             }
 
-            Debug.Log("RespawnPlayer Sent to Clients");
             RespawnPlayerClientRpc(id, team, spawnPos, timer);
         }
     }

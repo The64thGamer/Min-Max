@@ -43,17 +43,19 @@ public class Player : NetworkBehaviour
 
     //Const
     const ulong botID = 64646464646464;
-
-    public override void OnNetworkSpawn()
+    private void Awake()
     {
-        //Before
         tracker = GetComponentInChildren<PlayerTracker>();
         controller = GetComponentInChildren<FirstPersonController>();
         gm = GameObject.Find("Global Manager").GetComponent<GlobalManager>();
         al = gm.GetComponent<AllStats>();
-        gm.AddPlayerToClientList(this);
         wireSounds = transform.Find("WireSounds").GetComponent<WireSounds>();
         menu = transform.Find("Menu").GetComponent<Menu>();
+    }
+    public override void OnNetworkSpawn()
+    {
+        //Before
+        gm.AddPlayerToClientList(this);
 
         //After
         if (IsOwner)

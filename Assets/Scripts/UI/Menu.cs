@@ -132,6 +132,12 @@ public class Menu : MonoBehaviour
         }
     }
 
+    public void SetMouseOnly()
+    {
+        leftMenu.GetComponent<WorldSpaceUIDocument>().SetFinger(null);
+        rightMenu.GetComponent<WorldSpaceUIDocument>().SetFinger(null);
+    }
+
     private void Update()
     {
         soundTimer = Mathf.Max(0, soundTimer - Time.deltaTime);

@@ -58,7 +58,7 @@ namespace StarterAssets
         List<TickValues> oldTicksServer;
         bool nowSendServerValues;
 
-        public override void OnNetworkSpawn()
+        private void Awake()
         {
             currentTick = new TickValues();
             gm = GameObject.Find("Global Manager").GetComponent<GlobalManager>();
@@ -68,7 +68,10 @@ namespace StarterAssets
             menu = player.GetMenu();
             oldTicksClient = new List<PlayerDataSentToServer>();
             oldTicksServer = new List<TickValues>();
+        }
 
+        public override void OnNetworkSpawn()
+        {
             // reset our timeouts on start
             currentTick._fallTimeoutDelta = FallTimeout;
 
@@ -81,6 +84,7 @@ namespace StarterAssets
                 Destroy(_mainCamera.GetComponent<TrackedPoseDriver>());
                 Destroy(tracker.GetRightHand().GetComponent<ActionBasedController>());
                 Destroy(tracker.GetLeftHand().GetComponent<ActionBasedController>());
+                menu.SetMouseOnly();
             }
         }
 
@@ -530,6 +534,11 @@ namespace StarterAssets
                 gm.UpdateMatchFocalPoint(player.GetTeam());
                 gm.RemoveClientWireClientRpc(player.GetPlayerID(), heldWire.point, true);
             }
+        }
+
+        public bool isUsingMouse()
+        {
+            return usingMouse;
         }
 
         public TickValues GetCurrentTick()
