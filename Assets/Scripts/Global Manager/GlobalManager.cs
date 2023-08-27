@@ -927,6 +927,10 @@ public class GlobalManager : NetworkBehaviour
     [ClientRpc]
     void SendAllPlayerDataToNewPlayerClientRpc(PlayerInfoSentToClient[] data, ulong id)
     {
+        if(IsHost)
+        {
+            return;
+        }
         for (int i = 0; i < clients.Count; i++)
         {
             //This looks dumb but its to make sure redundant data isn't sent to all clients
