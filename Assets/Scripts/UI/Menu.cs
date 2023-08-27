@@ -2,8 +2,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection.Emit;
-using System.Xml.Linq;
 using Unity.Netcode;
 using Unity.Netcode.Transports.UTP;
 using Unity.Networking.Transport.Relay;
@@ -11,8 +9,6 @@ using Unity.Services.Authentication;
 using Unity.Services.Core;
 using Unity.Services.Relay;
 using Unity.Services.Relay.Models;
-using Unity.VisualScripting;
-using UnityEditor.ShaderGraph.Legacy;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UIElements;
@@ -1481,8 +1477,8 @@ public class Menu : MonoBehaviour
         isOpen = open;
         if(!open)
         {
-
             UnityEngine.Cursor.lockState = CursorLockMode.Locked;
+            UnityEngine.Cursor.visible = false;
             menuMesh.SetActive(false);
             fakeMenuLMesh.SetActive(false);
             fakeMenuRMesh.SetActive(false);
@@ -1497,6 +1493,7 @@ public class Menu : MonoBehaviour
         else
         {
             UnityEngine.Cursor.lockState = CursorLockMode.None;
+            UnityEngine.Cursor.visible = true;
             SwitchPage(0);
             menuMesh.SetActive(true);
             fakeMenuLMesh.SetActive(true);
