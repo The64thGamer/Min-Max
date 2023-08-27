@@ -11,14 +11,17 @@ public class BillboardUI : MonoBehaviour
     }
     void Update()
     {
-        this.transform.LookAt(Camera.main.transform);
-        if (Vector3.Distance(transform.position, Camera.main.transform.position) < 10)
+        if (Camera.main != null)
         {
-            transform.localScale = initialScale;
-        }
-        else
-        {
-            transform.localScale = Vector3.zero;
+            this.transform.LookAt(Camera.main.transform);
+            if (Vector3.Distance(transform.position, Camera.main.transform.position) < 10)
+            {
+                transform.localScale = initialScale;
+            }
+            else
+            {
+                transform.localScale = Vector3.zero;
+            }
         }
     }
 }

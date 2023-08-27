@@ -17,7 +17,6 @@ namespace StarterAssets
         CharacterController _controller;
         [SerializeField] GameObject _mainCamera;
 
-
         PlayerTracker tracker;
         GlobalManager gm;
         Player player;
