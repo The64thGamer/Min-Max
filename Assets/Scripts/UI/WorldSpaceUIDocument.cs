@@ -73,11 +73,6 @@ public class WorldSpaceUIDocument : MonoBehaviour
         }
     }
 
-    public void SetFinger(Transform fingerNew)
-    {
-        finger = fingerNew;
-    }
-
     private void InitializeMeshComponents()
     {
         meshCollider = GetComponent<MeshCollider>();
@@ -155,5 +150,11 @@ public class WorldSpaceUIDocument : MonoBehaviour
         textureCoord *= new Vector2(targetTexture.width, targetTexture.height);
 
         return textureCoord;
+    }
+
+
+    public void SetFinger(Transform fingerNew)
+    {
+        finger = fingerNew;
     }
 }
