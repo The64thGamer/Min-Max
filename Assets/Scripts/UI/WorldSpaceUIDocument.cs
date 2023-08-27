@@ -20,7 +20,7 @@ public class WorldSpaceUIDocument : MonoBehaviour
     [SerializeField] private Camera mainCamera;
     [SerializeField] private MeshCollider meshCollider;
     [SerializeField] Transform finger;
-    [SerializeField] Transform screenDot;
+    [SerializeField] ScreenDot screenDot;
 
     private const string AssetsFolderName = "WorldSpaceUI";
     private static readonly Vector2Int DefaultResolution = new(1000, 700);
@@ -41,13 +41,9 @@ public class WorldSpaceUIDocument : MonoBehaviour
             Ray ray = new Ray(finger.position, finger.forward);
             if (meshCollider.Raycast(ray, out var hit, Mathf.Infinity))
             {
-                screenDot.position = hit.point;
-                screenDot.forward = transform.forward;
-                screenDot.localScale = Vector3.one;
-            }
-            else
-            {
-                screenDot.localScale = Vector3.zero;
+                screenDot.transform.position = hit.point;
+                screenDot.transform.forward = transform.forward;
+                screenDot.DotVisible();
             }
         }
     }
