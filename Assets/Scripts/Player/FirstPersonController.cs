@@ -16,6 +16,8 @@ namespace StarterAssets
         //Objects
         CharacterController _controller;
         [SerializeField] GameObject _mainCamera;
+
+
         PlayerTracker tracker;
         GlobalManager gm;
         Player player;
@@ -30,6 +32,10 @@ namespace StarterAssets
         const float Gravity = -15.0f;
         const float FallTimeout = 0.15f;
         const float _terminalVelocity = 53.0f;
+
+        const float menuScale = 1.44f;
+        const float menuY = -0.43f;
+        const float menuZ = 0.55f;
 
         //Wire
         bool directionDecided;
@@ -132,6 +138,8 @@ namespace StarterAssets
             {
                 oldTicksClient.Add(currentTick.inputs);
             }
+            Vector3 oldPos = transform.position;
+
             _controller.Move(MovePlayer());
 
             if(IsHost)
@@ -152,37 +160,16 @@ namespace StarterAssets
             {
                 if (_controller.isGrounded)
                 {
-                    gm.GetAchievements().AddToValue("Achievement: Total Walking Distance", Vector3.Distance(currentTick.pos, transform.position));
+                    gm.GetAchievements().AddToValue("Achievement: Total Walking Distance", Vector3.Distance(oldPos, transform.position));
                 }
                 else
                 {
-                    gm.GetAchievements().AddToValue("Achievement: Total Air Travel", Vector3.Distance(currentTick.pos, transform.position));
+                    gm.GetAchievements().AddToValue("Achievement: Total Air Travel", Vector3.Distance(oldPos, transform.position));;
                     gm.GetAchievements().AddToValue("Achievement: Total Air-Time", Time.deltaTime);
                 }
             }
 
-            //Menu Stuff
-            if (menu != null)
-            {
-                if (currentTick.inputs.menu && !holdingMenuButton)
-                {
-                    holdingMenuButton = true;
-                    menu.CloseOpen(!menu.GetOpenState());
-                }
-                if (!currentTick.inputs.menu && holdingMenuButton)
-                {
-                    holdingMenuButton = false;
-                }
-                if (menu.GetOpenState())
-                {
-                    if (usingMouse)
-                    {
-                        menu.transform.position = _mainCamera.transform.position + (_mainCamera.transform.forward * 0.1f);
-                        menu.transform.LookAt(_mainCamera.transform.position);
-                        menu.transform.localScale = 3.5f * Vector3.Distance(_mainCamera.transform.position, menu.transform.position) * Mathf.Tan((PlayerPrefs.GetFloat("Settings: FOV") * Mathf.Deg2Rad) / 2) * Vector3.one;
-                    }
-                }
-            }
+           
 
             if (currentTick.inputs.shoot)
             {
@@ -221,6 +208,44 @@ namespace StarterAssets
                                 gm.SegmentClientWireClientRpc(player.GetPlayerID(), heldWire.point, heldWire.wireID, heldWire.parent.wireID, player.GetTeam());
                             }
                         }
+                    }
+                }
+            }
+        }
+
+        private void LateUpdate()
+        {
+            //Menu Stuff
+            if (menu != null)
+            {
+                if (currentTick.inputs.menu && !holdingMenuButton)
+                {
+                    holdingMenuButton = true;
+                    menu.CloseOpen(!menu.GetOpenState());
+                }
+                if (!currentTick.inputs.menu && holdingMenuButton)
+                {
+                    holdingMenuButton = false;
+                }
+                if (menu.GetOpenState())
+                {
+                    if (usingMouse)
+                    {
+                        menu.transform.position = _mainCamera.transform.position + (_mainCamera.transform.forward * 0.1f);
+                        menu.transform.LookAt(_mainCamera.transform.position);
+                        menu.transform.localScale = 3.5f * Vector3.Distance(_mainCamera.transform.position, menu.transform.position) * Mathf.Tan((PlayerPrefs.GetFloat("Settings: FOV") * Mathf.Deg2Rad) / 2) * Vector3.one;
+                    }
+                    else
+                    {
+                        menu.transform.localScale = menuScale * Vector3.Distance(_mainCamera.transform.position, menu.transform.position) * Mathf.Tan((PlayerPrefs.GetFloat("Settings: FOV") * Mathf.Deg2Rad) / 2) * Vector3.one;
+                        menu.transform.LookAt(_mainCamera.transform.position);
+                        Vector3 forward = currentTick.mainCamforward;
+                        Vector3 menuVector = menu.transform.position - _mainCamera.transform.position;
+                        menuVector.y = 0;
+                        forward.y = 0f;
+                        forward.Normalize();
+                        menuVector.Normalize();
+                        menu.transform.position = Vector3.Lerp(_mainCamera.transform.position + new Vector3(0, menuY, 0) + (forward * menuZ), menu.transform.position, Mathf.Max(0,Vector3.Dot(forward,menuVector)));
                     }
                 }
             }
