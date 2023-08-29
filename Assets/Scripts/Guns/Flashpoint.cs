@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using Unity.Mathematics;
 using Unity.Netcode;
 using UnityEngine;
@@ -116,18 +117,17 @@ public class Flashpoint : Gun
             if (playersInTrigger[i] != null)
             {
                 Vector3 fireAngle = ((playersInTrigger[i].transform.position + new Vector3(0, 0.5f, 0)) - firepos).normalized;
-                RaycastHit hit;
                 LayerMask layermask = GetIgnoreTeamAndVRLayerMask(currentPlayer);
                 Debug.DrawRay(firepos, fireAngle * FindStat(ChangableWeaponStats.maxBulletRange));
-                if (Physics.Raycast(firepos, fireAngle, out hit, FindStat(ChangableWeaponStats.maxBulletRange), layermask))
+                RaycastHit[] hit = Physics.RaycastAll(firepos, fireAngle, FindStat(ChangableWeaponStats.maxBulletRange), layermask);
+                for (int e = 0; e < hit.Length; e++)
                 {
-                    Player hitPlayer = hit.collider.GetComponent<Player>();
-                    if (hitPlayer != null)
+                    if (hit[e].collider.GetComponent<Player>() == playersInTrigger[i])
                     {
-                        int damage = Mathf.CeilToInt(Mathf.Max(0, Mathf.SmoothStep(FindStat(ChangableWeaponStats.damage), 0, hit.distance / FindStat(ChangableWeaponStats.maxBulletRange))));
+                        int damage = Mathf.CeilToInt(Mathf.Max(0, Mathf.SmoothStep(FindStat(ChangableWeaponStats.damage), 0, hit[e].distance / FindStat(ChangableWeaponStats.maxBulletRange))));
                         if (damage > 0)
                         {
-                            hitPlayer.ChangeHealth(currentPlayer.GetPlayerID(), -damage, bulletIdHash);
+                            playersInTrigger[i].ChangeHealth(currentPlayer.GetPlayerID(), -damage, bulletIdHash);
                         }
                     }
                 }
