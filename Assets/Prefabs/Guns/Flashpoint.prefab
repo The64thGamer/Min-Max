@@ -59,13 +59,13 @@ MonoBehaviour:
   - statName: 4
     stat: 5
   - statName: 5
-    stat: 15
+    stat: 50
   - statName: 6
     stat: 0.1
   - statName: 3
     stat: 400
   - statName: 7
-    stat: 10
+    stat: 7
   - statName: 1
     stat: 1
   firePoint: {fileID: 5960225029509838066}
@@ -363,10 +363,10 @@ Light:
   m_Type: 0
   m_Shape: 0
   m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_Intensity: 1
-  m_Range: 1.5
-  m_SpotAngle: 71.87405
-  m_InnerSpotAngle: 71.87405
+  m_Intensity: 25
+  m_Range: 7
+  m_SpotAngle: 50
+  m_InnerSpotAngle: 50
   m_CookieSize: 10
   m_Shadows:
     m_Type: 0
@@ -406,8 +406,8 @@ Light:
   m_LightShadowCasterMode: 0
   m_AreaSize: {x: 1, y: 1}
   m_BounceIntensity: 1
-  m_ColorTemperature: 6570
-  m_UseColorTemperature: 0
+  m_ColorTemperature: 4892
+  m_UseColorTemperature: 1
   m_BoundingSphereOverride: {x: 0, y: 0, z: 0, w: 0}
   m_UseBoundingSphereOverride: 0
   m_UseViewFrustumForShadowCasterCull: 1

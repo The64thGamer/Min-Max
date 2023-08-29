@@ -25,8 +25,11 @@ public class Flashpoint : Gun
     Transform currentParent;
     bool dumbstupidjank;
 
+    List<Player> playersInTrigger;
+
     public void Start()
     {
+        playersInTrigger = new List<Player>();
         au = this.GetComponent<AudioSource>();
         boxCl = this.GetComponent<BoxCollider>();
         gm = GameObject.Find("Global Manager").GetComponent<GlobalManager>();
@@ -98,7 +101,6 @@ public class Flashpoint : Gun
                 if (gm.IsHost)
                 {
                     HitScanHostDamageCalculation(null);
-                    gm.SpawnProjectileClientRpc(currentPlayer.GetPlayerID());
                 }
             }
         }
@@ -107,47 +109,17 @@ public class Flashpoint : Gun
     protected override void HitScanHostDamageCalculation(Player player)
     {
         Vector3 firepos = currentPlayer.GetTracker().GetRightHandFirePos(defaultStats.firepoint);
-        Vector3 fireAngle = CalculateFireAngle(currentPlayer);
-
-        Transform gunAngle = currentPlayer.GetTracker().GetRightHand();
-        float angle = FindStat(ChangableWeaponStats.bulletSpreadAngle);
-        float angleStep;
-        int numBullets = 1;
-        if (numBullets < 4)
-        {
-            angleStep = 360f / numBullets;
-        }
-        else
-        {
-            angleStep = 360f / (numBullets - 1);
-        }
-
         int bulletIdHash = UnityEngine.Random.Range(-999999999, 999999999);
 
-        for (int i = 0; i < numBullets; i++)
+        for (int i = 0; i < playersInTrigger.Count; i++)
         {
-            Vector3 finalAngle = fireAngle;
-            if (!(numBullets >= 4 && i == 0))
+            if (playersInTrigger[i] != null)
             {
-                int newi = i;
-                if (numBullets >= 4)
-                {
-                    newi--;
-                }
-                float currentAngle = newi * angleStep;
-
-                // Convert angle to radians
-                float angleInRadians = currentAngle * Mathf.Deg2Rad;
-
-                finalAngle = Quaternion.AngleAxis(Mathf.Cos(angleInRadians) * angle, gunAngle.right) * finalAngle;
-                finalAngle = Quaternion.AngleAxis(Mathf.Sin(angleInRadians) * angle, gunAngle.up) * finalAngle;
-            }
-            RaycastHit hit;
-            LayerMask layermask = GetIgnoreTeamAndVRLayerMask(currentPlayer);
-            float dotAngle = Vector3.Dot(currentPlayer.GetTracker().GetRightHandSafeForward(), fireAngle.normalized);
-            if (dotAngle > MINANGLE)
-            {
-                if (Physics.Raycast(firepos, finalAngle, out hit, FindStat(ChangableWeaponStats.maxBulletRange), layermask))
+                Vector3 fireAngle = ((playersInTrigger[i].transform.position + new Vector3(0, 0.5f, 0)) - firepos).normalized;
+                RaycastHit hit;
+                LayerMask layermask = GetIgnoreTeamAndVRLayerMask(currentPlayer);
+                Debug.DrawRay(firepos, fireAngle * FindStat(ChangableWeaponStats.maxBulletRange));
+                if (Physics.Raycast(firepos, fireAngle, out hit, FindStat(ChangableWeaponStats.maxBulletRange), layermask))
                 {
                     Player hitPlayer = hit.collider.GetComponent<Player>();
                     if (hitPlayer != null)
@@ -163,6 +135,30 @@ public class Flashpoint : Gun
         }
     }
 
+    private void OnTriggerEnter(Collider other)
+    {
+        Player p = other.GetComponent<Player>();
+        if (p != null)
+        {
+            playersInTrigger.Add(p);
+        }
+    }
+
+    private void OnTriggerExit(Collider other)
+    {
+        Player p = other.GetComponent<Player>();
+        if (p != null)
+        {
+            for (int i = 0; i < playersInTrigger.Count; i++)
+            {
+                if (playersInTrigger[i] == p)
+                {
+                    playersInTrigger.RemoveAt(i);
+                    return;
+                }
+            }
+        }
+    }
 
     public override void AltFire() { }
 

@@ -116,8 +116,7 @@ MonoBehaviour:
   - gunName: Flashpoint
     gunPrefab: {fileID: 1279211091985373482, guid: 3083b23dec86be245a9bbc03405465d9,
       type: 3}
-    firePrefab: {fileID: 922140614253316042, guid: 53704ecba574ad240816d00222ea8601,
-      type: 3}
+    firePrefab: {fileID: 0}
     altFirePrefab: {fileID: 0}
     firepoint: {x: 0, y: 0, z: 0}
 --- !u!114 &5384925024139106558
