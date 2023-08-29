@@ -15,11 +15,8 @@ MonoBehaviour:
   themeUss: {fileID: -4733365628477956816, guid: a31a9aefcdd09a44f9e02a04a53939d4,
     type: 3}
   m_TargetTexture: {fileID: 8400000, guid: 3530c5452b9086141af08dc9105070b4, type: 2}
-  m_RenderMode: 0
-  m_WorldSpaceLayer: 0
   m_ScaleMode: 1
   m_ReferenceSpritePixelsPerUnit: 100
-  m_PixelsPerUnit: 100
   m_Scale: 1
   m_ReferenceDpi: 96
   m_FallbackDpi: 96
@@ -28,7 +25,6 @@ MonoBehaviour:
   m_Match: 0
   m_SortingOrder: 0
   m_TargetDisplay: 0
-  m_BindingLogLevel: 0
   m_ClearDepthStencil: 1
   m_ClearColor: 0
   m_ColorClearValue: {r: 0, g: 0, b: 0, a: 0}

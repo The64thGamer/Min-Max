@@ -6,10 +6,10 @@ using UnityEngine;
 public abstract class Gun : MonoBehaviour
 {
     //Constants
-    const float MINANGLE = 0.8f;
-    const float MAXSPHERECASTDISTANCE = 20;
-    const float MAXRAYCASTDISTANCE = 1000;
-    const float maxDamageFalloff = 20;
+    protected const float MINANGLE = 0.8f;
+    protected const float MAXSPHERECASTDISTANCE = 20;
+    protected const float MAXRAYCASTDISTANCE = 1000;
+    protected const float maxDamageFalloff = 20;
 
     [SerializeField]
     protected List<WeaponStats> changableStats = new List<WeaponStats>()
@@ -33,7 +33,7 @@ public abstract class Gun : MonoBehaviour
 
     private void Start()
     {
-        currentAmmo = FindStat(ChangableWeaponStats.maxAmmo);
+        currentAmmo = (int)FindStat(ChangableWeaponStats.maxAmmo);
     }
 
     //Exploit: Hit needs to be parsed to ensure extreme angles aren't achievable.
@@ -46,7 +46,7 @@ public abstract class Gun : MonoBehaviour
             Vector3 fireAngle = CalculateFireAngle(player);
 
             Transform gunAngle = player.GetTracker().GetRightHand();
-            int numBullets = FindStat(ChangableWeaponStats.bulletsPerShot);
+            int numBullets = (int)FindStat(ChangableWeaponStats.bulletsPerShot);
             float angle = FindStat(ChangableWeaponStats.bulletSpreadAngle);
             float angleStep = 0;
             if(numBullets < 4)
@@ -155,15 +155,15 @@ public abstract class Gun : MonoBehaviour
         return mask;
     }
 
-    protected void HitScanHostDamageCalculation(Player player)
+    protected virtual void HitScanHostDamageCalculation(Player player)
     {
         Vector3 firepos = player.GetTracker().GetRightHandFirePos(defaultStats.firepoint);
         Vector3 fireAngle = CalculateFireAngle(player);
 
         Transform gunAngle = player.GetTracker().GetRightHand();
-        int numBullets = FindStat(ChangableWeaponStats.bulletsPerShot);
+        int numBullets = (int)FindStat(ChangableWeaponStats.bulletsPerShot);
         float angle = FindStat(ChangableWeaponStats.bulletSpreadAngle);
-        float angleStep = 0;
+        float angleStep;
         if (numBullets < 4)
         {
             angleStep = 360f / numBullets;
@@ -214,7 +214,7 @@ public abstract class Gun : MonoBehaviour
         }
     }
 
-    protected int FindStat(ChangableWeaponStats statName)
+    protected float FindStat(ChangableWeaponStats statName)
     {
         for (int i = 0; i < changableStats.Count; i++)
         {
@@ -235,7 +235,7 @@ public abstract class Gun : MonoBehaviour
 public class WeaponStats
 {
     public ChangableWeaponStats statName;
-    public int stat;
+    public float stat;
 }
 
 [SerializeField]
@@ -247,4 +247,6 @@ public enum ChangableWeaponStats
     bulletSpeed,
     damage,
     bulletSpreadAngle,
+    radiationAfterburn,
+    maxBulletRange,
 }

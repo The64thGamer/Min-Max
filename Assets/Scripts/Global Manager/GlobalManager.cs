@@ -481,7 +481,7 @@ public class GlobalManager : NetworkBehaviour
                 autoGun = "W.I.P.";
                 break;
             case ClassList.computer:
-                autoGun = "W.I.P.";
+                autoGun = "Flashpoint";
                 break;
             case ClassList.fabricator:
                 autoGun = "O-S F-O";
