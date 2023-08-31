@@ -164,7 +164,7 @@ public class Player : NetworkBehaviour
         cosmeticInts = classCosmetics;
         currentClass = setClass;
         currentStats = gm.GetComponent<AllStats>().GetClassStats(setClass);
-        currentHealth = currentStats.baseHealth;
+        SetHealth(currentStats.baseHealth);
         SetupCosmetics(classCosmetics);
         SetCharacterVisibility(currentPlayerVisibility);
         UpdateTeamColor();
