@@ -101,4 +101,16 @@ public class PlayerUIController : MonoBehaviour
         boxTeam.style.backgroundColor = boxColor;
     }
 
+    public void SetVisibility(bool visible)
+    {
+        if(visible)
+        {
+            playerUIVTA.rootVisualElement.style.display = DisplayStyle.Flex;
+        }
+        else
+        {
+            playerUIVTA.rootVisualElement.style.display = DisplayStyle.None;
+        }
+    }
+
 }

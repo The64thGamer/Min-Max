@@ -1495,6 +1495,10 @@ public class Menu : MonoBehaviour
             leftMenu.gameObject.GetComponent<MeshCollider>().enabled = false;
             rightMenu.gameObject.GetComponent<MeshRenderer>().enabled = false;
             rightMenu.gameObject.GetComponent<MeshCollider>().enabled = false;
+            if(optionalPlayer != null)
+            {
+                optionalPlayer.GetUIController().SetVisibility(true);
+            }
         }
         else
         {
@@ -1510,6 +1514,10 @@ public class Menu : MonoBehaviour
             leftMenu.gameObject.GetComponent<MeshCollider>().enabled = true;
             rightMenu.gameObject.GetComponent<MeshRenderer>().enabled = true;
             rightMenu.gameObject.GetComponent<MeshCollider>().enabled = true;
+            if (optionalPlayer != null)
+            {
+                optionalPlayer.GetUIController().SetVisibility(false);
+            }
         }
     }
 

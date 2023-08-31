@@ -591,6 +591,11 @@ public class Player : NetworkBehaviour
         }
     }
 
+    public PlayerUIController GetUIController()
+    {
+        return uiController;
+    }
+
 
     public int GetHealth()
     {
