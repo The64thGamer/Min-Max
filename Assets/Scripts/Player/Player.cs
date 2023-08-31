@@ -577,10 +577,11 @@ public class Player : NetworkBehaviour
 
     public void SetHealth(int health)
     {
+        float oldHealth = currentHealth;
         currentHealth = health;
         if (uiController != null)
         {
-            uiController.UpdateHealthUI();
+            uiController.UpdateHealthUI(oldHealth);
         }
     }
 
