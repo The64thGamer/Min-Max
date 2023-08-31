@@ -11,7 +11,7 @@
     border-top-right-radius: 15px;
     border-bottom-right-radius: 15px;
     border-bottom-left-radius: 15px;
-    background-color: rgba(229, 127, 78, 0.04);
+    background-color: rgba(229, 127, 78, 0.5);
     -unity-font-definition: url('project://database/Assets/Game%20Assets/UI/Fonts/256%20bytes.otf?fileID=12800000&guid=3da65d8dec80e0048a336d733ed50505&type=3#256 bytes');
     color: rgb(255, 255, 255);
     min-height: 150px;

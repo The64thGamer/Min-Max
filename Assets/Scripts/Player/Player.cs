@@ -21,7 +21,7 @@ public class Player : NetworkBehaviour
     string playerName;
     [SerializeField] TextMesh nameMesh;
 
-    UIDocument playerUIVTA;
+    PlayerUIController uiController;
     Menu menu;
     int[] cosmeticInts = new int[0];
     List<GameObject> currentCharMeshes = new List<GameObject>();
@@ -47,13 +47,13 @@ public class Player : NetworkBehaviour
     const ulong botID = 64646464646464;
     private void Awake()
     {
+        uiController = this.GetComponent<PlayerUIController>();
         tracker = GetComponentInChildren<PlayerTracker>();
         controller = GetComponentInChildren<FirstPersonController>();
         gm = GameObject.Find("Global Manager").GetComponent<GlobalManager>();
         al = gm.GetComponent<AllStats>();
         wireSounds = transform.Find("WireSounds").GetComponent<WireSounds>();
         menu = transform.Find("Menu").GetComponent<Menu>();
-        playerUIVTA = transform.Find("PlayerUIDoc").GetComponent<UIDocument>();
     }
     public override void OnNetworkSpawn()
     {
@@ -72,7 +72,9 @@ public class Player : NetworkBehaviour
             Destroy(this.GetComponentInChildren<Camera>());
             Destroy(this.GetComponentInChildren<AudioListener>());
             Destroy(menu.gameObject);
-            Destroy(playerUIVTA.gameObject);
+            Destroy(this.GetComponent<PlayerUIController>());
+            uiController = null;
+            Destroy(transform.Find("PlayerUIDoc").gameObject);
             TrackedPoseDriver[] pd = this.GetComponentsInChildren<TrackedPoseDriver>();
             for (int i = 0; i < pd.Length; i++)
             {
@@ -560,7 +562,6 @@ public class Player : NetworkBehaviour
         {
             if (currentHealth <= 0)
             {
-                UpdateHealthUI();
                 return 0;
             }
             int finalHealth = Mathf.Min(currentHealth + amount, currentStats.baseHealth);
@@ -569,7 +570,6 @@ public class Player : NetworkBehaviour
             {
                 gm.RespawnPlayer(GetPlayerID(), GetTeam(), false);
             }
-            UpdateHealthUI();
             return finalHealth;
         }
         return 0;
@@ -578,16 +578,12 @@ public class Player : NetworkBehaviour
     public void SetHealth(int health)
     {
         currentHealth = health;
-        UpdateHealthUI();
-    }
-
-    void UpdateHealthUI()
-    {
-        if (playerUIVTA != null)
+        if (uiController != null)
         {
-            playerUIVTA.rootVisualElement.Q<Label>("Health").text = currentHealth.ToString();
+            uiController.UpdateHealthUI();
         }
     }
+
 
     public int GetHealth()
     {
