@@ -1,25 +1,35 @@
 using System.Collections;
 using System.Collections.Generic;
 using Unity.Netcode;
+using UnityEditor;
 using UnityEngine;
 
 [RequireComponent(typeof(BoxCollider))]
 [RequireComponent(typeof(NetworkObject))]
 public class HealthChanger : NetworkBehaviour
 {
-    NetworkVariable<bool> currentState = new NetworkVariable<bool>(true,NetworkVariableReadPermission.Everyone,NetworkVariableWritePermission.Server);
 
-    [SerializeField] int health;
+    [Header("Setting")]
     [SerializeField] DamageChangerSettings setting;
-    [SerializeField] float respawnTime;
-    [SerializeField] float looptime;
+
+    [Header("All Modes")]
+    [SerializeField] int health;
     [SerializeField] bool healthIsPercent;
     [SerializeField] bool spinObject;
+    [SerializeField] bool dontKill;
+
+    [Header("Despawn Mode")]
+    [SerializeField] float respawnTime;
+
+    [Header("Loop Mode")]
+    [SerializeField] float looptime;
 
     float loopTimer;
     float respawningTimer;
     List<Player> currentPlayer = new List<Player>();
     bool alreadyDespawn;
+    NetworkVariable<bool> currentState = new NetworkVariable<bool>(true, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
+
 
     public override void OnNetworkSpawn()
     {
@@ -151,6 +161,10 @@ public class HealthChanger : NetworkBehaviour
         {
             healthFinal = Mathf.CeilToInt((currentPlayer[i].GetClassStats().baseHealth / 100.0f) * health);
         }
+        if(dontKill && oldHealth + health <= 0)
+        {
+            health = -oldHealth + 1;
+        }
 
         if (currentPlayer[i].ChangeHealth(currentPlayer[i].GetPlayerID(), healthFinal, Random.Range(-999999999, 999999999)) == oldHealth)
         {
@@ -192,8 +206,13 @@ public class HealthChanger : NetworkBehaviour
         }
     }
 
+    public DamageChangerSettings GetSetting()
+    {
+        return setting;
+    }
 
-    enum DamageChangerSettings
+
+    public enum DamageChangerSettings
     {
         standard,
         despawnOnTouch,
