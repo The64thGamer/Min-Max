@@ -7,6 +7,7 @@ using Unity.XR.CoreUtils;
 using UnityEngine;
 using UnityEngine.InputSystem.XR;
 using UnityEngine.Rendering.Universal;
+using UnityEngine.UIElements;
 using UnityEngine.XR.Interaction.Toolkit;
 
 [RequireComponent(typeof(NetworkObject))]
@@ -20,6 +21,7 @@ public class Player : NetworkBehaviour
     string playerName;
     [SerializeField] TextMesh nameMesh;
 
+    UIDocument playerUIVTA;
     Menu menu;
     int[] cosmeticInts = new int[0];
     List<GameObject> currentCharMeshes = new List<GameObject>();
@@ -51,6 +53,7 @@ public class Player : NetworkBehaviour
         al = gm.GetComponent<AllStats>();
         wireSounds = transform.Find("WireSounds").GetComponent<WireSounds>();
         menu = transform.Find("Menu").GetComponent<Menu>();
+        playerUIVTA = transform.Find("PlayerUIDoc").GetComponent<UIDocument>();
     }
     public override void OnNetworkSpawn()
     {
@@ -58,13 +61,9 @@ public class Player : NetworkBehaviour
         gm.AddPlayerToClientList(this);
 
         //After
-        if (IsOwner)
+        if (IsOwner && GetPlayerID() < botID)
         {
             SetCharacterVisibility(false);
-            if (GetPlayerID() >= botID)
-            {
-                Destroy(menu.gameObject);
-            }
         }
         else
         {
@@ -73,6 +72,7 @@ public class Player : NetworkBehaviour
             Destroy(this.GetComponentInChildren<Camera>());
             Destroy(this.GetComponentInChildren<AudioListener>());
             Destroy(menu.gameObject);
+            Destroy(playerUIVTA.gameObject);
             TrackedPoseDriver[] pd = this.GetComponentsInChildren<TrackedPoseDriver>();
             for (int i = 0; i < pd.Length; i++)
             {
@@ -560,6 +560,7 @@ public class Player : NetworkBehaviour
         {
             if (currentHealth <= 0)
             {
+                UpdateHealthUI();
                 return 0;
             }
             int finalHealth = Mathf.Min(currentHealth + amount, currentStats.baseHealth);
@@ -568,6 +569,7 @@ public class Player : NetworkBehaviour
             {
                 gm.RespawnPlayer(GetPlayerID(), GetTeam(), false);
             }
+            UpdateHealthUI();
             return finalHealth;
         }
         return 0;
@@ -576,6 +578,15 @@ public class Player : NetworkBehaviour
     public void SetHealth(int health)
     {
         currentHealth = health;
+        UpdateHealthUI();
+    }
+
+    void UpdateHealthUI()
+    {
+        if (playerUIVTA != null)
+        {
+            playerUIVTA.rootVisualElement.Q<Label>("Health").text = currentHealth.ToString();
+        }
     }
 
     public int GetHealth()

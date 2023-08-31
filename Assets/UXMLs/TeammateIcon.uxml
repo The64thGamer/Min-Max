@@ -1,0 +1,6 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="project://database/Assets/USSs/LargePanel.uss?fileID=7433441132597879392&amp;guid=4d29afbcdc6da644391e881ea9787bb1&amp;type=3#LargePanel" />
+    <ui:VisualElement name="TeammateBox" class="EnemyTeamIcon" style="background-image: url(&apos;project://database/Assets/Game%20Assets/UI/Renders/SwitchIconProgrammer.png?fileID=2800000&amp;guid=1d29f6c2fd92ab049941df833efc37c5&amp;type=3#SwitchIconProgrammer&apos;); -unity-background-scale-mode: scale-and-crop;">
+        <ui:VisualElement style="flex-grow: 1;" />
+    </ui:VisualElement>
+</ui:UXML>

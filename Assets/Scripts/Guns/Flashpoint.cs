@@ -116,7 +116,7 @@ public class Flashpoint : Gun
         {
             if (playersInTrigger[i] != null)
             {
-                Vector3 fireAngle = ((playersInTrigger[i].transform.position + new Vector3(0, 0.5f, 0)) - firepos).normalized;
+                Vector3 fireAngle = ((playersInTrigger[i].transform.position + new Vector3(0, 0.75f, 0)) - firepos).normalized;
                 LayerMask layermask = GetIgnoreTeamAndVRLayerMask(currentPlayer);
                 Debug.DrawRay(firepos, fireAngle * FindStat(ChangableWeaponStats.maxBulletRange));
                 RaycastHit[] hit = Physics.RaycastAll(firepos, fireAngle, FindStat(ChangableWeaponStats.maxBulletRange), layermask);
