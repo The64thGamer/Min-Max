@@ -54,7 +54,7 @@ public class PlayerUIController : MonoBehaviour
         healthText.style.fontSize = Mathf.Lerp(80, 120, healthLerp);
 
         Color boxColor = Color.Lerp(Color.red, palette.GetPixel((int)player.GetTeam(), 5), healthLerp);
-        if(healthLerp == 0)
+        if(healthLerp <= 0)
         {
             boxColor = new Color(0.3f, 0.3f, 0.35f, 1);
         }
