@@ -179,6 +179,11 @@ public class Player : NetworkBehaviour
         currentTeam = team;
         SetLayer(GetTeamLayer());
         UpdateTeamColor();
+
+        if (uiController != null)
+        {
+            uiController.UpdateTeamColorUI();
+        }
     }
 
     void SetLayer(int layer)
@@ -254,6 +259,7 @@ public class Player : NetworkBehaviour
 
     public void UpdateTeamColor()
     {
+
 
         //Player
         float teamFinal = (float)currentTeam + 1;

@@ -1,4 +1,4 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -13,6 +13,8 @@ public class PlayerUIController : MonoBehaviour
     float healthDrop;
 
     Label healthText;
+    Label ammoText;
+    Label clipText;
     VisualElement boxHealth;
     VisualElement boxAmmo;
     VisualElement boxTeam;
@@ -25,7 +27,15 @@ public class PlayerUIController : MonoBehaviour
         playerUIVTA = transform.Find("PlayerUIDoc").GetComponent<UIDocument>();
         player = this.GetComponent<Player>();
         healthText = playerUIVTA.rootVisualElement.Q<Label>("Health");
+        ammoText = playerUIVTA.rootVisualElement.Q<Label>("Ammo");
+        clipText = playerUIVTA.rootVisualElement.Q<Label>("Clip");
         boxHealth = playerUIVTA.rootVisualElement.Q<VisualElement>("BoxHealth");
+        boxAmmo = playerUIVTA.rootVisualElement.Q<VisualElement>("BoxAmmo");
+        boxTeam = playerUIVTA.rootVisualElement.Q<VisualElement>("BoxTeam");
+
+        //Temp
+        clipText.text = "∞";
+        ammoText.text = "/ ∞";
     }
 
     private void Update()
@@ -63,6 +73,27 @@ public class PlayerUIController : MonoBehaviour
 
     public void UpdateTeamColorUI()
     {
+        Color boxColor = palette.GetPixel((int)player.GetTeam(), 5);
+        Color innerColor = boxColor;
+        innerColor.a = 0.5f;
 
+        boxHealth.style.borderBottomColor = boxColor;
+        boxHealth.style.borderTopColor = boxColor;
+        boxHealth.style.borderLeftColor = boxColor;
+        boxHealth.style.borderRightColor = boxColor;
+        boxHealth.style.backgroundColor = innerColor;
+
+        boxAmmo.style.borderBottomColor = boxColor;
+        boxAmmo.style.borderTopColor = boxColor;
+        boxAmmo.style.borderLeftColor = boxColor;
+        boxAmmo.style.borderRightColor = boxColor;
+        boxAmmo.style.backgroundColor = innerColor;
+
+        boxTeam.style.borderBottomColor = boxColor;
+        boxTeam.style.borderTopColor = boxColor;
+        boxTeam.style.borderLeftColor = boxColor;
+        boxTeam.style.borderRightColor = boxColor;
+        boxTeam.style.backgroundColor = boxColor;
     }
+
 }
