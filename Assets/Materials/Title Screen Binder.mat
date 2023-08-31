@@ -21,8 +21,7 @@ Material:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: Title Screen Binder
-  m_Shader: {fileID: -6465566751694194690, guid: 8d079c324c697114c82dbedbece05483,
-    type: 3}
+  m_Shader: {fileID: 4800000, guid: 650dd9526735d5b46b79224bc6e94025, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
   m_ValidKeywords: []
@@ -31,7 +30,8 @@ Material:
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
   m_CustomRenderQueue: -1
-  stringTagMap: {}
+  stringTagMap:
+    RenderType: Opaque
   disabledShaderPasses:
   - MOTIONVECTORS
   m_LockedProperties: 
@@ -43,7 +43,7 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _BaseMap:
-        m_Texture: {fileID: 2800000, guid: 42406586b64d4eb418c5c1692e630add, type: 3}
+        m_Texture: {fileID: 2800000, guid: f079a11946f603c4897f084d3ede7ea5, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _BumpMap:
@@ -67,7 +67,7 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _MainTex:
-        m_Texture: {fileID: 2800000, guid: 42406586b64d4eb418c5c1692e630add, type: 3}
+        m_Texture: {fileID: 2800000, guid: f079a11946f603c4897f084d3ede7ea5, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _MetallicGlossMap:
@@ -188,6 +188,7 @@ Material:
     - _AlphaToMask: 0
     - _Blend: 0
     - _BlendModePreserveSpecular: 1
+    - _BlendOp: 0
     - _BumpScale: 1
     - _CelShade: 2
     - _ClearCoatMask: 0
@@ -224,6 +225,7 @@ Material:
     - _ReceiveShadows: 1
     - _ReflProbe: 4.9
     - _Reflective: 0
+    - _SampleGI: 0
     - _Smoothness: 10
     - _SmoothnessTextureChannel: 0
     - _SpecularHighlights: 1
