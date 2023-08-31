@@ -163,7 +163,7 @@ public class HealthChanger : NetworkBehaviour
         }
         if(dontKill && oldHealth + health <= 0)
         {
-            health = -oldHealth + 1;
+            healthFinal = -oldHealth + 1;
         }
 
         if (currentPlayer[i].ChangeHealth(currentPlayer[i].GetPlayerID(), healthFinal, Random.Range(-999999999, 999999999)) == oldHealth)
