@@ -161,7 +161,7 @@ public class HealthChanger : NetworkBehaviour
         {
             healthFinal = Mathf.CeilToInt((currentPlayer[i].GetClassStats().baseHealth / 100.0f) * health);
         }
-        if(dontKill && oldHealth + health <= 0)
+        if(dontKill && oldHealth + healthFinal <= 0)
         {
             healthFinal = -oldHealth + 1;
         }
