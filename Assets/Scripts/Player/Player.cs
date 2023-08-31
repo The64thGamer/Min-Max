@@ -593,7 +593,7 @@ public class Player : NetworkBehaviour
     public void ResetClassStats()
     {
         currentStats = al.GetClassStats(currentClass);
-        currentHealth = currentStats.baseHealth;
+        SetHealth(currentStats.baseHealth);
     }
 
     public void RemoveHeldWire(Vector3 finalPos, bool playSound)
