@@ -19,7 +19,6 @@ public class PlayerUIController : MonoBehaviour
     VisualElement boxAmmo;
     VisualElement boxTeam;
 
-
     const float dropFontSizeCompensation = 4;
 
     private void Awake()
@@ -40,8 +39,8 @@ public class PlayerUIController : MonoBehaviour
 
     private void Update()
     {
-        healthDrop = Mathf.Lerp(healthDrop,healthDrop * Mathf.Abs(healthDrop),Time.deltaTime * 10);
-        healthText.style.translate = new Translate(0,healthDrop * -40, 0);
+        healthDrop = Mathf.Lerp(healthDrop, healthDrop * Mathf.Abs(healthDrop), Time.deltaTime * 10);
+        healthText.style.translate = new Translate(0, healthDrop * -40, 0);
     }
 
     public void UpdateHealthUI(float oldHealth)
@@ -50,11 +49,17 @@ public class PlayerUIController : MonoBehaviour
         float healthLerp = player.GetHealth() / baseHealth;
         healthLerp *= healthLerp;
 
-        healthText.text = Mathf.Max(0,player.GetHealth()).ToString();
+        healthText.text = Mathf.Max(0, player.GetHealth()).ToString();
         healthText.style.fontSize = Mathf.Lerp(80, 120, healthLerp);
 
-        Color boxColor = Color.Lerp(Color.red, palette.GetPixel((int)player.GetTeam(), 5), healthLerp);
-        if(healthLerp <= 0)
+        Color[] colors = new Color[] { Color.red, Color.gray, palette.GetPixel((int)player.GetTeam(), 5) };
+        float scaledTime = healthLerp * (colors.Length - 1);
+        Color oldColor = colors[(int)scaledTime];
+        Color newColor = colors[Mathf.Min((int)scaledTime + 1,colors.Length-1)];
+        float newT = scaledTime - Mathf.Floor(scaledTime);
+        Color boxColor = Color.Lerp(oldColor, newColor, newT);
+
+        if (player.GetHealth() <= 0)
         {
             boxColor = new Color(0.3f, 0.3f, 0.35f, 1);
         }
@@ -68,7 +73,7 @@ public class PlayerUIController : MonoBehaviour
 
         //Health is dropped based on how much health is lost, and compensation
         //is given due to the font shrinking with health loss.
-        healthDrop = Mathf.Clamp(((player.GetHealth() - oldHealth) / baseHealth) * (dropFontSizeCompensation - ((dropFontSizeCompensation - 1) * (player.GetHealth() / baseHealth))) * 0.9f,-0.9f,0.9f);
+        healthDrop = Mathf.Clamp(((player.GetHealth() - oldHealth) / baseHealth) * (dropFontSizeCompensation - ((dropFontSizeCompensation - 1) * (player.GetHealth() / baseHealth))) * 0.9f, -0.9f, 0.9f);
     }
 
     public void UpdateTeamColorUI()
