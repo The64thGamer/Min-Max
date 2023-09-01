@@ -13,7 +13,7 @@
                 <ui:VisualElement name="BoxObjective" class="LargePanel MiniObjective" />
             </ui:VisualElement>
             <ui:VisualElement style="flex-direction: row; align-items: auto;">
-                <ui:VisualElement name="BoxTeam" class="MiniPanel MiniTeamList FilledPanel" />
+                <ui:VisualElement name="BoxTeam" class="MiniPanel MiniTeamList FilledPanel" style="background-color: rgb(128, 128, 128);" />
                 <ui:VisualElement name="HolderEnemies" style="flex-grow: 0; flex-direction: row; align-items: auto; align-self: center; justify-content: space-evenly;" />
             </ui:VisualElement>
         </ui:VisualElement>

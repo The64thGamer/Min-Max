@@ -1,28 +1,37 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UIElements;
 
 public class PlayerUIController : MonoBehaviour
 {
     [SerializeField] Texture2D palette;
+    [SerializeField] Texture2D[] playerIcons;
+    [SerializeField] VisualTreeAsset teammateVTA;
+    [SerializeField] VisualTreeAsset enemyVTA;
+
     UIDocument playerUIVTA;
     Player player;
+    GlobalManager gm;
+
 
     [Range(-0.9f, 0.9f)]
     float healthDrop;
-
+    List<TeamList> teams;
     Label healthText;
     Label ammoText;
     Label clipText;
     VisualElement boxHealth;
     VisualElement boxAmmo;
     VisualElement boxTeam;
+    VisualElement holderEnemies;
 
     const float dropFontSizeCompensation = 4;
 
     private void Awake()
     {
+        gm = GameObject.Find("Global Manager").GetComponent<GlobalManager>();
         playerUIVTA = transform.Find("PlayerUIDoc").GetComponent<UIDocument>();
         player = this.GetComponent<Player>();
         healthText = playerUIVTA.rootVisualElement.Q<Label>("Health");
@@ -31,6 +40,7 @@ public class PlayerUIController : MonoBehaviour
         boxHealth = playerUIVTA.rootVisualElement.Q<VisualElement>("BoxHealth");
         boxAmmo = playerUIVTA.rootVisualElement.Q<VisualElement>("BoxAmmo");
         boxTeam = playerUIVTA.rootVisualElement.Q<VisualElement>("BoxTeam");
+        holderEnemies = playerUIVTA.rootVisualElement.Q<VisualElement>("HolderEnemies");
 
         //Temp
         clipText.text = "∞";
@@ -99,6 +109,62 @@ public class PlayerUIController : MonoBehaviour
         boxTeam.style.borderLeftColor = boxColor;
         boxTeam.style.borderRightColor = boxColor;
         boxTeam.style.backgroundColor = boxColor;
+
+        UpdateClientsConnected();
+    }
+
+    public void UpdateClientsConnected()
+    {
+
+        //Enemy Holder
+        List<VisualElement> children = new List<VisualElement>();
+        foreach (var child in holderEnemies.Children())
+        {
+            children.Add(child);
+        }
+        for (int i = 0; i < children.Count; i++)
+        {
+            holderEnemies.Remove(children[i]);
+        }
+
+        teams = gm.GetTeamColors(true);
+        for (int i = 0; i < teams.Count; i++)
+        {
+            if (teams[i] != player.GetTeam())
+            {
+                TemplateContainer myUI = enemyVTA.Instantiate();
+                holderEnemies.Add(myUI);
+                Color boxColor = palette.GetPixel((int)teams[i], 5);
+                VisualElement box = myUI.Q<VisualElement>("BoxEnemyTeam");
+                box.style.borderBottomColor = boxColor;
+                box.style.borderTopColor = boxColor;
+                box.style.borderLeftColor = boxColor;
+                box.style.borderRightColor = boxColor;
+                box.style.backgroundColor = boxColor;
+            }
+        }
+
+        //Teammate Holder
+        children = new List<VisualElement>();
+        foreach (var child in boxTeam.Children())
+        {
+            children.Add(child);
+        }
+        for (int i = 0; i < children.Count; i++)
+        {
+            boxTeam.Remove(children[i]);
+        }
+
+        List<Player> players = gm.GetClients();
+        for (int i = 0; i < players.Count; i++)
+        {
+            if (players[i].GetTeam() == player.GetTeam())
+            {
+                TemplateContainer myUI = teammateVTA.Instantiate();
+                myUI.Q<VisualElement>("Icon").style.backgroundImage = playerIcons[(int)players[i].GetCurrentClass()];
+                boxTeam.Add(myUI);
+            }
+        }
     }
 
     public void SetVisibility(bool visible)
