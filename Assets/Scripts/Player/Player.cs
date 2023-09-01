@@ -523,32 +523,35 @@ public class Player : NetworkBehaviour
 
     void ApplyCosmetics(GameObject prefab, Transform t)
     {
-        GameObject g = new GameObject(prefab.name);
-        g.transform.parent = t;
-        SkinnedMeshRenderer targetSkin = g.AddComponent<SkinnedMeshRenderer>();
-        SkinnedMeshRenderer originalSkin = prefab.GetComponentInChildren<SkinnedMeshRenderer>();
-        targetSkin.SetSharedMaterials(originalSkin.sharedMaterials.ToList<Material>());
-        targetSkin.sharedMesh = originalSkin.sharedMesh;
-        targetSkin.rootBone = t.Find("Armature").GetChild(0);
-        currentCharMeshes.Add(g);
+        GameObject g = GameObject.Instantiate(prefab,t,false);
+        g.transform.localPosition = Vector3.zero;
 
-        Transform[] newBones = new Transform[originalSkin.bones.Length];
+        SkinnedMeshRenderer[] targetSkin = g.GetComponentsInChildren<SkinnedMeshRenderer>();
+        Transform rootBone = t.Find("Armature").GetChild(0);
 
-        int a = 0;
-        foreach (var originalBone in originalSkin.bones)
+
+        Dictionary<string, Transform> boneDictionary = new Dictionary<string, Transform>();
+        Transform[] rootBoneChildren = rootBone.GetComponentsInChildren<Transform>();
+        foreach (Transform child in rootBoneChildren)
         {
+            boneDictionary[child.name] = child;
+        }
 
-            foreach (var newBone in targetSkin.rootBone.GetComponentsInChildren<Transform>())
+        for (int j = 0; j < targetSkin.Length; j++)
+        {
+            targetSkin[j].rootBone = rootBone;
+            Transform[] newBones = new Transform[targetSkin[j].bones.Length];
+            for (int i = 0; i < targetSkin[j].bones.Length; i++)
             {
-                if (newBone.name == originalBone.name)
+                if (boneDictionary.TryGetValue(targetSkin[j].bones[i].name, out Transform newBone))
                 {
-                    newBones[a] = newBone;
-                    continue;
+                    newBones[i] = newBone;
                 }
             }
-            a++;
+            targetSkin[j].bones = newBones;
         }
-        targetSkin.bones = newBones;
+        currentCharMeshes.Add(g);
+
     }
 
     void SetMeshVis(Transform trans, string meshName, bool set, bool alwaysUpdate)

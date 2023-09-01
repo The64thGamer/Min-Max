@@ -107,28 +107,32 @@ MonoBehaviour:
   computer:
   - name: Computer's Head
     icon: {fileID: 2800000, guid: f013b5dc3ec29c84fb0a457b49134986, type: 3}
-    prefab: {fileID: 919132149155446097, guid: b71fa083fc0283d4295009ea0c906e9c, type: 3}
+    prefab: {fileID: 5557530538483424141, guid: b2f93dc3609b5444ca6f4540466b6959,
+      type: 3}
     region: 0
     hideBodyGroups: 0
     stock: 1
     weight: 2
   - name: Computer's Chestplate
     icon: {fileID: 2800000, guid: a53aaa5ed32dc4e4a813512bfc18f1ee, type: 3}
-    prefab: {fileID: 919132149155446097, guid: af4deb3cf1d18c4498ecea1bf31deead, type: 3}
+    prefab: {fileID: 8794000808349155465, guid: 1b6c034fe67a3c24d9a7adb7b2f8e618,
+      type: 3}
     region: 7
     hideBodyGroups: 0
     stock: 1
     weight: 3
   - name: Computer's Pauldrons
     icon: {fileID: 2800000, guid: f93743a5e7c109e4aadb1f5c3d631570, type: 3}
-    prefab: {fileID: 919132149155446097, guid: b15db015b2437ce4e86ff2b84f049e50, type: 3}
+    prefab: {fileID: 4971379284628878158, guid: 537d2d4d1504d3140be49da304834887,
+      type: 3}
     region: 10
     hideBodyGroups: 0
     stock: 1
     weight: 1
   - name: Ruined Magic
     icon: {fileID: 2800000, guid: 7e291695408d5ff43ac68a7e08180ef4, type: 3}
-    prefab: {fileID: 919132149155446097, guid: d0445b9542833b24eb08ea4d4a8b93d6, type: 3}
+    prefab: {fileID: 1270666353775947219, guid: a146196ef89b44c4cb48732697bca120,
+      type: 3}
     region: 0
     hideBodyGroups: 1
     stock: 0
@@ -184,6 +188,6 @@ MonoBehaviour:
     stock: 0
     weight: 0
   artist: []
-  freelancer: []
+  castmember: []
   craftsman: []
   manager: []
