@@ -554,10 +554,11 @@ public class Player : NetworkBehaviour
     void SetMeshVis(Transform trans, string meshName, bool set, bool alwaysUpdate)
     {
         GameObject g = trans.Find(meshName).gameObject;
-        SkinnedMeshRenderer r = g.GetComponent<SkinnedMeshRenderer>();
-        if (r != null)
+        SkinnedMeshRenderer[] r = g.GetComponentsInChildren<SkinnedMeshRenderer>();
+        for (int i = 0; i < r.Length; i++)
         {
-            r.updateWhenOffscreen = alwaysUpdate;
+            r[i].updateWhenOffscreen = alwaysUpdate;
+
         }
         g.SetActive(set);
     }
