@@ -7,8 +7,8 @@
         </ui:VisualElement>
         <ui:VisualElement style="flex-grow: 1; align-self: flex-end; flex-direction: column;">
             <ui:VisualElement style="flex-direction: row; align-items: auto;">
-                <ui:VisualElement name="BoxTimer" class="LargePanel MiniObjective" style="flex-grow: 0;">
-                    <ui:Label tabindex="-1" text="5:00" display-tooltip-when-elided="true" name="Timer" />
+                <ui:VisualElement name="BoxTimer" class="LargePanel MiniObjective" style="flex-grow: 0; min-width: 100px;">
+                    <ui:Label tabindex="-1" text="50:00" display-tooltip-when-elided="true" name="Timer" />
                 </ui:VisualElement>
                 <ui:VisualElement name="BoxObjective" class="LargePanel MiniObjective" />
             </ui:VisualElement>

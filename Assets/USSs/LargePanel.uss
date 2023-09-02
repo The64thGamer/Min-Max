@@ -4,9 +4,9 @@
     border-top-color: rgb(229, 127, 78);
     border-bottom-color: rgb(229, 127, 78);
     border-top-width: 15px;
-    border-right-width: 15px;
-    border-bottom-width: 15px;
-    border-left-width: 15px;
+    border-right-width: 10px;
+    border-bottom-width: 5px;
+    border-left-width: 10px;
     border-top-left-radius: 15px;
     border-top-right-radius: 15px;
     border-bottom-right-radius: 15px;
@@ -160,7 +160,7 @@
 .EnemyTeamIcon {
     flex-grow: 1;
     background-color: rgb(128, 128, 128);
-    min-width: 15px;
+    min-width: 0;
     max-width: 50px;
     max-height: 50px;
     min-height: 50px;
