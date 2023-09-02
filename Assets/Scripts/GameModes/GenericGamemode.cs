@@ -6,6 +6,11 @@ using UnityEngine;
 
 public abstract class GenericGamemode : NetworkBehaviour
 {
+    [SerializeField] protected int startingRoundTime;
+
+    protected float matchTime;
+
+
     public abstract void SetTeams();
     public abstract void SetTeams(List<TeamList> setTeams);
 
@@ -14,6 +19,10 @@ public abstract class GenericGamemode : NetworkBehaviour
     public abstract Vector3 GetCurrentMatchFocalPoint(int team);
 
     public abstract float RequestPlayerRespawnTimer(int index);
+    public int RequestRoundTime()
+    {
+        return Mathf.CeilToInt(matchTime);
+    }
 
     public void ResetMatch()
     {
@@ -51,6 +60,7 @@ public abstract class GenericGamemode : NetworkBehaviour
                 gm.AssignPlayerClassAndTeamClientRpc(pdstc);
                 gm.RespawnPlayer(clients[i].GetPlayerID(), clients[i].GetTeam(),true);
 
+                matchTime = startingRoundTime;
             }
         }
     }

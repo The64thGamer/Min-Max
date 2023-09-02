@@ -26,6 +26,7 @@ public class PlayerUIController : MonoBehaviour
     VisualElement boxAmmo;
     VisualElement boxTeam;
     VisualElement holderEnemies;
+    Label timerText;
 
     const float dropFontSizeCompensation = 4;
 
@@ -41,6 +42,7 @@ public class PlayerUIController : MonoBehaviour
         boxAmmo = playerUIVTA.rootVisualElement.Q<VisualElement>("BoxAmmo");
         boxTeam = playerUIVTA.rootVisualElement.Q<VisualElement>("BoxTeam");
         holderEnemies = playerUIVTA.rootVisualElement.Q<VisualElement>("HolderEnemies");
+        timerText = playerUIVTA.rootVisualElement.Q<Label>("Timer");
 
         //Temp
         clipText.text = "∞";
@@ -51,6 +53,15 @@ public class PlayerUIController : MonoBehaviour
     {
         healthDrop = Mathf.Lerp(healthDrop, healthDrop * Mathf.Abs(healthDrop), Time.deltaTime * 10);
         healthText.style.translate = new Translate(0, healthDrop * -40, 0);
+        int seconds = gm.GetCurrentRoundTime();
+        if(seconds < 0)
+        {
+            timerText.text = "∞";
+        }
+        else
+        {
+            timerText.text = $"{seconds / 60}:{seconds % 60:D2}";
+        }
     }
 
     public void UpdateHealthUI(float oldHealth)

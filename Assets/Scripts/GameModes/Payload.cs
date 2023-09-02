@@ -17,6 +17,19 @@ public class Payload : GenericGamemode
                 payloadTeams[i].goal.SetDefendingTeam(i+1);
             }
         }
+        matchTime = startingRoundTime;
+    }
+
+    private void Update()
+    {
+        if(matchTime >= 0)
+        {
+            matchTime = Mathf.Max(0, matchTime - Time.deltaTime);
+            if(matchTime == 0)
+            {
+                ResetMatch();
+            }
+        }
     }
 
     public override void SetTeams()
