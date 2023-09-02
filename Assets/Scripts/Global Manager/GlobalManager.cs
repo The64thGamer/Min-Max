@@ -33,7 +33,6 @@ public class GlobalManager : NetworkBehaviour
     AllStats al;
     AudioSource au;
     NetworkManager m_NetworkManager;
-    float tickTimer;
     bool serverStarted;
     GenericGamemode currentGamemode;
     List<Vector3> matchFocalPoint;
@@ -117,6 +116,11 @@ public class GlobalManager : NetworkBehaviour
         {
             SceneManager.LoadScene("Title Screen");
         }
+    }
+
+    public int GetCurrentRoundTime()
+    {
+        return currentGamemode.RequestRoundTime();
     }
 
     async void StartServer()
@@ -410,7 +414,17 @@ public class GlobalManager : NetworkBehaviour
             {
                 if (teams[e].teamColor == team)
                 {
-                    spawnPos = teamSpawns[teams[e].spawns].GetChild(UnityEngine.Random.Range(0, teamSpawns[teams[e].spawns].childCount)).position;
+                    Transform t = null;
+                    while (true)
+                    {
+                        Transform s = teamSpawns[teams[e].spawns].GetChild(UnityEngine.Random.Range(0, teamSpawns[teams[e].spawns].childCount));
+                        if(s.gameObject.activeSelf)
+                        {
+                            t = s;
+                            break;
+                        }
+                    }
+                    spawnPos = t.position;
                     break;
                 }
             }
