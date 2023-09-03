@@ -120,9 +120,17 @@ public class Flashpoint : Gun
                 LayerMask layermask = GetIgnoreTeamAndVRLayerMask(currentPlayer);
                 Debug.DrawRay(firepos, fireAngle * FindStat(ChangableWeaponStats.maxBulletRange));
                 RaycastHit[] hit = Physics.RaycastAll(firepos, fireAngle, FindStat(ChangableWeaponStats.maxBulletRange), layermask);
+                System.Array.Sort(hit, (x, y) => x.distance.CompareTo(y.distance));
+
+                Player p;
                 for (int e = 0; e < hit.Length; e++)
                 {
-                    if (hit[e].collider.GetComponent<Player>() == playersInTrigger[i])
+                    p = hit[e].collider.GetComponent<Player>();
+                    if(p == null)
+                    {
+                        break;
+                    }
+                    if (p == playersInTrigger[i])
                     {
                         int damage = Mathf.CeilToInt(Mathf.Max(0, Mathf.SmoothStep(FindStat(ChangableWeaponStats.damage), 0, hit[e].distance / FindStat(ChangableWeaponStats.maxBulletRange))));
                         if (damage > 0)
