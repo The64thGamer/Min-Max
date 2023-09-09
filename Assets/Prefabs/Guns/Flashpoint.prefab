@@ -55,9 +55,9 @@ MonoBehaviour:
   - statName: 2
     stat: 50
   - statName: 0
-    stat: 12
+    stat: 10
   - statName: 4
-    stat: 5
+    stat: 6
   - statName: 5
     stat: 50
   - statName: 6
