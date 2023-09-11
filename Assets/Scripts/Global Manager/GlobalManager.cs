@@ -1166,6 +1166,7 @@ public struct PlayerDataSentToClient : INetworkSerializable
     public float _verticalVelocity;
     public float _fallTimeoutDelta;
     public float _hasBeenMovingDelta;
+    public float baseSpeed;
 
     //Midair Movement
     public Vector3 oldAxis;
@@ -1202,6 +1203,7 @@ public struct PlayerDataSentToClient : INetworkSerializable
         serializer.SerializeValue(ref _verticalVelocity);
         serializer.SerializeValue(ref _fallTimeoutDelta);
         serializer.SerializeValue(ref _hasBeenMovingDelta);
+        serializer.SerializeValue(ref baseSpeed);
         serializer.SerializeValue(ref oldAxis);
         serializer.SerializeValue(ref oldInput);
         serializer.SerializeValue(ref hasBeenGrounded);

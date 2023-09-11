@@ -116,6 +116,7 @@ namespace StarterAssets
             currentTick.mainCamforward = _mainCamera.transform.forward;
             currentTick.mainCamRight = _mainCamera.transform.right;
             currentTick.inputs.deltaTime = Time.deltaTime;
+            currentTick.baseSpeed = player.GetClassStats().baseSpeed;
             if (IsHost)
             {
                 currentTick.inputs.localTime = NetworkManager.ServerTime.TimeAsFloat;
@@ -273,7 +274,7 @@ namespace StarterAssets
             forward.Normalize();
             right.Normalize();
             Vector3 newAxis = forward * currentTick.inputs.rightJoystick.y + right * currentTick.inputs.rightJoystick.x;
-            Vector3 targetSpeed = new Vector3(newAxis.x, 0.0f, newAxis.z).normalized * player.GetClassStats().baseSpeed / 25.0f;
+            Vector3 targetSpeed = new Vector3(newAxis.x, 0.0f, newAxis.z).normalized * currentTick.baseSpeed / 25.0f;
 
 
 
@@ -427,6 +428,7 @@ namespace StarterAssets
             currentTick.velocity = data.velocity;
             currentTick.mainCamforward = data.mainCamforward;
             currentTick.mainCamRight = data.mainCamRight;
+            currentTick.baseSpeed = data.baseSpeed;
 
             _controller.enabled = false;
             transform.position = data.pos;
@@ -565,6 +567,7 @@ namespace StarterAssets
             public float _verticalVelocity;
             public float _fallTimeoutDelta;
             public float _hasBeenMovingDelta;
+            public float baseSpeed;
 
             //Midair Movement
             public Vector3 oldAxis;
