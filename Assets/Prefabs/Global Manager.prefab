@@ -14,6 +14,7 @@ GameObject:
   - component: {fileID: 7623448802612895609}
   - component: {fileID: 2866549589540967719}
   - component: {fileID: 4213602069014871988}
+  - component: {fileID: 1059498740907293633}
   m_Layer: 0
   m_Name: Global Manager
   m_TagString: Untagged
@@ -50,45 +51,45 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   labourer:
-    baseHealth: 100
-    baseSpeed: 30
-    classEyeHeight: 0
+    baseHealth: 300
+    baseSpeed: 75
+    classEyeHeight: 1.584
   woodworker:
-    baseHealth: 100
-    baseSpeed: 30
-    classEyeHeight: 0
+    baseHealth: 200
+    baseSpeed: 80
+    classEyeHeight: 1.584
   developer:
-    baseHealth: 0
-    baseSpeed: 0
-    classEyeHeight: 0
+    baseHealth: 175
+    baseSpeed: 90
+    classEyeHeight: 1.584
   programmer:
     baseHealth: 150
     baseSpeed: 100
     classEyeHeight: 1.584
   computer:
     baseHealth: 125
-    baseSpeed: 105
+    baseSpeed: 100
     classEyeHeight: 1.646
   fabricator:
-    baseHealth: 100
-    baseSpeed: 90
+    baseHealth: 125
+    baseSpeed: 110
     classEyeHeight: 1.4116
   artist:
     baseHealth: 100
-    baseSpeed: 30
-    classEyeHeight: 0
+    baseSpeed: 125
+    classEyeHeight: 1.584
   castmember:
-    baseHealth: 0
-    baseSpeed: 0
-    classEyeHeight: 0
+    baseHealth: 100
+    baseSpeed: 125
+    classEyeHeight: 1.584
   craftsman:
-    baseHealth: 100
-    baseSpeed: 30
-    classEyeHeight: 0
+    baseHealth: 150
+    baseSpeed: 100
+    classEyeHeight: 1.584
   manager:
-    baseHealth: 100
-    baseSpeed: 30
-    classEyeHeight: 0
+    baseHealth: 125
+    baseSpeed: 110
+    classEyeHeight: 1.584
   mMChips:
   - buffsNerfs:
     - buffNerf: 1
@@ -268,6 +269,23 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 14da7b51e92588e4eb5aacf1b7374bc6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &1059498740907293633
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2772672783022388777}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 172515602e62fb746b5d573b38a5fe58, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_IsGlobal: 1
+  priority: 0
+  blendDistance: 0
+  weight: 1
+  sharedProfile: {fileID: 11400000, guid: 4896978f8f8aca24e8bfccce94dff5e9, type: 2}
 --- !u!1001 &1826620726766891009
 PrefabInstance:
   m_ObjectHideFlags: 0

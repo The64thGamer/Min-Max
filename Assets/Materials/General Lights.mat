@@ -20,7 +20,7 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: WhiteFloorTile
+  m_Name: General Lights
   m_Shader: {fileID: -6465566751694194690, guid: 8d079c324c697114c82dbedbece05483,
     type: 3}
   m_Parent: {fileID: 0}
@@ -29,7 +29,7 @@ Material:
   m_InvalidKeywords:
   - _DYNAMICISM_FORCE_TEAM_1
   - _PALETTE_BRIGHT
-  m_LightmapFlags: 4
+  m_LightmapFlags: 2
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
   m_CustomRenderQueue: -1
@@ -41,7 +41,7 @@ Material:
     serializedVersion: 3
     m_TexEnvs:
     - _Base:
-        m_Texture: {fileID: 0}
+        m_Texture: {fileID: 2800000, guid: 581301ce3f4a26d4a8790a2cfe313925, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _BaseMap:
@@ -69,7 +69,7 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _Emissive:
-        m_Texture: {fileID: 0}
+        m_Texture: {fileID: 2800000, guid: db0a135a8e2ed294ea9c7deada9d2b2f, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _MainTex:
@@ -81,11 +81,11 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _MixMap:
-        m_Texture: {fileID: 2800000, guid: 19865d269d0f95c4da176a70c93eb696, type: 3}
+        m_Texture: {fileID: 2800000, guid: 55fa3cce7f10f874bbf66d7c845eb31e, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _Normal:
-        m_Texture: {fileID: 2800000, guid: 7bbda38a5accc084da7d925f485ace31, type: 3}
+        m_Texture: {fileID: 2800000, guid: ffff4fbb8992d6c479f8af1e852b5792, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _OcclusionMap:
@@ -93,7 +93,7 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _PaletteMap:
-        m_Texture: {fileID: 2800000, guid: 0b1d4282579f8c949aa9b020827d342f, type: 3}
+        m_Texture: {fileID: 2800000, guid: f6cde0208801c974b9164179f3b7be40, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _ParallaxMap:
@@ -164,7 +164,7 @@ Material:
     - _DetailNormalMapScale: 1
     - _DstBlend: 0
     - _DstBlendAlpha: 0
-    - _Emissiveness: 0
+    - _Emissiveness: 5
     - _EnvironmentReflections: 1
     - _Force_Team1: 0
     - _GlossMapScale: 0
@@ -173,10 +173,10 @@ Material:
     - _Metallic: 0
     - _OcclusionStrength: 1
     - _PALETTE: 0
-    - _Palette1: 1
-    - _Palette2: 1
-    - _Palette3: 1
-    - _Palette4: 1
+    - _Palette1: 7
+    - _Palette2: 6
+    - _Palette3: 4
+    - _Palette4: 3
     - _Parallax: 0.005
     - _QueueControl: 0
     - _QueueOffset: 0
@@ -186,7 +186,7 @@ Material:
     - _SpecularHighlights: 1
     - _SrcBlend: 1
     - _SrcBlendAlpha: 1
-    - _Strength: 0.87
+    - _Strength: 1
     - _Surface: 0
     - _Team: 7
     - _Team_1: 9
@@ -195,7 +195,7 @@ Material:
     - _ZWrite: 1
     m_Colors:
     - _BaseColor: {r: 1, g: 1, b: 1, a: 1}
-    - _Color: {r: 0, g: 0, b: 0, a: 1}
+    - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _SpecColor: {r: 0.19999996, g: 0.19999996, b: 0.19999996, a: 1}
   m_BuildTextureStacks: []
