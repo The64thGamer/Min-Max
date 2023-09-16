@@ -67,7 +67,7 @@ public class GlobalManager : NetworkBehaviour
                     for (int i = 0; i < PlayerPrefs.GetInt("ServerMaxPlayers"); i++)
                     {
                         //Probably a bad idea for 24/7 servers, though what's a player gonna gain out of controlling bots?
-                        SpawnPlayer(botID + (uint)i, "Bot # " + i, UnityEngine.Random.Range(3, 6), new int[0]);
+                        SpawnPlayer(botID + (uint)i, "Bot # " + i, UnityEngine.Random.Range(0, 9), new int[0]);
                     }
                 }
                 Debug.Log("Started Local Host");
@@ -141,7 +141,7 @@ public class GlobalManager : NetworkBehaviour
                 for (int i = 0; i < PlayerPrefs.GetInt("ServerMaxPlayers"); i++)
                 {
                     //Probably a bad idea for 24/7 servers, though what's a player gonna gain out of controlling bots?
-                    SpawnPlayer(botID + (uint)i, "Bot # " + i, UnityEngine.Random.Range(3, 6), new int[0]);
+                    SpawnPlayer(botID + (uint)i, "Bot # " + i, UnityEngine.Random.Range(0, 9), new int[0]);
                 }
             }
             GUIUtility.systemCopyBuffer = joinCode;
@@ -491,6 +491,15 @@ public class GlobalManager : NetworkBehaviour
         string autoGun = "W.I.P.";
         switch (currentClassSelected)
         {
+            case ClassList.labourer:
+                autoGun = "Flashpoint";
+                break;
+            case ClassList.woodworker:
+                autoGun = "Flashpoint";
+                break;
+            case ClassList.developer:
+                autoGun = "O-S F-O";
+                break;
             case ClassList.programmer:
                 autoGun = "W.I.P.";
                 break;
@@ -499,6 +508,18 @@ public class GlobalManager : NetworkBehaviour
                 break;
             case ClassList.fabricator:
                 autoGun = "O-S F-O";
+                break;
+            case ClassList.artist:
+                autoGun = "W.I.P.";
+                break;
+            case ClassList.castmember:
+                autoGun = "W.I.P.";
+                break;
+            case ClassList.craftsman:
+                autoGun = "O-S F-O";
+                break;
+            case ClassList.manager:
+                autoGun = "W.I.P.";
                 break;
             default:
                 break;
@@ -528,7 +549,6 @@ public class GlobalManager : NetworkBehaviour
 
     void SpawnPlayer(ulong id, string playerName, int initialClass, int[] cosmetics)
     {
-        initialClass = Mathf.Clamp(initialClass, 3, 5);  //Can only pick current classes
 
         for (int i = 0; i < clients.Count; i++)
         {
@@ -679,8 +699,6 @@ public class GlobalManager : NetworkBehaviour
     [ServerRpc(RequireOwnership = false)]
     public void SendPlayerStatusOnSwitchedClassesServerRpc(bool yesChangeClass, int initialClass, int[] cosmetics, ServerRpcParams serverRpcParams = default)
     {
-
-        initialClass = Mathf.Clamp(initialClass, 3, 5);  //Can only pick current classes
 
         for (int i = 0; i < clients.Count; i++)
         {

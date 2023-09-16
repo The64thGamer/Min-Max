@@ -34,6 +34,7 @@ public class Player : NetworkBehaviour
     Wire.WirePoint heldWire;
 
     //Stats
+    float timeTillRespawn;
     int currentHealth;
     RespawnState respawnState = RespawnState.notRespawning;
     public enum RespawnState
@@ -109,7 +110,13 @@ public class Player : NetworkBehaviour
         respawnState = RespawnState.respawning;
         SetLayer(19); //Dead Player
         Debug.Log("Player " + GetPlayerID() + " Died. Respawning in " + respawnTimer + " sec");
-        yield return new WaitForSeconds(respawnTimer);
+        timeTillRespawn = respawnTimer;
+        while (timeTillRespawn > 0)
+        {
+            timeTillRespawn -= Time.deltaTime;
+            yield return null;
+        }
+        timeTillRespawn = 0;
         if (IsHost && GetPlayerID() < botID)
         {
             //Check if the player wants to update their class
@@ -144,7 +151,7 @@ public class Player : NetworkBehaviour
 
     public void SendPlayerSwitchClassStatusRejection()
     {
-        if(respawnState == RespawnState.waitingForResponse)
+        if (respawnState == RespawnState.waitingForResponse)
         {
             respawnState = RespawnState.notRespawning;
         }
@@ -155,7 +162,7 @@ public class Player : NetworkBehaviour
         playerName = name;
         this.name = name;
         nameMesh.text = name;
-        if(IsOwner && GetPlayerID() < botID)
+        if (IsOwner && GetPlayerID() < botID)
         {
             nameMesh.gameObject.SetActive(false);
         }
@@ -333,6 +340,12 @@ public class Player : NetworkBehaviour
         return playerName;
     }
 
+
+    public float GetTimeTillRespawn()
+    {
+        return timeTillRespawn;
+    }
+
     public Menu GetMenu()
     {
         return menu;
@@ -378,6 +391,16 @@ public class Player : NetworkBehaviour
             currentCharMeshes.RemoveAt(0);
         }
         currentPlayerVisibility = visible;
+
+        //Hide other classes
+        for (int i = 0; i < playerModels.Length; i++)
+        {
+            if (i != (int)currentClass)
+            {                
+                playerModels[i].SetActive(false);
+            }
+        }
+
         for (int i = 0; i < playerModels.Length; i++)
         {
             if (i == (int)currentClass)
@@ -501,11 +524,6 @@ public class Player : NetworkBehaviour
                 }
                 GetTracker().SetCharacter(playerModels[i].GetComponentInChildren<Animator>(), playerModels[i].transform, handR, handL, head, !visible);
             }
-            else
-            {
-                //Hide other classes
-                playerModels[i].SetActive(false);
-            }
         }
 
         if (currentGun != null)
@@ -523,7 +541,7 @@ public class Player : NetworkBehaviour
 
     void ApplyCosmetics(GameObject prefab, Transform t)
     {
-        GameObject g = GameObject.Instantiate(prefab,t,false);
+        GameObject g = GameObject.Instantiate(prefab, t, false);
         g.transform.localPosition = Vector3.zero;
 
         SkinnedMeshRenderer[] targetSkin = g.GetComponentsInChildren<SkinnedMeshRenderer>();
