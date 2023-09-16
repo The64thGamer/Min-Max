@@ -19,7 +19,7 @@
         </ui:VisualElement>
         <ui:VisualElement name="BoxHealth" class="LargePanel" style="flex-grow: 1;">
             <ui:Label tabindex="-1" text="100" display-tooltip-when-elided="true" name="Health" />
-            <ui:Label tabindex="-1" text="HP" display-tooltip-when-elided="true" class="MiniText" />
+            <ui:Label tabindex="-1" text="HP" display-tooltip-when-elided="true" name="HPLabel" class="MiniText" />
         </ui:VisualElement>
     </ui:VisualElement>
 </ui:UXML>

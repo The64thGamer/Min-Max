@@ -22,11 +22,12 @@ public class PlayerUIController : MonoBehaviour
     Label healthText;
     Label ammoText;
     Label clipText;
+    Label timerText;
+    Label hpLabelText;
     VisualElement boxHealth;
     VisualElement boxAmmo;
     VisualElement boxTeam;
     VisualElement holderEnemies;
-    Label timerText;
 
     const float dropFontSizeCompensation = 4;
 
@@ -43,6 +44,7 @@ public class PlayerUIController : MonoBehaviour
         boxTeam = playerUIVTA.rootVisualElement.Q<VisualElement>("BoxTeam");
         holderEnemies = playerUIVTA.rootVisualElement.Q<VisualElement>("HolderEnemies");
         timerText = playerUIVTA.rootVisualElement.Q<Label>("Timer");
+        hpLabelText = playerUIVTA.rootVisualElement.Q<Label>("HPLabel");
 
         //Temp
         clipText.text = "∞";
@@ -61,6 +63,10 @@ public class PlayerUIController : MonoBehaviour
         else
         {
             timerText.text = $"{seconds / 60}:{seconds % 60:D2}";
+        }
+        if (player.GetHealth() <= 0)
+        {
+            healthText.text = ((int)player.GetTimeTillRespawn()).ToString();
         }
     }
 
@@ -83,7 +89,13 @@ public class PlayerUIController : MonoBehaviour
         if (player.GetHealth() <= 0)
         {
             boxColor = new Color(0.3f, 0.3f, 0.35f, 1);
+            hpLabelText.text = "Sec";
         }
+        else
+        {
+            hpLabelText.text = "HP";
+        }
+
         boxHealth.style.borderBottomColor = boxColor;
         boxHealth.style.borderTopColor = boxColor;
         boxHealth.style.borderLeftColor = boxColor;
