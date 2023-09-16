@@ -6,6 +6,7 @@ using UnityEngine;
 
 [RequireComponent(typeof(BoxCollider))]
 [RequireComponent(typeof(NetworkObject))]
+[ExecuteInEditMode]
 public class HealthChanger : NetworkBehaviour
 {
 
@@ -95,6 +96,14 @@ public class HealthChanger : NetworkBehaviour
                     break;
             }   
         }
+        if (spinObject)
+        {
+            this.transform.Rotate(Vector3.up, Time.deltaTime * 100);
+        }
+    }
+
+    private void OnRenderObject()
+    {
         if (spinObject)
         {
             this.transform.Rotate(Vector3.up, Time.deltaTime * 100);
