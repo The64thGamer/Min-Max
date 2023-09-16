@@ -54,7 +54,7 @@ public class Payload : GenericGamemode
             }
         }
 
-        if (points.Count > 0)
+        if (points.Count == 0)
         {
             try
             {
@@ -70,7 +70,7 @@ public class Payload : GenericGamemode
             points = new List<Vector3>();
             for (int i = 0; i < payloadTeams.Count; i++)
             {
-                if (payloadTeams[i].goal == null)
+                if (payloadTeams[i].goal == null && i != team)
                 {
                     points.Add(gm.GetMatchFocalPoint(gm.GetTeamColors(true)[i]));
                 }
@@ -82,7 +82,7 @@ public class Payload : GenericGamemode
             for (int i = 0; i < points.Count; i++)
             {
                 float lng = 0;
-                NavMesh.CalculatePath(points[i], payloadTeams[team].goal.transform.position, NavMesh.AllAreas, path);
+                NavMesh.CalculatePath(payloadTeams[team].goal.transform.position,points[i], NavMesh.AllAreas, path);
                 if (path.status != NavMeshPathStatus.PathInvalid)
                 {
                     for (int e = 1; e < path.corners.Length; ++e)
