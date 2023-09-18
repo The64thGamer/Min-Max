@@ -73,7 +73,7 @@ public class PlayerUIController : MonoBehaviour
     public void UpdateHealthUI(float oldHealth)
     {
         float baseHealth = (float)player.GetClassStats().baseHealth;
-        float healthLerp = player.GetHealth() / baseHealth;
+        float healthLerp = Mathf.Max(0,player.GetHealth()) / baseHealth;
         healthLerp *= healthLerp;
 
         healthText.text = Mathf.Max(0, player.GetHealth()).ToString();
