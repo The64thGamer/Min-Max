@@ -7,23 +7,18 @@ using UnityEngine.UI;
 
 public class GenericGun : Gun
 {
-    [SerializeField] Transform firePoint;
     [SerializeField] Transform crosshair;
-    [SerializeField] Player currentPlayer;
     [SerializeField] AudioClip fireSound;
-    [SerializeField] string gunNameKey;
-    [SerializeField] Transform superJank;
 
-    float fireCooldown;
     Vector3 currentFireAngle;
     AudioSource au;
     GlobalManager gm;
     bool showCrosshair;
-    Transform currentParent;
-    bool dumbstupidjank;
+    Transform rightHand;
 
-    public void Start()
+    public override void Start()
     {
+        base.Start();
         au = this.GetComponent<AudioSource>();
         gm = GameObject.Find("Global Manager").GetComponent<GlobalManager>();
         if (currentPlayer.IsOwner)
@@ -34,36 +29,17 @@ public class GenericGun : Gun
         {
             Destroy(crosshair.gameObject.GetComponent<Image>());
         }
+        rightHand = currentPlayer.GetTracker().GetRightHand();
     }
-    void FixedUpdate()
+    public override void Update()
     {
-        if (currentParent != null)
-        {
-            transform.position = currentParent.position;
-            transform.rotation = currentParent.rotation;
-            transform.localScale = currentParent.localScale;
-
-            //Dumb stupid jank, please remove this and do proper weapon animations
-            if(dumbstupidjank)
-            {
-                //playermodel version jank
-                transform.rotation = superJank.rotation;
-            }
-            else
-            {
-                //vr mode jank
-                transform.localPosition += transform.up * -.15f;
-                transform.localPosition += transform.forward * -.1f;
-            }
-        }
-
+        base.Update();
         if (gm != null)
         {
-            Vector3 firePos = currentPlayer.GetTracker().GetRightHandFirePos(defaultStats.firepoint);
             currentFireAngle = CalculateFireAngle(currentPlayer);
             if (showCrosshair)
             {
-                crosshair.position = CalculateHitPosition(currentFireAngle, currentPlayer, firePos);
+                crosshair.position = CalculateHitPosition(currentFireAngle, currentPlayer, firePoint.position);
                 crosshair.transform.LookAt(Camera.main.transform.position);
                 crosshair.localScale = Vector3.one + (Vector3.one * (crosshair.position - Camera.main.transform.position).magnitude * 1.5f);
             }
@@ -72,25 +48,23 @@ public class GenericGun : Gun
                 fireCooldown = Mathf.Max(0, fireCooldown - Time.deltaTime);
             }
         }
+        transform.position = rightHand.position;
+        transform.rotation = rightHand.rotation;
     }
-
 
     public override void Fire()
     {
-        if (gm != null && au != null)
+        if (fireCooldown <= 0)
         {
-            if (fireCooldown <= 0)
-            {
-                au.PlayOneShot(fireSound);
-                fireCooldown = 1.0f / FindStat(ChangableWeaponStats.shotsPerSecond);
+            au.PlayOneShot(fireSound);
 
-                if(gm.IsHost)
-                {
-                    HitScanHostDamageCalculation(currentPlayer);
-                    gm.SpawnProjectileClientRpc(currentPlayer.GetPlayerID());
-                }
+            if (gm.IsHost)
+            {
+                HitScanHostDamageCalculation(currentPlayer);
+                gm.SpawnProjectileClientRpc(currentPlayer.GetPlayerID());
             }
         }
+        base.Fire();
     }
     public override void AltFire() { }
 
@@ -111,12 +85,6 @@ public class GenericGun : Gun
     public override string GetNameKey()
     {
         return gunNameKey;
-    }
-
-    public override void SetGunTransformParent(Transform parent, bool dumbStupidJank)
-    {
-        currentParent = parent;
-        dumbstupidjank = dumbStupidJank;
     }
 
 }

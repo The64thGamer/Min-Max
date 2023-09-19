@@ -525,18 +525,6 @@ public class Player : NetworkBehaviour
                 GetTracker().SetCharacter(playerModels[i].GetComponentInChildren<Animator>(), playerModels[i].transform, handR, handL, head, !visible);
             }
         }
-
-        if (currentGun != null)
-        {
-            if (visible)
-            {
-                currentGun.SetGunTransformParent(playerModels[(int)currentClass].GetNamedChild("Gun R").transform, true);
-            }
-            else
-            {
-                currentGun.SetGunTransformParent(tracker.GetRightHand(), false);
-            }
-        }
     }
 
     void ApplyCosmetics(GameObject prefab, Transform t)

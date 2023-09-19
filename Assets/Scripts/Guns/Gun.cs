@@ -5,12 +5,8 @@ using UnityEngine;
 
 public abstract class Gun : MonoBehaviour
 {
-    //Constants
-    protected const float MINANGLE = 0.8f;
-    protected const float MAXSPHERECASTDISTANCE = 20;
-    protected const float MAXRAYCASTDISTANCE = 1000;
-    protected const float maxDamageFalloff = 20;
 
+    //Inspector Values
     [SerializeField]
     protected List<WeaponStats> changableStats = new List<WeaponStats>()
     {
@@ -20,21 +16,56 @@ public abstract class Gun : MonoBehaviour
         new WeaponStats(){ statName = ChangableWeaponStats.bulletSpeed, stat = 3},
         new WeaponStats(){ statName = ChangableWeaponStats.damage, stat = 30},
     };
+    [SerializeField] protected List<WeaponPos> weaponPos;
+    [SerializeField] protected string gunNameKey;
+    [SerializeField] protected Player currentPlayer;
+    [SerializeField] protected Animator animator;
+    [SerializeField] protected float fireAnimationSpeed;
+    [SerializeField] protected Transform firePoint;
+
+
+    //Standard Values
     protected int currentAmmo;
     protected GunProjectiles defaultStats;
+    protected float oldFireSpeed;
+    protected float fireCooldown;
 
-    public abstract void Fire();
-    public abstract void AltFire();
-    public abstract List<WeaponStats> ChangableStats();
-    public abstract int GetCurrentAmmo();
-    public abstract string GetNameKey();
-    public abstract void SetGunTransformParent(Transform parent, bool dumbStupidJank);
-    public abstract void SetPlayer(Player player);
+    //Constants
+    protected const float MINANGLE = 0.8f;
+    protected const float MAXSPHERECASTDISTANCE = 20;
+    protected const float MAXRAYCASTDISTANCE = 1000;
+    protected const float maxDamageFalloff = 20;
 
-    private void Start()
+
+    public virtual void Start()
     {
         currentAmmo = (int)FindStat(ChangableWeaponStats.maxAmmo);
     }
+
+    public virtual void Update()
+    {
+        float fireSpeed = FindStat(ChangableWeaponStats.shotsPerSecond) * fireAnimationSpeed;
+        if (oldFireSpeed != fireSpeed)
+        {
+            oldFireSpeed = fireSpeed;
+            animator.SetFloat("Fire Speed", fireSpeed);
+        }
+    }
+
+    public virtual void LateUpdate()
+    {
+        animator.SetBool("Fire", false);
+    }
+
+    public virtual void Fire()
+    {
+        if (fireCooldown <= 0)
+        {
+            animator.SetBool("Fire", true);
+            fireCooldown = 1.0f / FindStat(ChangableWeaponStats.shotsPerSecond);
+        }
+    }
+
 
     //Exploit: Hit needs to be parsed to ensure extreme angles aren't achievable.
     //This function breaks if the currently held weapon switches before its called
@@ -42,20 +73,19 @@ public abstract class Gun : MonoBehaviour
     {
         if (defaultStats.firePrefab != null)
         {
-            Vector3 firepos = player.GetTracker().GetRightHandFirePos(defaultStats.firepoint);
             Vector3 fireAngle = CalculateFireAngle(player);
 
             Transform gunAngle = player.GetTracker().GetRightHand();
             int numBullets = (int)FindStat(ChangableWeaponStats.bulletsPerShot);
             float angle = FindStat(ChangableWeaponStats.bulletSpreadAngle);
             float angleStep = 0;
-            if(numBullets < 4)
+            if (numBullets < 4)
             {
                 angleStep = 360f / numBullets;
             }
             else
             {
-                angleStep = 360f / (numBullets-1);
+                angleStep = 360f / (numBullets - 1);
             }
 
             for (int i = 0; i < numBullets; i++)
@@ -66,7 +96,7 @@ public abstract class Gun : MonoBehaviour
                 if (!(numBullets >= 4 && i == 0))
                 {
                     int newi = i;
-                    if(numBullets >= 4)
+                    if (numBullets >= 4)
                     {
                         newi--;
                     }
@@ -78,7 +108,7 @@ public abstract class Gun : MonoBehaviour
                     finalAngle = Quaternion.AngleAxis(Mathf.Cos(angleInRadians) * angle, gunAngle.right) * finalAngle;
                     finalAngle = Quaternion.AngleAxis(Mathf.Sin(angleInRadians) * angle, gunAngle.up) * finalAngle;
                 }
-                currentProjectile.GetComponent<Projectile>().SetProjectile(firepos, finalAngle, player.GetCurrentGun().FindStat(ChangableWeaponStats.bulletSpeed), player.GetTeamLayer(), CalculateHitPosition(finalAngle, player, firepos),1/numBullets);
+                currentProjectile.GetComponent<Projectile>().SetProjectile(firePoint.position, finalAngle, player.GetCurrentGun().FindStat(ChangableWeaponStats.bulletSpeed), player.GetTeamLayer(), CalculateHitPosition(finalAngle, player, firePoint.position), 1 / numBullets);
             }
         }
     }
@@ -157,7 +187,6 @@ public abstract class Gun : MonoBehaviour
 
     protected virtual void HitScanHostDamageCalculation(Player player)
     {
-        Vector3 firepos = player.GetTracker().GetRightHandFirePos(defaultStats.firepoint);
         Vector3 fireAngle = CalculateFireAngle(player);
 
         Transform gunAngle = player.GetTracker().GetRightHand();
@@ -198,12 +227,12 @@ public abstract class Gun : MonoBehaviour
             float dotAngle = Vector3.Dot(player.GetTracker().GetRightHandSafeForward(), fireAngle.normalized);
             if (dotAngle > MINANGLE)
             {
-                if (Physics.Raycast(firepos, finalAngle, out hit, MAXRAYCASTDISTANCE, layermask))
+                if (Physics.Raycast(firePoint.position, finalAngle, out hit, MAXRAYCASTDISTANCE, layermask))
                 {
                     Player hitPlayer = hit.collider.GetComponent<Player>();
                     if (hitPlayer != null)
                     {
-                        int damage = Mathf.CeilToInt(Mathf.Max(0,Mathf.SmoothStep(FindStat(ChangableWeaponStats.damage),0, hit.distance / maxDamageFalloff)));
+                        int damage = Mathf.CeilToInt(Mathf.Max(0, Mathf.SmoothStep(FindStat(ChangableWeaponStats.damage), 0, hit.distance / maxDamageFalloff)));
                         if (damage > 0)
                         {
                             hitPlayer.ChangeHealth(player.GetPlayerID(), -damage, bulletIdHash);
@@ -230,12 +259,29 @@ public abstract class Gun : MonoBehaviour
     {
         defaultStats = stat;
     }
+
+    public abstract void AltFire();
+    public abstract List<WeaponStats> ChangableStats();
+    public abstract int GetCurrentAmmo();
+    public abstract string GetNameKey();
+    public abstract void SetPlayer(Player player);
 }
 [System.Serializable]
 public class WeaponStats
 {
     public ChangableWeaponStats statName;
     public float stat;
+}
+
+[System.Serializable]
+public struct WeaponPos
+{
+    public ClassList classUsed;
+    public Vector3 frontPos;
+    public Vector3 rightPos;
+    public Vector3 leftPos;
+    public Vector3 upPos;
+    public Vector3 downPos;
 }
 
 [SerializeField]

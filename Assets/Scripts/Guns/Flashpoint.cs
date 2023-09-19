@@ -12,24 +12,20 @@ public class Flashpoint : Gun
 {
     [SerializeField] Transform firePoint;
     [SerializeField] Transform crosshair;
-    [SerializeField] Player currentPlayer;
     [SerializeField] AudioClip fireSound;
-    [SerializeField] string gunNameKey;
     [SerializeField] Transform superJank;
     [SerializeField] Light spotLight;
     BoxCollider boxCl;
-    float fireCooldown;
     Vector3 currentFireAngle;
     AudioSource au;
     GlobalManager gm;
     bool showCrosshair;
-    Transform currentParent;
-    bool dumbstupidjank;
 
     List<Player> playersInTrigger;
 
-    public void Start()
+    public new void Start()
     {
+        base.Start();
         playersInTrigger = new List<Player>();
         au = this.GetComponent<AudioSource>();
         boxCl = this.GetComponent<BoxCollider>();
@@ -45,33 +41,12 @@ public class Flashpoint : Gun
     }
     void FixedUpdate()
     {
-        if (currentParent != null)
-        {
-            transform.position = currentParent.position;
-            transform.rotation = currentParent.rotation;
-            transform.localScale = currentParent.localScale;
-
-            //Dumb stupid jank, please remove this and do proper weapon animations
-            if (dumbstupidjank)
-            {
-                //playermodel version jank
-                transform.rotation = superJank.rotation;
-            }
-            else
-            {
-                //vr mode jank
-                transform.localPosition += transform.up * -.15f;
-                transform.localPosition += transform.forward * -.1f;
-            }
-        }
-
         if (gm != null)
         {
-            Vector3 firePos = currentPlayer.GetTracker().GetRightHandFirePos(defaultStats.firepoint);
             currentFireAngle = CalculateFireAngle(currentPlayer);
             if (showCrosshair)
             {
-                crosshair.position = CalculateHitPosition(currentFireAngle, currentPlayer, firePos);
+                crosshair.position = CalculateHitPosition(currentFireAngle, currentPlayer, firePoint.position);
                 crosshair.transform.LookAt(Camera.main.transform.position);
                 crosshair.localScale = Vector3.one + (Vector3.one * (crosshair.position - Camera.main.transform.position).magnitude * 1.5f);
             }
@@ -89,8 +64,12 @@ public class Flashpoint : Gun
         boxCl.center = new Vector3(0, 0, spotLight.range / 2.0f);
     }
 
+    new void Update()
+    {
+        base.Update();
+    }
 
-    public override void Fire()
+    public new void Fire()
     {
         if (gm != null && au != null)
         {
@@ -105,21 +84,21 @@ public class Flashpoint : Gun
                 }
             }
         }
+        base.Fire();
     }
 
     protected override void HitScanHostDamageCalculation(Player player)
     {
-        Vector3 firepos = currentPlayer.GetTracker().GetRightHandFirePos(defaultStats.firepoint);
         int bulletIdHash = UnityEngine.Random.Range(-999999999, 999999999);
 
         for (int i = 0; i < playersInTrigger.Count; i++)
         {
             if (playersInTrigger[i] != null)
             {
-                Vector3 fireAngle = ((playersInTrigger[i].transform.position + new Vector3(0, 0.75f, 0)) - firepos).normalized;
+                Vector3 fireAngle = ((playersInTrigger[i].transform.position + new Vector3(0, 0.75f, 0)) - firePoint.position).normalized;
                 LayerMask layermask = GetIgnoreTeamAndVRLayerMask(currentPlayer);
-                Debug.DrawRay(firepos, fireAngle * FindStat(ChangableWeaponStats.maxBulletRange));
-                RaycastHit[] hit = Physics.RaycastAll(firepos, fireAngle, FindStat(ChangableWeaponStats.maxBulletRange), layermask);
+                Debug.DrawRay(firePoint.position, fireAngle * FindStat(ChangableWeaponStats.maxBulletRange));
+                RaycastHit[] hit = Physics.RaycastAll(firePoint.position, fireAngle, FindStat(ChangableWeaponStats.maxBulletRange), layermask);
                 System.Array.Sort(hit, (x, y) => x.distance.CompareTo(y.distance));
 
                 Player p;
@@ -187,12 +166,6 @@ public class Flashpoint : Gun
     public override string GetNameKey()
     {
         return gunNameKey;
-    }
-
-    public override void SetGunTransformParent(Transform parent, bool dumbStupidJank)
-    {
-        currentParent = parent;
-        dumbstupidjank = dumbStupidJank;
     }
 
 }
