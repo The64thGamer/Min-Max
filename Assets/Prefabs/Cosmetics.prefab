@@ -45,27 +45,27 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   labourer:
-  - name: Programmer's Vest
-    icon: {fileID: 2800000, guid: b535e5302b5f68d47bf37e9d4ce38e5c, type: 3}
-    prefab: {fileID: 919132149155446097, guid: bbbd4ec58614fda4888463f3553cc4bd, type: 3}
-    region: 4
-    hideBodyGroups: 2
+  - name: Space-Age Headwear
+    icon: {fileID: 2800000, guid: 9c92225852f6bfb49a43775a8454759c, type: 3}
+    prefab: {fileID: 919132149155446097, guid: bbb5ff1b36ccf794ba0219325d106069, type: 3}
+    region: 0
+    hideBodyGroups: 0
     stock: 1
     weight: 1
   woodworker:
-  - name: Programmer's Vest
-    icon: {fileID: 2800000, guid: b535e5302b5f68d47bf37e9d4ce38e5c, type: 3}
-    prefab: {fileID: 919132149155446097, guid: bbbd4ec58614fda4888463f3553cc4bd, type: 3}
-    region: 4
-    hideBodyGroups: 2
+  - name: Space-Age Headwear
+    icon: {fileID: 2800000, guid: 9c92225852f6bfb49a43775a8454759c, type: 3}
+    prefab: {fileID: 919132149155446097, guid: bbb5ff1b36ccf794ba0219325d106069, type: 3}
+    region: 0
+    hideBodyGroups: 0
     stock: 1
     weight: 1
   developer:
-  - name: Programmer's Vest
-    icon: {fileID: 2800000, guid: b535e5302b5f68d47bf37e9d4ce38e5c, type: 3}
-    prefab: {fileID: 919132149155446097, guid: bbbd4ec58614fda4888463f3553cc4bd, type: 3}
-    region: 4
-    hideBodyGroups: 2
+  - name: Space-Age Headwear
+    icon: {fileID: 2800000, guid: 9c92225852f6bfb49a43775a8454759c, type: 3}
+    prefab: {fileID: 919132149155446097, guid: bbb5ff1b36ccf794ba0219325d106069, type: 3}
+    region: 0
+    hideBodyGroups: 0
     stock: 1
     weight: 1
   programmer:
@@ -209,34 +209,34 @@ MonoBehaviour:
     stock: 0
     weight: 0
   artist:
-  - name: Programmer's Vest
-    icon: {fileID: 2800000, guid: b535e5302b5f68d47bf37e9d4ce38e5c, type: 3}
-    prefab: {fileID: 919132149155446097, guid: bbbd4ec58614fda4888463f3553cc4bd, type: 3}
-    region: 4
-    hideBodyGroups: 2
+  - name: Space-Age Headwear
+    icon: {fileID: 2800000, guid: 9c92225852f6bfb49a43775a8454759c, type: 3}
+    prefab: {fileID: 919132149155446097, guid: bbb5ff1b36ccf794ba0219325d106069, type: 3}
+    region: 0
+    hideBodyGroups: 0
     stock: 1
     weight: 1
   castmember:
-  - name: Programmer's Vest
-    icon: {fileID: 2800000, guid: b535e5302b5f68d47bf37e9d4ce38e5c, type: 3}
-    prefab: {fileID: 919132149155446097, guid: bbbd4ec58614fda4888463f3553cc4bd, type: 3}
-    region: 4
-    hideBodyGroups: 2
+  - name: Space-Age Headwear
+    icon: {fileID: 2800000, guid: 9c92225852f6bfb49a43775a8454759c, type: 3}
+    prefab: {fileID: 919132149155446097, guid: bbb5ff1b36ccf794ba0219325d106069, type: 3}
+    region: 0
+    hideBodyGroups: 0
     stock: 1
     weight: 1
   craftsman:
-  - name: Programmer's Vest
-    icon: {fileID: 2800000, guid: b535e5302b5f68d47bf37e9d4ce38e5c, type: 3}
-    prefab: {fileID: 919132149155446097, guid: bbbd4ec58614fda4888463f3553cc4bd, type: 3}
-    region: 4
-    hideBodyGroups: 2
+  - name: Space-Age Headwear
+    icon: {fileID: 2800000, guid: 9c92225852f6bfb49a43775a8454759c, type: 3}
+    prefab: {fileID: 919132149155446097, guid: bbb5ff1b36ccf794ba0219325d106069, type: 3}
+    region: 0
+    hideBodyGroups: 0
     stock: 1
     weight: 1
   manager:
-  - name: Programmer's Vest
-    icon: {fileID: 2800000, guid: b535e5302b5f68d47bf37e9d4ce38e5c, type: 3}
-    prefab: {fileID: 919132149155446097, guid: bbbd4ec58614fda4888463f3553cc4bd, type: 3}
-    region: 4
-    hideBodyGroups: 2
+  - name: Space-Age Headwear
+    icon: {fileID: 2800000, guid: 9c92225852f6bfb49a43775a8454759c, type: 3}
+    prefab: {fileID: 919132149155446097, guid: bbb5ff1b36ccf794ba0219325d106069, type: 3}
+    region: 0
+    hideBodyGroups: 0
     stock: 1
     weight: 1

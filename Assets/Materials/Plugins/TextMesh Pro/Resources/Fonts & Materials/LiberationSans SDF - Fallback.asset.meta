@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 2e498d1c8094910479dc3e1b768306a4
+timeCreated: 1484171803
+licenseType: Store
+NativeFormatImporter:
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 165323
+  packageName: Auto Hand - VR Physics Interaction
+  packageVersion: 3.2.1
+  assetPath: Assets/Plugins/TextMesh Pro/Resources/Fonts & Materials/LiberationSans
+    SDF - Fallback.asset
+  uploadId: 565918

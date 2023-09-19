@@ -68,11 +68,14 @@ MonoBehaviour:
     stat: 7
   - statName: 1
     stat: 1
+  weaponPos: []
+  gunNameKey: Flashpoint
+  currentPlayer: {fileID: 0}
+  animator: {fileID: 4751596311346859352}
+  fireAnimationSpeed: 0
   firePoint: {fileID: 5960225029509838066}
   crosshair: {fileID: 3381283269250820758}
-  currentPlayer: {fileID: 0}
   fireSound: {fileID: 8300000, guid: 36081f86899c2e943af4c27f0ab9865a, type: 3}
-  gunNameKey: Flashpoint
   superJank: {fileID: 2880340218513434506}
   spotLight: {fileID: 2502844193956642739}
 --- !u!82 &4250082636226092830
@@ -656,7 +659,11 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 7837b79241c72124a9e39e5c3d257b78,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 4751596311346859352}
   m_SourcePrefab: {fileID: 100100000, guid: 7837b79241c72124a9e39e5c3d257b78, type: 3}
 --- !u!4 &2565481668753550087 stripped
 Transform:
@@ -664,3 +671,31 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 2598808437717044460}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &2941337986830479805 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: 7837b79241c72124a9e39e5c3d257b78,
+    type: 3}
+  m_PrefabInstance: {fileID: 2598808437717044460}
+  m_PrefabAsset: {fileID: 0}
+--- !u!95 &4751596311346859352
+Animator:
+  serializedVersion: 7
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2941337986830479805}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 0}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_AnimatePhysics: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0

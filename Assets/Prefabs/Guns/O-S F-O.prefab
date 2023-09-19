@@ -32,7 +32,6 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 1
   m_Children:
-  - {fileID: 2655086628268099182}
   - {fileID: 5960225029509838066}
   - {fileID: 2880340218513434506}
   - {fileID: 3123218478389914677}
@@ -63,12 +62,14 @@ MonoBehaviour:
     stat: 15
   - statName: 5
     stat: 4
+  weaponPos: []
+  gunNameKey: OS-FO
+  currentPlayer: {fileID: 0}
+  animator: {fileID: 6754426350411069817}
+  fireAnimationSpeed: 0
   firePoint: {fileID: 5960225029509838066}
   crosshair: {fileID: 3381283269250820758}
-  currentPlayer: {fileID: 0}
   fireSound: {fileID: 8300000, guid: 36081f86899c2e943af4c27f0ab9865a, type: 3}
-  gunNameKey: Worker Ionizing Pistol
-  superJank: {fileID: 2880340218513434506}
 --- !u!82 &4250082636226092830
 AudioSource:
   m_ObjectHideFlags: 0
@@ -80,7 +81,6 @@ AudioSource:
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 0}
-  m_Resource: {fileID: 0}
   m_PlayOnAwake: 1
   m_Volume: 1
   m_Pitch: 1
@@ -183,6 +183,7 @@ MonoBehaviour:
   SynchronizeTransform: 0
   ActiveSceneSynchronization: 0
   SceneMigrationSynchronization: 1
+  SpawnWithObservers: 1
   DontDestroyWithOwner: 0
   AutoObjectParentSync: 1
 --- !u!1 &1360893760067889085
@@ -402,6 +403,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5960225029509838066}
+  - component: {fileID: 6754426350411069817}
   m_Layer: 28
   m_Name: Fire Point
   m_TagString: Untagged
@@ -425,90 +427,28 @@ Transform:
   - {fileID: 4309540953772060079}
   m_Father: {fileID: 1279211091985373483}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1001 &2545231180004991365
-PrefabInstance:
+--- !u!95 &6754426350411069817
+Animator:
+  serializedVersion: 7
   m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    serializedVersion: 3
-    m_TransformParent: {fileID: 1279211091985373483}
-    m_Modifications:
-    - target: {fileID: -8679921383154817045, guid: f7d4d18eb668c3241bae9c2602d8948a,
-        type: 3}
-      propertyPath: m_RootOrder
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: -8679921383154817045, guid: f7d4d18eb668c3241bae9c2602d8948a,
-        type: 3}
-      propertyPath: m_LocalPosition.x
-      value: -0
-      objectReference: {fileID: 0}
-    - target: {fileID: -8679921383154817045, guid: f7d4d18eb668c3241bae9c2602d8948a,
-        type: 3}
-      propertyPath: m_LocalPosition.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: -8679921383154817045, guid: f7d4d18eb668c3241bae9c2602d8948a,
-        type: 3}
-      propertyPath: m_LocalPosition.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: -8679921383154817045, guid: f7d4d18eb668c3241bae9c2602d8948a,
-        type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 0.7071068
-      objectReference: {fileID: 0}
-    - target: {fileID: -8679921383154817045, guid: f7d4d18eb668c3241bae9c2602d8948a,
-        type: 3}
-      propertyPath: m_LocalRotation.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: -8679921383154817045, guid: f7d4d18eb668c3241bae9c2602d8948a,
-        type: 3}
-      propertyPath: m_LocalRotation.y
-      value: -0.7071068
-      objectReference: {fileID: 0}
-    - target: {fileID: -8679921383154817045, guid: f7d4d18eb668c3241bae9c2602d8948a,
-        type: 3}
-      propertyPath: m_LocalRotation.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: -8679921383154817045, guid: f7d4d18eb668c3241bae9c2602d8948a,
-        type: 3}
-      propertyPath: m_LocalEulerAnglesHint.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: -8679921383154817045, guid: f7d4d18eb668c3241bae9c2602d8948a,
-        type: 3}
-      propertyPath: m_LocalEulerAnglesHint.y
-      value: -90
-      objectReference: {fileID: 0}
-    - target: {fileID: -8679921383154817045, guid: f7d4d18eb668c3241bae9c2602d8948a,
-        type: 3}
-      propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 919132149155446097, guid: f7d4d18eb668c3241bae9c2602d8948a,
-        type: 3}
-      propertyPath: m_Name
-      value: WIP Gun
-      objectReference: {fileID: 0}
-    - target: {fileID: 919132149155446097, guid: f7d4d18eb668c3241bae9c2602d8948a,
-        type: 3}
-      propertyPath: m_Layer
-      value: 28
-      objectReference: {fileID: 0}
-    m_RemovedComponents: []
-    m_RemovedGameObjects: []
-    m_AddedGameObjects: []
-    m_AddedComponents: []
-  m_SourcePrefab: {fileID: 100100000, guid: f7d4d18eb668c3241bae9c2602d8948a, type: 3}
---- !u!4 &2655086628268099182 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: f7d4d18eb668c3241bae9c2602d8948a,
-    type: 3}
-  m_PrefabInstance: {fileID: 2545231180004991365}
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8905209547214463766}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 0}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_AnimatePhysics: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
 --- !u!1001 &3232845479828032478
 PrefabInstance:
   m_ObjectHideFlags: 0

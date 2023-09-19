@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 3997e2241185407d80309a82f9148466
+ShaderImporter:
+  externalObjects: {}
+  defaultTextures: []
+  nonModifiableTextures: []
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 165323
+  packageName: Auto Hand - VR Physics Interaction
+  packageVersion: 3.2.1
+  assetPath: Assets/Plugins/TextMesh Pro/Shaders/TMPro_Properties.cginc
+  uploadId: 565918

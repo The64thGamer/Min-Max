@@ -9893,13 +9893,14 @@ GameObject:
   m_Component:
   - component: {fileID: 3344357607343733284}
   - component: {fileID: 3501787828495568387}
+  - component: {fileID: 525207946954463755}
   m_Layer: 10
   m_Name: Programmer
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &3344357607343733284
 Transform:
   m_ObjectHideFlags: 0
@@ -9948,6 +9949,24 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &525207946954463755
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2675801367933182110}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 244dbf48172af22428b65bd68b88fd3e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  LeftHandIKTarget: {fileID: 0}
+  RightHandIKTarget: {fileID: 0}
+  LeftElbowIKTarget: {fileID: 0}
+  RightElbowIKTarget: {fileID: 0}
+  HandIKAmount: 1
+  ElbowIKAmount: 1
 --- !u!1 &2681044994259424247
 GameObject:
   m_ObjectHideFlags: 0
