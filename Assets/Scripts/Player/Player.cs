@@ -15,11 +15,7 @@ public class Player : NetworkBehaviour
 {
     [SerializeField] Gun currentGun;
     [SerializeField] List<Gun> guns;
-    [SerializeField] TeamList currentTeam;
-    [SerializeField] ClassList currentClass;
-    [SerializeField] ClassStats currentStats;
     [SerializeField] GameObject[] playerModels;
-    string playerName;
     [SerializeField] TextMesh nameMesh;
 
     PlayerUIController uiController;
@@ -157,9 +153,9 @@ public class Player : NetworkBehaviour
         }
     }
 
-    public void SetName(string name)
+    public void UpdateName()
     {
-        playerName = name;
+        string name = gm.FindPlayerName(GetPlayerID());
         this.name = name;
         nameMesh.text = name;
         if (IsOwner && GetPlayerID() < botID)
@@ -168,22 +164,16 @@ public class Player : NetworkBehaviour
         }
     }
 
-    public void SetClass(ClassList setClass, int[] classCosmetics)
+    public void UpdateClass(int[] classCosmetics)
     {
         cosmeticInts = classCosmetics;
-        currentClass = setClass;
-        currentStats = gm.GetComponent<AllStats>().GetClassStats(setClass);
-        ServerSetHealth(currentStats.baseHealth);
         SetupCosmetics(classCosmetics);
         SetCharacterVisibility(currentPlayerVisibility);
         UpdateTeamColor();
-        float height = PlayerPrefs.GetFloat("Settings: PlayerHeight") - 0.127f; //Height offset by 5 inches (Height from eyes to top of head)
-        tracker.GetForwardRoot().localScale = Vector3.one * (currentStats.classEyeHeight / height);
     }
 
     public void SetTeam(TeamList team)
     {
-        currentTeam = team;
         SetLayer(GetTeamLayer());
         UpdateTeamColor();
 
@@ -219,7 +209,7 @@ public class Player : NetworkBehaviour
 
     void SetupCosmetics(int[] classCosmetics)
     {
-        List<Cosmetic> stockCosmetics = gm.GetCosmetics().GetClassCosmetics(currentClass);
+        List<Cosmetic> stockCosmetics = gm.GetCosmetics().GetClassCosmetics(gm.FindPlayerClass(GetPlayerID()));
         List<int> cosmeticIntList = cosmeticInts.ToList<int>();
         for (int i = 0; i < classCosmetics.Length; i++)
         {
@@ -306,25 +296,6 @@ public class Player : NetworkBehaviour
         return controller;
     }
 
-    public TeamList GetTeam()
-    {
-        return currentTeam;
-    }
-
-    public Gun GetCurrentGun()
-    {
-        return currentGun;
-    }
-
-    public ClassList GetCurrentClass()
-    {
-        return currentClass;
-    }
-    public ClassStats GetClassStats()
-    {
-        return currentStats;
-    }
-
     public bool IsPlayerOwner()
     {
         return IsOwner;
@@ -333,12 +304,6 @@ public class Player : NetworkBehaviour
     {
         return OwnerClientId;
     }
-
-    public string GetPlayerName()
-    {
-        return playerName;
-    }
-
 
     public float GetTimeTillRespawn()
     {
@@ -384,6 +349,7 @@ public class Player : NetworkBehaviour
 
     public void SetCharacterVisibility(bool visible)
     {
+        ClassList currentClass = (int)gm.FindPlayerClass(GetPlayerID());
         while (currentCharMeshes.Count > 0)
         {
             Destroy(currentCharMeshes[0]);
@@ -573,17 +539,18 @@ public class Player : NetworkBehaviour
 
     public int ChangeHealth(ulong id, int amount, int idHash)
     {
+        float currentHealth = gm.FindPlayerStat(GetPlayerID(), ChangablePlayerStats.currentHealth);
         if (IsHost)
         {
             if (currentHealth <= 0)
             {
                 return 0;
             }
-            int finalHealth = Mathf.Min(currentHealth + amount, currentStats.baseHealth);
+            int finalHealth = (int)Mathf.Min(currentHealth + amount, gm.FindPlayerStat(GetPlayerID(), ChangablePlayerStats.maxHealth));
             gm.PlayerTookDamageClientRpc(GetPlayerID(), finalHealth, id, idHash);
             if (currentHealth <= 0)
             {
-                gm.RespawnPlayer(GetPlayerID(), GetTeam(), false);
+                gm.RespawnPlayer(GetPlayerID(), gm.FindPlayerTeam(GetPlayerID()), false);
             }
             return finalHealth;
         }

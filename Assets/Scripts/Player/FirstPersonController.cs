@@ -111,7 +111,7 @@ namespace StarterAssets
             currentPositionData.baseSpeed = player.GetClassStats().baseSpeed;
 
             //Remove inputs in situations
-            if (menu.GetOpenState() || player.GetHealth() <= 0)
+            if (menu.GetOpenState() || gm.FindPlayerStat(player.GetPlayerID(),ChangablePlayerStats.currentHealth) <= 0)
             {
                 currentInputData.rightJoystick = Vector2.zero;
                 currentInputData.crouch = false;
@@ -489,7 +489,7 @@ namespace StarterAssets
         {
             if (currentInputData.crouch && _controller.isGrounded)
             {
-                if (!currentPositionData.hasBeenCrouched && player.GetHealth() > 0)
+                if (!currentPositionData.hasBeenCrouched && gm.FindPlayerStat(player.GetPlayerID(),ChangablePlayerStats.currentHealth) > 0)
                 {
                     player.SetWirePoint(gm.GetWire(player.GetTeam()).RequestForWire(transform.position), true);
                     heldWire = player.GetWirePoint();

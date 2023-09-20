@@ -205,7 +205,7 @@ public class AiPlayer : NetworkBehaviour
         }
         if (currentFind != null)
         {
-            if (currentFind.GetHealth() > 0)
+            if (gm.FindPlayerStat(currentFind.GetPlayerID(), ChangablePlayerStats.currentHealth) > 0)
             {
                 target = currentFind;
                 targetHeadset = target.GetTracker().GetCamera();

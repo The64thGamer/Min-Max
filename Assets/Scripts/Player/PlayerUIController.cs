@@ -84,21 +84,22 @@ public class PlayerUIController : MonoBehaviour
 
     public void UpdateHealthUI(float oldHealth)
     {
-        float baseHealth = (float)player.GetClassStats().baseHealth;
-        float healthLerp = Mathf.Max(0,player.GetHealth()) / baseHealth;
+        float currentHealth = gm.FindPlayerStat(player.GetPlayerID(), ChangablePlayerStats.currentHealth);
+        float baseHealth = gm.FindPlayerStat(player.GetPlayerID(), ChangablePlayerStats.maxHealth);
+        float healthLerp = Mathf.Max(0, currentHealth) / baseHealth;
         healthLerp *= healthLerp;
 
-        healthText.text = Mathf.Max(0, player.GetHealth()).ToString();
+        healthText.text = Mathf.Max(0, currentHealth).ToString();
         healthText.style.fontSize = Mathf.Lerp(80, 120, healthLerp);
 
-        Color[] colors = new Color[] { Color.red, Color.gray, palette.GetPixel((int)player.GetTeam(), 5) };
+        Color[] colors = new Color[] { Color.red, Color.gray, palette.GetPixel((int)gm.FindPlayerTeam(player.GetPlayerID()), 5) };
         float scaledTime = healthLerp * (colors.Length - 1);
         Color oldColor = colors[(int)scaledTime];
         Color newColor = colors[Mathf.Min((int)scaledTime + 1,colors.Length-1)];
         float newT = scaledTime - Mathf.Floor(scaledTime);
         Color boxColor = Color.Lerp(oldColor, newColor, newT);
 
-        if (player.GetHealth() <= 0)
+        if (currentHealth <= 0)
         {
             boxColor = new Color(0.3f, 0.3f, 0.35f, 1);
             hpLabelText.text = "Sec";
@@ -118,12 +119,12 @@ public class PlayerUIController : MonoBehaviour
 
         //Health is dropped based on how much health is lost, and compensation
         //is given due to the font shrinking with health loss.
-        healthDrop = Mathf.Clamp(((player.GetHealth() - oldHealth) / baseHealth) * (dropFontSizeCompensation - ((dropFontSizeCompensation - 1) * (player.GetHealth() / baseHealth))) * 0.9f, -0.9f, 0.9f);
+        healthDrop = Mathf.Clamp(((currentHealth - oldHealth) / baseHealth) * (dropFontSizeCompensation - ((dropFontSizeCompensation - 1) * (currentHealth / baseHealth))) * 0.9f, -0.9f, 0.9f);
     }
 
     public void UpdateTeamColorUI()
     {
-        Color boxColor = palette.GetPixel((int)player.GetTeam(), 5);
+        Color boxColor = palette.GetPixel((int)gm.FindPlayerTeam(player.GetPlayerID()), 5);
         Color innerColor = boxColor;
         innerColor.a = 0.5f;
 
@@ -150,7 +151,7 @@ public class PlayerUIController : MonoBehaviour
 
     public void UpdateClientsConnected()
     {
-
+        TeamList currentTeam = gm.FindPlayerTeam(player.GetPlayerID());
         //Enemy Holder
         List<VisualElement> children = new List<VisualElement>();
         foreach (var child in holderEnemies.Children())
@@ -165,7 +166,7 @@ public class PlayerUIController : MonoBehaviour
         teams = gm.GetTeamColors(true);
         for (int i = 0; i < teams.Count; i++)
         {
-            if (teams[i] != player.GetTeam())
+            if (teams[i] != currentTeam)
             {
                 TemplateContainer myUI = enemyVTA.Instantiate();
                 holderEnemies.Add(myUI);
@@ -193,10 +194,10 @@ public class PlayerUIController : MonoBehaviour
         List<Player> players = gm.GetClients();
         for (int i = 0; i < players.Count; i++)
         {
-            if (players[i].GetTeam() == player.GetTeam())
+            if (gm.FindPlayerTeam(players[i].GetPlayerID()) == currentTeam)
             {
                 TemplateContainer myUI = teammateVTA.Instantiate();
-                myUI.Q<VisualElement>("Icon").style.backgroundImage = playerIcons[(int)players[i].GetCurrentClass()];
+                myUI.Q<VisualElement>("Icon").style.backgroundImage = playerIcons[(int)gm.FindPlayerClass(players[i].GetPlayerID())];
                 boxTeam.Add(myUI);
             }
         }

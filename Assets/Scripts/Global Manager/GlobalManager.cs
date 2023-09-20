@@ -921,19 +921,6 @@ public class GlobalManager : NetworkBehaviour
     }
 
     [ClientRpc]
-    public void SetPlayerTeamClientRpc(ulong id, TeamList team)
-    {
-        for (int i = 0; i < clients.Count; i++)
-        {
-            if (clients[i].GetPlayerID() == id)
-            {
-                clients[i].SetTeam(team);
-                return;
-            }
-        }
-    }
-
-    [ClientRpc]
     void SendAllPlayerDataToNewPlayerClientRpc(PlayerInfoSentToClient[] data, ulong id)
     {
         if (IsHost)
@@ -1026,8 +1013,10 @@ public class GlobalManager : NetworkBehaviour
         }
 
         //Keep this where it is
-        int damageTaken = clients[foundClient].GetHealth() - Mathf.Max(currentHealth, 0);
-        if (clients[foundClient].GetHealth() <= 0 || damageTaken == 0)
+        int oldHealth = (int)FindPlayerStat(id, ChangablePlayerStats.currentHealth);
+
+        int damageTaken = oldHealth - Mathf.Max(currentHealth, 0);
+        if ((int)FindPlayerStat(id, ChangablePlayerStats.currentHealth) <= 0 || damageTaken == 0)
         {
             return;
         }
@@ -1043,7 +1032,7 @@ public class GlobalManager : NetworkBehaviour
                 }
                 else
                 {
-                    Debug.Log("Player " + id + " was killed (" + clients[foundClient].GetHealth() + " -> " + currentHealth + " HP) by Player" + idOfKiller);
+                    Debug.Log("Player " + id + " was killed (" + oldHealth + " -> " + currentHealth + " HP) by Player" + idOfKiller);
                 }
                 achievments.AddToValue("Achievement: Total Deaths", 1);
             }
@@ -1057,7 +1046,7 @@ public class GlobalManager : NetworkBehaviour
         }
         if (killerIsCurrentPC && !damagedIsCurrentPC)
         {
-            Debug.Log("Player " + id + " took " + damageTaken + " damage (" + clients[foundClient].GetHealth() + " -> " + currentHealth + " HP) by Player" + idOfKiller);
+            Debug.Log("Player " + id + " took " + damageTaken + " damage (" + oldHealth + " -> " + currentHealth + " HP) by Player" + idOfKiller);
             achievments.AddToValue("Achievement: Total Damage", Mathf.Max(0, damageTaken));
             achievments.AddToValue("Achievement: Total Healing", Mathf.Max(0, -damageTaken));
 
@@ -1127,7 +1116,7 @@ public class GlobalManager : NetworkBehaviour
                 au.PlayOneShot((AudioClip)Resources.Load("Sounds/Damage/hitsound", typeof(AudioClip)));
             }
         }
-        SetPlayerValueClientRpc(id, ChangablePlayerStats.currentHealth, currentHealth);
+        SetPlayerValue(id, ChangablePlayerStats.currentHealth, currentHealth);
     }
 
     [ServerRpc(RequireOwnership = false)]
@@ -1192,13 +1181,20 @@ public class GlobalManager : NetworkBehaviour
     [ClientRpc]
     public void SetPlayerValueClientRpc(ulong id, ChangablePlayerStats statName, float value)
     {
+        SetPlayerValue(id, statName, value);
+    }
+
+    void SetPlayerValue(ulong id, ChangablePlayerStats statName, float value)
+    {
         int index = SearchClients(id);
 
         for (int i = 0; i < clientData[index].playerStats.Count; i++)
         {
             if (clientData[index].playerStats[i].statName == statName)
             {
+                clients[index].GetUIController().UpdateHealthUI(FindPlayerStat(id,ChangablePlayerStats.currentHealth));
                 clientData[index].playerStats[i].stat = value;
+                return;
             }
         }
     }
@@ -1217,10 +1213,65 @@ public class GlobalManager : NetworkBehaviour
         return 0;
     }
 
-    void SetStat(ulong id, ChangableWeaponStats statName, float value)
+    [ClientRpc]
+    public void SetPlayerNameClientRpc(ulong id, string value)
     {
-       
+        SetPlayerName(id, value);
     }
+
+    void SetPlayerName(ulong id, string value)
+    {
+        int index = SearchClients(id);
+        clientData[index].playerName.value = value;
+        clients[index].UpdateName();
+    }
+
+    public string FindPlayerName(ulong id)
+    {
+        return clientData[SearchClients(id)].playerName.value;
+    }
+
+    [ClientRpc]
+    public void SetPlayerTeamClientRpc(ulong id, TeamList value)
+    {
+        SetPlayerTeam(id, value);
+    }
+
+    void SetPlayerTeam(ulong id, TeamList value)
+    {
+        int index = SearchClients(id);
+        clientData[index].playerTeam.value = value;
+        clients[index].UpdateTeamColor();
+    }
+
+    public TeamList FindPlayerTeam(ulong id)
+    {
+        return clientData[SearchClients(id)].playerTeam.value;
+    }
+
+    [ClientRpc]
+    public void SetPlayerClassClientRpc(ulong id, ClassList value)
+    {
+        SetPlayerClass(id, value);
+    }
+
+    void SetPlayerClass(ulong id, ClassList value)
+    {
+        int index = SearchClients(id);
+        clientData[index].playerClass.value = value;
+        float height = PlayerPrefs.GetFloat("Settings: PlayerHeight") - 0.127f; //Height offset by 5 inches (Height from eyes to top of head)
+        currentClass = setClass;
+        currentStats = gm.GetComponent<AllStats>().GetClassStats(setClass);
+        ServerSetHealth(currentStats.baseHealth);
+        tracker.GetForwardRoot().localScale = Vector3.one * (currentStats.classEyeHeight / height);
+        clients[index].UpdateClass();
+    }
+
+    public ClassList FindPlayerClass(ulong id)
+    {
+        return clientData[SearchClients(id)].playerClass.value;
+    }
+
 
 
     private void OnDrawGizmosSelected()
@@ -1273,6 +1324,8 @@ public class PlayerData
 {
     public SyncString playerName;
     public SyncUlong playerId;
+    public SyncClass playerClass;
+    public SyncTeam playerTeam;
     public List<PlayerStats> playerStats;
     public List<PlayerGunData> playerGuns;
     public List<PlayerInputData> playerInputs;
@@ -1280,7 +1333,7 @@ public class PlayerData
 }
 
 [System.Serializable]
-public class SyncString
+public struct SyncString
 {
     public string value;
     public float lastTimeSynced;
@@ -1290,6 +1343,46 @@ public class SyncString
         serializer.SerializeValue(ref lastTimeSynced);
     }
 }
+
+
+[System.Serializable]
+public struct SyncUlong
+{
+    public ulong value;
+    public float lastTimeSynced;
+
+    public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
+    {
+        serializer.SerializeValue(ref value);
+        serializer.SerializeValue(ref lastTimeSynced);
+    }
+}
+
+[System.Serializable]
+public struct SyncClass
+{
+    public ClassList value;
+    public float lastTimeSynced;
+    public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
+    {
+        serializer.SerializeValue(ref value);
+        serializer.SerializeValue(ref lastTimeSynced);
+    }
+}
+
+[System.Serializable]
+public struct SyncTeam
+{
+    public TeamList value;
+    public float lastTimeSynced;
+    public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
+    {
+        serializer.SerializeValue(ref value);
+        serializer.SerializeValue(ref lastTimeSynced);
+    }
+}
+
+
 
 [System.Serializable]
 public class PlayerInputData
@@ -1324,18 +1417,6 @@ public class PlayerInputData
     }
 }
 
-[System.Serializable]
-public class SyncUlong
-{
-    public ulong value;
-    public float lastTimeSynced;
-
-    public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
-    {
-        serializer.SerializeValue(ref value);
-        serializer.SerializeValue(ref lastTimeSynced);
-    }
-}
 
 [System.Serializable]
 public class PlayerGunData
