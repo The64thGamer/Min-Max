@@ -116,7 +116,7 @@ public abstract class Gun : MonoBehaviour
         }
     }
 
-    IEnumerator Reload(bool waitForFiring)
+    protected IEnumerator Reload(bool waitForFiring)
     {
         if (waitForFiring)
         {

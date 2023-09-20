@@ -34,15 +34,24 @@ public class Flashpoint : Gun
 
     public new void Fire()
     {
-        if ((gunState == GunState.none || gunState == GunState.reloading) && FindStat(ChangableWeaponStats.currentClip) > 0)
+        float ammo = FindStat(ChangableWeaponStats.currentClip);
+
+        if ((gunState == GunState.none || gunState == GunState.reloading) && ammo > 0)
         {
             au.PlayOneShot(fireSound);
             if (gm.IsHost)
             {
                 HitScanHostDamageCalculation(null);
             }
+            SetStat(ChangableWeaponStats.currentClip, ammo - 1);
+            gunState = GunState.firing;
+            animator.SetBool("Fire", true);
+            if (currentPlayer.IsOwner && currentPlayer.GetPlayerID() < botID)
+            {
+                currentPlayer.GetUIController().UpdateGunUI();
+            }
+            base.StartCoroutine(Reload(true));
         }
-        base.Fire();
     }
 
     protected override void HitScanHostDamageCalculation(Player player)
