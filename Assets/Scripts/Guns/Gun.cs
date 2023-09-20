@@ -1,7 +1,5 @@
 using System.Collections;
 using System.Collections.Generic;
-using System.Globalization;
-using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -24,10 +22,17 @@ public abstract class Gun : MonoBehaviour
     [SerializeField] protected Animator animator;
     [SerializeField] protected Transform firePoint;
     [SerializeField] protected GunState gunState;
+    [SerializeField] protected Transform crosshair;
+    [SerializeField] protected AudioClip fireSound;
 
     //Standard Values
+    protected Vector3 currentFireAngle;
+    protected AudioSource au;
+    protected GlobalManager gm;
+    protected Transform rightHand;
     protected GunProjectiles defaultStats;
     protected float oldFireSpeed;
+    protected bool showCrosshair;
 
     //Constants
     protected const float MINANGLE = 0.8f;
@@ -43,6 +48,18 @@ public abstract class Gun : MonoBehaviour
         {
             currentPlayer.GetUIController().UpdateGunUI();
         }
+        au = this.GetComponent<AudioSource>();
+        gm = GameObject.Find("Global Manager").GetComponent<GlobalManager>();
+        if (currentPlayer.IsOwner && currentPlayer.GetPlayerID() < botID)
+        {
+            showCrosshair = true;
+        }
+        else
+        {
+            showCrosshair = false;
+            crosshair.gameObject.SetActive(false);
+        }
+        rightHand = currentPlayer.GetTracker().GetRightHand();
     }
 
     public virtual void Update()
@@ -53,10 +70,22 @@ public abstract class Gun : MonoBehaviour
             oldFireSpeed = fireSpeed;
             animator.SetFloat("Fire Speed", fireSpeed);
         }
-        if(FindStat(ChangableWeaponStats.currentClip) <= 0)
+        if (FindStat(ChangableWeaponStats.currentClip) <= 0)
         {
             StartCoroutine(Reload(false));
         }
+        if (gm != null)
+        {
+            currentFireAngle = CalculateFireAngle(currentPlayer);
+            if (showCrosshair)
+            {
+                crosshair.position = CalculateHitPosition(currentFireAngle, currentPlayer, firePoint.position);
+                crosshair.transform.LookAt(Camera.main.transform.position);
+                crosshair.localScale = Vector3.one + (Vector3.one * (crosshair.position - Camera.main.transform.position).magnitude * 1.5f);
+            }
+        }
+        transform.position = rightHand.position;
+        transform.rotation = rightHand.rotation;
     }
 
     public virtual void LateUpdate()
@@ -70,6 +99,12 @@ public abstract class Gun : MonoBehaviour
         float ammo = FindStat(ChangableWeaponStats.currentClip);
         if ((gunState == GunState.none || gunState == GunState.reloading) && ammo > 0)
         {
+            au.PlayOneShot(fireSound);
+            if (gm.IsHost)
+            {
+                HitScanHostDamageCalculation(currentPlayer);
+                gm.SpawnProjectileClientRpc(currentPlayer.GetPlayerID());
+            }
             SetStat(ChangableWeaponStats.currentClip, ammo - 1);
             gunState = GunState.firing;
             animator.SetBool("Fire", true);
@@ -321,8 +356,14 @@ public abstract class Gun : MonoBehaviour
         defaultStats = stat;
     }
 
-    public abstract void AltFire();
-    public abstract string GetNameKey();
+    public virtual void AltFire()
+    {
+
+    }
+    public string GetNameKey()
+    {
+        return gunNameKey;
+    }
 }
 [System.Serializable]
 public class WeaponStats

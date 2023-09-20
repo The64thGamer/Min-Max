@@ -10,57 +10,26 @@ using UnityEngine.UI;
 [RequireComponent(typeof(BoxCollider))]
 public class Flashpoint : Gun
 {
-    [SerializeField] Transform crosshair;
-    [SerializeField] AudioClip fireSound;
     [SerializeField] Light spotLight;
     BoxCollider boxCl;
-    Vector3 currentFireAngle;
-    AudioSource au;
-    GlobalManager gm;
-    bool showCrosshair;
-
     List<Player> playersInTrigger;
 
     public new void Start()
     {
         base.Start();
         playersInTrigger = new List<Player>();
-        au = this.GetComponent<AudioSource>();
         boxCl = this.GetComponent<BoxCollider>();
-        gm = GameObject.Find("Global Manager").GetComponent<GlobalManager>();
-        if (currentPlayer.IsOwner)
-        {
-            showCrosshair = true;
-        }
-        else
-        {
-            Destroy(crosshair.gameObject.GetComponent<Image>());
-        }
     }
-    void FixedUpdate()
-    {
-        if (gm != null)
-        {
-            currentFireAngle = CalculateFireAngle(currentPlayer);
-            if (showCrosshair)
-            {
-                crosshair.position = CalculateHitPosition(currentFireAngle, currentPlayer, firePoint.position);
-                crosshair.transform.LookAt(Camera.main.transform.position);
-                crosshair.localScale = Vector3.one + (Vector3.one * (crosshair.position - Camera.main.transform.position).magnitude * 1.5f);
-            }
-        }
 
+    new void Update()
+    {
+        base.Update();
         //Box stuff
         spotLight.range = FindStat(ChangableWeaponStats.maxBulletRange);
         spotLight.spotAngle = FindStat(ChangableWeaponStats.bulletSpreadAngle);
         spotLight.innerSpotAngle = spotLight.spotAngle;
         boxCl.size = spotLight.range * Vector3.one;
         boxCl.center = new Vector3(0, 0, spotLight.range / 2.0f);
-    }
-
-    new void Update()
-    {
-        base.Update();
     }
 
     public new void Fire()
@@ -134,14 +103,6 @@ public class Flashpoint : Gun
                 }
             }
         }
-    }
-
-    public override void AltFire() { }
-
-
-    public override string GetNameKey()
-    {
-        return gunNameKey;
     }
 
 }
