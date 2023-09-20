@@ -1,7 +1,9 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Globalization;
 using Unity.Netcode;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 public abstract class Gun : MonoBehaviour
 {
@@ -20,49 +22,97 @@ public abstract class Gun : MonoBehaviour
     [SerializeField] protected string gunNameKey;
     [SerializeField] protected Player currentPlayer;
     [SerializeField] protected Animator animator;
-    [SerializeField] protected float fireAnimationSpeed;
     [SerializeField] protected Transform firePoint;
-
+    [SerializeField] protected GunState gunState;
 
     //Standard Values
-    protected int currentAmmo;
     protected GunProjectiles defaultStats;
     protected float oldFireSpeed;
-    protected float fireCooldown;
 
     //Constants
     protected const float MINANGLE = 0.8f;
     protected const float MAXSPHERECASTDISTANCE = 20;
     protected const float MAXRAYCASTDISTANCE = 1000;
     protected const float maxDamageFalloff = 20;
-
+    protected const ulong botID = 64646464646464;
 
     public virtual void Start()
     {
-        currentAmmo = (int)FindStat(ChangableWeaponStats.maxAmmo);
+        currentPlayer = transform.parent.GetComponent<Player>();
+        if (currentPlayer.IsOwner && currentPlayer.GetPlayerID() < botID)
+        {
+            currentPlayer.GetUIController().UpdateGunUI();
+        }
     }
 
     public virtual void Update()
     {
-        float fireSpeed = FindStat(ChangableWeaponStats.shotsPerSecond) * fireAnimationSpeed;
+        float fireSpeed = FindStat(ChangableWeaponStats.shotsPerSecond);
         if (oldFireSpeed != fireSpeed)
         {
             oldFireSpeed = fireSpeed;
             animator.SetFloat("Fire Speed", fireSpeed);
+        }
+        if(FindStat(ChangableWeaponStats.currentClip) <= 0)
+        {
+            StartCoroutine(Reload(false));
         }
     }
 
     public virtual void LateUpdate()
     {
         animator.SetBool("Fire", false);
+        animator.SetBool("Reload", false);
     }
 
     public virtual void Fire()
     {
-        if (fireCooldown <= 0)
+        float ammo = FindStat(ChangableWeaponStats.currentClip);
+        if ((gunState == GunState.none || gunState == GunState.reloading) && ammo > 0)
         {
+            SetStat(ChangableWeaponStats.currentClip, ammo - 1);
+            gunState = GunState.firing;
             animator.SetBool("Fire", true);
-            fireCooldown = 1.0f / FindStat(ChangableWeaponStats.shotsPerSecond);
+            if (currentPlayer.IsOwner && currentPlayer.GetPlayerID() < botID)
+            {
+                currentPlayer.GetUIController().UpdateGunUI();
+            }
+            StartCoroutine(Reload(true));
+        }
+    }
+
+    IEnumerator Reload(bool waitForFiring)
+    {
+        if (waitForFiring)
+        {
+            yield return new WaitForSeconds(1.0f / FindStat(ChangableWeaponStats.shotsPerSecond));
+            gunState = GunState.none;
+        }
+        if (FindStat(ChangableWeaponStats.currentAmmo) > 0 && gunState == GunState.none)
+        {
+            animator.SetBool("Reload", true);
+            gunState = GunState.reloading;
+            float timeReloading = FindStat(ChangableWeaponStats.reloadSpeed);
+            while (timeReloading > 0)
+            {
+                if (gunState != GunState.reloading)
+                {
+                    yield break;
+                }
+                timeReloading -= Time.deltaTime;
+                yield return null;
+            }
+            if (gunState == GunState.reloading)
+            {
+                gunState = GunState.none;
+                float totalConversion = Mathf.Min(FindStat(ChangableWeaponStats.currentAmmo), FindStat(ChangableWeaponStats.maxClip));
+                SetStat(ChangableWeaponStats.currentClip, totalConversion);
+                SetStat(ChangableWeaponStats.currentAmmo, FindStat(ChangableWeaponStats.currentAmmo) - totalConversion);
+                if (currentPlayer.IsOwner && currentPlayer.GetPlayerID() < botID)
+                {
+                    currentPlayer.GetUIController().UpdateGunUI();
+                }
+            }
         }
     }
 
@@ -243,7 +293,7 @@ public abstract class Gun : MonoBehaviour
         }
     }
 
-    protected float FindStat(ChangableWeaponStats statName)
+    public float FindStat(ChangableWeaponStats statName)
     {
         for (int i = 0; i < changableStats.Count; i++)
         {
@@ -255,16 +305,24 @@ public abstract class Gun : MonoBehaviour
         return 0;
     }
 
+    protected void SetStat(ChangableWeaponStats statName, float value)
+    {
+        for (int i = 0; i < changableStats.Count; i++)
+        {
+            if (changableStats[i].statName == statName)
+            {
+                changableStats[i].stat = value;
+            }
+        }
+    }
+
     public void SetDefaultStats(GunProjectiles stat)
     {
         defaultStats = stat;
     }
 
     public abstract void AltFire();
-    public abstract List<WeaponStats> ChangableStats();
-    public abstract int GetCurrentAmmo();
     public abstract string GetNameKey();
-    public abstract void SetPlayer(Player player);
 }
 [System.Serializable]
 public class WeaponStats
@@ -290,9 +348,22 @@ public enum ChangableWeaponStats
     shotsPerSecond,
     bulletsPerShot,
     maxAmmo,
+    maxClip,
     bulletSpeed,
     damage,
     bulletSpreadAngle,
     radiationAfterburn,
     maxBulletRange,
+    reloadSpeed,
+    currentClip,
+    currentAmmo,
+}
+
+[SerializeField]
+public enum GunState
+{
+    none,
+    firing,
+    altFiring,
+    reloading
 }

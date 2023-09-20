@@ -21,7 +21,7 @@ public class GenericGun : Gun
         base.Start();
         au = this.GetComponent<AudioSource>();
         gm = GameObject.Find("Global Manager").GetComponent<GlobalManager>();
-        if (currentPlayer.IsOwner)
+        if (currentPlayer.IsOwner && currentPlayer.GetPlayerID() < botID)
         {
             showCrosshair = true;
         }
@@ -43,10 +43,6 @@ public class GenericGun : Gun
                 crosshair.transform.LookAt(Camera.main.transform.position);
                 crosshair.localScale = Vector3.one + (Vector3.one * (crosshair.position - Camera.main.transform.position).magnitude * 1.5f);
             }
-            if (fireCooldown > 0)
-            {
-                fireCooldown = Mathf.Max(0, fireCooldown - Time.deltaTime);
-            }
         }
         transform.position = rightHand.position;
         transform.rotation = rightHand.rotation;
@@ -54,10 +50,9 @@ public class GenericGun : Gun
 
     public override void Fire()
     {
-        if (fireCooldown <= 0)
+        if ((gunState == GunState.none || gunState == GunState.reloading) && FindStat(ChangableWeaponStats.currentClip) > 0)
         {
             au.PlayOneShot(fireSound);
-
             if (gm.IsHost)
             {
                 HitScanHostDamageCalculation(currentPlayer);
@@ -67,20 +62,6 @@ public class GenericGun : Gun
         base.Fire();
     }
     public override void AltFire() { }
-
-    public override void SetPlayer(Player player)
-    {
-        currentPlayer = player;
-    }
-
-    public override List<WeaponStats> ChangableStats()
-    {
-        return null;
-    }
-    public override int GetCurrentAmmo()
-    {
-        return 0;
-    }
 
     public override string GetNameKey()
     {

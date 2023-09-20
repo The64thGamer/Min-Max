@@ -50,17 +50,25 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   changableStats:
   - statName: 2
-    stat: 5
+    stat: 60
+  - statName: 11
+    stat: 60
+  - statName: 3
+    stat: 6
+  - statName: 10
+    stat: 6
   - statName: 1
     stat: 1
   - statName: 0
     stat: 4
-  - statName: 3
-    stat: 200
   - statName: 4
-    stat: 22
+    stat: 200
   - statName: 5
+    stat: 22
+  - statName: 6
     stat: 0
+  - statName: 9
+    stat: 1.5
   weaponPos:
   - classUsed: 3
     frontPos: {x: 0, y: 1, z: 0.5}
@@ -71,8 +79,8 @@ MonoBehaviour:
   gunNameKey: Worker Ionizing Pistol
   currentPlayer: {fileID: 0}
   animator: {fileID: 4923113546473925071}
-  fireAnimationSpeed: 0.5
   firePoint: {fileID: 5960225029509838066}
+  gunState: 0
   crosshair: {fileID: 3381283269250820758}
   fireSound: {fileID: 8300000, guid: 36081f86899c2e943af4c27f0ab9865a, type: 3}
 --- !u!82 &4250082636226092830

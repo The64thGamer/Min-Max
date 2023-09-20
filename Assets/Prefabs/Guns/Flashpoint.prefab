@@ -52,31 +52,36 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   changableStats:
-  - statName: 2
-    stat: 50
   - statName: 0
     stat: 10
-  - statName: 4
-    stat: 6
   - statName: 5
-    stat: 50
+    stat: 6
   - statName: 6
-    stat: 0.1
-  - statName: 3
-    stat: 400
+    stat: 50
   - statName: 7
+    stat: 0.1
+  - statName: 4
+    stat: 400
+  - statName: 8
     stat: 7
   - statName: 1
     stat: 1
+  - statName: 2
+    stat: 0
+  - statName: 11
+    stat: 0
+  - statName: 3
+    stat: 200
+  - statName: 10
+    stat: 200
   weaponPos: []
   gunNameKey: Flashpoint
   currentPlayer: {fileID: 0}
-  animator: {fileID: 4751596311346859352}
-  fireAnimationSpeed: 0
+  animator: {fileID: 3201257767445204851}
   firePoint: {fileID: 5960225029509838066}
+  gunState: 0
   crosshair: {fileID: 3381283269250820758}
   fireSound: {fileID: 8300000, guid: 36081f86899c2e943af4c27f0ab9865a, type: 3}
-  superJank: {fileID: 2880340218513434506}
   spotLight: {fileID: 2502844193956642739}
 --- !u!82 &4250082636226092830
 AudioSource:
@@ -663,7 +668,7 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 7837b79241c72124a9e39e5c3d257b78,
         type: 3}
       insertIndex: -1
-      addedObject: {fileID: 4751596311346859352}
+      addedObject: {fileID: 3201257767445204851}
   m_SourcePrefab: {fileID: 100100000, guid: 7837b79241c72124a9e39e5c3d257b78, type: 3}
 --- !u!4 &2565481668753550087 stripped
 Transform:
@@ -677,7 +682,7 @@ GameObject:
     type: 3}
   m_PrefabInstance: {fileID: 2598808437717044460}
   m_PrefabAsset: {fileID: 0}
---- !u!95 &4751596311346859352
+--- !u!95 &3201257767445204851
 Animator:
   serializedVersion: 7
   m_ObjectHideFlags: 0
@@ -687,7 +692,7 @@ Animator:
   m_GameObject: {fileID: 2941337986830479805}
   m_Enabled: 1
   m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: e1a7d349d676b3b48b8201cdfd36e8df, type: 2}
   m_CullingMode: 0
   m_UpdateMode: 0
   m_ApplyRootMotion: 0

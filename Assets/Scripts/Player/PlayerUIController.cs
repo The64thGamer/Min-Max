@@ -45,10 +45,6 @@ public class PlayerUIController : MonoBehaviour
         holderEnemies = playerUIVTA.rootVisualElement.Q<VisualElement>("HolderEnemies");
         timerText = playerUIVTA.rootVisualElement.Q<Label>("Timer");
         hpLabelText = playerUIVTA.rootVisualElement.Q<Label>("HPLabel");
-
-        //Temp
-        clipText.text = "∞";
-        ammoText.text = "/ ∞";
     }
 
     private void Update()
@@ -68,6 +64,13 @@ public class PlayerUIController : MonoBehaviour
         {
             healthText.text = ((int)player.GetTimeTillRespawn()).ToString();
         }
+    }
+
+    public void UpdateGunUI()
+    {
+        Gun currentGun = player.GetCurrentGun();
+        clipText.text = currentGun.FindStat(ChangableWeaponStats.currentClip).ToString();
+        ammoText.text = "/ " + currentGun.FindStat(ChangableWeaponStats.currentAmmo).ToString();
     }
 
     public void UpdateHealthUI(float oldHealth)

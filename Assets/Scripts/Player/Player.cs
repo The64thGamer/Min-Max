@@ -212,7 +212,6 @@ public class Player : NetworkBehaviour
         GameObject gunObject = GameObject.Instantiate(gun.gunPrefab, Vector3.zero, Quaternion.identity, this.transform);
         gunObject.name = gun.gunName;
         currentGun = gunObject.GetComponent<Gun>();
-        currentGun.SetPlayer(this);
         currentGun.SetDefaultStats(gun);
         SetCharacterVisibility(currentPlayerVisibility);
         UpdateTeamColor();

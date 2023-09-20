@@ -10,10 +10,8 @@ using UnityEngine.UI;
 [RequireComponent(typeof(BoxCollider))]
 public class Flashpoint : Gun
 {
-    [SerializeField] Transform firePoint;
     [SerializeField] Transform crosshair;
     [SerializeField] AudioClip fireSound;
-    [SerializeField] Transform superJank;
     [SerializeField] Light spotLight;
     BoxCollider boxCl;
     Vector3 currentFireAngle;
@@ -50,10 +48,6 @@ public class Flashpoint : Gun
                 crosshair.transform.LookAt(Camera.main.transform.position);
                 crosshair.localScale = Vector3.one + (Vector3.one * (crosshair.position - Camera.main.transform.position).magnitude * 1.5f);
             }
-            if (fireCooldown > 0)
-            {
-                fireCooldown = Mathf.Max(0, fireCooldown - Time.deltaTime);
-            }
         }
 
         //Box stuff
@@ -71,17 +65,12 @@ public class Flashpoint : Gun
 
     public new void Fire()
     {
-        if (gm != null && au != null)
+        if ((gunState == GunState.none || gunState == GunState.reloading) && FindStat(ChangableWeaponStats.currentClip) > 0)
         {
-            if (fireCooldown <= 0)
+            au.PlayOneShot(fireSound);
+            if (gm.IsHost)
             {
-                au.PlayOneShot(fireSound);
-                fireCooldown = 1.0f / FindStat(ChangableWeaponStats.shotsPerSecond);
-
-                if (gm.IsHost)
-                {
-                    HitScanHostDamageCalculation(null);
-                }
+                HitScanHostDamageCalculation(null);
             }
         }
         base.Fire();
@@ -105,7 +94,7 @@ public class Flashpoint : Gun
                 for (int e = 0; e < hit.Length; e++)
                 {
                     p = hit[e].collider.GetComponent<Player>();
-                    if(p == null)
+                    if (p == null)
                     {
                         break;
                     }
@@ -149,19 +138,6 @@ public class Flashpoint : Gun
 
     public override void AltFire() { }
 
-    public override void SetPlayer(Player player)
-    {
-        currentPlayer = player;
-    }
-
-    public override List<WeaponStats> ChangableStats()
-    {
-        return null;
-    }
-    public override int GetCurrentAmmo()
-    {
-        return 0;
-    }
 
     public override string GetNameKey()
     {
