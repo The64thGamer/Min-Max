@@ -52,29 +52,19 @@ namespace StarterAssets
         const ulong botID = 64646464646464;
         Vector2 currentRotation;
 
-        //Prediction Values
-        TickValues currentTick;
-        List<PlayerDataSentToServer> oldTicksClient;
-        List<TickValues> oldTicksServer;
         bool nowSendServerValues;
 
         private void Awake()
         {
-            currentTick = new TickValues();
             gm = GameObject.Find("Global Manager").GetComponent<GlobalManager>();
             tracker = this.GetComponent<PlayerTracker>();
             _controller = GetComponent<CharacterController>();
             player = GetComponent<Player>();
             menu = player.GetMenu();
-            oldTicksClient = new List<PlayerDataSentToServer>();
-            oldTicksServer = new List<TickValues>();
         }
 
         public override void OnNetworkSpawn()
         {
-            // reset our timeouts on start
-            currentTick._fallTimeoutDelta = FallTimeout;
-
             if (PlayerPrefs.GetInt("IsVREnabled") == 0 && IsOwner && player.GetPlayerID() < botID)
             {
                 usingMouse = true;
@@ -109,53 +99,50 @@ namespace StarterAssets
                 _mainCamera.transform.localPosition = new Vector3(0, height, 0);
             }
 
-            //CurrentTick
-            currentTick.inputs = player.GetTracker().GetPlayerNetworkData();
-            currentTick.pos = transform.position;
-            currentTick.velocity = _controller.velocity;
-            currentTick.mainCamforward = _mainCamera.transform.forward;
-            currentTick.mainCamRight = _mainCamera.transform.right;
-            currentTick.inputs.deltaTime = Time.deltaTime;
-            currentTick.baseSpeed = player.GetClassStats().baseSpeed;
-            if (IsHost)
+            //currentPositionData
+            PlayerPositionData currentPositionData = gm.GetCurrentPlayerPositonData(player.GetPlayerID());
+            PlayerInputData currentInputData = gm.GetCurrentPlayerInputData(player.GetPlayerID());
+
+            currentInputData = player.GetTracker().GetPlayerInputData();
+            currentPositionData.position = transform.position;
+            currentPositionData.velocity = _controller.velocity;
+            currentPositionData.mainCamforward = _mainCamera.transform.forward;
+            currentPositionData.mainCamRight = _mainCamera.transform.right;
+            currentPositionData.baseSpeed = player.GetClassStats().baseSpeed;
+
+            //Remove inputs in situations
+            if (menu.GetOpenState() || player.GetHealth() <= 0)
             {
-                currentTick.inputs.localTime = NetworkManager.ServerTime.TimeAsFloat;
-            }
-            else
-            {
-                currentTick.inputs.localTime = NetworkManager.LocalTime.TimeAsFloat;
+                currentInputData.rightJoystick = Vector2.zero;
+                currentInputData.crouch = false;
+                currentInputData.shoot = false;
+                currentInputData.jump = false;
+                tracker.ResetInputs();
             }
 
             //Wire
             heldWire = player.GetWirePoint();
             if (IsHost)
             {
-                HostWireChecking();
+                HostWireChecking(currentInputData, currentPositionData);
             }
 
-            //Execute Movement
-            if (IsHost && !IsOwner)
-            {
-                //oldTicksServer.Add(currentTick);
-            }
-            if (!IsHost)
-            {
-                oldTicksClient.Add(currentTick.inputs);
-            }
             Vector3 oldPos = transform.position;
 
-            _controller.Move(MovePlayer());
+            currentPositionData = MovePlayer(currentPositionData, currentInputData, NetworkManager.LocalTime.TimeAsFloat - currentPositionData.lastTimeSynced);
 
-            if(IsHost)
+            _controller.Move(currentPositionData.velocity);
+
+            if (IsHost)
             {
-                if(IsOwner)
+                if (IsOwner)
                 {
-                    gm.SendPosClientRpc(tracker.GetPlayerPosData());
+                    gm.SetPlayerPositionDataClientRpc(player.GetPlayerID(), currentPositionData);
                 }
-                else if(nowSendServerValues || player.GetPlayerID() >= botID)
+                else if (nowSendServerValues || player.GetPlayerID() >= botID)
                 {
                     nowSendServerValues = false;
-                    gm.SendPosClientRpc(tracker.GetPlayerPosData());
+                    gm.SetPlayerPositionDataClientRpc(player.GetPlayerID(), currentPositionData);
                 }
             }
 
@@ -168,18 +155,15 @@ namespace StarterAssets
                 }
                 else
                 {
-                    gm.GetAchievements().AddToValue("Achievement: Total Air Travel", Vector3.Distance(oldPos, transform.position));;
+                    gm.GetAchievements().AddToValue("Achievement: Total Air Travel", Vector3.Distance(oldPos, transform.position)); ;
                     gm.GetAchievements().AddToValue("Achievement: Total Air-Time", Time.deltaTime);
                 }
             }
 
-           
-
-            if (currentTick.inputs.shoot)
+            if (currentInputData.shoot)
             {
                 player.GetCurrentGun().Fire();
             }
-
 
             //Holding Wire
             if (heldWire != null)
@@ -219,15 +203,18 @@ namespace StarterAssets
 
         private void LateUpdate()
         {
+            PlayerPositionData currentPositionData = gm.GetCurrentPlayerPositonData(player.GetPlayerID());
+            PlayerInputData currentInputData = gm.GetCurrentPlayerInputData(player.GetPlayerID());
+
             //Menu Stuff
             if (menu != null)
             {
-                if (currentTick.inputs.menu && !holdingMenuButton)
+                if (currentInputData.menu && !holdingMenuButton)
                 {
                     holdingMenuButton = true;
                     menu.CloseOpen(!menu.GetOpenState());
                 }
-                if (!currentTick.inputs.menu && holdingMenuButton)
+                if (!currentInputData.menu && holdingMenuButton)
                 {
                     holdingMenuButton = false;
                 }
@@ -243,89 +230,80 @@ namespace StarterAssets
                     {
                         menu.transform.localScale = menuScale * Vector3.Distance(_mainCamera.transform.position, menu.transform.position) * Mathf.Tan((PlayerPrefs.GetFloat("Settings: FOV") * Mathf.Deg2Rad) / 2) * Vector3.one;
                         menu.transform.LookAt(_mainCamera.transform.position);
-                        Vector3 forward = currentTick.mainCamforward;
+                        Vector3 forward = currentPositionData.mainCamforward;
                         Vector3 menuVector = menu.transform.position - _mainCamera.transform.position;
                         menuVector.y = 0;
                         forward.y = 0f;
                         forward.Normalize();
                         menuVector.Normalize();
-                        menu.transform.position = Vector3.Lerp(_mainCamera.transform.position + new Vector3(0, menuY, 0) + (forward * menuZ), menu.transform.position, Mathf.Max(0,Vector3.Dot(forward,menuVector)));
+                        menu.transform.position = Vector3.Lerp(_mainCamera.transform.position + new Vector3(0, menuY, 0) + (forward * menuZ), menu.transform.position, Mathf.Max(0, Vector3.Dot(forward, menuVector)));
                     }
                 }
             }
         }
 
-        Vector3 MovePlayer()
-        {            
-            //Remove inputs in situations
-            if (menu.GetOpenState() || player.GetHealth() <= 0)
-            {
-                currentTick.inputs.rightJoystick = Vector2.zero;
-                currentTick.inputs.crouch = false;
-                currentTick.inputs.shoot = false;
-                currentTick.inputs.jump = false;
-                tracker.ResetInputs();
-            }
+        PlayerPositionData MovePlayer(PlayerPositionData currentPositionData, PlayerInputData currentInputData, float deltaTime)
+        {
 
-            Vector3 forward = currentTick.mainCamforward;
-            Vector3 right = currentTick.mainCamRight;
+            Vector3 forward = currentPositionData.mainCamforward;
+            Vector3 right = currentPositionData.mainCamRight;
             forward.y = 0f;
             right.y = 0f;
             forward.Normalize();
             right.Normalize();
-            Vector3 newAxis = forward * currentTick.inputs.rightJoystick.y + right * currentTick.inputs.rightJoystick.x;
-            Vector3 targetSpeed = new Vector3(newAxis.x, 0.0f, newAxis.z).normalized * currentTick.baseSpeed / 25.0f;
+            Vector3 newAxis = forward * currentInputData.rightJoystick.y + right * currentInputData.rightJoystick.x;
+            Vector3 targetSpeed = new Vector3(newAxis.x, 0.0f, newAxis.z).normalized * currentPositionData.baseSpeed / 25.0f;
 
 
 
             //Crouch
-            if (currentTick.inputs.crouch && _controller.isGrounded)
+            if (currentInputData.crouch && _controller.isGrounded)
             {
-                if (!currentTick.hasBeenCrouched)
+                if (!currentPositionData.hasBeenCrouched)
                 {
-                    currentTick.hasBeenCrouched = true;
+                    currentPositionData.hasBeenCrouched = true;
                 }
-                currentTick.currentCrouchLerp = Mathf.Clamp01(currentTick.currentCrouchLerp + (currentTick.inputs.deltaTime * crouchSpeed));
+                currentPositionData.currentCrouchLerp = Mathf.Clamp01(currentPositionData.currentCrouchLerp + (deltaTime * crouchSpeed));
             }
             else
             {
-                if (currentTick.hasBeenCrouched)
+                if (currentPositionData.hasBeenCrouched)
                 {
-                    currentTick.hasBeenCrouched = false;
+                    currentPositionData.hasBeenCrouched = false;
                 }
-                currentTick.currentCrouchLerp = Mathf.Clamp01(currentTick.currentCrouchLerp - (currentTick.inputs.deltaTime * crouchSpeed));
+                currentPositionData.currentCrouchLerp = Mathf.Clamp01(currentPositionData.currentCrouchLerp - (deltaTime * crouchSpeed));
             }
-            targetSpeed *= ((1 - currentTick.currentCrouchLerp) / 2.0f) + 0.5f;
-            tracker.ModifyPlayerHeight(currentTick.currentCrouchLerp);
+            targetSpeed *= ((1 - currentPositionData.currentCrouchLerp) / 2.0f) + 0.5f;
+            tracker.ModifyPlayerHeight(currentPositionData.currentCrouchLerp);
 
             //Movement rotation halted in midair
             if (!_controller.isGrounded)
             {
-                if (!currentTick.hasBeenGrounded)
+                if (!currentPositionData.hasBeenGrounded)
                 {
-                    currentTick.oldAxis = newAxis;
-                    currentTick.oldInput = currentTick.inputs.rightJoystick;
-                    currentTick.hasBeenGrounded = true;
+                    currentPositionData.oldAxis = newAxis;
+                    currentPositionData.oldInput = currentInputData.rightJoystick;
+                    currentPositionData.hasBeenGrounded = true;
                 }
                 else
                 {
-                    if (!currentTick.hasBeenStopped)
+                    if (!currentPositionData.hasBeenStopped)
                     {
                         //No Starting Input In Air
-                        if (currentTick.oldAxis == Vector3.zero)
+                        if (currentPositionData.oldAxis == Vector3.zero)
                         {
-                            currentTick.oldAxis = newAxis;
-                            currentTick.oldInput = currentTick.inputs.rightJoystick;
+                            currentPositionData.oldAxis = newAxis;
+                            currentPositionData.oldInput = currentInputData.rightJoystick;
                         }
-                        else if (Vector2.Dot(currentTick.oldInput, currentTick.inputs.rightJoystick) < -0.5f)
+                        else if (Vector2.Dot(currentPositionData.oldInput, currentInputData.rightJoystick) < -0.5f)
                         {
                             //Stop Mid-air if holding opposite direction
                             newAxis = Vector3.zero;
-                            currentTick.hasBeenStopped = true;
+                            currentPositionData.hasBeenStopped = true;
                         }
                         else
                         {
-                            newAxis = currentTick.oldAxis;
+                            newAxis = currentPositionData.oldAxis;
                         }
                     }
                     else
@@ -336,28 +314,28 @@ namespace StarterAssets
             }
             else
             {
-                currentTick.hasBeenGrounded = false;
-                currentTick.hasBeenStopped = false;
+                currentPositionData.hasBeenGrounded = false;
+                currentPositionData.hasBeenStopped = false;
                 // accelerate or decelerate to target speed
                 if (newAxis == Vector3.zero) targetSpeed = Vector2.zero;
 
 
                 if (targetSpeed != Vector3.zero)
                 {
-                    if (currentTick._hasBeenMovingDelta > 0.01f)
+                    if (currentPositionData._hasBeenMovingDelta > 0.01f)
                     {
-                        currentTick._speed.x = Mathf.Lerp(currentTick.velocity.x, targetSpeed.x, currentTick.inputs.deltaTime * acceleration);
-                        currentTick._speed.z = Mathf.Lerp(currentTick.velocity.z, targetSpeed.z, currentTick.inputs.deltaTime * acceleration);
+                        currentPositionData._speed.x = Mathf.Lerp(currentPositionData.velocity.x, targetSpeed.x, deltaTime * acceleration);
+                        currentPositionData._speed.z = Mathf.Lerp(currentPositionData.velocity.z, targetSpeed.z, deltaTime * acceleration);
                     }
                     else
                     {
-                        currentTick._speed = targetSpeed;
+                        currentPositionData._speed = targetSpeed;
                     }
                 }
                 else
                 {
-                    currentTick._speed.x = Mathf.Lerp(currentTick.velocity.x, targetSpeed.x, currentTick.inputs.deltaTime * deceleration);
-                    currentTick._speed.z = Mathf.Lerp(currentTick.velocity.z, targetSpeed.z, currentTick.inputs.deltaTime * deceleration);
+                    currentPositionData._speed.x = Mathf.Lerp(currentPositionData.velocity.x, targetSpeed.x, deltaTime * deceleration);
+                    currentPositionData._speed.z = Mathf.Lerp(currentPositionData.velocity.z, targetSpeed.z, deltaTime * deceleration);
                 }
             }
 
@@ -365,70 +343,71 @@ namespace StarterAssets
             if (_controller.isGrounded)
             {
                 // reset the fall timeout timer
-                currentTick._fallTimeoutDelta = FallTimeout;
+                currentPositionData._fallTimeoutDelta = FallTimeout;
 
                 // stop our velocity dropping infinitely when grounded
-                if (currentTick._verticalVelocity < 0.0f)
+                if (currentPositionData._verticalVelocity < 0.0f)
                 {
-                    currentTick._verticalVelocity = -2f;
+                    currentPositionData._verticalVelocity = -2f;
                 }
 
                 // Jump
-                if (currentTick.inputs.jump)
+                if (currentInputData.jump)
                 {
                     // the square root of H * -2 * G = how much velocity needed to reach desired height
-                    currentTick._verticalVelocity = Mathf.Sqrt(JumpHeight * -2f * Gravity);
+                    currentPositionData._verticalVelocity = Mathf.Sqrt(JumpHeight * -2f * Gravity);
                 }
             }
             else
             {
                 // fall timeout
-                if (currentTick._fallTimeoutDelta >= 0.0f)
+                if (currentPositionData._fallTimeoutDelta >= 0.0f)
                 {
-                    currentTick._fallTimeoutDelta -= currentTick.inputs.deltaTime;
+                    currentPositionData._fallTimeoutDelta -= deltaTime;
                 }
             }
 
             // apply gravity over time if under terminal (multiply by delta time twice to linearly speed up over time)
-            if (currentTick._verticalVelocity < _terminalVelocity)
+            if (currentPositionData._verticalVelocity < _terminalVelocity)
             {
-                currentTick._verticalVelocity += Gravity * currentTick.inputs.deltaTime;
+                currentPositionData._verticalVelocity += Gravity * deltaTime;
             }
 
-            if (currentTick.inputs.rightJoystick.magnitude == 0)
+            if (currentInputData.rightJoystick.magnitude == 0)
             {
-                currentTick._hasBeenMovingDelta = Mathf.Lerp(currentTick._hasBeenMovingDelta, 0, currentTick.inputs.deltaTime * hasMovedDeltaTimeout);
+                currentPositionData._hasBeenMovingDelta = Mathf.Lerp(currentPositionData._hasBeenMovingDelta, 0, deltaTime * hasMovedDeltaTimeout);
             }
             else
             {
-                currentTick._hasBeenMovingDelta = Mathf.Lerp(currentTick._hasBeenMovingDelta, 1, currentTick.inputs.deltaTime * hasMovedDeltaTimeout);
+                currentPositionData._hasBeenMovingDelta = Mathf.Lerp(currentPositionData._hasBeenMovingDelta, 1, deltaTime * hasMovedDeltaTimeout);
             }
 
             // move the player
-            Vector3 finalVelocity = (currentTick._speed * currentTick.inputs.deltaTime) + new Vector3(0.0f, currentTick._verticalVelocity, 0.0f) * currentTick.inputs.deltaTime;
+            Vector3 finalVelocity = (currentPositionData._speed * deltaTime) + new Vector3(0.0f, currentPositionData._verticalVelocity, 0.0f) * deltaTime;
 
-            currentTick.velocity = finalVelocity;
-            return finalVelocity;
+            currentPositionData.velocity = finalVelocity;
+            return currentPositionData;
         }
 
 
-        public void RecalculateClientPosition(PlayerDataSentToClient data)
+        public void RecalculateClientPosition()
         {
+            /*
             //Initial Pass
-            currentTick._speed = data._speed;
-            currentTick._verticalVelocity = data._verticalVelocity;
-            currentTick._fallTimeoutDelta = data._fallTimeoutDelta;
-            currentTick._hasBeenMovingDelta = data._hasBeenMovingDelta;
-            currentTick.oldAxis = data.oldAxis;
-            currentTick.oldInput = data.oldInput;
-            currentTick.hasBeenGrounded = data.hasBeenGrounded;
-            currentTick.hasBeenStopped = data.hasBeenStopped;
-            currentTick.currentCrouchLerp = data.currentCrouchLerp;
-            currentTick.hasBeenCrouched = data.hasBeenCrouched;
-            currentTick.velocity = data.velocity;
-            currentTick.mainCamforward = data.mainCamforward;
-            currentTick.mainCamRight = data.mainCamRight;
-            currentTick.baseSpeed = data.baseSpeed;
+            currentPositionData._speed = data._speed;
+            currentPositionData._verticalVelocity = data._verticalVelocity;
+            currentPositionData._fallTimeoutDelta = data._fallTimeoutDelta;
+            currentPositionData._hasBeenMovingDelta = data._hasBeenMovingDelta;
+            currentPositionData.oldAxis = data.oldAxis;
+            currentPositionData.oldInput = data.oldInput;
+            currentPositionData.hasBeenGrounded = data.hasBeenGrounded;
+            currentPositionData.hasBeenStopped = data.hasBeenStopped;
+            currentPositionData.currentCrouchLerp = data.currentCrouchLerp;
+            currentPositionData.hasBeenCrouched = data.hasBeenCrouched;
+            currentPositionData.velocity = data.velocity;
+            currentPositionData.mainCamforward = data.mainCamforward;
+            currentPositionData.mainCamRight = data.mainCamRight;
+            currentPositionData.baseSpeed = data.baseSpeed;
 
             _controller.enabled = false;
             transform.position = data.pos;
@@ -446,24 +425,24 @@ namespace StarterAssets
             {
                 if (oldTicksClient[i].localTime > data.serverTime)
                 {
-                    if(i - 1 < 0)
+                    if (i - 1 < 0)
                     {
-                        currentTick.inputs = oldTicksClient[i];
+                        currentInputData = oldTicksClient[i];
                     }
                     else
                     {
-                        currentTick.inputs = oldTicksClient[i-1];
+                        currentInputData = oldTicksClient[i - 1];
                     }
-                    currentTick.inputs.deltaTime = oldTicksClient[i].localTime - deltaTime;
+                    currentInputData.deltaTime = oldTicksClient[i].localTime - deltaTime;
                     deltaTime = oldTicksClient[i].localTime;
                     //For non-owned clients
                     if (!IsOwner && !IsHost)
                     {
-                        currentTick.inputs.rightJoystick = data.rightJoystick;
-                        currentTick.inputs.jump = data.jump;
-                        currentTick.inputs.shoot = data.shoot;
-                        currentTick.inputs.crouch = data.crouch;
-                        currentTick.inputs.menu = data.menu;
+                        currentInputData.rightJoystick = data.rightJoystick;
+                        currentInputData.jump = data.jump;
+                        currentInputData.shoot = data.shoot;
+                        currentInputData.crouch = data.crouch;
+                        currentInputData.menu = data.menu;
                     }
                     _controller.Move(MovePlayer());
                 }
@@ -473,11 +452,12 @@ namespace StarterAssets
                 }
             }
             oldTicksClient.RemoveRange(0, deleteBehindThis);
-
+            */
         }
 
-        public void RecalculateServerPosition(PlayerDataSentToServer data)
+        public void RecalculateServerPosition()
         {
+            /*
             nowSendServerValues = true;
             if (oldTicksServer.Count > 0)
             {
@@ -488,33 +468,28 @@ namespace StarterAssets
                 _controller.enabled = false;
                 transform.position = oldTicksServer[0].pos;
                 _controller.enabled = true;
-                currentTick = oldTicksServer[0];
-                currentTick.inputs.rightJoystick = data.rightJoystick;
-                currentTick.inputs.jump = data.jump;
-                currentTick.inputs.shoot = data.shoot;
-                currentTick.inputs.crouch = data.crouch;
-                currentTick.inputs.menu = data.menu;
+                currentPositionData = oldTicksServer[0];
+                currentInputData.rightJoystick = data.rightJoystick;
+                currentInputData.jump = data.jump;
+                currentInputData.shoot = data.shoot;
+                currentInputData.crouch = data.crouch;
+                currentInputData.menu = data.menu;
             }
             //Player Input Compensation
             for (int i = 0; i < oldTicksServer.Count; i++)
             {
-                currentTick.inputs.deltaTime = oldTicksServer[i].inputs.deltaTime;
+                currentInputData.deltaTime = oldTicksServer[i].inputs.deltaTime;
                 _controller.Move(MovePlayer());
             }
-            oldTicksServer = new List<TickValues>();
+            oldTicksServer = new List<TickValues
+            */
         }
 
-        public void ResetStateBuffers()
+        void HostWireChecking(PlayerInputData currentInputData, PlayerPositionData currentPositionData)
         {
-            oldTicksClient = new List<PlayerDataSentToServer>();
-            oldTicksServer = new List<TickValues>();
-        }
-
-        void HostWireChecking()
-        {
-            if (currentTick.inputs.crouch && _controller.isGrounded)
+            if (currentInputData.crouch && _controller.isGrounded)
             {
-                if (!currentTick.hasBeenCrouched && player.GetHealth() > 0)
+                if (!currentPositionData.hasBeenCrouched && player.GetHealth() > 0)
                 {
                     player.SetWirePoint(gm.GetWire(player.GetTeam()).RequestForWire(transform.position), true);
                     heldWire = player.GetWirePoint();
@@ -525,13 +500,13 @@ namespace StarterAssets
                     }
                 }
             }
-            else if (currentTick.hasBeenCrouched && heldWire != null)
+            else if (currentPositionData.hasBeenCrouched && heldWire != null)
             {
                 gm.UpdateMatchFocalPoint(player.GetTeam());
                 gm.RemoveClientWireClientRpc(player.GetPlayerID(), heldWire.point, true);
             }
 
-            if (currentTick.inputs.jump && heldWire != null)
+            if (currentInputData.jump && heldWire != null)
             {
                 gm.UpdateMatchFocalPoint(player.GetTeam());
                 gm.RemoveClientWireClientRpc(player.GetPlayerID(), heldWire.point, true);
@@ -543,11 +518,6 @@ namespace StarterAssets
             return usingMouse;
         }
 
-        public TickValues GetCurrentTick()
-        {
-            return currentTick;
-        }
-
         private void OnDrawGizmos()
         {
             if (heldWire != null)
@@ -556,35 +526,5 @@ namespace StarterAssets
             }
         }
 
-        [System.Serializable]
-        public struct TickValues
-        {
-            //Input
-            public PlayerDataSentToServer inputs;
-
-            //Movement
-            public Vector3 _speed;
-            public float _verticalVelocity;
-            public float _fallTimeoutDelta;
-            public float _hasBeenMovingDelta;
-            public float baseSpeed;
-
-            //Midair Movement
-            public Vector3 oldAxis;
-            public Vector2 oldInput;
-            public bool hasBeenGrounded;
-            public bool hasBeenStopped;
-
-            //Crouch
-            public float currentCrouchLerp;
-            public bool hasBeenCrouched;
-
-            //Server Only
-            public Vector3 pos;
-            public Vector3 velocity;
-            public Vector3 mainCamforward;
-            public Vector3 mainCamRight;
-
-        }
     }
 }

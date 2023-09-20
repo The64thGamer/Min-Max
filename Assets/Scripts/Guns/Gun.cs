@@ -43,13 +43,13 @@ public abstract class Gun : MonoBehaviour
 
     public virtual void Start()
     {
+        au = this.GetComponent<AudioSource>();
+        gm = GameObject.Find("Global Manager").GetComponent<GlobalManager>();
         currentPlayer = transform.parent.GetComponent<Player>();
         if (currentPlayer.IsOwner && currentPlayer.GetPlayerID() < botID)
         {
             currentPlayer.GetUIController().UpdateGunUI();
         }
-        au = this.GetComponent<AudioSource>();
-        gm = GameObject.Find("Global Manager").GetComponent<GlobalManager>();
         if (currentPlayer.IsOwner && currentPlayer.GetPlayerID() < botID)
         {
             showCrosshair = true;
@@ -99,20 +99,23 @@ public abstract class Gun : MonoBehaviour
         float ammo = FindStat(ChangableWeaponStats.currentClip);
         if ((gunState == GunState.none || gunState == GunState.reloading) && ammo > 0)
         {
-            au.PlayOneShot(fireSound);
-            if (gm.IsHost)
+            if (au != null && gm != null)
             {
-                HitScanHostDamageCalculation(currentPlayer);
-                gm.SpawnProjectileClientRpc(currentPlayer.GetPlayerID());
+                au.PlayOneShot(fireSound);
+                if (gm.IsHost)
+                {
+                    HitScanHostDamageCalculation(currentPlayer);
+                    gm.SpawnProjectileClientRpc(currentPlayer.GetPlayerID());
+                }
+                SetStat(ChangableWeaponStats.currentClip, ammo - 1);
+                gunState = GunState.firing;
+                animator.SetBool("Fire", true);
+                if (currentPlayer.IsOwner && currentPlayer.GetPlayerID() < botID)
+                {
+                    currentPlayer.GetUIController().UpdateGunUI();
+                }
+                StartCoroutine(Reload(true));
             }
-            SetStat(ChangableWeaponStats.currentClip, ammo - 1);
-            gunState = GunState.firing;
-            animator.SetBool("Fire", true);
-            if (currentPlayer.IsOwner && currentPlayer.GetPlayerID() < botID)
-            {
-                currentPlayer.GetUIController().UpdateGunUI();
-            }
-            StartCoroutine(Reload(true));
         }
     }
 
@@ -123,7 +126,9 @@ public abstract class Gun : MonoBehaviour
             yield return new WaitForSeconds(1.0f / FindStat(ChangableWeaponStats.shotsPerSecond));
             gunState = GunState.none;
         }
-        if (FindStat(ChangableWeaponStats.currentAmmo) > 0 && gunState == GunState.none)
+        float ammo = FindStat(ChangableWeaponStats.currentAmmo);
+        float clip = FindStat(ChangableWeaponStats.currentClip);
+        if (ammo > 0 && gunState == GunState.none)
         {
             animator.SetBool("Reload", true);
             gunState = GunState.reloading;
@@ -140,9 +145,10 @@ public abstract class Gun : MonoBehaviour
             if (gunState == GunState.reloading)
             {
                 gunState = GunState.none;
-                float totalConversion = Mathf.Min(FindStat(ChangableWeaponStats.currentAmmo), FindStat(ChangableWeaponStats.maxClip));
-                SetStat(ChangableWeaponStats.currentClip, totalConversion);
-                SetStat(ChangableWeaponStats.currentAmmo, FindStat(ChangableWeaponStats.currentAmmo) - totalConversion);
+                float bulletsNeeded = Mathf.Min(FindStat(ChangableWeaponStats.maxClip) - clip,ammo);
+                
+                SetStat(ChangableWeaponStats.currentClip, clip + bulletsNeeded);
+                SetStat(ChangableWeaponStats.currentAmmo, ammo - bulletsNeeded);
                 if (currentPlayer.IsOwner && currentPlayer.GetPlayerID() < botID)
                 {
                     currentPlayer.GetUIController().UpdateGunUI();
@@ -328,29 +334,6 @@ public abstract class Gun : MonoBehaviour
         }
     }
 
-    public float FindStat(ChangableWeaponStats statName)
-    {
-        for (int i = 0; i < changableStats.Count; i++)
-        {
-            if (changableStats[i].statName == statName)
-            {
-                return changableStats[i].stat;
-            }
-        }
-        return 0;
-    }
-
-    protected void SetStat(ChangableWeaponStats statName, float value)
-    {
-        for (int i = 0; i < changableStats.Count; i++)
-        {
-            if (changableStats[i].statName == statName)
-            {
-                changableStats[i].stat = value;
-            }
-        }
-    }
-
     public void SetDefaultStats(GunProjectiles stat)
     {
         defaultStats = stat;
@@ -365,12 +348,7 @@ public abstract class Gun : MonoBehaviour
         return gunNameKey;
     }
 }
-[System.Serializable]
-public class WeaponStats
-{
-    public ChangableWeaponStats statName;
-    public float stat;
-}
+
 
 [System.Serializable]
 public struct WeaponPos
@@ -383,22 +361,7 @@ public struct WeaponPos
     public Vector3 downPos;
 }
 
-[SerializeField]
-public enum ChangableWeaponStats
-{
-    shotsPerSecond,
-    bulletsPerShot,
-    maxAmmo,
-    maxClip,
-    bulletSpeed,
-    damage,
-    bulletSpreadAngle,
-    radiationAfterburn,
-    maxBulletRange,
-    reloadSpeed,
-    currentClip,
-    currentAmmo,
-}
+
 
 [SerializeField]
 public enum GunState

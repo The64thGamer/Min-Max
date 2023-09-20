@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using Unity.Netcode;
 using Unity.Netcode.Transports.UTP;
 using Unity.Networking.Transport.Relay;
@@ -10,19 +11,20 @@ using Unity.Services.Relay;
 using Unity.Services.Relay.Models;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using static UnityEngine.Rendering.VolumeComponent;
 
 public class GlobalManager : NetworkBehaviour
 {
     [Header("Server Settings")]
     List<TeamInfo> teams = new List<TeamInfo>();
-    List<PlayerDataSentToClient> playerPosRPCData = new List<PlayerDataSentToClient>();
     [SerializeField] NetworkVariable<int> ServerTickRate = new NetworkVariable<int>(10);
 
     [Header("Lists")]
+    List<Player> clients = new List<Player>();
+    [SerializeField] List<PlayerData> clientData;
     [SerializeField] Cosmetics co;
     [SerializeField] Achievements achievments;
     [SerializeField] GameObject clientPrefab;
-    List<Player> clients = new List<Player>();
     [SerializeField] List<Transform> teamSpawns;
     [SerializeField] List<Transform> teamGeometry;
     [SerializeField] List<Wire> teamWires;
@@ -88,6 +90,14 @@ public class GlobalManager : NetworkBehaviour
         }
     }
 
+    void CheckHostValidity()
+    {
+        if (!IsHost)
+        {
+            Debug.LogError("Global Manager Access Violation");
+        }
+    }
+
     private void OnApplicationQuit()
     {
         Debug.Log("Runtime: " + Mathf.Max(0, Time.time - timeStartedPlaying) + " sec");
@@ -98,7 +108,8 @@ public class GlobalManager : NetworkBehaviour
 
     public void DisconnectToTitleScreen(bool unused)
     {
-        if (IsHost && !serverStarted)
+        CheckHostValidity();
+        if (!serverStarted)
         {
             return;
         }
@@ -189,7 +200,7 @@ public class GlobalManager : NetworkBehaviour
             //Client Networking
             if (clients[i].IsOwner)
             {
-                SendJoystickServerRpc(clients[i].GetTracker().GetPlayerNetworkData());
+                SendInputDataServerRpc(clients[i].GetTracker().GetPlayerInputData());
             }
         }
     }
@@ -308,6 +319,23 @@ public class GlobalManager : NetworkBehaviour
         return clients;
     }
 
+    public Player GetClient(ulong id)
+    {
+        return clients[SearchClients(id)];
+    }
+    int SearchClients(ulong id)
+    {
+        for (int i = 0; i < clients.Count; i++)
+        {
+            if (clients[i].GetPlayerID() == id)
+            {
+                return i;
+            }
+        }
+        Debug.LogError("Could Not Find Client");
+        return -1;
+    }
+
     public void AddNewTeam(TeamInfo newTeam)
     {
         teams.Add(newTeam);
@@ -418,7 +446,7 @@ public class GlobalManager : NetworkBehaviour
                     while (true)
                     {
                         Transform s = teamSpawns[teams[e].spawns].GetChild(UnityEngine.Random.Range(0, teamSpawns[teams[e].spawns].childCount));
-                        if(s.gameObject.activeSelf)
+                        if (s.gameObject.activeSelf)
                         {
                             t = s;
                             break;
@@ -444,12 +472,6 @@ public class GlobalManager : NetworkBehaviour
         {
             KickPlayerClientRpc(id, "Player " + id + " Left");
         }
-    }
-
-    public void AddPlayerToClientList(Player player)
-    {
-        clients.Add(player);
-        playerPosRPCData.Add(new PlayerDataSentToClient());
     }
 
     private void ApprovalCheck(NetworkManager.ConnectionApprovalRequest request, NetworkManager.ConnectionApprovalResponse response)
@@ -525,20 +547,6 @@ public class GlobalManager : NetworkBehaviour
                 break;
         }
         return autoGun;
-    }
-
-    [ServerRpc(RequireOwnership = false)]
-    void SendJoystickServerRpc(PlayerDataSentToServer serverData, ServerRpcParams serverRpcParams = default)
-    {
-        for (int i = 0; i < clients.Count; i++)
-        {
-            if (clients[i].GetPlayerID() == serverRpcParams.Receive.SenderClientId && !clients[i].IsOwner)
-            {
-                clients[i].GetTracker().ServerSyncPlayerInputs(serverData);
-                clients[i].GetController().RecalculateServerPosition(serverData);
-                return;
-            }
-        }
     }
 
     [ServerRpc(RequireOwnership = false)]
@@ -765,27 +773,6 @@ public class GlobalManager : NetworkBehaviour
         }
     }
 
-    /// <summary>
-    /// Client Data needs to be sorted by ID
-    /// </summary>
-    /// <param name="data"></param>
-    [ClientRpc]
-    public void SendPosClientRpc(PlayerDataSentToClient data)
-    {
-        if (IsHost) { return; }
-
-        for (int e = 0; e < clients.Count; e++)
-        {
-            if (clients[e].GetPlayerID() == data.id)
-            {
-                clients[e].GetController().RecalculateClientPosition(data);
-                if (!IsOwner)
-                {
-                    clients[e].GetTracker().ClientSyncPlayerInputs(data);
-                }
-            }
-        }
-    }
 
     [ClientRpc]
     public void RemoveAllWiresClientRpc()
@@ -894,34 +881,26 @@ public class GlobalManager : NetworkBehaviour
             return;
         }
         Debug.Log("Disconnect: " + reason);
-        for (int i = 0; i < clients.Count; i++)
+        int index = SearchClients(id);
+
+        if (clients[index].IsOwner && clients[index].GetPlayerID() < botID)
         {
-            if (clients[i].GetPlayerID() == id)
-            {
-                if (clients[i].IsOwner && clients[i].GetPlayerID() < botID)
-                {
-                    PlayerPrefs.SetString("Disconnect Reason", reason);
-                }
+            PlayerPrefs.SetString("Disconnect Reason", reason);
+        }
 
-                Wire.WirePoint wireHeld = clients[i].GetWirePoint();
-                if (wireHeld != null && IsHost)
-                {
-                    RemoveClientWireClientRpc(id, wireHeld.point, false);
-                }
+        Wire.WirePoint wireHeld = clients[index].GetWirePoint();
+        if (wireHeld != null && IsHost)
+        {
+            RemoveClientWireClientRpc(id, wireHeld.point, false);
+        }
 
-                bool isowner = clients[i].IsOwner;
-                Destroy(clients[i].gameObject);
-                clients.RemoveAt(i);
-                playerPosRPCData = new List<PlayerDataSentToClient>();
-                for (int e = 0; e < clients.Count; e++)
-                {
-                    playerPosRPCData.Add(new PlayerDataSentToClient());
-                }
-                if (isowner && !IsHost)
-                {
-                    DisconnectToTitleScreen(false);
-                }
-            }
+        bool isowner = clients[index].IsOwner;
+        Destroy(clients[index].gameObject);
+        clients.RemoveAt(index);
+
+        if (isowner && !IsHost)
+        {
+            DisconnectToTitleScreen(false);
         }
     }
 
@@ -957,7 +936,7 @@ public class GlobalManager : NetworkBehaviour
     [ClientRpc]
     void SendAllPlayerDataToNewPlayerClientRpc(PlayerInfoSentToClient[] data, ulong id)
     {
-        if(IsHost)
+        if (IsHost)
         {
             return;
         }
@@ -1148,9 +1127,101 @@ public class GlobalManager : NetworkBehaviour
                 au.PlayOneShot((AudioClip)Resources.Load("Sounds/Damage/hitsound", typeof(AudioClip)));
             }
         }
-
-        clients[foundClient].SetHealth(currentHealth);
+        SetPlayerValueClientRpc(id, ChangablePlayerStats.currentHealth, currentHealth);
     }
+
+    [ServerRpc(RequireOwnership = false)]
+    public void SendInputDataServerRpc(PlayerInputData inputData, ServerRpcParams serverRpcParams = default)
+    {
+        for (int i = 0; i < clientData.Count; i++)
+        {
+            int index = SearchClients(serverRpcParams.Receive.SenderClientId);
+            bool goodToGo = false;
+            if (clientData[index].playerInputs.Count == 0)
+            {
+                goodToGo = true;
+            }
+            else
+            {
+                if (inputData.lastTimeSynced > clientData[index].playerInputs[clientData[index].playerInputs.Count - 1].lastTimeSynced)
+                {
+                    goodToGo = true;
+                }
+            }
+            if (goodToGo)
+            {
+                clientData[index].playerInputs.Add(inputData);
+                GetClient(serverRpcParams.Receive.SenderClientId).GetController().RecalculateServerPosition();
+            }
+        }
+    }
+
+    [ClientRpc]
+    public void SetPlayerPositionDataClientRpc(ulong id, PlayerPositionData data)
+    {
+        int index = SearchClients(id);
+        clientData[index].playerPositionData.Add(data);
+        if (!IsHost)
+        {
+            clients[index].GetController().RecalculateClientPosition();
+        }
+    }
+
+    public PlayerPositionData GetCurrentPlayerPositonData(ulong id)
+    {
+        int index = SearchClients(id);
+        if (clientData[index].playerPositionData.Count == 0)
+        {
+            Debug.LogError("No Player Position Data Found");
+            return new PlayerPositionData();
+        }
+        return clientData[index].playerPositionData[clientData[index].playerPositionData.Count - 1];
+    }
+
+    public PlayerInputData GetCurrentPlayerInputData(ulong id)
+    {
+        int index = SearchClients(id);
+        if (clientData[index].playerPositionData.Count == 0)
+        {
+            Debug.LogError("No Player Position Data Found");
+            return new PlayerInputData();
+        }
+        return clientData[index].playerInputs[clientData[index].playerInputs.Count - 1];
+    }
+
+    [ClientRpc]
+    public void SetPlayerValueClientRpc(ulong id, ChangablePlayerStats statName, float value)
+    {
+        int index = SearchClients(id);
+
+        for (int i = 0; i < clientData[index].playerStats.Count; i++)
+        {
+            if (clientData[index].playerStats[i].statName == statName)
+            {
+                clientData[index].playerStats[i].stat = value;
+            }
+        }
+    }
+
+    public float FindPlayerStat(ulong id, ChangablePlayerStats statName)
+    {
+        int index = SearchClients(id);
+
+        for (int i = 0; i < clientData[index].playerStats.Count; i++)
+        {
+            if (clientData[index].playerStats[i].statName == statName)
+            {
+                return clientData[index].playerStats[i].stat;
+            }
+        }
+        return 0;
+    }
+
+    void SetStat(ulong id, ChangableWeaponStats statName, float value)
+    {
+       
+    }
+
 
     private void OnDrawGizmosSelected()
     {
@@ -1161,84 +1232,9 @@ public class GlobalManager : NetworkBehaviour
     }
 }
 
-[System.Serializable]
-public struct PlayerDataSentToClient : INetworkSerializable
-{
-    public ulong id;
-    public Vector3 headsetPos;
-    public Quaternion headsetRot;
-    public Vector3 rHandPos;
-    public Quaternion rHandRot;
-    public Vector3 lHandPos;
-    public Quaternion lHandRot;
-
-    //Controls
-    public Vector2 rightJoystick;
-    public bool jump;
-    public bool shoot;
-    public bool crouch;
-    public bool menu;
-
-    //Movement
-    public Vector3 _speed;
-    public float _verticalVelocity;
-    public float _fallTimeoutDelta;
-    public float _hasBeenMovingDelta;
-    public float baseSpeed;
-
-    //Midair Movement
-    public Vector3 oldAxis;
-    public Vector2 oldInput;
-    public bool hasBeenGrounded;
-    public bool hasBeenStopped;
-
-    //Crouch
-    public float currentCrouchLerp;
-    public bool hasBeenCrouched;
-
-    //Server
-    public Vector3 pos;
-    public Vector3 velocity;
-    public Vector3 mainCamforward;
-    public Vector3 mainCamRight;
-    public float serverTime;
-
-    public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
-    {
-        serializer.SerializeValue(ref id);
-        serializer.SerializeValue(ref headsetPos);
-        serializer.SerializeValue(ref headsetRot);
-        serializer.SerializeValue(ref rHandPos);
-        serializer.SerializeValue(ref rHandRot);
-        serializer.SerializeValue(ref lHandPos);
-        serializer.SerializeValue(ref lHandRot);
-        serializer.SerializeValue(ref rightJoystick);
-        serializer.SerializeValue(ref jump);
-        serializer.SerializeValue(ref shoot);
-        serializer.SerializeValue(ref crouch);
-        serializer.SerializeValue(ref menu);
-        serializer.SerializeValue(ref _speed);
-        serializer.SerializeValue(ref _verticalVelocity);
-        serializer.SerializeValue(ref _fallTimeoutDelta);
-        serializer.SerializeValue(ref _hasBeenMovingDelta);
-        serializer.SerializeValue(ref baseSpeed);
-        serializer.SerializeValue(ref oldAxis);
-        serializer.SerializeValue(ref oldInput);
-        serializer.SerializeValue(ref hasBeenGrounded);
-        serializer.SerializeValue(ref hasBeenStopped);
-        serializer.SerializeValue(ref currentCrouchLerp);
-        serializer.SerializeValue(ref hasBeenCrouched);
-        serializer.SerializeValue(ref pos);
-        serializer.SerializeValue(ref velocity);
-        serializer.SerializeValue(ref mainCamforward);
-        serializer.SerializeValue(ref mainCamRight);
-        serializer.SerializeValue(ref serverTime);
-    }
-}
-
 
 [System.Serializable]
-public struct TeamInfo : INetworkSerializable
+public class TeamInfo : INetworkSerializable
 {
     public TeamList teamColor;
     public int spawns;
@@ -1251,7 +1247,7 @@ public struct TeamInfo : INetworkSerializable
 }
 
 [System.Serializable]
-public struct PlayerInfoSentToClient : INetworkSerializable
+public class PlayerInfoSentToClient : INetworkSerializable
 {
     public ulong id;
     public ClassList currentClass;
@@ -1271,8 +1267,32 @@ public struct PlayerInfoSentToClient : INetworkSerializable
     }
 }
 
+
 [System.Serializable]
-public struct PlayerDataSentToServer : INetworkSerializable
+public class PlayerData
+{
+    public SyncString playerName;
+    public SyncUlong playerId;
+    public List<PlayerStats> playerStats;
+    public List<PlayerGunData> playerGuns;
+    public List<PlayerInputData> playerInputs;
+    public List<PlayerPositionData> playerPositionData;
+}
+
+[System.Serializable]
+public class SyncString
+{
+    public string value;
+    public float lastTimeSynced;
+    public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
+    {
+        serializer.SerializeValue(ref value);
+        serializer.SerializeValue(ref lastTimeSynced);
+    }
+}
+
+[System.Serializable]
+public class PlayerInputData
 {
     public Vector3 headsetPos;
     public Quaternion headsetRot;
@@ -1280,18 +1300,12 @@ public struct PlayerDataSentToServer : INetworkSerializable
     public Quaternion rHandRot;
     public Vector3 lHandPos;
     public Quaternion lHandRot;
-
-    //Prediction
-    public float localTime;
-    public float deltaTime;
-
-    //Controls
     public Vector2 rightJoystick;
     public bool jump;
     public bool shoot;
     public bool crouch;
     public bool menu;
-
+    public float lastTimeSynced;
 
     public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
     {
@@ -1305,8 +1319,130 @@ public struct PlayerDataSentToServer : INetworkSerializable
         serializer.SerializeValue(ref jump);
         serializer.SerializeValue(ref shoot);
         serializer.SerializeValue(ref crouch);
-        serializer.SerializeValue(ref localTime);
-        serializer.SerializeValue(ref deltaTime);
-
+        serializer.SerializeValue(ref menu);
+        serializer.SerializeValue(ref lastTimeSynced);
     }
+}
+
+[System.Serializable]
+public class SyncUlong
+{
+    public ulong value;
+    public float lastTimeSynced;
+
+    public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
+    {
+        serializer.SerializeValue(ref value);
+        serializer.SerializeValue(ref lastTimeSynced);
+    }
+}
+
+[System.Serializable]
+public class PlayerGunData
+{
+    public string gunNameKey;
+    public List<WeaponStats> weaponStats;
+}
+
+[System.Serializable]
+public class WeaponStats
+{
+    public ChangableWeaponStats statName;
+    public float stat;
+    public float lastTimeSynced;
+
+    public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
+    {
+        serializer.SerializeValue(ref statName);
+        serializer.SerializeValue(ref stat);
+        serializer.SerializeValue(ref lastTimeSynced);
+    }
+}
+
+[System.Serializable]
+public class PlayerStats
+{
+    public ChangablePlayerStats statName;
+    public float stat;
+    public float lastTimeSynced;
+
+    public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
+    {
+        serializer.SerializeValue(ref statName);
+        serializer.SerializeValue(ref stat);
+        serializer.SerializeValue(ref lastTimeSynced);
+    }
+}
+
+[System.Serializable]
+public class PlayerPositionData
+{
+    //Position
+    public Vector3 position;
+    public Vector3 velocity;
+
+    //Physics Calculations
+    public Vector3 _speed;
+    public float _verticalVelocity;
+    public float _fallTimeoutDelta;
+    public float _hasBeenMovingDelta;
+    public float baseSpeed;
+    public Vector3 oldAxis;
+    public Vector2 oldInput;
+    public bool hasBeenGrounded;
+    public bool hasBeenStopped;
+    public float currentCrouchLerp;
+    public bool hasBeenCrouched;
+    public Vector3 mainCamforward;
+    public Vector3 mainCamRight;
+
+    //Sync
+    public float lastTimeSynced;
+
+    public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
+    {
+        serializer.SerializeValue(ref position);
+        serializer.SerializeValue(ref velocity);
+        serializer.SerializeValue(ref _speed);
+        serializer.SerializeValue(ref _verticalVelocity);
+        serializer.SerializeValue(ref _fallTimeoutDelta);
+        serializer.SerializeValue(ref _hasBeenMovingDelta);
+        serializer.SerializeValue(ref baseSpeed);
+        serializer.SerializeValue(ref oldAxis);
+        serializer.SerializeValue(ref oldInput);
+        serializer.SerializeValue(ref hasBeenGrounded);
+        serializer.SerializeValue(ref hasBeenStopped);
+        serializer.SerializeValue(ref currentCrouchLerp);
+        serializer.SerializeValue(ref hasBeenCrouched);
+        serializer.SerializeValue(ref mainCamforward);
+        serializer.SerializeValue(ref mainCamRight);
+    }
+}
+
+[SerializeField]
+public enum ChangableWeaponStats
+{
+    shotsPerSecond,
+    bulletsPerShot,
+    maxAmmo,
+    maxClip,
+    bulletSpeed,
+    damage,
+    bulletSpreadAngle,
+    radiationAfterburn,
+    maxBulletRange,
+    reloadSpeed,
+    currentClip,
+    currentAmmo,
+}
+
+[SerializeField]
+public enum ChangablePlayerStats
+{
+    currentHealth,
+    maxHealth,
+    eyeHeight,
+    groundSpeed,
+    airSpeed,
+    currentlyHeldWeapon,
 }

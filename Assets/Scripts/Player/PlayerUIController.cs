@@ -70,7 +70,16 @@ public class PlayerUIController : MonoBehaviour
     {
         Gun currentGun = player.GetCurrentGun();
         clipText.text = currentGun.FindStat(ChangableWeaponStats.currentClip).ToString();
-        ammoText.text = "/ " + currentGun.FindStat(ChangableWeaponStats.currentAmmo).ToString();
+        float ammo = currentGun.FindStat(ChangableWeaponStats.currentAmmo);
+        if(ammo > 0)
+        {
+            ammoText.text = "/ " + ammo.ToString();
+
+        }
+        else
+        {
+            ammoText.text = "";
+        }
     }
 
     public void UpdateHealthUI(float oldHealth)

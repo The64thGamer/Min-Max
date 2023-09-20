@@ -12,6 +12,8 @@ public class HealthChanger : NetworkBehaviour
 
     [Header("Setting")]
     [SerializeField] DamageChangerSettings setting;
+    [SerializeField] HealthChangerVariant dispenseType;
+
 
     [Header("All Modes")]
     [SerializeField] int health;
@@ -164,29 +166,39 @@ public class HealthChanger : NetworkBehaviour
 
     bool TakeDamage(int i)
     {
-        int oldHealth = currentPlayer[i].GetHealth();
-        int healthFinal = health;
-        if (healthIsPercent)
+        switch (dispenseType)
         {
-            healthFinal = Mathf.CeilToInt((currentPlayer[i].GetClassStats().baseHealth / 100.0f) * health);
-        }
-        if(dontKill && oldHealth + healthFinal <= 0)
-        {
-            healthFinal = -oldHealth + 1;
-        }
+            case HealthChangerVariant.health:
+                int oldHealth = currentPlayer[i].GetHealth();
+                int healthFinal = health;
+                if (healthIsPercent)
+                {
+                    healthFinal = Mathf.CeilToInt((currentPlayer[i].GetClassStats().baseHealth / 100.0f) * health);
+                }
+                if (dontKill && oldHealth + healthFinal <= 0)
+                {
+                    healthFinal = -oldHealth + 1;
+                }
 
-        if (currentPlayer[i].ChangeHealth(currentPlayer[i].GetPlayerID(), healthFinal, Random.Range(-999999999, 999999999)) == oldHealth)
-        {
-            return false;
+                if (currentPlayer[i].ChangeHealth(currentPlayer[i].GetPlayerID(), healthFinal, Random.Range(-999999999, 999999999)) == oldHealth)
+                {
+                    return false;
+                }
+                else
+                {
+                    if (currentPlayer[i].GetHealth() + healthFinal <= 0)
+                    {
+                        currentPlayer[i] = null;
+                    }
+                    return true;
+                }
+            case HealthChangerVariant.ammo:
+                //AAAAAAAAAAAAAAAAAAA
+                break;
+            default:
+                break;
         }
-        else
-        {
-            if (currentPlayer[i].GetHealth() + healthFinal <= 0)
-            {
-                currentPlayer[i] = null;
-            }
-            return true;
-        }
+        return false;
     }
 
     void ClientRespawn(bool prev, bool current)
@@ -220,6 +232,11 @@ public class HealthChanger : NetworkBehaviour
         return setting;
     }
 
+    public enum HealthChangerVariant
+    {
+        health,
+        ammo,
+    }
 
     public enum DamageChangerSettings
     {

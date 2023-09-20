@@ -158,69 +158,11 @@ public class PlayerTracker : NetworkBehaviour
         charController.enabled = false;
         transform.position = pos;
         charController.enabled = true;
-        player.GetController().ResetStateBuffers();
     }
 
-    public void ClientSyncPlayerInputs(PlayerDataSentToClient data)
+    public PlayerInputData GetPlayerInputData()
     {
-        if (!IsOwner)
-        {
-            headset.localPosition = data.headsetPos;
-            headset.rotation = data.headsetRot;
-            rightController.localPosition = data.rHandPos;
-            rightController.rotation = data.rHandRot;
-            leftController.localPosition = data.lHandPos;
-            leftController.rotation = data.lHandRot;
-        }
-    }
-
-    public void ServerSyncPlayerInputs(PlayerDataSentToServer data)
-    {
-        headset.localPosition = data.headsetPos;
-        headset.rotation = data.headsetRot;
-        rightController.localPosition = data.rHandPos;
-        rightController.rotation = data.rHandRot;
-        leftController.localPosition = data.lHandPos;
-        leftController.rotation = data.lHandRot;
-        movementAxis = data.rightJoystick;
-        rhandAButton = data.jump;
-        triggerR = data.shoot;
-        pressRstick = data.crouch;
-    }
-
-    public PlayerDataSentToClient GetPlayerPosData()
-    {
-        FirstPersonController.TickValues t = player.GetController().GetCurrentTick();
-        return new PlayerDataSentToClient()
-        {
-            id = player.GetPlayerID(),
-            headsetPos = headset.localPosition,
-            headsetRot = headset.rotation,
-            rHandPos = rightController.localPosition,
-            rHandRot = rightController.rotation,
-            lHandPos = leftController.localPosition,
-            lHandRot = leftController.rotation,
-            _speed = t._speed,
-            _verticalVelocity = t._verticalVelocity,
-            _fallTimeoutDelta = t._fallTimeoutDelta,
-            _hasBeenMovingDelta = t._hasBeenMovingDelta,
-            oldAxis = t.oldAxis,
-            oldInput = t.oldInput,
-            hasBeenGrounded = t.hasBeenGrounded,
-            hasBeenStopped = t.hasBeenStopped,
-            currentCrouchLerp = t.currentCrouchLerp,
-            hasBeenCrouched = t.hasBeenCrouched,
-            pos = t.pos,
-            velocity = t.velocity,
-            mainCamforward = t.mainCamforward,
-            mainCamRight = t.mainCamRight,
-            serverTime = t.inputs.localTime,
-        };
-    }
-
-    public PlayerDataSentToServer GetPlayerNetworkData()
-    {
-        return new PlayerDataSentToServer()
+        return new PlayerInputData()
         {
             rightJoystick = movementAxis,
             jump = rhandAButton,

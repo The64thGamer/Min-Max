@@ -14,6 +14,7 @@ using UnityEngine.XR.Interaction.Toolkit;
 public class Player : NetworkBehaviour
 {
     [SerializeField] Gun currentGun;
+    [SerializeField] List<Gun> guns;
     [SerializeField] TeamList currentTeam;
     [SerializeField] ClassList currentClass;
     [SerializeField] ClassStats currentStats;
@@ -35,7 +36,6 @@ public class Player : NetworkBehaviour
 
     //Stats
     float timeTillRespawn;
-    int currentHealth;
     RespawnState respawnState = RespawnState.notRespawning;
     public enum RespawnState
     {
@@ -173,7 +173,7 @@ public class Player : NetworkBehaviour
         cosmeticInts = classCosmetics;
         currentClass = setClass;
         currentStats = gm.GetComponent<AllStats>().GetClassStats(setClass);
-        SetHealth(currentStats.baseHealth);
+        ServerSetHealth(currentStats.baseHealth);
         SetupCosmetics(classCosmetics);
         SetCharacterVisibility(currentPlayerVisibility);
         UpdateTeamColor();
@@ -590,32 +590,11 @@ public class Player : NetworkBehaviour
         return 0;
     }
 
-    public void SetHealth(int health)
-    {
-        float oldHealth = currentHealth;
-        currentHealth = health;
-        if (uiController != null)
-        {
-            uiController.UpdateHealthUI(oldHealth);
-        }
-    }
-
     public PlayerUIController GetUIController()
     {
         return uiController;
     }
 
-
-    public int GetHealth()
-    {
-        return currentHealth;
-    }
-
-    public void ResetClassStats()
-    {
-        currentStats = al.GetClassStats(currentClass);
-        SetHealth(currentStats.baseHealth);
-    }
 
     public void RemoveHeldWire(Vector3 finalPos, bool playSound)
     {

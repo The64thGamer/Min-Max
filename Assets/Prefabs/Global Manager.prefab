@@ -15,6 +15,7 @@ GameObject:
   - component: {fileID: 2866549589540967719}
   - component: {fileID: 4213602069014871988}
   - component: {fileID: 1059498740907293633}
+  - component: {fileID: 2233780033148056081}
   m_Layer: 0
   m_Name: Global Manager
   m_TagString: Untagged
@@ -105,20 +106,17 @@ MonoBehaviour:
     firePrefab: {fileID: 922140614253316042, guid: 53704ecba574ad240816d00222ea8601,
       type: 3}
     altFirePrefab: {fileID: 0}
-    firepoint: {x: 0, y: 0.005, z: 0.12}
   - gunName: O-S F-O
     gunPrefab: {fileID: 1279211091985373482, guid: 1f924fd53cd6049459bc4ac106a15d1c,
       type: 3}
     firePrefab: {fileID: 922140614253316042, guid: 53704ecba574ad240816d00222ea8601,
       type: 3}
     altFirePrefab: {fileID: 0}
-    firepoint: {x: 0, y: 0.178, z: 0.311}
   - gunName: Flashpoint
     gunPrefab: {fileID: 1279211091985373482, guid: 3083b23dec86be245a9bbc03405465d9,
       type: 3}
     firePrefab: {fileID: 0}
     altFirePrefab: {fileID: 0}
-    firepoint: {x: 0, y: 0, z: 0}
 --- !u!114 &5384925024139106558
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -286,6 +284,45 @@ MonoBehaviour:
   blendDistance: 0
   weight: 1
   sharedProfile: {fileID: 11400000, guid: 4896978f8f8aca24e8bfccce94dff5e9, type: 2}
+--- !u!114 &2233780033148056081
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2772672783022388777}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 64791ffe257d9694bbde984f31a93a4b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  clients:
+  - playerName:
+      value: 
+      lastTimeSynced: 0
+    playerId:
+      value: 0
+      lastTimeSynced: 0
+    playerStats:
+    - statName: 0
+      stat: 0
+      lastTimeSynced: 0
+    playerGuns:
+    - gunNameKey: 
+      weaponStats: []
+    playerInputs:
+      headsetPos: {x: 0, y: 0, z: 0}
+      headsetRot: {x: 0, y: 0, z: 0, w: 0}
+      rHandPos: {x: 0, y: 0, z: 0}
+      rHandRot: {x: 0, y: 0, z: 0, w: 0}
+      lHandPos: {x: 0, y: 0, z: 0}
+      lHandRot: {x: 0, y: 0, z: 0, w: 0}
+      rightJoystick: {x: 0, y: 0}
+      jump: 0
+      shoot: 0
+      crouch: 0
+      menu: 0
+      lastTimeSynced: 0
 --- !u!1001 &1826620726766891009
 PrefabInstance:
   m_ObjectHideFlags: 0
