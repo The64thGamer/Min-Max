@@ -335,6 +335,18 @@ public class GlobalManager : NetworkBehaviour
         Debug.LogError("Could Not Find Client");
         return -1;
     }
+    int SearchGuns(int clientIndex, string gunNameKey)
+    {
+        for (int i = 0; i < clientData[clientIndex].playerGuns.Count; i++)
+        {
+            if (clientData[clientIndex].playerGuns[i].gunNameKey == gunNameKey)
+            {
+                return i;
+            }
+        }
+        Debug.LogError("Could Not Find Client");
+        return -1;
+    }
 
     public void AddNewTeam(TeamInfo newTeam)
     {
@@ -1192,14 +1204,50 @@ public class GlobalManager : NetworkBehaviour
         {
             if (clientData[index].playerStats[i].statName == statName)
             {
-                clients[index].GetUIController().UpdateHealthUI(FindPlayerStat(id,ChangablePlayerStats.currentHealth));
+                float oldHealth = FindPlayerStat(id, ChangablePlayerStats.currentHealth);
                 clientData[index].playerStats[i].stat = value;
+                clients[index].GetUIController().UpdateHealthUI(oldHealth);
                 return;
             }
         }
     }
 
     public float FindPlayerStat(ulong id, ChangablePlayerStats statName)
+    {
+        int index = SearchClients(id);
+
+        for (int i = 0; i < clientData[index].playerStats.Count; i++)
+        {
+            if (clientData[index].playerStats[i].statName == statName)
+            {
+                return clientData[index].playerStats[i].stat;
+            }
+        }
+        return 0;
+    }
+
+    [ClientRpc]
+    public void SetPlayerGunValueClientRpc(ulong id, string gunNameKey, ChangableWeaponStats statName, float value)
+    {
+        SetPlayerGunValue(id, gunNameKey, statName, value);
+    }
+
+    void SetPlayerGunValue(ulong id, string gunNameKey, ChangableWeaponStats statName, float value)
+    {
+        int index = SearchClients(id);
+        int gunIndex = SearchGuns(index, gunNameKey);
+        for (int i = 0; i < clientData[index].playerGuns[gunIndex].weaponStats.Count; i++)
+        {
+            if (clientData[index].playerGuns[gunIndex].weaponStats[i].statName == statName)
+            {
+                clientData[index].playerGuns[gunIndex].weaponStats[i].stat = value;
+                clients[index].GetUIController().UpdateGunUI();
+                return;
+            }
+        }
+    }
+
+    public float FindPlayerGunValue(ulong id, string gunNameKey, ChangableWeaponStats statName)
     {
         int index = SearchClients(id);
 

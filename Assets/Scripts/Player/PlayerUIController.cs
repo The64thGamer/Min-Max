@@ -60,7 +60,7 @@ public class PlayerUIController : MonoBehaviour
         {
             timerText.text = $"{seconds / 60}:{seconds % 60:D2}";
         }
-        if (player.GetHealth() <= 0)
+        if (gm.FindPlayerStat(player.GetPlayerID(), ChangablePlayerStats.currentHealth) <= 0)
         {
             healthText.text = ((int)player.GetTimeTillRespawn()).ToString();
         }
