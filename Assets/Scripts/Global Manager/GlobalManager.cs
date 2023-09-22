@@ -570,6 +570,7 @@ public class GlobalManager : NetworkBehaviour
 
     void SpawnPlayer(ulong id, string playerName, int initialClass, int[] cosmetics)
     {
+        CheckHostValidity();
 
         for (int i = 0; i < clients.Count; i++)
         {
@@ -672,15 +673,14 @@ public class GlobalManager : NetworkBehaviour
             cosmetics = cos.ToArray();
         }
 
-        PlayerInfoSentToClient pdstc = new PlayerInfoSentToClient
-        {
-            id = id,
-            currentClass = (ClassList)initialClass,
-            currentTeam = decidedTeam,
-            cosmetics = cosmetics,
-            gunName = autoGun,
-            playerName = playerName,
-        };
+        SetPlayerCosmeticsClientRpc(id, cosmetics);
+        SetPlayerClassClientRpc(id, (ClassList)initialClass);
+        SetPlayerTeamClientRpc(id, decidedTeam);
+        SetPlayerNameClientRpc(id,playerName);
+
+        //Do This
+        gunName = autoGun,
+
         AssignPlayerClassAndTeamClientRpc(pdstc);
         RespawnPlayer(id, decidedTeam, true);
 
@@ -870,20 +870,16 @@ public class GlobalManager : NetworkBehaviour
     [ClientRpc]
     void RespawnPlayerClientRpc(ulong id, TeamList team, Vector3 spawnPos, float respawnTimer)
     {
-        for (int i = 0; i < clients.Count; i++)
+        int i = SearchClients(id);
+
+        if (clients[i].IsOwner && clients[i].GetPlayerID() < botID)
         {
-            if (clients[i].GetPlayerID() == id)
-            {
-                if (clients[i].IsOwner && clients[i].GetPlayerID() < botID)
-                {
-                    achievments.SaveAchievements();
-                }
-                //Refresh Stats
-                clients[i].RespawnPlayer(spawnPos, respawnTimer);
-                UpdateMatchFocalPoint(clients[i].GetTeam());
-                return;
-            }
+            achievments.SaveAchievements();
         }
+        //Refresh Stats
+        clients[i].RespawnPlayer(spawnPos, respawnTimer);
+        UpdateMatchFocalPoint(FindPlayerTeam(id));
+        return;
     }
 
     [ClientRpc]
@@ -914,52 +910,6 @@ public class GlobalManager : NetworkBehaviour
         if (isowner && !IsHost)
         {
             DisconnectToTitleScreen(false);
-        }
-    }
-
-    [ClientRpc]
-    public void AssignPlayerClassAndTeamClientRpc(PlayerInfoSentToClient data)
-    {
-        for (int i = 0; i < clients.Count; i++)
-        {
-            if (clients[i].GetPlayerID() == data.id)
-            {
-                clients[i].SetName(data.playerName);
-                clients[i].SetClass(data.currentClass, data.cosmetics);
-                clients[i].SetTeam(data.currentTeam);
-                clients[i].SetGun(al.SearchGuns(data.gunName));
-                return;
-            }
-        }
-    }
-
-    [ClientRpc]
-    void SendAllPlayerDataToNewPlayerClientRpc(PlayerInfoSentToClient[] data, ulong id)
-    {
-        if (IsHost)
-        {
-            return;
-        }
-        for (int i = 0; i < clients.Count; i++)
-        {
-            //This looks dumb but its to make sure redundant data isn't sent to all clients
-            if (clients[i].GetPlayerID() == id)
-            {
-                for (int e = 0; e < clients.Count; e++)
-                {
-                    for (int j = 0; j < data.Length; j++)
-                    {
-                        if (clients[e].GetPlayerID() == data[j].id)
-                        {
-                            clients[e].SetName(data[j].playerName);
-                            clients[e].SetClass(data[j].currentClass, data[j].cosmetics);
-                            clients[e].SetTeam(data[j].currentTeam);
-                            clients[e].SetGun(al.SearchGuns(data[j].gunName));
-                        }
-                    }
-                }
-                return;
-            }
         }
     }
 
@@ -1310,20 +1260,32 @@ public class GlobalManager : NetworkBehaviour
     public void SetPlayerClassClientRpc(ulong id, ClassList value)
     {
         SetPlayerClass(id, value);
+        if (IsHost)
+        {
+            ResetClassStatsClientRpc(id, al.GetClassStats(FindPlayerClass(id)));
+        }
     }
 
     void SetPlayerClass(ulong id, ClassList value)
     {
         int index = SearchClients(id);
         clientData[index].playerClass.value = value;
-        currentStats = gm.GetComponent<AllStats>().GetClassStats(setClass);
-        ServerSetHealth(currentStats.baseHealth);
+        SetPlayerValueClientRpc(id, ChangablePlayerStats.currentHealth, FindPlayerStat(id, ChangablePlayerStats.maxHealth));
         clients[index].UpdateClass();
     }
 
     public ClassList FindPlayerClass(ulong id)
     {
         return clientData[SearchClients(id)].playerClass.value;
+    }
+
+    [ClientRpc]
+    public void ResetClassStatsClientRpc(ulong id, PlayerStats[] data)
+    {
+        for (int i = 0; i < data.Length; i++)
+        {
+            SetPlayerValue(id, data[i].statName, data[i].stat);
+        }
     }
 
     [ClientRpc]
@@ -1341,7 +1303,7 @@ public class GlobalManager : NetworkBehaviour
 
     public int[] FindPlayerCosmetics(ulong id)
     {
-        return clientData[SearchClients(id)].playerName.value;
+        return clientData[SearchClients(id)].playerCosmetics.value;
     }
 
 

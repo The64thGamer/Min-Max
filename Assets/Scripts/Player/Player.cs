@@ -132,7 +132,7 @@ public class Player : NetworkBehaviour
         Debug.Log("Player " + GetPlayerID() + " respawned in " + gm.FindPlayerTeam(GetPlayerID()) + " spawn room");
         if(IsHost)
         {
-            gm.SetPlayerValueClientRpc(GetPlayerID(), ChangablePlayerStats.currentHealth,gm.FindPlayerStat(GetPlayerID(),ChangablePlayerStats.maxHealth));
+            gm.ResetClassStatsClientRpc(GetPlayerID(), al.GetClassStats(gm.FindPlayerClass(GetPlayerID())));
         }
         GetTracker().ForceNewPosition(spawnPos);
         SetLayer(GetTeamLayer());
@@ -177,7 +177,7 @@ public class Player : NetworkBehaviour
         UpdateTeamColor();
     }
 
-    public void SetTeam(TeamList team)
+    public void UpdateTeam()
     {
         SetLayer(GetTeamLayer());
         UpdateTeamColor();
@@ -198,7 +198,7 @@ public class Player : NetworkBehaviour
         this.gameObject.layer = layer;
     }
 
-    public void SetGun(GunProjectiles gun)
+    public void UpdateGun(GunProjectiles gun)
     {
         if (currentGun != null)
         {

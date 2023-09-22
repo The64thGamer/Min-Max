@@ -6,17 +6,19 @@ using UnityEngine;
 
 public class AllStats : MonoBehaviour
 {
-    [SerializeField] ClassStats 
-        labourer,
-        woodworker,
-        developer,
-        programmer,
-        computer,
-        fabricator,
-        artist,
-        castmember,
-        craftsman,
-        manager;
+    [SerializeField]
+    PlayerStats[]
+    labourer,
+    woodworker,
+    developer,
+    programmer,
+    computer,
+    fabricator,
+    artist,
+    castmember,
+    craftsman,
+    manager;
+
     [Header("MM-Chips")]
     [SerializeField] List<MMChip> mMChips;
     [Header("Guns")]
@@ -34,7 +36,7 @@ public class AllStats : MonoBehaviour
         return new GunProjectiles();
     }
 
-    public ClassStats GetClassStats(ClassList currentClass)
+    public PlayerStats[] GetClassStats(ClassList currentClass)
     {
         switch (currentClass)
         {
@@ -59,7 +61,7 @@ public class AllStats : MonoBehaviour
             case ClassList.manager:
                 return manager;
             default:
-                return new ClassStats();
+                return new PlayerStats[0];
          }
     }
 }
