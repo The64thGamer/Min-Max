@@ -25,8 +25,8 @@ public class Flashpoint : Gun
     {
         base.Update();
         //Box stuff
-        spotLight.range = FindStat(ChangableWeaponStats.maxBulletRange);
-        spotLight.spotAngle = FindStat(ChangableWeaponStats.bulletSpreadAngle);
+        spotLight.range = gm.FindPlayerGunValue(currentPlayer.GetPlayerID(), gunNameKey, ChangableWeaponStats.maxBulletRange);
+        spotLight.spotAngle = gm.FindPlayerGunValue(currentPlayer.GetPlayerID(), gunNameKey, ChangableWeaponStats.bulletSpreadAngle);
         spotLight.innerSpotAngle = spotLight.spotAngle;
         boxCl.size = spotLight.range * Vector3.one;
         boxCl.center = new Vector3(0, 0, spotLight.range / 2.0f);
@@ -34,7 +34,7 @@ public class Flashpoint : Gun
 
     public new void Fire()
     {
-        float ammo = FindStat(ChangableWeaponStats.currentClip);
+        float ammo = gm.FindPlayerGunValue(currentPlayer.GetPlayerID(), gunNameKey, ChangableWeaponStats.currentClip);
 
         if ((gunState == GunState.none || gunState == GunState.reloading) && ammo > 0)
         {
@@ -42,8 +42,8 @@ public class Flashpoint : Gun
             if (gm.IsHost)
             {
                 HitScanHostDamageCalculation(null);
+                gm.SetPlayerGunValueClientRpc(currentPlayer.GetPlayerID(), gunNameKey, ChangableWeaponStats.currentClip, ammo - 1);
             }
-            SetStat(ChangableWeaponStats.currentClip, ammo - 1);
             gunState = GunState.firing;
             animator.SetBool("Fire", true);
             if (currentPlayer.IsOwner && currentPlayer.GetPlayerID() < botID)
@@ -64,8 +64,8 @@ public class Flashpoint : Gun
             {
                 Vector3 fireAngle = ((playersInTrigger[i].transform.position + new Vector3(0, 0.75f, 0)) - firePoint.position).normalized;
                 LayerMask layermask = GetIgnoreTeamAndVRLayerMask(currentPlayer);
-                Debug.DrawRay(firePoint.position, fireAngle * FindStat(ChangableWeaponStats.maxBulletRange));
-                RaycastHit[] hit = Physics.RaycastAll(firePoint.position, fireAngle, FindStat(ChangableWeaponStats.maxBulletRange), layermask);
+                Debug.DrawRay(firePoint.position, fireAngle * gm.FindPlayerGunValue(currentPlayer.GetPlayerID(), gunNameKey, ChangableWeaponStats.maxBulletRange));
+                RaycastHit[] hit = Physics.RaycastAll(firePoint.position, fireAngle, gm.FindPlayerGunValue(currentPlayer.GetPlayerID(), gunNameKey, ChangableWeaponStats.maxBulletRange), layermask);
                 System.Array.Sort(hit, (x, y) => x.distance.CompareTo(y.distance));
 
                 Player p;
@@ -78,7 +78,7 @@ public class Flashpoint : Gun
                     }
                     if (p == playersInTrigger[i])
                     {
-                        int damage = Mathf.CeilToInt(Mathf.Max(0, Mathf.SmoothStep(FindStat(ChangableWeaponStats.damage), 0, hit[e].distance / FindStat(ChangableWeaponStats.maxBulletRange))));
+                        int damage = Mathf.CeilToInt(Mathf.Max(0, Mathf.SmoothStep(gm.FindPlayerGunValue(currentPlayer.GetPlayerID(), gunNameKey, ChangableWeaponStats.damage), 0, hit[e].distance / gm.FindPlayerGunValue(currentPlayer.GetPlayerID(), gunNameKey, ChangableWeaponStats.maxBulletRange))));
                         if (damage > 0)
                         {
                             playersInTrigger[i].ChangeHealth(currentPlayer.GetPlayerID(), -damage, bulletIdHash);

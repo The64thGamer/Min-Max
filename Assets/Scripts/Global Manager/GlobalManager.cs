@@ -11,6 +11,7 @@ using Unity.Services.Relay;
 using Unity.Services.Relay.Models;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using static UnityEngine.Rendering.DebugUI;
 using static UnityEngine.Rendering.VolumeComponent;
 
 public class GlobalManager : NetworkBehaviour
@@ -1250,12 +1251,12 @@ public class GlobalManager : NetworkBehaviour
     public float FindPlayerGunValue(ulong id, string gunNameKey, ChangableWeaponStats statName)
     {
         int index = SearchClients(id);
-
-        for (int i = 0; i < clientData[index].playerStats.Count; i++)
+        int gunIndex = SearchGuns(index, gunNameKey);
+        for (int i = 0; i < clientData[index].playerGuns[gunIndex].weaponStats.Count; i++)
         {
-            if (clientData[index].playerStats[i].statName == statName)
+            if (clientData[index].playerGuns[gunIndex].weaponStats[i].statName == statName)
             {
-                return clientData[index].playerStats[i].stat;
+                return clientData[index].playerGuns[gunIndex].weaponStats[i].stat;
             }
         }
         return 0;
@@ -1292,6 +1293,14 @@ public class GlobalManager : NetworkBehaviour
         clients[index].UpdateTeamColor();
     }
 
+    public void AddPlayerToClientList(Player player)
+    {
+        clients.Add(player);
+        PlayerData data = new PlayerData();
+        data.playerId.value = player.GetPlayerID();
+        clientData.Add(data);
+    }
+
     public TeamList FindPlayerTeam(ulong id)
     {
         return clientData[SearchClients(id)].playerTeam.value;
@@ -1307,11 +1316,8 @@ public class GlobalManager : NetworkBehaviour
     {
         int index = SearchClients(id);
         clientData[index].playerClass.value = value;
-        float height = PlayerPrefs.GetFloat("Settings: PlayerHeight") - 0.127f; //Height offset by 5 inches (Height from eyes to top of head)
-        currentClass = setClass;
         currentStats = gm.GetComponent<AllStats>().GetClassStats(setClass);
         ServerSetHealth(currentStats.baseHealth);
-        tracker.GetForwardRoot().localScale = Vector3.one * (currentStats.classEyeHeight / height);
         clients[index].UpdateClass();
     }
 
@@ -1320,6 +1326,23 @@ public class GlobalManager : NetworkBehaviour
         return clientData[SearchClients(id)].playerClass.value;
     }
 
+    [ClientRpc]
+    public void SetPlayerCosmeticsClientRpc(ulong id, int[] value)
+    {
+        SetPlayerCosmetics(id, value);
+    }
+
+    void SetPlayerCosmetics(ulong id, int[] value)
+    {
+        int index = SearchClients(id);
+        clientData[index].playerCosmetics.value = value;
+        clients[index].UpdateClass();
+    }
+
+    public int[] FindPlayerCosmetics(ulong id)
+    {
+        return clientData[SearchClients(id)].playerName.value;
+    }
 
 
     private void OnDrawGizmosSelected()
@@ -1346,34 +1369,13 @@ public class TeamInfo : INetworkSerializable
 }
 
 [System.Serializable]
-public class PlayerInfoSentToClient : INetworkSerializable
-{
-    public ulong id;
-    public ClassList currentClass;
-    public TeamList currentTeam;
-    public string gunName;
-    public int[] cosmetics;
-    public string playerName;
-
-    public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
-    {
-        serializer.SerializeValue(ref id);
-        serializer.SerializeValue(ref currentClass);
-        serializer.SerializeValue(ref currentTeam);
-        serializer.SerializeValue(ref cosmetics);
-        serializer.SerializeValue(ref gunName);
-        serializer.SerializeValue(ref playerName);
-    }
-}
-
-
-[System.Serializable]
 public class PlayerData
 {
     public SyncString playerName;
     public SyncUlong playerId;
     public SyncClass playerClass;
     public SyncTeam playerTeam;
+    public SyncCosmetics playerCosmetics;
     public List<PlayerStats> playerStats;
     public List<PlayerGunData> playerGuns;
     public List<PlayerInputData> playerInputs;
@@ -1391,6 +1393,19 @@ public struct SyncString
         serializer.SerializeValue(ref lastTimeSynced);
     }
 }
+
+[System.Serializable]
+public struct SyncCosmetics
+{
+    public int[] value;
+    public float lastTimeSynced;
+    public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
+    {
+        serializer.SerializeValue(ref value);
+        serializer.SerializeValue(ref lastTimeSynced);
+    }
+}
+
 
 
 [System.Serializable]

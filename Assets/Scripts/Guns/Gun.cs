@@ -64,13 +64,13 @@ public abstract class Gun : MonoBehaviour
 
     public virtual void Update()
     {
-        float fireSpeed = FindStat(ChangableWeaponStats.shotsPerSecond);
+        float fireSpeed = gm.FindPlayerGunValue(currentPlayer.GetPlayerID(),gunNameKey, ChangableWeaponStats.shotsPerSecond);
         if (oldFireSpeed != fireSpeed)
         {
             oldFireSpeed = fireSpeed;
             animator.SetFloat("Fire Speed", fireSpeed);
         }
-        if (FindStat(ChangableWeaponStats.currentClip) <= 0)
+        if (gm.FindPlayerGunValue(currentPlayer.GetPlayerID(), gunNameKey, ChangableWeaponStats.currentClip) <= 0)
         {
             StartCoroutine(Reload(false));
         }
@@ -96,7 +96,7 @@ public abstract class Gun : MonoBehaviour
 
     public virtual void Fire()
     {
-        float ammo = FindStat(ChangableWeaponStats.currentClip);
+        float ammo = gm.FindPlayerGunValue(currentPlayer.GetPlayerID(), gunNameKey, ChangableWeaponStats.currentClip);
         if ((gunState == GunState.none || gunState == GunState.reloading) && ammo > 0)
         {
             if (au != null && gm != null)
@@ -106,8 +106,8 @@ public abstract class Gun : MonoBehaviour
                 {
                     HitScanHostDamageCalculation(currentPlayer);
                     gm.SpawnProjectileClientRpc(currentPlayer.GetPlayerID());
+                    gm.SetPlayerGunValueClientRpc(currentPlayer.GetPlayerID(), gunNameKey, ChangableWeaponStats.currentClip, ammo - 1);
                 }
-                SetStat(ChangableWeaponStats.currentClip, ammo - 1);
                 gunState = GunState.firing;
                 animator.SetBool("Fire", true);
                 if (currentPlayer.IsOwner && currentPlayer.GetPlayerID() < botID)
@@ -123,16 +123,16 @@ public abstract class Gun : MonoBehaviour
     {
         if (waitForFiring)
         {
-            yield return new WaitForSeconds(1.0f / FindStat(ChangableWeaponStats.shotsPerSecond));
+            yield return new WaitForSeconds(1.0f / gm.FindPlayerGunValue(currentPlayer.GetPlayerID(), gunNameKey, ChangableWeaponStats.shotsPerSecond));
             gunState = GunState.none;
         }
-        float ammo = FindStat(ChangableWeaponStats.currentAmmo);
-        float clip = FindStat(ChangableWeaponStats.currentClip);
+        float ammo = gm.FindPlayerGunValue(currentPlayer.GetPlayerID(), gunNameKey, ChangableWeaponStats.currentAmmo);
+        float clip = gm.FindPlayerGunValue(currentPlayer.GetPlayerID(), gunNameKey, ChangableWeaponStats.currentClip);
         if (ammo > 0 && gunState == GunState.none)
         {
             animator.SetBool("Reload", true);
             gunState = GunState.reloading;
-            float timeReloading = FindStat(ChangableWeaponStats.reloadSpeed);
+            float timeReloading = gm.FindPlayerGunValue(currentPlayer.GetPlayerID(), gunNameKey, ChangableWeaponStats.reloadSpeed);
             while (timeReloading > 0)
             {
                 if (gunState != GunState.reloading)
@@ -145,10 +145,12 @@ public abstract class Gun : MonoBehaviour
             if (gunState == GunState.reloading)
             {
                 gunState = GunState.none;
-                float bulletsNeeded = Mathf.Min(FindStat(ChangableWeaponStats.maxClip) - clip,ammo);
-                
-                SetStat(ChangableWeaponStats.currentClip, clip + bulletsNeeded);
-                SetStat(ChangableWeaponStats.currentAmmo, ammo - bulletsNeeded);
+                float bulletsNeeded = Mathf.Min(gm.FindPlayerGunValue(currentPlayer.GetPlayerID(), gunNameKey, ChangableWeaponStats.maxClip) - clip,ammo);
+                if (gm.IsHost)
+                {
+                    gm.SetPlayerGunValueClientRpc(currentPlayer.GetPlayerID(), gunNameKey, ChangableWeaponStats.currentClip, clip + bulletsNeeded);
+                    gm.SetPlayerGunValueClientRpc(currentPlayer.GetPlayerID(), gunNameKey, ChangableWeaponStats.currentAmmo, ammo - bulletsNeeded);
+                }
                 if (currentPlayer.IsOwner && currentPlayer.GetPlayerID() < botID)
                 {
                     currentPlayer.GetUIController().UpdateGunUI();
@@ -167,8 +169,8 @@ public abstract class Gun : MonoBehaviour
             Vector3 fireAngle = CalculateFireAngle(player);
 
             Transform gunAngle = player.GetTracker().GetRightHand();
-            int numBullets = (int)FindStat(ChangableWeaponStats.bulletsPerShot);
-            float angle = FindStat(ChangableWeaponStats.bulletSpreadAngle);
+            int numBullets = (int)gm.FindPlayerGunValue(currentPlayer.GetPlayerID(), gunNameKey, ChangableWeaponStats.bulletsPerShot);
+            float angle = gm.FindPlayerGunValue(currentPlayer.GetPlayerID(), gunNameKey, ChangableWeaponStats.bulletSpreadAngle);
             float angleStep = 0;
             if (numBullets < 4)
             {
@@ -199,7 +201,7 @@ public abstract class Gun : MonoBehaviour
                     finalAngle = Quaternion.AngleAxis(Mathf.Cos(angleInRadians) * angle, gunAngle.right) * finalAngle;
                     finalAngle = Quaternion.AngleAxis(Mathf.Sin(angleInRadians) * angle, gunAngle.up) * finalAngle;
                 }
-                currentProjectile.GetComponent<Projectile>().SetProjectile(firePoint.position, finalAngle, player.GetCurrentGun().FindStat(ChangableWeaponStats.bulletSpeed), player.GetTeamLayer(), CalculateHitPosition(finalAngle, player, firePoint.position), 1 / numBullets);
+                currentProjectile.GetComponent<Projectile>().SetProjectile(firePoint.position, finalAngle, gm.FindPlayerGunValue(currentPlayer.GetPlayerID(), gunNameKey, ChangableWeaponStats.bulletSpeed), player.GetTeamLayer(), CalculateHitPosition(finalAngle, player, firePoint.position), 1 / numBullets);
             }
         }
     }
@@ -237,7 +239,7 @@ public abstract class Gun : MonoBehaviour
     protected LayerMask GetIgnoreTeamAndVRLayerMask(Player player)
     {
         LayerMask mask;
-        switch (player.GetTeam())
+        switch (gm.FindPlayerTeam(player.GetPlayerID()))
         {
             case TeamList.orange:
                 mask = 1 << LayerMask.NameToLayer("OrangeTeam");
@@ -281,8 +283,8 @@ public abstract class Gun : MonoBehaviour
         Vector3 fireAngle = CalculateFireAngle(player);
 
         Transform gunAngle = player.GetTracker().GetRightHand();
-        int numBullets = (int)FindStat(ChangableWeaponStats.bulletsPerShot);
-        float angle = FindStat(ChangableWeaponStats.bulletSpreadAngle);
+        int numBullets = (int)gm.FindPlayerGunValue(currentPlayer.GetPlayerID(), gunNameKey, ChangableWeaponStats.bulletsPerShot);
+        float angle = gm.FindPlayerGunValue(currentPlayer.GetPlayerID(), gunNameKey, ChangableWeaponStats.bulletSpreadAngle);
         float angleStep;
         if (numBullets < 4)
         {
@@ -323,7 +325,7 @@ public abstract class Gun : MonoBehaviour
                     Player hitPlayer = hit.collider.GetComponent<Player>();
                     if (hitPlayer != null)
                     {
-                        int damage = Mathf.CeilToInt(Mathf.Max(0, Mathf.SmoothStep(FindStat(ChangableWeaponStats.damage), 0, hit.distance / maxDamageFalloff)));
+                        int damage = Mathf.CeilToInt(Mathf.Max(0, Mathf.SmoothStep(gm.FindPlayerGunValue(currentPlayer.GetPlayerID(), gunNameKey, ChangableWeaponStats.damage), 0, hit.distance / maxDamageFalloff)));
                         if (damage > 0)
                         {
                             hitPlayer.ChangeHealth(player.GetPlayerID(), -damage, bulletIdHash);

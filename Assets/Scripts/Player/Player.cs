@@ -129,8 +129,11 @@ public class Player : NetworkBehaviour
         {
             respawnState = RespawnState.notRespawning;
         }
-        Debug.Log("Player " + GetPlayerID() + " respawned in " + currentTeam.ToString() + " spawn room");
-        ResetClassStats();
+        Debug.Log("Player " + GetPlayerID() + " respawned in " + gm.FindPlayerTeam(GetPlayerID()) + " spawn room");
+        if(IsHost)
+        {
+            gm.SetPlayerValueClientRpc(GetPlayerID(), ChangablePlayerStats.currentHealth,gm.FindPlayerStat(GetPlayerID(),ChangablePlayerStats.maxHealth));
+        }
         GetTracker().ForceNewPosition(spawnPos);
         SetLayer(GetTeamLayer());
     }
@@ -164,10 +167,12 @@ public class Player : NetworkBehaviour
         }
     }
 
-    public void UpdateClass(int[] classCosmetics)
+    public void UpdateClass()
     {
-        cosmeticInts = classCosmetics;
-        SetupCosmetics(classCosmetics);
+        float height = PlayerPrefs.GetFloat("Settings: PlayerHeight") - 0.127f; //Height offset by 5 inches (Height from eyes to top of head)
+        tracker.GetForwardRoot().localScale = Vector3.one * (gm.FindPlayerStat(GetPlayerID(), ChangablePlayerStats.eyeHeight) / height);
+        cosmeticInts = gm.FindPlayerCosmetics(GetPlayerID());
+        SetupCosmetics();
         SetCharacterVisibility(currentPlayerVisibility);
         UpdateTeamColor();
     }
@@ -207,15 +212,15 @@ public class Player : NetworkBehaviour
         UpdateTeamColor();
     }
 
-    void SetupCosmetics(int[] classCosmetics)
+    void SetupCosmetics()
     {
         List<Cosmetic> stockCosmetics = gm.GetCosmetics().GetClassCosmetics(gm.FindPlayerClass(GetPlayerID()));
         List<int> cosmeticIntList = cosmeticInts.ToList<int>();
-        for (int i = 0; i < classCosmetics.Length; i++)
+        for (int i = 0; i < cosmeticInts.Length; i++)
         {
-            if (classCosmetics[i] < stockCosmetics.Count)
+            if (cosmeticInts[i] < stockCosmetics.Count)
             {
-                Cosmetic cm = stockCosmetics[classCosmetics[i]];
+                Cosmetic cm = stockCosmetics[cosmeticInts[i]];
                 bool isDupeEquipRegion = false;
                 for (int e = 0; e < cosmeticIntList.Count; e++)
                 {
@@ -226,7 +231,7 @@ public class Player : NetworkBehaviour
                 }
                 if (!isDupeEquipRegion)
                 {
-                    cosmeticIntList.Add(classCosmetics[i]);
+                    cosmeticIntList.Add(cosmeticInts[i]);
                 }
             }
         }
@@ -256,9 +261,8 @@ public class Player : NetworkBehaviour
     public void UpdateTeamColor()
     {
 
-
         //Player
-        float teamFinal = (float)currentTeam + 1;
+        float teamFinal = (float)gm.FindPlayerTeam(GetPlayerID()) + 1;
         Renderer[] meshes = this.GetComponentsInChildren<Renderer>();
         for (int i = 0; i < meshes.Length; i++)
         {
@@ -322,7 +326,7 @@ public class Player : NetworkBehaviour
 
     public int GetTeamLayer()
     {
-        switch (currentTeam)
+        switch (gm.FindPlayerTeam(GetPlayerID()))
         {
             case TeamList.orange:
                 return LayerMask.NameToLayer("OrangeTeam");
@@ -349,7 +353,7 @@ public class Player : NetworkBehaviour
 
     public void SetCharacterVisibility(bool visible)
     {
-        ClassList currentClass = (int)gm.FindPlayerClass(GetPlayerID());
+        ClassList currentClass = gm.FindPlayerClass(GetPlayerID());
         while (currentCharMeshes.Count > 0)
         {
             Destroy(currentCharMeshes[0]);
