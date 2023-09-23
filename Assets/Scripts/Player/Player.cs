@@ -21,7 +21,6 @@ public class Player : NetworkBehaviour
 
     PlayerUIController uiController;
     Menu menu;
-    int[] cosmeticInts = new int[0];
     List<GameObject> currentCharMeshes = new List<GameObject>();
     WireSounds wireSounds;
     PlayerTracker tracker;
@@ -172,8 +171,6 @@ public class Player : NetworkBehaviour
     {
         float height = PlayerPrefs.GetFloat("Settings: PlayerHeight") - 0.127f; //Height offset by 5 inches (Height from eyes to top of head)
         tracker.GetForwardRoot().localScale = Vector3.one * (gm.FindPlayerStat(GetPlayerID(), ChangablePlayerStats.eyeHeight) / height);
-        cosmeticInts = gm.FindPlayerCosmetics(GetPlayerID());
-        SetupCosmetics();
         SetCharacterVisibility(currentPlayerVisibility);
         UpdateTeamColor();
     }
@@ -212,52 +209,6 @@ public class Player : NetworkBehaviour
         currentGun.SetDefaultStats(gun);
         SetCharacterVisibility(currentPlayerVisibility);
         UpdateTeamColor();
-    }
-
-    void SetupCosmetics()
-    {
-        List<Cosmetic> stockCosmetics = gm.GetCosmetics().GetClassCosmetics(gm.FindPlayerClass(GetPlayerID()));
-        List<int> cosmeticIntList = cosmeticInts.ToList<int>();
-        for (int i = 0; i < cosmeticInts.Length; i++)
-        {
-            if (cosmeticInts[i] < stockCosmetics.Count)
-            {
-                Cosmetic cm = stockCosmetics[cosmeticInts[i]];
-                bool isDupeEquipRegion = false;
-                for (int e = 0; e < cosmeticIntList.Count; e++)
-                {
-                    if (stockCosmetics[cosmeticIntList[e]].region == cm.region)
-                    {
-                        isDupeEquipRegion = true;
-                    }
-                }
-                if (!isDupeEquipRegion)
-                {
-                    cosmeticIntList.Add(cosmeticInts[i]);
-                }
-            }
-        }
-        //Stock
-        for (int i = 0; i < stockCosmetics.Count; i++)
-        {
-            if (stockCosmetics[i].stock == StockCosmetic.stock)
-            {
-                bool isStockDupeEquipRegion = false;
-                for (int e = 0; e < cosmeticIntList.Count; e++)
-                {
-                    if (stockCosmetics[cosmeticIntList[e]].region == stockCosmetics[i].region)
-                    {
-                        isStockDupeEquipRegion = true;
-                    }
-                }
-                if (!isStockDupeEquipRegion)
-                {
-
-                    cosmeticIntList.Add(i);
-                }
-            }
-        }
-        cosmeticInts = cosmeticIntList.ToArray();
     }
 
     public void UpdateTeamColor()
@@ -321,11 +272,6 @@ public class Player : NetworkBehaviour
         return menu;
     }
 
-    public int[] GetCosmeticInts()
-    {
-        return cosmeticInts;
-    }
-
     public Gun GetCurrentGun()
     {
         return currentGun;
@@ -360,6 +306,7 @@ public class Player : NetworkBehaviour
 
     public void SetCharacterVisibility(bool visible)
     {
+        int[] cosmeticInts = gm.FindPlayerCosmetics(GetPlayerID());
         ClassList currentClass = gm.FindPlayerClass(GetPlayerID());
         while (currentCharMeshes.Count > 0)
         {
@@ -384,7 +331,7 @@ public class Player : NetworkBehaviour
                 if (visible)
                 {
                     List<Cosmetic> classCosmetics = gm.GetCosmetics().GetClassCosmetics(currentClass);
-
+                    Debug.Log(classCosmetics.Count + " AAA " + cosmeticInts.Length);
                     //Reveal class
                     playerModels[i].SetActive(true);
 

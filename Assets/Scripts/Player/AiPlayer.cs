@@ -85,7 +85,7 @@ public class AiPlayer : NetworkBehaviour
                 //Slowly converges on parent wire of random enemy team by calculating halfway point and scrambling pos;
                 NavMeshHit hit;
 
-                if(NavMesh.SamplePosition((Random.insideUnitSphere * maxNavRange) + gm.GetMatchFocalPoint(player.GetTeam()), out hit, maxNavRange, 1))
+                if(NavMesh.SamplePosition((Random.insideUnitSphere * maxNavRange) + gm.GetMatchFocalPoint(gm.FindPlayerTeam(player.GetPlayerID())), out hit, maxNavRange, 1))
                 {
                     setDestination = hit.position;
                 }
@@ -100,7 +100,7 @@ public class AiPlayer : NetworkBehaviour
 
 
         //Data
-        PlayerDataSentToServer data = tracker.GetPlayerNetworkData();
+        PlayerInputData data = tracker.GetPlayerInputData();
 
         if (target != null && targetHeadset.position - rhand.position != Vector3.zero && targetHeadset.position - headset.position != Vector3.zero)
         {
@@ -144,8 +144,10 @@ public class AiPlayer : NetworkBehaviour
             data.rightJoystick.x = Vector3.Dot(currentPath, camRight);
 
         }
-        tracker.ServerSyncPlayerInputs(data);
-
+        if (IsHost)
+        {
+            gm.SendBotInputData(data,player.GetPlayerID());
+        }
     }
 
     private void OnDrawGizmosSelected()
@@ -185,8 +187,8 @@ public class AiPlayer : NetworkBehaviour
                     else
                     {
                         //If an enemy is within seeable players, prioritize them
-                        bool currentlyOnlyFriendlies = currentFind.GetTeam() == player.GetTeam();
-                        bool isEnemy = collidePlayer.GetTeam() != player.GetTeam();
+                        bool currentlyOnlyFriendlies = gm.FindPlayerTeam(currentFind.GetPlayerID()) == gm.FindPlayerTeam(player.GetPlayerID());
+                        bool isEnemy = gm.FindPlayerTeam(collidePlayer.GetPlayerID()) != gm.FindPlayerTeam(player.GetPlayerID());
                         if ((currentlyOnlyFriendlies && !isEnemy) || (!currentlyOnlyFriendlies && isEnemy))
                         {
                             //Prioritize closest player
@@ -209,7 +211,7 @@ public class AiPlayer : NetworkBehaviour
             {
                 target = currentFind;
                 targetHeadset = target.GetTracker().GetCamera();
-                isTargetEnemy = currentFind.GetTeam() != player.GetTeam();
+                isTargetEnemy = gm.FindPlayerTeam(currentFind.GetPlayerID()) != gm.FindPlayerTeam(player.GetPlayerID());
                 timeToSwap = Random.Range(0.3f, 2f);
                 timeToChangePos = 0;
             }

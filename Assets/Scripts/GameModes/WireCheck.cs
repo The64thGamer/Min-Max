@@ -26,7 +26,7 @@ public class WireCheck : MonoBehaviour
             Wire.WirePoint wire = player.GetWirePoint();
             if(wire != null)
             {
-                if (player.GetTeam() != gm.GetTeams()[defenderTeam].teamColor)
+                if (gm.FindPlayerTeam(player.GetPlayerID()) != gm.GetTeams()[defenderTeam].teamColor)
                 {
                     wireFound.Invoke();
                 }

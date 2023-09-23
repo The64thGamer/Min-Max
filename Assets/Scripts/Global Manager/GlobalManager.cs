@@ -333,7 +333,7 @@ public class GlobalManager : NetworkBehaviour
                 return i;
             }
         }
-        Debug.LogError("Could Not Find Client");
+        Debug.LogError("Could Not Find Client: " + id);
         return -1;
     }
     int SearchGuns(int clientIndex, string gunNameKey)
@@ -1088,6 +1088,32 @@ public class GlobalManager : NetworkBehaviour
         }
     }
 
+    public void SendBotInputData(PlayerInputData inputData, ulong id)
+    {
+        CheckHostValidity();
+        for (int i = 0; i < clientData.Count; i++)
+        {
+            int index = SearchClients(id);
+            bool goodToGo = false;
+            if (clientData[index].playerInputs.Count == 0)
+            {
+                goodToGo = true;
+            }
+            else
+            {
+                if (inputData.lastTimeSynced > clientData[index].playerInputs[clientData[index].playerInputs.Count - 1].lastTimeSynced)
+                {
+                    goodToGo = true;
+                }
+            }
+            if (goodToGo)
+            {
+                clientData[index].playerInputs.Add(inputData);
+                GetClient(id).GetController().RecalculateServerPosition();
+            }
+        }
+    }
+
     [ClientRpc]
     public void SetPlayerPositionDataClientRpc(bool sendToOneUser, ulong oneUserId, ulong id, PlayerPositionData data)
     {
@@ -1109,7 +1135,7 @@ public class GlobalManager : NetworkBehaviour
         int index = SearchClients(id);
         if (clientData[index].playerPositionData.Count == 0)
         {
-            Debug.LogError("No Player Position Data Found");
+            //Debug.LogError("No Player Position Data Found");
             return new PlayerPositionData();
         }
         return clientData[index].playerPositionData[clientData[index].playerPositionData.Count - 1];
@@ -1120,7 +1146,7 @@ public class GlobalManager : NetworkBehaviour
         int index = SearchClients(id);
         if (clientData[index].playerPositionData.Count == 0)
         {
-            Debug.LogError("No Player Position Data Found");
+            //Debug.LogError("No Player Position Data Found");
             return new PlayerInputData();
         }
         return clientData[index].playerInputs[clientData[index].playerInputs.Count - 1];
@@ -1233,6 +1259,11 @@ public class GlobalManager : NetworkBehaviour
         clients.Add(player);
         PlayerData data = new PlayerData();
         data.playerId.value = player.GetPlayerID();
+        data.playerCosmetics.value = new int[0];
+        data.playerStats = new List<PlayerStats>();
+        data.playerGuns = new List<PlayerGunData>();
+        data.playerInputs = new List<PlayerInputData>();
+        data.playerPositionData = new List<PlayerPositionData>();
         clientData.Add(data);
     }
 
@@ -1288,13 +1319,60 @@ public class GlobalManager : NetworkBehaviour
         }
 
         int index = SearchClients(id);
-        clientData[index].playerCosmetics.value = value;
+
+        List<Cosmetic> stockCosmetics = GetCosmetics().GetClassCosmetics(FindPlayerClass(id));
+        List<int> cosmeticIntList = new List<int>();
+        for (int i = 0; i < value.Length; i++)
+        {
+            //This check is here to make sure you don't use unused cosmetic IDs
+            if (value[i] < stockCosmetics.Count)
+            {
+                bool isDupeEquipRegion = false;
+                for (int e = 0; e < cosmeticIntList.Count; e++)
+                {
+                    if (stockCosmetics[cosmeticIntList[e]].region == stockCosmetics[value[i]].region)
+                    {
+                        isDupeEquipRegion = true;
+                    }
+                }
+                if (!isDupeEquipRegion)
+                {
+                    cosmeticIntList.Add(value[i]);
+                }
+            }
+        }
+        //Stock
+        for (int i = 0; i < stockCosmetics.Count; i++)
+        {
+            if (stockCosmetics[i].stock == StockCosmetic.stock)
+            {
+                bool isStockDupeEquipRegion = false;
+                for (int e = 0; e < cosmeticIntList.Count; e++)
+                {
+                    if (stockCosmetics[cosmeticIntList[e]].region == stockCosmetics[i].region)
+                    {
+                        isStockDupeEquipRegion = true;
+                    }
+                }
+                if (!isStockDupeEquipRegion)
+                {
+                    cosmeticIntList.Add(i);
+                }
+            }
+        }
+        clientData[index].playerCosmetics.value = cosmeticIntList.ToArray();
+
         clients[index].UpdateClass();
     }
 
     public int[] FindPlayerCosmetics(ulong id)
     {
-        return clientData[SearchClients(id)].playerCosmetics.value;
+        int[] data = clientData[SearchClients(id)].playerCosmetics.value;
+        if(data == null)
+        {
+            return new int[0];
+        }
+        return data;
     }
 
     [ClientRpc]
@@ -1390,7 +1468,7 @@ public class PlayerData
 }
 
 [System.Serializable]
-public struct SyncString
+public struct SyncString : INetworkSerializable
 {
     public string value;
     public float lastTimeSynced;
@@ -1402,7 +1480,7 @@ public struct SyncString
 }
 
 [System.Serializable]
-public struct SyncCosmetics
+public struct SyncCosmetics : INetworkSerializable
 {
     public int[] value;
     public float lastTimeSynced;
@@ -1416,7 +1494,7 @@ public struct SyncCosmetics
 
 
 [System.Serializable]
-public struct SyncUlong
+public struct SyncUlong : INetworkSerializable
 {
     public ulong value;
     public float lastTimeSynced;
@@ -1429,7 +1507,7 @@ public struct SyncUlong
 }
 
 [System.Serializable]
-public struct SyncClass
+public struct SyncClass : INetworkSerializable
 {
     public ClassList value;
     public float lastTimeSynced;
@@ -1441,7 +1519,7 @@ public struct SyncClass
 }
 
 [System.Serializable]
-public struct SyncTeam
+public struct SyncTeam : INetworkSerializable
 {
     public TeamList value;
     public float lastTimeSynced;
@@ -1455,7 +1533,7 @@ public struct SyncTeam
 
 
 [System.Serializable]
-public class PlayerInputData
+public class PlayerInputData : INetworkSerializable
 {
     public Vector3 headsetPos;
     public Quaternion headsetRot;
@@ -1498,7 +1576,7 @@ public class PlayerGunData
 }
 
 [System.Serializable]
-public class WeaponStats
+public class WeaponStats : INetworkSerializable
 {
     public ChangableWeaponStats statName;
     public float stat;
@@ -1513,7 +1591,7 @@ public class WeaponStats
 }
 
 [System.Serializable]
-public class PlayerStats
+public class PlayerStats : INetworkSerializable
 {
     public ChangablePlayerStats statName;
     public float stat;
@@ -1528,7 +1606,7 @@ public class PlayerStats
 }
 
 [System.Serializable]
-public class PlayerPositionData
+public class PlayerPositionData : INetworkSerializable
 {
     //Position
     public Vector3 position;
@@ -1569,6 +1647,7 @@ public class PlayerPositionData
         serializer.SerializeValue(ref hasBeenCrouched);
         serializer.SerializeValue(ref mainCamforward);
         serializer.SerializeValue(ref mainCamRight);
+        serializer.SerializeValue(ref lastTimeSynced);
     }
 }
 

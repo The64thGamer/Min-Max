@@ -39,26 +39,20 @@ public abstract class GenericGamemode : NetworkBehaviour
             for (int i = 0; i < clients.Count; i++)
             {
                 TeamList team = TeamList.gray;
-                if (clients[i].GetTeam() == team1)
+                if (gm.FindPlayerTeam(clients[i].GetPlayerID()) == team1)
                 {
                     team = team2;
                 }
-                else if (clients[i].GetTeam() == team2)
+                else if (gm.FindPlayerTeam(clients[i].GetPlayerID()) == team2)
                 {
                     team = team1;
                 }
 
-                PlayerInfoSentToClient pdstc = new PlayerInfoSentToClient
+                if (IsHost)
                 {
-                    id = clients[i].GetPlayerID(),
-                    currentClass = clients[i].GetCurrentClass(),
-                    currentTeam = team,
-                    cosmetics = clients[i].GetCosmeticInts(),
-                    gunName = clients[i].GetCurrentGun().name,
-                    playerName = clients[i].GetPlayerName(),
-                };
-                gm.AssignPlayerClassAndTeamClientRpc(pdstc);
-                gm.RespawnPlayer(clients[i].GetPlayerID(), clients[i].GetTeam(),true);
+                    gm.SetPlayerTeamClientRpc(false, 0, clients[i].GetPlayerID(), team);
+                }
+                gm.RespawnPlayer(clients[i].GetPlayerID(), gm.FindPlayerTeam(clients[i].GetPlayerID()), true);
 
                 matchTime = startingRoundTime;
             }

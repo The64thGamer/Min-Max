@@ -38,6 +38,7 @@ public class PlayerTracker : NetworkBehaviour
     [SerializeField] InputActionProperty menuAction;
     [SerializeField] Player player;
     [SerializeField] CharacterController charController;
+    GlobalManager gm;
 
     //other
     bool isInFirstPerson;
@@ -73,6 +74,7 @@ public class PlayerTracker : NetworkBehaviour
 
     private void Start()
     {
+        gm = GameObject.Find("Global Manager").GetComponent<GlobalManager>();
         height = PlayerPrefs.GetFloat("Settings: PlayerHeight") - 0.127f;
         UpdateFOV();
     }
@@ -115,8 +117,8 @@ public class PlayerTracker : NetworkBehaviour
         //Animations
         if (animController != null)
         {
-            animController.SetFloat("VelX", Vector3.Dot(GetVelocity(), Vector3.ProjectOnPlane(headset.transform.right, Vector3.up).normalized) / (player.GetClassStats().baseSpeed / 25.0f));
-            animController.SetFloat("VelZ", Vector3.Dot(GetVelocity(), Vector3.ProjectOnPlane(headset.transform.forward, Vector3.up).normalized) / (player.GetClassStats().baseSpeed / 25.0f));
+            animController.SetFloat("VelX", Vector3.Dot(GetVelocity(), Vector3.ProjectOnPlane(headset.transform.right, Vector3.up).normalized) / (gm.FindPlayerStat(player.GetPlayerID(), ChangablePlayerStats.groundSpeed) / 25.0f));
+            animController.SetFloat("VelZ", Vector3.Dot(GetVelocity(), Vector3.ProjectOnPlane(headset.transform.forward, Vector3.up).normalized) / (gm.FindPlayerStat(player.GetPlayerID(), ChangablePlayerStats.groundSpeed) / 25.0f));
 
             animController.SetFloat("HandX", CalcLerpVector3(centerPos.position, rightPos.position, rightController.position, false) - CalcLerpVector3(centerPos.position, leftPos.position, rightController.position, false));
             animController.SetFloat("HandY", CalcLerpVector3(centerPos.position, upPos.position, rightController.position, true) - CalcLerpVector3(centerPos.position, downPos.position, rightController.position, true));

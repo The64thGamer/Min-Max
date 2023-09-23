@@ -1134,7 +1134,7 @@ public class Menu : MonoBehaviour
             });
         }
 
-        currentCustTeam = (int)optionalPlayer.GetTeam();
+        currentCustTeam = (int)GameObject.Find("Global Manager").GetComponent<GlobalManager>().FindPlayerTeam(optionalPlayer.GetPlayerID());
         SetCharacterVisibility();
         UpdateTeamColor();
         customizeMenuCamera.SetActive(true);
@@ -1149,7 +1149,7 @@ public class Menu : MonoBehaviour
         }
         else
         {
-            currentCustTeam = (int)optionalPlayer.GetTeam();
+            currentCustTeam = (int)GameObject.Find("Global Manager").GetComponent<GlobalManager>().FindPlayerTeam(optionalPlayer.GetPlayerID());
         }
         currentCustPage = 0;
         currentCustLoadout = Mathf.Clamp(PlayerPrefs.GetInt("Selected Loadout"), 0, 25); //Only variants A-Z

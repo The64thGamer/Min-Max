@@ -32,6 +32,11 @@ public class HealthChanger : NetworkBehaviour
     List<Player> currentPlayer = new List<Player>();
     bool alreadyDespawn;
     NetworkVariable<bool> currentState = new NetworkVariable<bool>(true, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
+    GlobalManager gm;
+    private void Start()
+    {
+        gm = GameObject.Find("Global Manager").GetComponent<GlobalManager>();
+    }
 
 
     public override void OnNetworkSpawn()
@@ -169,11 +174,11 @@ public class HealthChanger : NetworkBehaviour
         switch (dispenseType)
         {
             case HealthChangerVariant.health:
-                int oldHealth = currentPlayer[i].GetHealth();
+                int oldHealth = (int)gm.FindPlayerStat(currentPlayer[i].GetPlayerID(),ChangablePlayerStats.currentHealth);
                 int healthFinal = health;
                 if (healthIsPercent)
                 {
-                    healthFinal = Mathf.CeilToInt((currentPlayer[i].GetClassStats().baseHealth / 100.0f) * health);
+                    healthFinal = Mathf.CeilToInt((gm.FindPlayerStat(currentPlayer[i].GetPlayerID(), ChangablePlayerStats.maxHealth) / 100.0f) * health);
                 }
                 if (dontKill && oldHealth + healthFinal <= 0)
                 {
@@ -186,7 +191,7 @@ public class HealthChanger : NetworkBehaviour
                 }
                 else
                 {
-                    if (currentPlayer[i].GetHealth() + healthFinal <= 0)
+                    if (gm.FindPlayerStat(currentPlayer[i].GetPlayerID(), ChangablePlayerStats.currentHealth) + healthFinal <= 0)
                     {
                         currentPlayer[i] = null;
                     }

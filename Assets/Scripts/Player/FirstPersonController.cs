@@ -108,7 +108,7 @@ namespace StarterAssets
             currentPositionData.velocity = _controller.velocity;
             currentPositionData.mainCamforward = _mainCamera.transform.forward;
             currentPositionData.mainCamRight = _mainCamera.transform.right;
-            currentPositionData.baseSpeed = player.GetClassStats().baseSpeed;
+            currentPositionData.baseSpeed = gm.FindPlayerStat(player.GetPlayerID(), ChangablePlayerStats.groundSpeed);
 
             //Remove inputs in situations
             if (menu.GetOpenState() || gm.FindPlayerStat(player.GetPlayerID(),ChangablePlayerStats.currentHealth) <= 0)
@@ -137,12 +137,12 @@ namespace StarterAssets
             {
                 if (IsOwner)
                 {
-                    gm.SetPlayerPositionDataClientRpc(player.GetPlayerID(), currentPositionData);
+                    gm.SetPlayerPositionDataClientRpc(false, 0, player.GetPlayerID(), currentPositionData);
                 }
                 else if (nowSendServerValues || player.GetPlayerID() >= botID)
                 {
                     nowSendServerValues = false;
-                    gm.SetPlayerPositionDataClientRpc(player.GetPlayerID(), currentPositionData);
+                    gm.SetPlayerPositionDataClientRpc(false, 0, player.GetPlayerID(), currentPositionData);
                 }
             }
 
@@ -188,12 +188,12 @@ namespace StarterAssets
                         {
                             directionDecided = false;
 
-                            player.SetWirePoint(gm.GetWire(player.GetTeam()).RequestForWire(transform.position), false);
+                            player.SetWirePoint(gm.GetWire(gm.FindPlayerTeam(player.GetPlayerID())).RequestForWire(transform.position), false);
                             heldWire = player.GetWirePoint();
                             if (heldWire != null)
                             {
-                                gm.UpdateMatchFocalPoint(player.GetTeam());
-                                gm.SegmentClientWireClientRpc(player.GetPlayerID(), heldWire.point, heldWire.wireID, heldWire.parent.wireID, player.GetTeam());
+                                gm.UpdateMatchFocalPoint(gm.FindPlayerTeam(player.GetPlayerID()));
+                                gm.SegmentClientWireClientRpc(player.GetPlayerID(), heldWire.point, heldWire.wireID, heldWire.parent.wireID, gm.FindPlayerTeam(player.GetPlayerID()));
                             }
                         }
                     }
@@ -491,24 +491,24 @@ namespace StarterAssets
             {
                 if (!currentPositionData.hasBeenCrouched && gm.FindPlayerStat(player.GetPlayerID(),ChangablePlayerStats.currentHealth) > 0)
                 {
-                    player.SetWirePoint(gm.GetWire(player.GetTeam()).RequestForWire(transform.position), true);
+                    player.SetWirePoint(gm.GetWire(gm.FindPlayerTeam(player.GetPlayerID())).RequestForWire(transform.position), true);
                     heldWire = player.GetWirePoint();
                     if (heldWire != null)
                     {
-                        gm.UpdateMatchFocalPoint(player.GetTeam());
-                        gm.GiveClientWireClientRpc(player.GetPlayerID(), heldWire.wireID, heldWire.parent.wireID, player.GetTeam());
+                        gm.UpdateMatchFocalPoint(gm.FindPlayerTeam(player.GetPlayerID()));
+                        gm.GiveClientWireClientRpc(player.GetPlayerID(), heldWire.wireID, heldWire.parent.wireID, gm.FindPlayerTeam(player.GetPlayerID()));
                     }
                 }
             }
             else if (currentPositionData.hasBeenCrouched && heldWire != null)
             {
-                gm.UpdateMatchFocalPoint(player.GetTeam());
+                gm.UpdateMatchFocalPoint(gm.FindPlayerTeam(player.GetPlayerID()));
                 gm.RemoveClientWireClientRpc(player.GetPlayerID(), heldWire.point, true);
             }
 
             if (currentInputData.jump && heldWire != null)
             {
-                gm.UpdateMatchFocalPoint(player.GetTeam());
+                gm.UpdateMatchFocalPoint(gm.FindPlayerTeam(player.GetPlayerID()));
                 gm.RemoveClientWireClientRpc(player.GetPlayerID(), heldWire.point, true);
             }
         }

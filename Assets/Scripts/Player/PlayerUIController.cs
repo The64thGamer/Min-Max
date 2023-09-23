@@ -69,12 +69,11 @@ public class PlayerUIController : MonoBehaviour
     public void UpdateGunUI()
     {
         Gun currentGun = player.GetCurrentGun();
-        clipText.text = currentGun.FindStat(ChangableWeaponStats.currentClip).ToString();
-        float ammo = currentGun.FindStat(ChangableWeaponStats.currentAmmo);
-        if(ammo > 0)
+        clipText.text = gm.FindPlayerGunValue(player.GetPlayerID(),currentGun.GetNameKey(), ChangableWeaponStats.currentClip).ToString();
+        float ammo = gm.FindPlayerGunValue(player.GetPlayerID(), currentGun.GetNameKey(), ChangableWeaponStats.currentAmmo);
+        if (ammo > 0)
         {
             ammoText.text = "/ " + ammo.ToString();
-
         }
         else
         {

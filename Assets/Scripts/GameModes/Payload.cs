@@ -117,7 +117,7 @@ public class Payload : GenericGamemode
         int[] clientTeams = new int[clients.Count];
         for (int i = 0; i < clients.Count; i++)
         {
-            TeamList color = clients[i].GetTeam();
+            TeamList color = gm.FindPlayerTeam(clients[i].GetPlayerID());
             for (int e = 0; e < teamColors.Count; e++)
             {
                 if (color == teamColors[e])
@@ -149,12 +149,14 @@ public class Payload : GenericGamemode
             gm.AddNewTeam(nextTeam);
         }
 
-        //Re-apply Player Teams
-        for (int i = 0; i < clients.Count; i++)
+        if (IsHost)
         {
-            gm.SetPlayerTeamClientRpc(clients[i].GetPlayerID(), gm.GetTeams()[clientTeams[i]].teamColor);
+            //Re-apply Player Teams
+            for (int i = 0; i < clients.Count; i++)
+            {
+                gm.SetPlayerTeamClientRpc(false, 0, clients[i].GetPlayerID(), gm.GetTeams()[clientTeams[i]].teamColor);
+            }
         }
-
         gm.ModifyTeamsAcrossServer();
     }
 
@@ -166,7 +168,7 @@ public class Payload : GenericGamemode
         int[] teamCounts = new int[teams.Count];
         for (int i = 0; i < clients.Count; i++)
         {
-            TeamList t = clients[i].GetTeam();
+            TeamList t = gm.FindPlayerTeam(clients[i].GetPlayerID());
             for (int e = 0; e < teams.Count; e++)
             {
                 if (teams[e] == t)
@@ -190,7 +192,7 @@ public class Payload : GenericGamemode
     public override float RequestPlayerRespawnTimer(int index)
     {
         List<TeamInfo> tempTeams = gm.GetTeams();
-        TeamList playerTeam = gm.GetClients()[index].GetTeam();
+        TeamList playerTeam = gm.FindPlayerTeam(gm.GetClients()[index].GetPlayerID());
         for (int i = 1; i < tempTeams.Count; i++)
         {
             if (tempTeams[i].teamColor == playerTeam)
