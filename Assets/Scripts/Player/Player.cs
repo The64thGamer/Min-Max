@@ -2,6 +2,7 @@ using StarterAssets;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.ConstrainedExecution;
 using Unity.Netcode;
 using Unity.XR.CoreUtils;
 using UnityEngine;
@@ -132,7 +133,7 @@ public class Player : NetworkBehaviour
         Debug.Log("Player " + GetPlayerID() + " respawned in " + gm.FindPlayerTeam(GetPlayerID()) + " spawn room");
         if(IsHost)
         {
-            gm.ResetClassStatsClientRpc(GetPlayerID(), al.GetClassStats(gm.FindPlayerClass(GetPlayerID())));
+            gm.ResetClassStats(false,0,GetPlayerID(), al.GetClassStats(gm.FindPlayerClass(GetPlayerID())));
         }
         GetTracker().ForceNewPosition(spawnPos);
         SetLayer(GetTeamLayer());
@@ -198,12 +199,13 @@ public class Player : NetworkBehaviour
         this.gameObject.layer = layer;
     }
 
-    public void UpdateGun(GunProjectiles gun)
+    public void UpdateGuns()
     {
         if (currentGun != null)
         {
             Destroy(currentGun.gameObject);
         }
+        GunProjectiles gun = al.SearchGuns(gm.FindPlayerGun(GetPlayerID(), (int)gm.FindPlayerStat(GetPlayerID(), ChangablePlayerStats.currentlyHeldWeapon)));
         GameObject gunObject = GameObject.Instantiate(gun.gunPrefab, Vector3.zero, Quaternion.identity, this.transform);
         gunObject.name = gun.gunName;
         currentGun = gunObject.GetComponent<Gun>();
@@ -322,6 +324,11 @@ public class Player : NetworkBehaviour
     public int[] GetCosmeticInts()
     {
         return cosmeticInts;
+    }
+
+    public Gun GetCurrentGun()
+    {
+        return currentGun;
     }
 
     public int GetTeamLayer()

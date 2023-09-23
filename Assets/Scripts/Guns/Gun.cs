@@ -106,7 +106,7 @@ public abstract class Gun : MonoBehaviour
                 {
                     HitScanHostDamageCalculation(currentPlayer);
                     gm.SpawnProjectileClientRpc(currentPlayer.GetPlayerID());
-                    gm.SetPlayerGunValueClientRpc(currentPlayer.GetPlayerID(), gunNameKey, ChangableWeaponStats.currentClip, ammo - 1);
+                    gm.SetPlayerGunValueClientRpc(false, 0, currentPlayer.GetPlayerID(), gunNameKey, ChangableWeaponStats.currentClip, ammo - 1);
                 }
                 gunState = GunState.firing;
                 animator.SetBool("Fire", true);
@@ -148,8 +148,8 @@ public abstract class Gun : MonoBehaviour
                 float bulletsNeeded = Mathf.Min(gm.FindPlayerGunValue(currentPlayer.GetPlayerID(), gunNameKey, ChangableWeaponStats.maxClip) - clip,ammo);
                 if (gm.IsHost)
                 {
-                    gm.SetPlayerGunValueClientRpc(currentPlayer.GetPlayerID(), gunNameKey, ChangableWeaponStats.currentClip, clip + bulletsNeeded);
-                    gm.SetPlayerGunValueClientRpc(currentPlayer.GetPlayerID(), gunNameKey, ChangableWeaponStats.currentAmmo, ammo - bulletsNeeded);
+                    gm.SetPlayerGunValueClientRpc(false, 0, currentPlayer.GetPlayerID(), gunNameKey, ChangableWeaponStats.currentClip, clip + bulletsNeeded);
+                    gm.SetPlayerGunValueClientRpc(false, 0, currentPlayer.GetPlayerID(), gunNameKey, ChangableWeaponStats.currentAmmo, ammo - bulletsNeeded);
                 }
                 if (currentPlayer.IsOwner && currentPlayer.GetPlayerID() < botID)
                 {
@@ -348,6 +348,11 @@ public abstract class Gun : MonoBehaviour
     public string GetNameKey()
     {
         return gunNameKey;
+    }
+
+    public WeaponStats[] GetWeaponStats()
+    {
+        return changableStats.ToArray();
     }
 }
 

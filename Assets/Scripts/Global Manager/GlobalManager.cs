@@ -673,31 +673,16 @@ public class GlobalManager : NetworkBehaviour
             cosmetics = cos.ToArray();
         }
 
-        SetPlayerCosmeticsClientRpc(id, cosmetics);
-        SetPlayerClassClientRpc(id, (ClassList)initialClass);
-        SetPlayerTeamClientRpc(id, decidedTeam);
-        SetPlayerNameClientRpc(id,playerName);
-
-        //Do This
-        gunName = autoGun,
-
-        AssignPlayerClassAndTeamClientRpc(pdstc);
+        //New Player
+        SetPlayerCosmeticsClientRpc(false, 0, id, cosmetics);
+        SetPlayerClassClientRpc(false, 0, id, (ClassList)initialClass);
+        SetPlayerTeamClientRpc(false, 0, id, decidedTeam);
+        SetPlayerNameClientRpc(false, 0, id, playerName);
+        SetPlayerGunsClientRpc(false, 0, id, autoGun, al.SearchGuns(autoGun).gunPrefab.GetComponent<Gun>().GetWeaponStats(), "", new WeaponStats[0], "", new WeaponStats[0]);
         RespawnPlayer(id, decidedTeam, true);
 
-        PlayerInfoSentToClient[] data = new PlayerInfoSentToClient[clients.Count];
-        for (int i = 0; i < clients.Count; i++)
-        {
-            data[i] = new PlayerInfoSentToClient
-            {
-                id = clients[i].GetPlayerID(),
-                currentTeam = clients[i].GetTeam(),
-                currentClass = clients[i].GetCurrentClass(),
-                cosmetics = clients[i].GetCosmeticInts(),
-                gunName = clients[i].GetCurrentGun().name,
-                playerName = clients[i].GetPlayerName(),
-            };
-        }
-        SendAllPlayerDataToNewPlayerClientRpc(data, id);
+        //Send Other Player Data to New Connection
+        SendClientOtherPlayerData(id);
 
         List<Wire.WirePointData> wireData = new List<Wire.WirePointData>();
         for (int i = 0; i < teamWires.Count; i++)
@@ -734,16 +719,11 @@ public class GlobalManager : NetworkBehaviour
                 {
                     if (clients[i].SendPlayerSwitchClassStatus())
                     {
-                        PlayerInfoSentToClient pdstc = new PlayerInfoSentToClient
-                        {
-                            id = serverRpcParams.Receive.SenderClientId,
-                            currentClass = (ClassList)initialClass,
-                            currentTeam = clients[i].GetTeam(),
-                            cosmetics = cosmetics,
-                            gunName = AutoGun((ClassList)initialClass),
-                            playerName = clients[i].GetPlayerName(),
-                        };
-                        AssignPlayerClassAndTeamClientRpc(pdstc);
+                        initialClass = Mathf.Clamp(initialClass, 0, 9);
+                        string autoGun = AutoGun((ClassList)initialClass);
+                        SetPlayerClassClientRpc(false, 0, serverRpcParams.Receive.SenderClientId, (ClassList)initialClass);
+                        SetPlayerCosmeticsClientRpc(false, 0, serverRpcParams.Receive.SenderClientId, cosmetics);
+                        SetPlayerGunsClientRpc(false, 0, serverRpcParams.Receive.SenderClientId, autoGun, al.SearchGuns(autoGun).gunPrefab.GetComponent<Gun>().GetWeaponStats(), "", new WeaponStats[0], "", new WeaponStats[0]);
                     }
                 }
                 return;
@@ -938,10 +918,7 @@ public class GlobalManager : NetworkBehaviour
         {
             if (clients[i].GetPlayerID() == id)
             {
-                if (clients[i].GetCurrentGun() != null)
-                {
-                    clients[i].GetCurrentGun().SpawnProjectile(clients[i]);
-                }
+                clients[i].GetCurrentGun().SpawnProjectile(clients[i]);
             }
         }
     }
@@ -1016,7 +993,7 @@ public class GlobalManager : NetworkBehaviour
             if (currentHealth <= 0)
             {
                 achievments.AddToValue("Achievement: Total Kills", 1);
-                switch (clients[foundClient].GetCurrentClass())
+                switch (FindPlayerClass(clients[foundClient].GetPlayerID()))
                 {
                     case ClassList.labourer:
                         achievments.AddToValue("Achievement: Total Laborers Killed", 1);
@@ -1079,7 +1056,10 @@ public class GlobalManager : NetworkBehaviour
                 au.PlayOneShot((AudioClip)Resources.Load("Sounds/Damage/hitsound", typeof(AudioClip)));
             }
         }
-        SetPlayerValue(id, ChangablePlayerStats.currentHealth, currentHealth);
+        if (IsHost)
+        {
+            SetPlayerValueClientRpc(false, 0, id, ChangablePlayerStats.currentHealth, currentHealth);
+        }
     }
 
     [ServerRpc(RequireOwnership = false)]
@@ -1109,8 +1089,13 @@ public class GlobalManager : NetworkBehaviour
     }
 
     [ClientRpc]
-    public void SetPlayerPositionDataClientRpc(ulong id, PlayerPositionData data)
+    public void SetPlayerPositionDataClientRpc(bool sendToOneUser, ulong oneUserId, ulong id, PlayerPositionData data)
     {
+        if (sendToOneUser && !CheckIfIDIsOwner(oneUserId))
+        {
+            return;
+        }
+
         int index = SearchClients(id);
         clientData[index].playerPositionData.Add(data);
         if (!IsHost)
@@ -1142,13 +1127,13 @@ public class GlobalManager : NetworkBehaviour
     }
 
     [ClientRpc]
-    public void SetPlayerValueClientRpc(ulong id, ChangablePlayerStats statName, float value)
+    public void SetPlayerValueClientRpc(bool sendToOneUser, ulong oneUserId, ulong id, ChangablePlayerStats statName, float value)
     {
-        SetPlayerValue(id, statName, value);
-    }
+        if (sendToOneUser && !CheckIfIDIsOwner(oneUserId))
+        {
+            return;
+        }
 
-    void SetPlayerValue(ulong id, ChangablePlayerStats statName, float value)
-    {
         int index = SearchClients(id);
 
         for (int i = 0; i < clientData[index].playerStats.Count; i++)
@@ -1178,13 +1163,13 @@ public class GlobalManager : NetworkBehaviour
     }
 
     [ClientRpc]
-    public void SetPlayerGunValueClientRpc(ulong id, string gunNameKey, ChangableWeaponStats statName, float value)
+    public void SetPlayerGunValueClientRpc(bool sendToOneUser, ulong oneUserId, ulong id, string gunNameKey, ChangableWeaponStats statName, float value)
     {
-        SetPlayerGunValue(id, gunNameKey, statName, value);
-    }
+        if (sendToOneUser && !CheckIfIDIsOwner(oneUserId))
+        {
+            return;
+        }
 
-    void SetPlayerGunValue(ulong id, string gunNameKey, ChangableWeaponStats statName, float value)
-    {
         int index = SearchClients(id);
         int gunIndex = SearchGuns(index, gunNameKey);
         for (int i = 0; i < clientData[index].playerGuns[gunIndex].weaponStats.Count; i++)
@@ -1213,13 +1198,13 @@ public class GlobalManager : NetworkBehaviour
     }
 
     [ClientRpc]
-    public void SetPlayerNameClientRpc(ulong id, string value)
+    public void SetPlayerNameClientRpc(bool sendToOneUser, ulong oneUserId, ulong id, string value)
     {
-        SetPlayerName(id, value);
-    }
+        if (sendToOneUser && !CheckIfIDIsOwner(oneUserId))
+        {
+            return;
+        }
 
-    void SetPlayerName(ulong id, string value)
-    {
         int index = SearchClients(id);
         clientData[index].playerName.value = value;
         clients[index].UpdateName();
@@ -1231,13 +1216,13 @@ public class GlobalManager : NetworkBehaviour
     }
 
     [ClientRpc]
-    public void SetPlayerTeamClientRpc(ulong id, TeamList value)
+    public void SetPlayerTeamClientRpc(bool sendToOneUser, ulong oneUserId, ulong id, TeamList value)
     {
-        SetPlayerTeam(id, value);
-    }
+        if (sendToOneUser && !CheckIfIDIsOwner(oneUserId))
+        {
+            return;
+        }
 
-    void SetPlayerTeam(ulong id, TeamList value)
-    {
         int index = SearchClients(id);
         clientData[index].playerTeam.value = value;
         clients[index].UpdateTeamColor();
@@ -1257,45 +1242,51 @@ public class GlobalManager : NetworkBehaviour
     }
 
     [ClientRpc]
-    public void SetPlayerClassClientRpc(ulong id, ClassList value)
+    public void SetPlayerClassClientRpc(bool sendToOneUser, ulong oneUserId, ulong id, ClassList value)
     {
-        SetPlayerClass(id, value);
+        if (sendToOneUser && !CheckIfIDIsOwner(oneUserId))
+        {
+            return;
+        }
+
+        int index = SearchClients(id);
+        clientData[index].playerClass.value = value;
+        SetPlayerValueClientRpc(sendToOneUser, oneUserId, id, ChangablePlayerStats.currentHealth, FindPlayerStat(id, ChangablePlayerStats.maxHealth));
+        clients[index].UpdateClass();
         if (IsHost)
         {
-            ResetClassStatsClientRpc(id, al.GetClassStats(FindPlayerClass(id)));
+            ResetClassStats(sendToOneUser, oneUserId, id, al.GetClassStats(FindPlayerClass(id)));
         }
     }
 
-    void SetPlayerClass(ulong id, ClassList value)
-    {
-        int index = SearchClients(id);
-        clientData[index].playerClass.value = value;
-        SetPlayerValueClientRpc(id, ChangablePlayerStats.currentHealth, FindPlayerStat(id, ChangablePlayerStats.maxHealth));
-        clients[index].UpdateClass();
-    }
 
     public ClassList FindPlayerClass(ulong id)
     {
         return clientData[SearchClients(id)].playerClass.value;
     }
 
-    [ClientRpc]
-    public void ResetClassStatsClientRpc(ulong id, PlayerStats[] data)
+    public void ResetClassStats(bool sendToOneUser, ulong oneUserId, ulong id, PlayerStats[] data)
     {
+        CheckHostValidity();
+        if (sendToOneUser && !CheckIfIDIsOwner(oneUserId))
+        {
+            return;
+        }
+
         for (int i = 0; i < data.Length; i++)
         {
-            SetPlayerValue(id, data[i].statName, data[i].stat);
+            SetPlayerValueClientRpc(false,0,id, data[i].statName, data[i].stat);
         }
     }
 
     [ClientRpc]
-    public void SetPlayerCosmeticsClientRpc(ulong id, int[] value)
+    public void SetPlayerCosmeticsClientRpc(bool sendToOneUser, ulong oneUserId, ulong id, int[] value)
     {
-        SetPlayerCosmetics(id, value);
-    }
+        if (sendToOneUser && !CheckIfIDIsOwner(oneUserId))
+        {
+            return;
+        }
 
-    void SetPlayerCosmetics(ulong id, int[] value)
-    {
         int index = SearchClients(id);
         clientData[index].playerCosmetics.value = value;
         clients[index].UpdateClass();
@@ -1306,6 +1297,60 @@ public class GlobalManager : NetworkBehaviour
         return clientData[SearchClients(id)].playerCosmetics.value;
     }
 
+    [ClientRpc]
+    public void SetPlayerGunsClientRpc(bool sendToOneUser, ulong oneUserId, ulong id, string primaryKey, WeaponStats[] primaryStats, string secondaryKey, WeaponStats[] secondaryStats, string meleeKey, WeaponStats[] meleeStats)
+    {
+        if(sendToOneUser && !CheckIfIDIsOwner(oneUserId))
+        {
+            return;
+        }
+
+        int index = SearchClients(id);
+        clientData[index].playerGuns = new List<PlayerGunData>();
+
+        PlayerGunData primary = new PlayerGunData();
+        primary.gunNameKey = primaryKey;
+        primary.weaponStats = primaryStats.ToList();
+        clientData[index].playerGuns.Add(primary);
+        PlayerGunData secondary = new PlayerGunData();
+        secondary.gunNameKey = secondaryKey;
+        secondary.weaponStats = secondaryStats.ToList();
+        clientData[index].playerGuns.Add(secondary);
+        PlayerGunData melee = new PlayerGunData();
+        melee.gunNameKey = meleeKey;
+        melee.weaponStats = meleeStats.ToList();
+        clientData[index].playerGuns.Add(melee);
+
+        clients[index].UpdateGuns();
+    }
+
+
+    public string FindPlayerGun(ulong id, int slot)
+    {
+        return clientData[SearchClients(id)].playerGuns[slot].gunNameKey;
+    }
+
+    public void SendClientOtherPlayerData(ulong id)
+    {
+        for (int i = 0; i < clientData.Count; i++)
+        {
+            SetPlayerCosmeticsClientRpc(true, id, clients[i].GetPlayerID(), clientData[i].playerCosmetics.value);
+            SetPlayerClassClientRpc(true, id, clients[i].GetPlayerID(), clientData[i].playerClass.value);
+            SetPlayerTeamClientRpc(true, id, clients[i].GetPlayerID(), clientData[i].playerTeam.value);
+            SetPlayerNameClientRpc(true, id, clients[i].GetPlayerID(), clientData[i].playerName.value);
+            SetPlayerGunsClientRpc(true, id, clients[i].GetPlayerID(), clientData[i].playerGuns[0].gunNameKey, clientData[i].playerGuns[0].weaponStats.ToArray(), clientData[i].playerGuns[1].gunNameKey, clientData[i].playerGuns[1].weaponStats.ToArray(), clientData[i].playerGuns[2].gunNameKey, clientData[i].playerGuns[2].weaponStats.ToArray());
+        }
+    }
+
+    bool CheckIfIDIsOwner(ulong id)
+    {
+        int index = SearchClients(id);
+        if (clients[index].IsOwner && clients[index].GetPlayerID() < botID)
+        {
+            return true;
+        }
+        return false;
+    }
 
     private void OnDrawGizmosSelected()
     {
@@ -1448,6 +1493,8 @@ public class PlayerGunData
 {
     public string gunNameKey;
     public List<WeaponStats> weaponStats;
+    public float lastTimeSynced;
+
 }
 
 [System.Serializable]

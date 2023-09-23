@@ -42,7 +42,7 @@ public class Flashpoint : Gun
             if (gm.IsHost)
             {
                 HitScanHostDamageCalculation(null);
-                gm.SetPlayerGunValueClientRpc(currentPlayer.GetPlayerID(), gunNameKey, ChangableWeaponStats.currentClip, ammo - 1);
+                gm.SetPlayerGunValueClientRpc(false,0,currentPlayer.GetPlayerID(), gunNameKey, ChangableWeaponStats.currentClip, ammo - 1);
             }
             gunState = GunState.firing;
             animator.SetBool("Fire", true);
