@@ -103,7 +103,15 @@ namespace StarterAssets
             PlayerPositionData currentPositionData = gm.GetCurrentPlayerPositonData(player.GetPlayerID());
             PlayerInputData currentInputData = gm.GetCurrentPlayerInputData(player.GetPlayerID());
 
-            currentInputData = player.GetTracker().GetPlayerInputData();
+            if(player.GetPlayerID() < botID)
+            {
+                currentInputData = player.GetTracker().GetPlayerInputData();
+
+            }
+            else
+            {
+                currentInputData = gm.GetCurrentPlayerInputData(player.GetPlayerID());
+            }
             currentPositionData.position = transform.position;
             currentPositionData.velocity = _controller.velocity;
             currentPositionData.mainCamforward = _mainCamera.transform.forward;

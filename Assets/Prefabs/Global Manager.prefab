@@ -65,7 +65,7 @@ MonoBehaviour:
     stat: 100
     lastTimeSynced: 0
   - statName: 2
-    stat: 30
+    stat: 1.584
     lastTimeSynced: 0
   woodworker:
   - statName: 0
@@ -81,7 +81,7 @@ MonoBehaviour:
     stat: 100
     lastTimeSynced: 0
   - statName: 2
-    stat: 30
+    stat: 1.584
     lastTimeSynced: 0
   developer:
   - statName: 0
@@ -97,7 +97,7 @@ MonoBehaviour:
     stat: 100
     lastTimeSynced: 0
   - statName: 2
-    stat: 30
+    stat: 1.584
     lastTimeSynced: 0
   programmer:
   - statName: 0
@@ -113,7 +113,7 @@ MonoBehaviour:
     stat: 100
     lastTimeSynced: 0
   - statName: 2
-    stat: 30
+    stat: 1.584
     lastTimeSynced: 0
   computer:
   - statName: 0
@@ -129,7 +129,7 @@ MonoBehaviour:
     stat: 100
     lastTimeSynced: 0
   - statName: 2
-    stat: 30
+    stat: 1.646
     lastTimeSynced: 0
   fabricator:
   - statName: 0
@@ -145,7 +145,7 @@ MonoBehaviour:
     stat: 100
     lastTimeSynced: 0
   - statName: 2
-    stat: 30
+    stat: 1.4116
     lastTimeSynced: 0
   artist:
   - statName: 0
@@ -161,7 +161,7 @@ MonoBehaviour:
     stat: 100
     lastTimeSynced: 0
   - statName: 2
-    stat: 30
+    stat: 1.584
     lastTimeSynced: 0
   castmember:
   - statName: 0
@@ -177,7 +177,7 @@ MonoBehaviour:
     stat: 100
     lastTimeSynced: 0
   - statName: 2
-    stat: 30
+    stat: 1.584
     lastTimeSynced: 0
   craftsman:
   - statName: 0
@@ -193,7 +193,7 @@ MonoBehaviour:
     stat: 100
     lastTimeSynced: 0
   - statName: 2
-    stat: 30
+    stat: 1.584
     lastTimeSynced: 0
   manager:
   - statName: 0
@@ -209,7 +209,7 @@ MonoBehaviour:
     stat: 100
     lastTimeSynced: 0
   - statName: 2
-    stat: 30
+    stat: 1.584
     lastTimeSynced: 0
   mMChips:
   - buffsNerfs:

@@ -198,7 +198,7 @@ public class GlobalManager : NetworkBehaviour
         for (int i = 0; i < clientData.Count; i++)
         {
             //Client Networking
-            if (clientData[i].client.IsOwner)
+            if (clientData[i].client.IsOwner && clientData[i].playerId.value < botID)
             {
                 SendInputDataServerRpc(clientData[i].client.GetTracker().GetPlayerInputData());
             }
@@ -1070,10 +1070,7 @@ public class GlobalManager : NetworkBehaviour
     public void SendBotInputData(PlayerInputData data, ulong id)
     {
         CheckHostValidity();
-
-        int index = SearchClients(id);
-        clientData[index].playerInputIndex = (clientData[index].playerInputIndex + 1) % clientData[index].playerInputs.Length;
-        clientData[index].playerInputs[clientData[index].playerInputIndex] = data;
+        SetPlayerInputDataClientRpc(false, 0, id, data);
     }
 
     [ClientRpc]
@@ -1083,11 +1080,11 @@ public class GlobalManager : NetworkBehaviour
         {
             return;
         }
-        GetClient(id).GetController().RecalculateServerPosition();
-
         int index = SearchClients(id);
         clientData[index].playerInputIndex = (clientData[index].playerInputIndex + 1) % clientData[index].playerInputs.Length;
         clientData[index].playerInputs[clientData[index].playerInputIndex] = data;
+
+        clientData[index].client.GetController().RecalculateServerPosition();
     }
 
     [ClientRpc]
@@ -1139,13 +1136,18 @@ public class GlobalManager : NetworkBehaviour
 
         int index = SearchClients(id);
         float oldHealth = 0;
+        PlayerUIController uiC;
         for (int i = 0; i < clientData[index].playerStats.Count; i++)
         {
             if (clientData[index].playerStats[i].statName == statName)
             {
                 oldHealth = FindPlayerStat(id, ChangablePlayerStats.currentHealth);
                 clientData[index].playerStats[i].stat = value;
-                clientData[index].client.GetUIController().UpdateHealthUI(oldHealth);
+                uiC = clientData[index].client.GetUIController();
+                if(uiC != null)
+                {
+                    uiC.UpdateHealthUI(oldHealth);
+                }
                 return;
             }
         }
@@ -1155,8 +1157,11 @@ public class GlobalManager : NetworkBehaviour
         playerStat.statName = statName;
         playerStat.stat = value;
         clientData[index].playerStats.Add(playerStat);
-        clientData[index].client.GetUIController().UpdateHealthUI(oldHealth);
-
+        uiC = clientData[index].client.GetUIController();
+        if (uiC != null)
+        {
+            uiC.UpdateHealthUI(oldHealth);
+        }
     }
 
     public float FindPlayerStat(ulong id, ChangablePlayerStats statName)
@@ -1188,7 +1193,11 @@ public class GlobalManager : NetworkBehaviour
             if (clientData[index].playerGuns[gunIndex].weaponStats[i].statName == statName)
             {
                 clientData[index].playerGuns[gunIndex].weaponStats[i].stat = value;
-                clientData[index].client.GetUIController().UpdateGunUI();
+                PlayerUIController uiC = clientData[index].client.GetUIController();
+                if (uiC != null)
+                {
+                    uiC.UpdateGunUI();
+                }
                 return;
             }
         }

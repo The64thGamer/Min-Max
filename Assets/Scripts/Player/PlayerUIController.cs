@@ -52,7 +52,7 @@ public class PlayerUIController : MonoBehaviour
         healthDrop = Mathf.Lerp(healthDrop, healthDrop * Mathf.Abs(healthDrop), Time.deltaTime * 10);
         healthText.style.translate = new Translate(0, healthDrop * -40, 0);
         int seconds = gm.GetCurrentRoundTime();
-        if(seconds < 0)
+        if (seconds < 0)
         {
             timerText.text = "∞";
         }
@@ -69,7 +69,7 @@ public class PlayerUIController : MonoBehaviour
     public void UpdateGunUI()
     {
         Gun currentGun = player.GetCurrentGun();
-        clipText.text = gm.FindPlayerGunValue(player.GetPlayerID(),currentGun.GetNameKey(), ChangableWeaponStats.currentClip).ToString();
+        clipText.text = gm.FindPlayerGunValue(player.GetPlayerID(), currentGun.GetNameKey(), ChangableWeaponStats.currentClip).ToString();
         float ammo = gm.FindPlayerGunValue(player.GetPlayerID(), currentGun.GetNameKey(), ChangableWeaponStats.currentAmmo);
         if (ammo > 0)
         {
@@ -93,8 +93,8 @@ public class PlayerUIController : MonoBehaviour
 
         Color[] colors = new Color[] { Color.red, Color.gray, palette.GetPixel((int)gm.FindPlayerTeam(player.GetPlayerID()), 5) };
         float scaledTime = healthLerp * (colors.Length - 1);
-        Color oldColor = colors[(int)scaledTime];
-        Color newColor = colors[Mathf.Min((int)scaledTime + 1,colors.Length-1)];
+        Color oldColor = colors[Mathf.Clamp((int)scaledTime, 0, colors.Length - 1)];
+        Color newColor = colors[Mathf.Clamp((int)scaledTime + 1, 0, colors.Length - 1)];
         float newT = scaledTime - Mathf.Floor(scaledTime);
         Color boxColor = Color.Lerp(oldColor, newColor, newT);
 
@@ -204,7 +204,7 @@ public class PlayerUIController : MonoBehaviour
 
     public void SetVisibility(bool visible)
     {
-        if(visible)
+        if (visible)
         {
             playerUIVTA.rootVisualElement.style.display = DisplayStyle.Flex;
         }
