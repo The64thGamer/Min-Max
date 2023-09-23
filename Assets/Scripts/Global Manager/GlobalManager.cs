@@ -1138,17 +1138,25 @@ public class GlobalManager : NetworkBehaviour
         }
 
         int index = SearchClients(id);
-
+        float oldHealth = 0;
         for (int i = 0; i < clientData[index].playerStats.Count; i++)
         {
             if (clientData[index].playerStats[i].statName == statName)
             {
-                float oldHealth = FindPlayerStat(id, ChangablePlayerStats.currentHealth);
+                oldHealth = FindPlayerStat(id, ChangablePlayerStats.currentHealth);
                 clientData[index].playerStats[i].stat = value;
                 clientData[index].client.GetUIController().UpdateHealthUI(oldHealth);
                 return;
             }
         }
+
+        oldHealth = FindPlayerStat(id, ChangablePlayerStats.currentHealth);
+        PlayerStats playerStat = new PlayerStats();
+        playerStat.statName = statName;
+        playerStat.stat = value;
+        clientData[index].playerStats.Add(playerStat);
+        clientData[index].client.GetUIController().UpdateHealthUI(oldHealth);
+
     }
 
     public float FindPlayerStat(ulong id, ChangablePlayerStats statName)
