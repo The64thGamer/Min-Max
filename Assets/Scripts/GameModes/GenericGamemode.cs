@@ -18,7 +18,7 @@ public abstract class GenericGamemode : NetworkBehaviour
 
     public abstract Vector3 GetCurrentMatchFocalPoint(int team);
 
-    public abstract float RequestPlayerRespawnTimer(int index);
+    public abstract float RequestPlayerRespawnTimer(ulong id);
     public int RequestRoundTime()
     {
         return Mathf.CeilToInt(matchTime);
@@ -30,29 +30,30 @@ public abstract class GenericGamemode : NetworkBehaviour
         {
             GlobalManager gm = GameObject.Find("Global Manager").GetComponent<GlobalManager>();
             gm.RemoveAllWiresClientRpc();
-            List<Player> clients = gm.GetClients();
+            List<PlayerData> clientData = gm.GetClients();
 
             //Assuming only 2 teams, please rewrite later
             TeamList team1 = gm.GetTeams()[1].teamColor;
             TeamList team2 = gm.GetTeams()[2].teamColor;
 
-            for (int i = 0; i < clients.Count; i++)
+            for (int i = 0; i < clientData.Count; i++)
             {
                 TeamList team = TeamList.gray;
-                if (gm.FindPlayerTeam(clients[i].GetPlayerID()) == team1)
+                ulong id = clientData[i].playerId.value;
+                if (gm.FindPlayerTeam(id) == team1)
                 {
                     team = team2;
                 }
-                else if (gm.FindPlayerTeam(clients[i].GetPlayerID()) == team2)
+                else if (gm.FindPlayerTeam(id) == team2)
                 {
                     team = team1;
                 }
 
                 if (IsHost)
                 {
-                    gm.SetPlayerTeamClientRpc(false, 0, clients[i].GetPlayerID(), team);
+                    gm.SetPlayerTeamClientRpc(false, 0, id, team);
                 }
-                gm.RespawnPlayer(clients[i].GetPlayerID(), gm.FindPlayerTeam(clients[i].GetPlayerID()), true);
+                gm.RespawnPlayer(id, gm.FindPlayerTeam(id), true);
 
                 matchTime = startingRoundTime;
             }

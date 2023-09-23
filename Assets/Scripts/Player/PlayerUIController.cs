@@ -190,13 +190,13 @@ public class PlayerUIController : MonoBehaviour
             boxTeam.Remove(children[i]);
         }
 
-        List<Player> players = gm.GetClients();
+        List<PlayerData> players = gm.GetClients();
         for (int i = 0; i < players.Count; i++)
         {
-            if (gm.FindPlayerTeam(players[i].GetPlayerID()) == currentTeam)
+            if (gm.FindPlayerTeam(players[i].playerId.value) == currentTeam)
             {
                 TemplateContainer myUI = teammateVTA.Instantiate();
-                myUI.Q<VisualElement>("Icon").style.backgroundImage = playerIcons[(int)gm.FindPlayerClass(players[i].GetPlayerID())];
+                myUI.Q<VisualElement>("Icon").style.backgroundImage = playerIcons[(int)gm.FindPlayerClass(players[i].playerId.value)];
                 boxTeam.Add(myUI);
             }
         }

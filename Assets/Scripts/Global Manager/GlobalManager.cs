@@ -21,7 +21,6 @@ public class GlobalManager : NetworkBehaviour
     [SerializeField] NetworkVariable<int> ServerTickRate = new NetworkVariable<int>(10);
 
     [Header("Lists")]
-    List<Player> clients = new List<Player>();
     [SerializeField] List<PlayerData> clientData;
     [SerializeField] Cosmetics co;
     [SerializeField] Achievements achievments;
@@ -195,13 +194,13 @@ public class GlobalManager : NetworkBehaviour
 
     private void Update()
     {
-        clients.RemoveAll(item => item == null);
-        for (int i = 0; i < clients.Count; i++)
+        clientData.RemoveAll(item => item == null);
+        for (int i = 0; i < clientData.Count; i++)
         {
             //Client Networking
-            if (clients[i].IsOwner)
+            if (clientData[i].client.IsOwner)
             {
-                SendInputDataServerRpc(clients[i].GetTracker().GetPlayerInputData());
+                SendInputDataServerRpc(clientData[i].client.GetTracker().GetPlayerInputData());
             }
         }
     }
@@ -280,9 +279,9 @@ public class GlobalManager : NetworkBehaviour
                 }
             }
         }
-        for (int i = 0; i < clients.Count; i++)
+        for (int i = 0; i < clientData.Count; i++)
         {
-            clients[i].UpdateTeamColor();
+            clientData[i].client.UpdateTeamColor();
         }
     }
 
@@ -315,20 +314,20 @@ public class GlobalManager : NetworkBehaviour
         return teamSpawns;
     }
 
-    public List<Player> GetClients()
+    public List<PlayerData> GetClients()
     {
-        return clients;
+        return clientData;
     }
 
     public Player GetClient(ulong id)
     {
-        return clients[SearchClients(id)];
+        return clientData[SearchClients(id)].client;
     }
     int SearchClients(ulong id)
     {
-        for (int i = 0; i < clients.Count; i++)
+        for (int i = 0; i < clientData.Count; i++)
         {
-            if (clients[i].GetPlayerID() == id)
+            if (clientData[i].playerId.value == id)
             {
                 return i;
             }
@@ -345,7 +344,7 @@ public class GlobalManager : NetworkBehaviour
                 return i;
             }
         }
-        Debug.LogError("Could Not Find Client");
+        Debug.LogError("Could Not Find Gun: " + gunNameKey);
         return -1;
     }
 
@@ -430,21 +429,21 @@ public class GlobalManager : NetworkBehaviour
         {
             float timer = 10;
 
-            for (int i = 0; i < clients.Count; i++)
+            for (int i = 0; i < clientData.Count; i++)
             {
-                if (clients[i].GetPlayerID() == id)
+                if (clientData[i].playerId.value == id)
                 {
                     if (!instant)
                     {
-                        timer = currentGamemode.RequestPlayerRespawnTimer(i);
+                        timer = currentGamemode.RequestPlayerRespawnTimer(id);
                     }
                     else
                     {
                         timer = 0;
                     }
-                    if (clients[i].GetWirePoint() != null)
+                    if (clientData[i].client.GetWirePoint() != null)
                     {
-                        RemoveClientWireClientRpc(clients[i].GetPlayerID(), clients[i].GetWirePoint().point, false);
+                        RemoveClientWireClientRpc(clientData[i].playerId.value, clientData[i].client.GetWirePoint().point, false);
                     }
                 }
             }
@@ -496,7 +495,7 @@ public class GlobalManager : NetworkBehaviour
             Debug.Log("Player is Pinging Server, Sending Data");
             response.Approved = false;
             response.Reason = "P"
-                + clients.Count + "😂"
+                + clientData.Count + "😂"
                 + PlayerPrefs.GetInt("ServerMaxPlayers") + "😂"
                 + PlayerPrefs.GetString("ServerName") + "😂"
                 + PlayerPrefs.GetInt("ServerMapName") + "😂"
@@ -533,7 +532,7 @@ public class GlobalManager : NetworkBehaviour
                 autoGun = "Flashpoint";
                 break;
             case ClassList.developer:
-                autoGun = "O-S F-O";
+                autoGun = "OS-FO";
                 break;
             case ClassList.programmer:
                 autoGun = "W.I.P.";
@@ -542,7 +541,7 @@ public class GlobalManager : NetworkBehaviour
                 autoGun = "Flashpoint";
                 break;
             case ClassList.fabricator:
-                autoGun = "O-S F-O";
+                autoGun = "OS-FO";
                 break;
             case ClassList.artist:
                 autoGun = "W.I.P.";
@@ -551,7 +550,7 @@ public class GlobalManager : NetworkBehaviour
                 autoGun = "W.I.P.";
                 break;
             case ClassList.craftsman:
-                autoGun = "O-S F-O";
+                autoGun = "OS-FO";
                 break;
             case ClassList.manager:
                 autoGun = "W.I.P.";
@@ -572,23 +571,23 @@ public class GlobalManager : NetworkBehaviour
     {
         CheckHostValidity();
 
-        for (int i = 0; i < clients.Count; i++)
+        for (int i = 0; i < clientData.Count; i++)
         {
-            ulong finalId = clients[i].GetPlayerID();
+            ulong finalId = clientData[i].playerId.value;
             if (finalId == id && finalId < botID)
             {
                 Debug.Log("Player " + id + " attempted to request more than one player object.");
                 return;
             }
         }
-        if (clients.Count >= PlayerPrefs.GetInt("ServerMaxPlayers"))
+        if (clientData.Count >= PlayerPrefs.GetInt("ServerMaxPlayers"))
         {
             bool goodToGo = false;
-            for (int i = 0; i < clients.Count; i++)
+            for (int i = 0; i < clientData.Count; i++)
             {
-                if (clients[i].GetPlayerID() >= botID)
+                if (clientData[i].playerId.value >= botID)
                 {
-                    KickPlayerClientRpc(clients[i].GetPlayerID(), "Bot " + clients[i].GetPlayerID() + " removed from player list to make room for new player)");
+                    KickPlayerClientRpc(clientData[i].playerId.value, "Bot " + clientData[i].playerId.value + " removed from player list to make room for new player)");
                     goodToGo = true;
                     break;
                 }
@@ -698,7 +697,7 @@ public class GlobalManager : NetworkBehaviour
         }
         UpdateClientMapDataClientRpc(teams.ToArray(), wireData.ToArray());
 
-        Debug.Log("New Player Joined (#" + clients.Count + "), Team " + decidedTeam);
+        Debug.Log("New Player Joined (#" + clientData.Count + "), Team " + decidedTeam);
     }
 
 
@@ -706,18 +705,18 @@ public class GlobalManager : NetworkBehaviour
     public void SendPlayerStatusOnSwitchedClassesServerRpc(bool yesChangeClass, int initialClass, int[] cosmetics, ServerRpcParams serverRpcParams = default)
     {
 
-        for (int i = 0; i < clients.Count; i++)
+        for (int i = 0; i < clientData.Count; i++)
         {
-            if (clients[i].GetPlayerID() == serverRpcParams.Receive.SenderClientId)
+            if (clientData[i].playerId.value == serverRpcParams.Receive.SenderClientId)
             {
                 if (!yesChangeClass)
                 {
-                    clients[i].SendPlayerSwitchClassStatusRejection();
+                    clientData[i].client.SendPlayerSwitchClassStatusRejection();
                     return;
                 }
                 else
                 {
-                    if (clients[i].SendPlayerSwitchClassStatus())
+                    if (clientData[i].client.SendPlayerSwitchClassStatus())
                     {
                         initialClass = Mathf.Clamp(initialClass, 0, 9);
                         string autoGun = AutoGun((ClassList)initialClass);
@@ -734,11 +733,11 @@ public class GlobalManager : NetworkBehaviour
     [ClientRpc]
     public void RequestPlayerStatusOnSwitchedClassesClientRpc(ulong id)
     {
-        for (int i = 0; i < clients.Count; i++)
+        for (int i = 0; i < clientData.Count; i++)
         {
-            if (clients[i].GetPlayerID() == id)
+            if (clientData[i].playerId.value == id)
             {
-                if (clients[i].IsOwner && clients[i].GetPlayerID() < botID)
+                if (clientData[i].client.IsOwner && clientData[i].playerId.value < botID)
                 {
                     if (Convert.ToBoolean(PlayerPrefs.GetInt("SendToServerSwitchClass")))
                     {
@@ -770,9 +769,9 @@ public class GlobalManager : NetworkBehaviour
     [ClientRpc]
     public void RemoveAllWiresClientRpc()
     {
-        for (int i = 0; i < clients.Count; i++)
+        for (int i = 0; i < clientData.Count; i++)
         {
-            clients[i].RemoveHeldWire(Vector3.zero, false);
+            clientData[i].client.RemoveHeldWire(Vector3.zero, false);
         }
         for (int i = 0; i < teamWires.Count; i++)
         {
@@ -796,11 +795,11 @@ public class GlobalManager : NetworkBehaviour
                 break;
             }
         }
-        for (int i = 0; i < clients.Count; i++)
+        for (int i = 0; i < clientData.Count; i++)
         {
-            if (clients[i].GetPlayerID() == id)
+            if (clientData[i].playerId.value == id)
             {
-                clients[i].SetWirePoint(neededWire.CreateNewClientWire(wireID, parentID), true);
+                clientData[i].client.SetWirePoint(neededWire.CreateNewClientWire(wireID, parentID), true);
                 return;
             }
         }
@@ -810,11 +809,11 @@ public class GlobalManager : NetworkBehaviour
     public void RemoveClientWireClientRpc(ulong id, Vector3 finalPos, bool playSound)
     {
         Debug.Log("RemoveClientWireClientRpc");
-        for (int i = 0; i < clients.Count; i++)
+        for (int i = 0; i < clientData.Count; i++)
         {
-            if (clients[i].GetPlayerID() == id)
+            if (clientData[i].playerId.value == id)
             {
-                clients[i].RemoveHeldWire(finalPos, playSound);
+                clientData[i].client.RemoveHeldWire(finalPos, playSound);
                 break;
             }
         }
@@ -835,12 +834,12 @@ public class GlobalManager : NetworkBehaviour
                 break;
             }
         }
-        for (int i = 0; i < clients.Count; i++)
+        for (int i = 0; i < clientData.Count; i++)
         {
-            if (clients[i].GetPlayerID() == id)
+            if (clientData[i].playerId.value == id)
             {
-                clients[i].RemoveHeldWire(finalPos, false);
-                clients[i].SetWirePoint(neededWire.CreateNewClientWire(wireID, parentID), false);
+                clientData[i].client.RemoveHeldWire(finalPos, false);
+                clientData[i].client.SetWirePoint(neededWire.CreateNewClientWire(wireID, parentID), false);
                 return;
             }
         }
@@ -852,12 +851,12 @@ public class GlobalManager : NetworkBehaviour
     {
         int i = SearchClients(id);
 
-        if (clients[i].IsOwner && clients[i].GetPlayerID() < botID)
+        if (clientData[i].client.IsOwner && clientData[i].playerId.value < botID)
         {
             achievments.SaveAchievements();
         }
         //Refresh Stats
-        clients[i].RespawnPlayer(spawnPos, respawnTimer);
+        clientData[i].client.RespawnPlayer(spawnPos, respawnTimer);
         UpdateMatchFocalPoint(FindPlayerTeam(id));
         return;
     }
@@ -872,20 +871,20 @@ public class GlobalManager : NetworkBehaviour
         Debug.Log("Disconnect: " + reason);
         int index = SearchClients(id);
 
-        if (clients[index].IsOwner && clients[index].GetPlayerID() < botID)
+        if (clientData[index].client.IsOwner && clientData[index].playerId.value < botID)
         {
             PlayerPrefs.SetString("Disconnect Reason", reason);
         }
 
-        Wire.WirePoint wireHeld = clients[index].GetWirePoint();
+        Wire.WirePoint wireHeld = clientData[index].client.GetWirePoint();
         if (wireHeld != null && IsHost)
         {
             RemoveClientWireClientRpc(id, wireHeld.point, false);
         }
 
-        bool isowner = clients[index].IsOwner;
-        Destroy(clients[index].gameObject);
-        clients.RemoveAt(index);
+        bool isowner = clientData[index].client.IsOwner;
+        Destroy(clientData[index].client.gameObject);
+        clientData.RemoveAt(index);
 
         if (isowner && !IsHost)
         {
@@ -914,11 +913,11 @@ public class GlobalManager : NetworkBehaviour
     [ClientRpc]
     public void SpawnProjectileClientRpc(ulong id)
     {
-        for (int i = 0; i < clients.Count; i++)
+        for (int i = 0; i < clientData.Count; i++)
         {
-            if (clients[i].GetPlayerID() == id)
+            if (clientData[i].playerId.value == id)
             {
-                clients[i].GetCurrentGun().SpawnProjectile(clients[i]);
+                clientData[i].client.GetCurrentGun().SpawnProjectile(clientData[i].client);
             }
         }
     }
@@ -932,20 +931,20 @@ public class GlobalManager : NetworkBehaviour
         bool killerIsCurrentPC = false;
 
         //Search for client first
-        for (int i = 0; i < clients.Count; i++)
+        for (int i = 0; i < clientData.Count; i++)
         {
-            if (clients[i].GetPlayerID() == id)
+            if (clientData[i].playerId.value == id)
             {
                 foundClient = i;
-                if (clients[foundClient].IsOwner && id < botID)
+                if (clientData[foundClient].client.IsOwner && id < botID)
                 {
                     damagedIsCurrentPC = true;
                 }
             }
-            if (clients[i].GetPlayerID() == idOfKiller)
+            if (clientData[i].playerId.value == idOfKiller)
             {
                 foundKiller = i;
-                if (clients[foundKiller].IsOwner && idOfKiller < botID)
+                if (clientData[foundKiller].client.IsOwner && idOfKiller < botID)
                 {
                     killerIsCurrentPC = true;
                 }
@@ -993,7 +992,7 @@ public class GlobalManager : NetworkBehaviour
             if (currentHealth <= 0)
             {
                 achievments.AddToValue("Achievement: Total Kills", 1);
-                switch (FindPlayerClass(clients[foundClient].GetPlayerID()))
+                switch (FindPlayerClass(clientData[foundClient].playerId.value))
                 {
                     case ClassList.labourer:
                         achievments.AddToValue("Achievement: Total Laborers Killed", 1);
@@ -1065,53 +1064,30 @@ public class GlobalManager : NetworkBehaviour
     [ServerRpc(RequireOwnership = false)]
     public void SendInputDataServerRpc(PlayerInputData inputData, ServerRpcParams serverRpcParams = default)
     {
-        for (int i = 0; i < clientData.Count; i++)
-        {
-            int index = SearchClients(serverRpcParams.Receive.SenderClientId);
-            bool goodToGo = false;
-            if (clientData[index].playerInputs.Count == 0)
-            {
-                goodToGo = true;
-            }
-            else
-            {
-                if (inputData.lastTimeSynced > clientData[index].playerInputs[clientData[index].playerInputs.Count - 1].lastTimeSynced)
-                {
-                    goodToGo = true;
-                }
-            }
-            if (goodToGo)
-            {
-                clientData[index].playerInputs.Add(inputData);
-                GetClient(serverRpcParams.Receive.SenderClientId).GetController().RecalculateServerPosition();
-            }
-        }
+        SetPlayerInputDataClientRpc(false, 0, serverRpcParams.Receive.SenderClientId, inputData);
     }
 
-    public void SendBotInputData(PlayerInputData inputData, ulong id)
+    public void SendBotInputData(PlayerInputData data, ulong id)
     {
         CheckHostValidity();
-        for (int i = 0; i < clientData.Count; i++)
+
+        int index = SearchClients(id);
+        clientData[index].playerInputIndex = (clientData[index].playerInputIndex + 1) % clientData[index].playerInputs.Length;
+        clientData[index].playerInputs[clientData[index].playerInputIndex] = data;
+    }
+
+    [ClientRpc]
+    public void SetPlayerInputDataClientRpc(bool sendToOneUser, ulong oneUserId, ulong id, PlayerInputData data)
+    {
+        if (sendToOneUser && !CheckIfIDIsOwner(oneUserId))
         {
-            int index = SearchClients(id);
-            bool goodToGo = false;
-            if (clientData[index].playerInputs.Count == 0)
-            {
-                goodToGo = true;
-            }
-            else
-            {
-                if (inputData.lastTimeSynced > clientData[index].playerInputs[clientData[index].playerInputs.Count - 1].lastTimeSynced)
-                {
-                    goodToGo = true;
-                }
-            }
-            if (goodToGo)
-            {
-                clientData[index].playerInputs.Add(inputData);
-                GetClient(id).GetController().RecalculateServerPosition();
-            }
+            return;
         }
+        GetClient(id).GetController().RecalculateServerPosition();
+
+        int index = SearchClients(id);
+        clientData[index].playerInputIndex = (clientData[index].playerInputIndex + 1) % clientData[index].playerInputs.Length;
+        clientData[index].playerInputs[clientData[index].playerInputIndex] = data;
     }
 
     [ClientRpc]
@@ -1123,33 +1099,34 @@ public class GlobalManager : NetworkBehaviour
         }
 
         int index = SearchClients(id);
-        clientData[index].playerPositionData.Add(data);
+        clientData[index].playerPositionIndex = (clientData[index].playerPositionIndex + 1) % clientData[index].playerPositionData.Length;
+        clientData[index].playerPositionData[clientData[index].playerPositionIndex] = data;
         if (!IsHost)
         {
-            clients[index].GetController().RecalculateClientPosition();
+            clientData[index].client.GetController().RecalculateClientPosition();
         }
     }
 
     public PlayerPositionData GetCurrentPlayerPositonData(ulong id)
     {
         int index = SearchClients(id);
-        if (clientData[index].playerPositionData.Count == 0)
+        if (clientData[index].playerPositionData.Length == 0)
         {
-            //Debug.LogError("No Player Position Data Found");
+            Debug.LogError("No Player Position Data Found");
             return new PlayerPositionData();
         }
-        return clientData[index].playerPositionData[clientData[index].playerPositionData.Count - 1];
+        return clientData[index].playerPositionData[clientData[index].playerPositionIndex];
     }
 
     public PlayerInputData GetCurrentPlayerInputData(ulong id)
     {
         int index = SearchClients(id);
-        if (clientData[index].playerPositionData.Count == 0)
+        if (clientData[index].playerInputs.Length == 0)
         {
-            //Debug.LogError("No Player Position Data Found");
+            Debug.LogError("No Player Position Data Found");
             return new PlayerInputData();
         }
-        return clientData[index].playerInputs[clientData[index].playerInputs.Count - 1];
+        return clientData[index].playerInputs[clientData[index].playerInputIndex];
     }
 
     [ClientRpc]
@@ -1168,7 +1145,7 @@ public class GlobalManager : NetworkBehaviour
             {
                 float oldHealth = FindPlayerStat(id, ChangablePlayerStats.currentHealth);
                 clientData[index].playerStats[i].stat = value;
-                clients[index].GetUIController().UpdateHealthUI(oldHealth);
+                clientData[index].client.GetUIController().UpdateHealthUI(oldHealth);
                 return;
             }
         }
@@ -1203,7 +1180,7 @@ public class GlobalManager : NetworkBehaviour
             if (clientData[index].playerGuns[gunIndex].weaponStats[i].statName == statName)
             {
                 clientData[index].playerGuns[gunIndex].weaponStats[i].stat = value;
-                clients[index].GetUIController().UpdateGunUI();
+                clientData[index].client.GetUIController().UpdateGunUI();
                 return;
             }
         }
@@ -1233,7 +1210,7 @@ public class GlobalManager : NetworkBehaviour
 
         int index = SearchClients(id);
         clientData[index].playerName.value = value;
-        clients[index].UpdateName();
+        clientData[index].client.UpdateName();
     }
 
     public string FindPlayerName(ulong id)
@@ -1251,19 +1228,21 @@ public class GlobalManager : NetworkBehaviour
 
         int index = SearchClients(id);
         clientData[index].playerTeam.value = value;
-        clients[index].UpdateTeamColor();
+        clientData[index].client.UpdateTeamColor();
     }
 
     public void AddPlayerToClientList(Player player)
     {
-        clients.Add(player);
         PlayerData data = new PlayerData();
+        data.client = player;
         data.playerId.value = player.GetPlayerID();
         data.playerCosmetics.value = new int[0];
         data.playerStats = new List<PlayerStats>();
         data.playerGuns = new List<PlayerGunData>();
-        data.playerInputs = new List<PlayerInputData>();
-        data.playerPositionData = new List<PlayerPositionData>();
+        data.playerInputs = new PlayerInputData[32];
+        data.playerPositionData = new PlayerPositionData[32];
+        data.playerPositionIndex = 0;
+        data.playerInputIndex = 0;
         clientData.Add(data);
     }
 
@@ -1283,7 +1262,7 @@ public class GlobalManager : NetworkBehaviour
         int index = SearchClients(id);
         clientData[index].playerClass.value = value;
         SetPlayerValueClientRpc(sendToOneUser, oneUserId, id, ChangablePlayerStats.currentHealth, FindPlayerStat(id, ChangablePlayerStats.maxHealth));
-        clients[index].UpdateClass();
+        clientData[index].client.UpdateClass();
         if (IsHost)
         {
             ResetClassStats(sendToOneUser, oneUserId, id, al.GetClassStats(FindPlayerClass(id)));
@@ -1362,7 +1341,7 @@ public class GlobalManager : NetworkBehaviour
         }
         clientData[index].playerCosmetics.value = cosmeticIntList.ToArray();
 
-        clients[index].UpdateClass();
+        clientData[index].client.UpdateClass();
     }
 
     public int[] FindPlayerCosmetics(ulong id)
@@ -1399,7 +1378,7 @@ public class GlobalManager : NetworkBehaviour
         melee.weaponStats = meleeStats.ToList();
         clientData[index].playerGuns.Add(melee);
 
-        clients[index].UpdateGuns();
+        clientData[index].client.UpdateGuns();
     }
 
 
@@ -1412,18 +1391,25 @@ public class GlobalManager : NetworkBehaviour
     {
         for (int i = 0; i < clientData.Count; i++)
         {
-            SetPlayerCosmeticsClientRpc(true, id, clients[i].GetPlayerID(), clientData[i].playerCosmetics.value);
-            SetPlayerClassClientRpc(true, id, clients[i].GetPlayerID(), clientData[i].playerClass.value);
-            SetPlayerTeamClientRpc(true, id, clients[i].GetPlayerID(), clientData[i].playerTeam.value);
-            SetPlayerNameClientRpc(true, id, clients[i].GetPlayerID(), clientData[i].playerName.value);
-            SetPlayerGunsClientRpc(true, id, clients[i].GetPlayerID(), clientData[i].playerGuns[0].gunNameKey, clientData[i].playerGuns[0].weaponStats.ToArray(), clientData[i].playerGuns[1].gunNameKey, clientData[i].playerGuns[1].weaponStats.ToArray(), clientData[i].playerGuns[2].gunNameKey, clientData[i].playerGuns[2].weaponStats.ToArray());
+            int index = i;
+            SetPlayerCosmeticsClientRpc(true, id, clientData[index].playerId.value, clientData[index].playerCosmetics.value);
+            SetPlayerClassClientRpc(true, id, clientData[index].playerId.value, clientData[index].playerClass.value);
+            SetPlayerTeamClientRpc(true, id, clientData[index].playerId.value, clientData[index].playerTeam.value);
+            SetPlayerNameClientRpc(true, id, clientData[index].playerId.value, clientData[index].playerName.value);
+            SetPlayerGunsClientRpc(true, id, clientData[index].playerId.value, 
+                clientData[index].playerGuns[0].gunNameKey, 
+                clientData[index].playerGuns[0].weaponStats.ToArray(), 
+                clientData[index].playerGuns[1].gunNameKey, 
+                clientData[index].playerGuns[1].weaponStats.ToArray(), 
+                clientData[index].playerGuns[2].gunNameKey, 
+                clientData[index].playerGuns[2].weaponStats.ToArray());
         }
     }
 
     bool CheckIfIDIsOwner(ulong id)
     {
         int index = SearchClients(id);
-        if (clients[index].IsOwner && clients[index].GetPlayerID() < botID)
+        if (clientData[index].client.IsOwner && clientData[index].playerId.value < botID)
         {
             return true;
         }
@@ -1461,10 +1447,13 @@ public class PlayerData
     public SyncClass playerClass;
     public SyncTeam playerTeam;
     public SyncCosmetics playerCosmetics;
+    public Player client;
     public List<PlayerStats> playerStats;
     public List<PlayerGunData> playerGuns;
-    public List<PlayerInputData> playerInputs;
-    public List<PlayerPositionData> playerPositionData;
+    public PlayerInputData[] playerInputs;
+    public PlayerPositionData[] playerPositionData;
+    public int playerPositionIndex;
+    public int playerInputIndex;
 }
 
 [System.Serializable]
@@ -1533,7 +1522,7 @@ public struct SyncTeam : INetworkSerializable
 
 
 [System.Serializable]
-public class PlayerInputData : INetworkSerializable
+public struct PlayerInputData : INetworkSerializable
 {
     public Vector3 headsetPos;
     public Quaternion headsetRot;
@@ -1606,7 +1595,7 @@ public class PlayerStats : INetworkSerializable
 }
 
 [System.Serializable]
-public class PlayerPositionData : INetworkSerializable
+public struct PlayerPositionData : INetworkSerializable
 {
     //Position
     public Vector3 position;

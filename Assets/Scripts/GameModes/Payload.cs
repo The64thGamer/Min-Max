@@ -112,12 +112,12 @@ public class Payload : GenericGamemode
         }
 
         //Gather player original teams
-        List<Player> clients = gm.GetClients();
+        List<PlayerData> clientData = gm.GetClients();
         List<TeamList> teamColors = gm.GetTeamColors(false);
-        int[] clientTeams = new int[clients.Count];
-        for (int i = 0; i < clients.Count; i++)
+        int[] clientTeams = new int[clientData.Count];
+        for (int i = 0; i < clientData.Count; i++)
         {
-            TeamList color = gm.FindPlayerTeam(clients[i].GetPlayerID());
+            TeamList color = gm.FindPlayerTeam(clientData[i].playerId.value);
             for (int e = 0; e < teamColors.Count; e++)
             {
                 if (color == teamColors[e])
@@ -152,9 +152,9 @@ public class Payload : GenericGamemode
         if (IsHost)
         {
             //Re-apply Player Teams
-            for (int i = 0; i < clients.Count; i++)
+            for (int i = 0; i < clientData.Count; i++)
             {
-                gm.SetPlayerTeamClientRpc(false, 0, clients[i].GetPlayerID(), gm.GetTeams()[clientTeams[i]].teamColor);
+                gm.SetPlayerTeamClientRpc(false, 0, clientData[i].playerId.value, gm.GetTeams()[clientTeams[i]].teamColor);
             }
         }
         gm.ModifyTeamsAcrossServer();
@@ -163,12 +163,12 @@ public class Payload : GenericGamemode
     public override TeamList DecideWhichPlayerTeam()
     {
         //Decides based on which team has the least amount of players
-        List<Player> clients = gm.GetClients();
+        List<PlayerData> clientData = gm.GetClients();
         List<TeamList> teams = gm.GetTeamColors(true);
         int[] teamCounts = new int[teams.Count];
-        for (int i = 0; i < clients.Count; i++)
+        for (int i = 0; i < clientData.Count; i++)
         {
-            TeamList t = gm.FindPlayerTeam(clients[i].GetPlayerID());
+            TeamList t = clientData[i].playerTeam.value;
             for (int e = 0; e < teams.Count; e++)
             {
                 if (teams[e] == t)
@@ -189,10 +189,10 @@ public class Payload : GenericGamemode
         return teams[finalIndex];
     }
 
-    public override float RequestPlayerRespawnTimer(int index)
+    public override float RequestPlayerRespawnTimer(ulong id)
     {
         List<TeamInfo> tempTeams = gm.GetTeams();
-        TeamList playerTeam = gm.FindPlayerTeam(gm.GetClients()[index].GetPlayerID());
+        TeamList playerTeam = gm.FindPlayerTeam(id);
         for (int i = 1; i < tempTeams.Count; i++)
         {
             if (tempTeams[i].teamColor == playerTeam)

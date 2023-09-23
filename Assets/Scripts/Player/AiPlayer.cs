@@ -169,13 +169,13 @@ public class AiPlayer : NetworkBehaviour
 
     void ChangeFocus()
     {
-        List<Player> clients = gm.GetClients();
+        List<PlayerData> clientData = gm.GetClients();
         RaycastHit hit;
         Player currentFind = null;
-        for (int i = 0; i < clients.Count; i++)
+        for (int i = 0; i < clientData.Count; i++)
         {
             //Check for players within view
-            if (Physics.Raycast(headset.position, clients[i].GetTracker().GetCamera().position + (Vector3.up * -0.4f) - headset.position, out hit))
+            if (Physics.Raycast(headset.position, clientData[i].client.GetTracker().GetCamera().position + (Vector3.up * -0.4f) - headset.position, out hit))
             {
                 Player collidePlayer = hit.collider.GetComponent<Player>();
                 if (collidePlayer != null)

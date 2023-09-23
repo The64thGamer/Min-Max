@@ -52,45 +52,165 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   labourer:
-    baseHealth: 300
-    baseSpeed: 75
-    classEyeHeight: 1.584
+  - statName: 0
+    stat: 100
+    lastTimeSynced: 0
+  - statName: 1
+    stat: 100
+    lastTimeSynced: 0
+  - statName: 3
+    stat: 100
+    lastTimeSynced: 0
+  - statName: 4
+    stat: 100
+    lastTimeSynced: 0
+  - statName: 2
+    stat: 30
+    lastTimeSynced: 0
   woodworker:
-    baseHealth: 200
-    baseSpeed: 80
-    classEyeHeight: 1.584
+  - statName: 0
+    stat: 100
+    lastTimeSynced: 0
+  - statName: 1
+    stat: 100
+    lastTimeSynced: 0
+  - statName: 3
+    stat: 100
+    lastTimeSynced: 0
+  - statName: 4
+    stat: 100
+    lastTimeSynced: 0
+  - statName: 2
+    stat: 30
+    lastTimeSynced: 0
   developer:
-    baseHealth: 175
-    baseSpeed: 90
-    classEyeHeight: 1.584
+  - statName: 0
+    stat: 100
+    lastTimeSynced: 0
+  - statName: 1
+    stat: 100
+    lastTimeSynced: 0
+  - statName: 3
+    stat: 100
+    lastTimeSynced: 0
+  - statName: 4
+    stat: 100
+    lastTimeSynced: 0
+  - statName: 2
+    stat: 30
+    lastTimeSynced: 0
   programmer:
-    baseHealth: 150
-    baseSpeed: 100
-    classEyeHeight: 1.584
+  - statName: 0
+    stat: 100
+    lastTimeSynced: 0
+  - statName: 1
+    stat: 100
+    lastTimeSynced: 0
+  - statName: 3
+    stat: 100
+    lastTimeSynced: 0
+  - statName: 4
+    stat: 100
+    lastTimeSynced: 0
+  - statName: 2
+    stat: 30
+    lastTimeSynced: 0
   computer:
-    baseHealth: 125
-    baseSpeed: 100
-    classEyeHeight: 1.646
+  - statName: 0
+    stat: 100
+    lastTimeSynced: 0
+  - statName: 1
+    stat: 100
+    lastTimeSynced: 0
+  - statName: 3
+    stat: 100
+    lastTimeSynced: 0
+  - statName: 4
+    stat: 100
+    lastTimeSynced: 0
+  - statName: 2
+    stat: 30
+    lastTimeSynced: 0
   fabricator:
-    baseHealth: 125
-    baseSpeed: 110
-    classEyeHeight: 1.4116
+  - statName: 0
+    stat: 100
+    lastTimeSynced: 0
+  - statName: 1
+    stat: 100
+    lastTimeSynced: 0
+  - statName: 3
+    stat: 100
+    lastTimeSynced: 0
+  - statName: 4
+    stat: 100
+    lastTimeSynced: 0
+  - statName: 2
+    stat: 30
+    lastTimeSynced: 0
   artist:
-    baseHealth: 100
-    baseSpeed: 125
-    classEyeHeight: 1.584
+  - statName: 0
+    stat: 100
+    lastTimeSynced: 0
+  - statName: 1
+    stat: 100
+    lastTimeSynced: 0
+  - statName: 3
+    stat: 100
+    lastTimeSynced: 0
+  - statName: 4
+    stat: 100
+    lastTimeSynced: 0
+  - statName: 2
+    stat: 30
+    lastTimeSynced: 0
   castmember:
-    baseHealth: 100
-    baseSpeed: 125
-    classEyeHeight: 1.584
+  - statName: 0
+    stat: 100
+    lastTimeSynced: 0
+  - statName: 1
+    stat: 100
+    lastTimeSynced: 0
+  - statName: 3
+    stat: 100
+    lastTimeSynced: 0
+  - statName: 4
+    stat: 100
+    lastTimeSynced: 0
+  - statName: 2
+    stat: 30
+    lastTimeSynced: 0
   craftsman:
-    baseHealth: 150
-    baseSpeed: 100
-    classEyeHeight: 1.584
+  - statName: 0
+    stat: 100
+    lastTimeSynced: 0
+  - statName: 1
+    stat: 100
+    lastTimeSynced: 0
+  - statName: 3
+    stat: 100
+    lastTimeSynced: 0
+  - statName: 4
+    stat: 100
+    lastTimeSynced: 0
+  - statName: 2
+    stat: 30
+    lastTimeSynced: 0
   manager:
-    baseHealth: 125
-    baseSpeed: 110
-    classEyeHeight: 1.584
+  - statName: 0
+    stat: 100
+    lastTimeSynced: 0
+  - statName: 1
+    stat: 100
+    lastTimeSynced: 0
+  - statName: 3
+    stat: 100
+    lastTimeSynced: 0
+  - statName: 4
+    stat: 100
+    lastTimeSynced: 0
+  - statName: 2
+    stat: 30
+    lastTimeSynced: 0
   mMChips:
   - buffsNerfs:
     - buffNerf: 1
@@ -106,7 +226,7 @@ MonoBehaviour:
     firePrefab: {fileID: 922140614253316042, guid: 53704ecba574ad240816d00222ea8601,
       type: 3}
     altFirePrefab: {fileID: 0}
-  - gunName: O-S F-O
+  - gunName: OS-FO
     gunPrefab: {fileID: 1279211091985373482, guid: 1f924fd53cd6049459bc4ac106a15d1c,
       type: 3}
     firePrefab: {fileID: 922140614253316042, guid: 53704ecba574ad240816d00222ea8601,
@@ -131,6 +251,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   ServerTickRate:
     m_InternalValue: 60
+  clientData: []
   co: {fileID: 2645215035361401876}
   achievments: {fileID: 4213602069014871988}
   clientPrefab: {fileID: 8093838907312818641, guid: 183b441558cd63c45bf2e7be831cfa21,
@@ -296,33 +417,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 64791ffe257d9694bbde984f31a93a4b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  clients:
-  - playerName:
-      value: 
-      lastTimeSynced: 0
-    playerId:
-      value: 0
-      lastTimeSynced: 0
-    playerStats:
-    - statName: 0
-      stat: 0
-      lastTimeSynced: 0
-    playerGuns:
-    - gunNameKey: 
-      weaponStats: []
-    playerInputs:
-      headsetPos: {x: 0, y: 0, z: 0}
-      headsetRot: {x: 0, y: 0, z: 0, w: 0}
-      rHandPos: {x: 0, y: 0, z: 0}
-      rHandRot: {x: 0, y: 0, z: 0, w: 0}
-      lHandPos: {x: 0, y: 0, z: 0}
-      lHandRot: {x: 0, y: 0, z: 0, w: 0}
-      rightJoystick: {x: 0, y: 0}
-      jump: 0
-      shoot: 0
-      crouch: 0
-      menu: 0
-      lastTimeSynced: 0
 --- !u!1001 &1826620726766891009
 PrefabInstance:
   m_ObjectHideFlags: 0

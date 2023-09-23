@@ -129,7 +129,8 @@ namespace StarterAssets
 
             Vector3 oldPos = transform.position;
 
-            currentPositionData = MovePlayer(currentPositionData, currentInputData, NetworkManager.LocalTime.TimeAsFloat - currentPositionData.lastTimeSynced);
+            //old deltatime function == NetworkManager.LocalTime.TimeAsFloat - currentPositionData.lastTimeSynced;
+            currentPositionData = MovePlayer(currentPositionData, currentInputData, Time.deltaTime);
 
             _controller.Move(currentPositionData.velocity);
 
@@ -137,7 +138,7 @@ namespace StarterAssets
             {
                 if (IsOwner)
                 {
-                    gm.SetPlayerPositionDataClientRpc(false, 0, player.GetPlayerID(), currentPositionData);
+                    gm.SetPlayerPositionDataClientRpc(false,0,player.GetPlayerID(), currentPositionData);
                 }
                 else if (nowSendServerValues || player.GetPlayerID() >= botID)
                 {

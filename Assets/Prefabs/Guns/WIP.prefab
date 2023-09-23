@@ -51,24 +51,34 @@ MonoBehaviour:
   changableStats:
   - statName: 2
     stat: 60
+    lastTimeSynced: 0
   - statName: 11
     stat: 60
+    lastTimeSynced: 0
   - statName: 3
     stat: 6
+    lastTimeSynced: 0
   - statName: 10
     stat: 6
+    lastTimeSynced: 0
   - statName: 1
     stat: 1
+    lastTimeSynced: 0
   - statName: 0
     stat: 4
+    lastTimeSynced: 0
   - statName: 4
     stat: 200
+    lastTimeSynced: 0
   - statName: 5
     stat: 22
+    lastTimeSynced: 0
   - statName: 6
     stat: 0
+    lastTimeSynced: 0
   - statName: 9
     stat: 1.5
+    lastTimeSynced: 0
   weaponPos:
   - classUsed: 3
     frontPos: {x: 0, y: 1, z: 0.5}
@@ -76,7 +86,7 @@ MonoBehaviour:
     leftPos: {x: -1, y: 1, z: 0.5}
     upPos: {x: 0, y: 1.5, z: 0.5}
     downPos: {x: 0, y: 0.5, z: 0.5}
-  gunNameKey: Worker Ionizing Pistol
+  gunNameKey: W.I.P.
   currentPlayer: {fileID: 0}
   animator: {fileID: 4923113546473925071}
   firePoint: {fileID: 5960225029509838066}

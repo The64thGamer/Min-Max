@@ -331,7 +331,6 @@ public class Player : NetworkBehaviour
                 if (visible)
                 {
                     List<Cosmetic> classCosmetics = gm.GetCosmetics().GetClassCosmetics(currentClass);
-                    Debug.Log(classCosmetics.Count + " AAA " + cosmeticInts.Length);
                     //Reveal class
                     playerModels[i].SetActive(true);
 

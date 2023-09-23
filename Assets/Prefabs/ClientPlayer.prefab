@@ -28731,12 +28731,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   currentGun: {fileID: 0}
-  currentTeam: 0
-  currentClass: 3
-  currentStats:
-    baseHealth: 0
-    baseSpeed: 0
-    classEyeHeight: 0
+  guns: []
   playerModels:
   - {fileID: 8187831611808316676}
   - {fileID: 8187831611808316676}
