@@ -211,7 +211,7 @@ public class HealthChanger : NetworkBehaviour
                 {
                     ammoFinal = Mathf.CeilToInt((gm.FindPlayerGunValue(id, gun, ChangableWeaponStats.maxAmmo) / 100.0f) * health);
                 }
-                ammoFinal = Mathf.Min(ammoFinal, (int)gm.FindPlayerGunValue(id, gun, ChangableWeaponStats.maxAmmo));
+                ammoFinal = Mathf.Min((int)gm.FindPlayerGunValue(id, gun, ChangableWeaponStats.currentAmmo) + ammoFinal, (int)gm.FindPlayerGunValue(id, gun, ChangableWeaponStats.maxAmmo));
                 if(IsHost)
                 {
                     gm.SetPlayerGunValueClientRpc(false, 0, id, gun, ChangableWeaponStats.currentAmmo, ammoFinal);
