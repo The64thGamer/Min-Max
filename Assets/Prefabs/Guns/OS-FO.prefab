@@ -52,24 +52,34 @@ MonoBehaviour:
   changableStats:
   - statName: 1
     stat: 10
+    lastTimeSynced: 0
   - statName: 0
     stat: 1
+    lastTimeSynced: 0
   - statName: 4
     stat: 200
-  - statName: 6
-    stat: 15
+    lastTimeSynced: 0
   - statName: 6
     stat: 4
+    lastTimeSynced: 0
   - statName: 5
     stat: 15
+    lastTimeSynced: 0
+  - statName: 2
+    stat: 15
+    lastTimeSynced: 0
   - statName: 11
     stat: 15
+    lastTimeSynced: 0
   - statName: 3
     stat: 3
+    lastTimeSynced: 0
   - statName: 10
     stat: 3
+    lastTimeSynced: 0
   - statName: 9
     stat: 1
+    lastTimeSynced: 0
   weaponPos: []
   gunNameKey: OS-FO
   currentPlayer: {fileID: 0}

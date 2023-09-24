@@ -30,7 +30,7 @@ public class HealthChanger : NetworkBehaviour
     float loopTimer;
     float respawningTimer;
     List<Player> currentPlayer = new List<Player>();
-    bool alreadyDespawn;
+    bool stateFinishedChanging;
     NetworkVariable<bool> currentState = new NetworkVariable<bool>(true, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
     GlobalManager gm;
     private void Start()
@@ -89,10 +89,10 @@ public class HealthChanger : NetworkBehaviour
             {
                 case DamageChangerSettings.despawnOnTouch:
                     respawningTimer = Mathf.Max(0, respawningTimer - Time.deltaTime);
-                    if (respawningTimer == 0)
+                    if (respawningTimer <= 0)
                     {
                         RespawnDespawn(true);
-                        alreadyDespawn = true;
+                        stateFinishedChanging = true;
                     }
                     break;
                 case DamageChangerSettings.loopWhileInside:
@@ -126,15 +126,17 @@ public class HealthChanger : NetworkBehaviour
                 case DamageChangerSettings.despawnOnTouch:
                     if (respawningTimer <= 0)
                     {
-                        alreadyDespawn = false;
-                        respawningTimer = respawnTime;
+
                         for (int i = 0; i < currentPlayer.Count; i++)
                         {
                             if (currentPlayer[i] != null)
                             {
                                 if (TakeDamage(i))
                                 {
+                                    stateFinishedChanging = false;
+                                    respawningTimer = respawnTime;
                                     RespawnDespawn(false);
+                                    return;
                                 }
                             }
                         }
@@ -171,35 +173,50 @@ public class HealthChanger : NetworkBehaviour
 
     bool TakeDamage(int i)
     {
+        ulong id = currentPlayer[i].GetPlayerID();
         switch (dispenseType)
         {
             case HealthChangerVariant.health:
-                int oldHealth = (int)gm.FindPlayerStat(currentPlayer[i].GetPlayerID(),ChangablePlayerStats.currentHealth);
+                int oldHealth = (int)gm.FindPlayerStat(id, ChangablePlayerStats.currentHealth);
                 int healthFinal = health;
                 if (healthIsPercent)
                 {
-                    healthFinal = Mathf.CeilToInt((gm.FindPlayerStat(currentPlayer[i].GetPlayerID(), ChangablePlayerStats.maxHealth) / 100.0f) * health);
+                    healthFinal = Mathf.CeilToInt((gm.FindPlayerStat(id, ChangablePlayerStats.maxHealth) / 100.0f) * health);
                 }
                 if (dontKill && oldHealth + healthFinal <= 0)
                 {
                     healthFinal = -oldHealth + 1;
                 }
 
-                if (currentPlayer[i].ChangeHealth(currentPlayer[i].GetPlayerID(), healthFinal, Random.Range(-999999999, 999999999)) == oldHealth)
+                if (currentPlayer[i].ChangeHealth(id, healthFinal, Random.Range(-999999999, 999999999)) == oldHealth)
                 {
                     return false;
                 }
                 else
                 {
-                    if (gm.FindPlayerStat(currentPlayer[i].GetPlayerID(), ChangablePlayerStats.currentHealth) + healthFinal <= 0)
+                    if (gm.FindPlayerStat(id, ChangablePlayerStats.currentHealth) + healthFinal <= 0)
                     {
                         currentPlayer[i] = null;
                     }
                     return true;
                 }
             case HealthChangerVariant.ammo:
-                //AAAAAAAAAAAAAAAAAAA
-                break;
+                int ammoFinal = health;
+                string gun = gm.FindPlayerGun(id, (int)gm.FindPlayerStat(id, ChangablePlayerStats.currentlyHeldWeapon));
+                if(gm.FindPlayerGunValue(id,gun,ChangableWeaponStats.currentAmmo) >= gm.FindPlayerGunValue(id, gun, ChangableWeaponStats.maxAmmo))
+                {
+                    return false;
+                }
+                if (healthIsPercent)
+                {
+                    ammoFinal = Mathf.CeilToInt((gm.FindPlayerGunValue(id, gun, ChangableWeaponStats.maxAmmo) / 100.0f) * health);
+                }
+                ammoFinal = Mathf.Min(ammoFinal, (int)gm.FindPlayerGunValue(id, gun, ChangableWeaponStats.maxAmmo));
+                if(IsHost)
+                {
+                    gm.SetPlayerGunValueClientRpc(false, 0, id, gun, ChangableWeaponStats.currentAmmo, ammoFinal);
+                }
+                return true;
             default:
                 break;
         }
@@ -208,12 +225,15 @@ public class HealthChanger : NetworkBehaviour
 
     void ClientRespawn(bool prev, bool current)
     {
-        RespawnDespawn(currentState.Value);
+        if (!IsHost)
+        {
+            RespawnDespawn(currentState.Value);
+        }
     }
 
     void RespawnDespawn(bool respawn)
     {
-        if (!alreadyDespawn)
+        if (!stateFinishedChanging)
         {
             Renderer[] rend = this.GetComponentsInChildren<Renderer>();
             for (int i = 0; i < rend.Length; i++)
@@ -223,7 +243,12 @@ public class HealthChanger : NetworkBehaviour
             this.GetComponent<BoxCollider>().enabled = respawn;
             if (!respawn)
             {
+                Debug.Log("Pack Despawned");
                 currentPlayer = new List<Player>();
+            }
+            else
+            {
+                Debug.Log("Pack Respawned");
             }
             if(IsHost)
             {
