@@ -281,7 +281,7 @@ public class GlobalManager : NetworkBehaviour
         }
         for (int i = 0; i < clientData.Count; i++)
         {
-            clientData[i].client.UpdateTeamColor();
+            clientData[i].client.UpdateTeam();
         }
     }
 
@@ -858,7 +858,6 @@ public class GlobalManager : NetworkBehaviour
         //Refresh Stats
         clientData[i].client.RespawnPlayer(spawnPos, respawnTimer);
         UpdateMatchFocalPoint(FindPlayerTeam(id));
-        return;
     }
 
     [ClientRpc]
@@ -1245,7 +1244,7 @@ public class GlobalManager : NetworkBehaviour
 
         int index = SearchClients(id);
         clientData[index].playerTeam.value = value;
-        clientData[index].client.UpdateTeamColor();
+        clientData[index].client.UpdateTeam();
     }
 
     public void AddPlayerToClientList(Player player)

@@ -211,7 +211,7 @@ public class Player : NetworkBehaviour
         UpdateTeamColor();
     }
 
-    public void UpdateTeamColor()
+    void UpdateTeamColor()
     {
 
         //Player
@@ -505,7 +505,7 @@ public class Player : NetworkBehaviour
             }
             int finalHealth = (int)Mathf.Min(currentHealth + amount, gm.FindPlayerStat(GetPlayerID(), ChangablePlayerStats.maxHealth));
             gm.PlayerTookDamageClientRpc(GetPlayerID(), finalHealth, id, idHash);
-            if (currentHealth <= 0)
+            if (finalHealth <= 0)
             {
                 gm.RespawnPlayer(GetPlayerID(), gm.FindPlayerTeam(GetPlayerID()), false);
             }
